@@ -1,5 +1,6 @@
 import { Context, Schema, h } from "koishi";
 import * as utils from "./utils.ts";
+import { ImageType } from "./utils.ts";
 import * as puppeteer from "koishi-plugin-puppeteer";
 import fs from "fs";
 import * as cheerio from "cheerio";
@@ -32,7 +33,7 @@ export async function apply(ctx: Context, config: Config) {
     // write your plugin here
     utils.CONFIGS.STRATZ_API.TOKEN = config.STRATZ_API_TOKEN; // 读取配置API_TOKEN
 
-    ctx.command("订阅本群","订阅后还需玩家在本群绑定SteamID")
+    ctx.command("订阅本群", "订阅后还需玩家在本群绑定SteamID")
         .usage("订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。")
         .action(async ({ session }) => {
             if (session.guild) {
@@ -345,10 +346,12 @@ export async function apply(ctx: Context, config: Config) {
                         if (!AbilitiesConstantsCN || AbilitiesConstantsCN.gameVersionsId < queryConstants.gameVersions[0].id) {
                             session.send("初次使用或版本更新，正在更新英雄技能数据中……");
                             let queryRes2 = await utils.query(utils.ALL_ABILITIES_CHINESE_NAME());
-                            
+
                             if (queryRes2.status == 200) {
                                 AbilitiesConstantsCN.data = queryRes2.data.data.constants;
-                                await ctx.database.upsert("dt_constants_abilities_cn", (row) => [{ id: 1, data: AbilitiesConstantsCN, gameVersionId: queryConstants.gameVersions[0].id, gameVersionName: queryConstants.gameVersions[0].name }]);
+                                await ctx.database.upsert("dt_constants_abilities_cn", (row) => [
+                                    { id: 1, data: AbilitiesConstantsCN, gameVersionId: queryConstants.gameVersions[0].id, gameVersionName: queryConstants.gameVersions[0].name },
+                                ]);
                             } else throw 0;
                         }
                     } else throw 0;
@@ -619,8 +622,8 @@ function genMatchImageHTML(match) {
     };
     // 填充头部比赛信息模板
     let matchInfo_html = `
-    <img src="${utils.getBase64ImageFromLocal("flag_radiant")}" alt="" class="flag radiant${match.didRadiantWin ? " won" : ""}" style="order: 1" />
-    <img src="${utils.getBase64ImageFromLocal("flag_dire")}" alt="" class="flag dire${match.didRadiantWin ? "" : " won"}" style="order: 3" />
+    <img src="${utils.getImageUrl("flag_radiant")}" alt="" class="flag radiant${match.didRadiantWin ? " won" : ""}" style="order: 1" />
+    <img src="${utils.getImageUrl("flag_dire")}" alt="" class="flag dire${match.didRadiantWin ? "" : " won"}" style="order: 3" />
     <p class="won${match.didRadiantWin ? " radiant" : ""}">获胜</p>
     <div class="details" style="order: 2">
         <p>比赛编号：<span class="match_id">${match.id}</span></p>
@@ -629,8 +632,8 @@ function genMatchImageHTML(match) {
         <p>起始时间：<span class="start_time">${moment(new Date(match.startDateTime * 1000))
             .format("YYYY-MM-DD HH:mm:ss")
             .slice(2)}</span></p>
-        <img src="${utils.getBase64ImageFromLocal("star_" + match.rank?.toString().split("")[1])}" alt="" class="star">
-        <img src="${utils.getBase64ImageFromLocal("medal_" + match.rank?.toString().split("")[0])}" alt="" class="rank">
+        <img src="${utils.getImageUrl("star_" + match.rank?.toString().split("")[1])}" alt="" class="star">
+        <img src="${utils.getImageUrl("medal_" + match.rank?.toString().split("")[0])}" alt="" class="rank">
         <p>结束时间：<span class="end_time">${moment(new Date(match.endDateTime * 1000))
             .format("YYYY-MM-DD HH:mm:ss")
             .slice(2)}</span></p>
@@ -649,7 +652,7 @@ function genMatchImageHTML(match) {
     <div class="player${player.hero.id == 80 ? " bear" : ""}${player.leaverStatus != "NONE" && player.leaverStatus != "DISCONNECTED" ? " giveup" : ""}" style="order:${player.position?.slice(-1)}">
         <div class="hero">
             <div class="player_avatar">
-                <img alt="" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/${player.hero.shortName}.png" />
+                <img alt="" src="${utils.getImageUrl(player.hero.shortName, ImageType.Heroes)}" />
                 <p class="party_line${player.partyId != null ? " party_" + match.party[player.partyId] : ""}"></p>
                 <p class="party_mark${player.partyId != null ? " party_" + match.party[player.partyId] : ""}"></p>
                 <p class="position p${Math.floor(player.order / 4) + 1}">${player.isRandom ? "随机" : `第<span>${player.order ? player.order + 1 : "-"}</span>手`}<br/>${d2a.position[player.position?.slice(-1)]}</p>
@@ -671,7 +674,7 @@ function genMatchImageHTML(match) {
                 player.steamAccount.seasonRank
                     ? `
                 <div class="rank">
-                    <img class="medal" src="${utils.getBase64ImageFromLocal(
+                    <img class="medal" src="${utils.getImageUrl(
                         "medal_" +
                             (player.steamAccount.seasonLeaderboardRank
                                 ? player.steamAccount.seasonLeaderboardRank <= 100
@@ -684,18 +687,18 @@ function genMatchImageHTML(match) {
                     ${
                         !player.steamAccount.seasonLeaderboardRank
                             ? `
-                    <img class="star" src="${utils.getBase64ImageFromLocal("star_" + player.steamAccount.seasonRank.toString().split("")[1])}" alt="" />`
+                    <img class="star" src="${utils.getImageUrl("star_" + player.steamAccount.seasonRank.toString().split("")[1])}" alt="" />`
                             : `
                     <p>${player.steamAccount.seasonLeaderboardRank}</p>`
                     }
                 </div>`
                     : `
                 <div class="norank">
-                    <img class="medal" src="${utils.getBase64ImageFromLocal("medal_0")}" alt="" />
+                    <img class="medal" src="${utils.getImageUrl("medal_0")}" alt="" />
                 </div>`
             }
                 <div class="dotaPlusLevel"${!player.dotaPlus ? ` style="display:none"` : ""}>
-                    <img src="${utils.getBase64ImageFromLocal("hero_badge_" + (player.dotaPlus ? Math.ceil((player.dotaPlus?.level + 1) / 6) : 1))}" alt="" class="badge">
+                    <img src="${utils.getImageUrl("hero_badge_" + (player.dotaPlus ? Math.ceil((player.dotaPlus?.level + 1) / 6) : 1))}" alt="" class="badge">
                     <p class="level">${player.dotaPlus?.level}</p>
                 </div>
             </div>
@@ -713,12 +716,12 @@ function genMatchImageHTML(match) {
                     item
                         ? `
                 <div class="item${item.isRecipe ? " recipe" : ""}">
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${item.name}.png" alt="" />
+                    <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
                     <p class="time">${sec2time(item.time)}</p>
                 </div>`
                         : `
                 <div class="item" style="visibility:hidden"}">
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/blink.png" alt="" />
+                    <img src="${utils.getImageUrl("blink", ImageType.Items)}" alt="" />
                     <p class="time">--:--</p>
                 </div>`
                 )
@@ -730,18 +733,18 @@ function genMatchImageHTML(match) {
                     item
                         ? `
                 <div class="item back${item.isRecipe ? " recipe" : ""}">
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${item.name}.png" alt="" />
+                    <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
                     <p class="time">${sec2time(item.time)}</p>
                 </div>`
                         : `
                 <div class="item back" style="visibility:hidden"}">
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/blink.png" alt="" />
+                    <img src="${utils.getImageUrl("blink", ImageType.Items)}" alt="" />
                     <p class="time">--:--</p>
                 </div>`
                 )
                 .join("")}
             </div>
-            <div class="item neutral" style="background-image: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${dotaconstants.item_ids[player.neutral0Id]}.png)"></div>
+            <div class="item neutral" style="background-image: url(${utils.getImageUrl(dotaconstants.item_ids[player.neutral0Id], ImageType.Items)})"></div>
         </div>
         <div class="buffs">
             <section>
@@ -749,11 +752,7 @@ function genMatchImageHTML(match) {
                     ?.map(
                         (buff) => `
                 <div class="buff">
-                    ${
-                        buff.abilityId
-                            ? `<img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/${dotaconstants.ability_ids[buff.abilityId]}.png" alt="" />`
-                            : `<img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${dotaconstants.item_ids[buff.itemId]}.png" alt="" />`
-                    }
+                    <img src="${utils.getImageUrl(dotaconstants[buff.abilityId ? "ability_ids" : "item_ids"][buff.abilityId ?? buff.itemId], buff.abilityId ? ImageType.Abilities : ImageType.Items)}" alt="" />
                     <p>${buff.stackCount ?? ""}</p>
                 </div>`
                     )
@@ -761,23 +760,23 @@ function genMatchImageHTML(match) {
             </section>
             <section>
                 <div class="support_item"${player.supportItemsCount[30] > 0 ? "" : ' style="display:none"'}>
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/gem.png" alt="" />
+                    <img src="${utils.getImageUrl("gem", ImageType.Items)}" alt="" />
                     <p>${player.supportItemsCount[30]}</p>
                 </div>
                 <div class="support_item"${player.supportItemsCount[40] > 0 ? "" : ' style="display:none"'}>
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/dust.png" alt="" />
+                    <img src="${utils.getImageUrl("dust", ImageType.Items)}" alt="" />
                     <p>${player.supportItemsCount[40]}</p>
                 </div>
                 <div class="support_item"${player.supportItemsCount[42] > 0 ? "" : ' style="display:none"'}>
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/ward_observer.png" alt="" />
+                    <img src="${utils.getImageUrl("ward_observer", ImageType.Items)}" alt="" />
                     <p>${player.supportItemsCount[42]}</p>
                 </div>
                 <div class="support_item"${player.supportItemsCount[43] > 0 ? "" : ' style="display:none"'}>
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/ward_sentry.png" alt="" />
+                    <img src="${utils.getImageUrl("ward_sentry", ImageType.Items)}" alt="" />
                     <p>${player.supportItemsCount[43]}</p>
                 </div>
                 <div class="support_item"${player.supportItemsCount[188] > 0 ? "" : ' style="display:none"'}>
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/smoke_of_deceit.png" alt="" />
+                    <img src="${utils.getImageUrl("smoke_of_deceit", ImageType.Items)}" alt="" />
                     <p>${player.supportItemsCount[188]}</p>
                 </div>
             </section>
@@ -790,33 +789,33 @@ function genMatchImageHTML(match) {
                         item
                             ? `
                 <div class="item${item.isRecipe ? " recipe" : ""}">
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${item.name}.png" alt="" />
+                    <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
                     <p class="time">${sec2time(item.time)}</p>
                 </div>`
                             : `
                 <div class="item" style="visibility:hidden"}">
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/blink.png" alt="" />
+                    <img src="${utils.getImageUrl("blink", ImageType.Items)}" alt="" />>
                     <p class="time">--:--</p>
                 </div>`
                     )
                     .join("")}
-                    ${player.backpacks
-                        .map((item) =>
-                            item
-                                ? `
+                ${player.backpacks
+                    .map((item) =>
+                        item
+                            ? `
                 <div class="item back${item.isRecipe ? " recipe" : ""}">
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${item.name}.png" alt="" />
+                    <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
                     <p class="time">${sec2time(item.time)}</p>
                 </div>`
-                                : `
+                            : `
                 <div class="item back" style="visibility:hidden"}">
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/blink.png" alt="" />
+                    <img src="${utils.getImageUrl("blink", ImageType.Items)}" alt="" />
                     <p class="time">--:--</p>
                 </div>`
-                        )
-                        .join("")}
+                    )
+                    .join("")}
                 <div class="item neutral">
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${dotaconstants.item_ids[player.neutral0Id]}.png" alt="" />
+                    <img src="${utils.getImageUrl(dotaconstants.item_ids[player.neutral0Id], ImageType.Items)}" alt="" />
                 </div>
             </div>
             <div class="buffs master">
@@ -824,82 +823,77 @@ function genMatchImageHTML(match) {
                     ?.map(
                         (buff) => `
                 <div class="buff">
-                    ${
-                        buff.abilityId
-                            ? `<img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/${dotaconstants.ability_ids[buff.abilityId]}.png" alt="" />`
-                            : `<img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${dotaconstants.item_ids[buff.itemId]}.png" alt="" />`
-                    }
+                    <img src="${utils.getImageUrl(dotaconstants[buff.abilityId ? "ability_ids" : "item_ids"][buff.abilityId ?? buff.itemId], buff.abilityId ? ImageType.Abilities : ImageType.Items)}" alt="" />
                     <p>${buff.stackCount ?? ""}</p>
                 </div>`
                     )
                     .join("")}
             </div>
         </div>
-    <div class="items_buffs slave">
-        <div class="items slave">
-            
-            ${player.unitItems
-                .map((item) =>
-                    item
-                        ? `
-            <div class="item${item.isRecipe ? " recipe" : ""}">
-                <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${item.name}.png" alt="" />
-                <p class="time">${sec2time(item.time)}</p>
-            </div>`
-                        : `
-            <div class="item" style="visibility:hidden"}">
-                <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/blink.png" alt="" />
-                <p class="time">--:--</p>
-            </div>`
-                )
-                .join("")}
-            ${player.unitBackpacks
-                .map((item) =>
-                    item
-                        ? `
-            <div class="item back${item.isRecipe ? " recipe" : ""}">
-                <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${item.name}.png" alt="" />
-                <p class="time">${sec2time(item.time)}</p>
-            </div>`
-                        : `
-            <div class="item back" style="visibility:hidden"}">
-                <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/blink.png" alt="" />
-                <p class="time">--:--</p>
-            </div>`
-                )
-                .join("")}
-            <div class="item neutral">
-                <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${dotaconstants.item_ids[player.additionalUnit.neutral0Id]}.png" alt="" />
-            </div>
-        </div>
-        <div class="buffs_supportItems slave">
-            <div class="buffs">
-                <!-- 无有效API获取熊灵buff -->
-            </div>
-            <div class="support_items">
-                <div class="support_item"${player.supportItemsCount[30] > 0 ? "" : ' style="display:none"'}>
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/gem.png" alt="" />
-                    <p>${player.supportItemsCount[30]}</p>
-                </div>
-                <div class="support_item"${player.supportItemsCount[40] > 0 ? "" : ' style="display:none"'}>
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/dust.png" alt="" />
-                    <p>${player.supportItemsCount[40]}</p>
-                </div>
-                <div class="support_item"${player.supportItemsCount[42] > 0 ? "" : ' style="display:none"'}>
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/ward_observer.png" alt="" />
-                    <p>${player.supportItemsCount[42]}</p>
-                </div>
-                <div class="support_item"${player.supportItemsCount[43] > 0 ? "" : ' style="display:none"'}>
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/ward_sentry.png" alt="" />
-                    <p>${player.supportItemsCount[43]}</p>
-                </div>
-                <div class="support_item"${player.supportItemsCount[188] > 0 ? "" : ' style="display:none"'}>
-                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/smoke_of_deceit.png" alt="" />
-                    <p>${player.supportItemsCount[188]}</p>
+        <div class="items_buffs slave">
+            <div class="items slave">
+                ${player.unitItems
+                    .map((item) =>
+                        item
+                            ? `
+                <div class="item${item.isRecipe ? " recipe" : ""}">
+                    <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
+                    <p class="time">${sec2time(item.time)}</p>
+                </div>`
+                            : `
+                <div class="item" style="visibility:hidden"}">
+                    <img src="${utils.getImageUrl("blink", ImageType.Items)}" alt="" />>
+                    <p class="time">--:--</p>
+                </div>`
+                    )
+                    .join("")}
+                ${player.unitBackpacks
+                    .map((item) =>
+                        item
+                            ? `
+                <div class="item back${item.isRecipe ? " recipe" : ""}">
+                    <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
+                    <p class="time">${sec2time(item.time)}</p>
+                </div>`
+                            : `
+                <div class="item back" style="visibility:hidden"}">
+                    <img src="${utils.getImageUrl("blink", ImageType.Items)}" alt="" />
+                    <p class="time">--:--</p>
+                </div>`
+                    )
+                    .join("")}
+                <div class="item neutral">
+                    <img src="${utils.getImageUrl(dotaconstants.item_ids[player.additionalUnit.neutral0Id], ImageType.Items)}" alt="" />
                 </div>
             </div>
-        </div>
-    </div>`
+            <div class="buffs_supportItems slave">
+                <div class="buffs">
+                    <!-- 无有效API获取熊灵buff -->
+                </div>
+                <div class="support_items">
+                    <div class="support_item"${player.supportItemsCount[30] > 0 ? "" : ' style="display:none"'}>
+                        <img src="${utils.getImageUrl("gem", ImageType.Items)}" alt="" />
+                        <p>${player.supportItemsCount[30]}</p>
+                    </div>
+                    <div class="support_item"${player.supportItemsCount[40] > 0 ? "" : ' style="display:none"'}>
+                        <img src="${utils.getImageUrl("dust", ImageType.Items)}" alt="" />
+                        <p>${player.supportItemsCount[40]}</p>
+                    </div>
+                    <div class="support_item"${player.supportItemsCount[42] > 0 ? "" : ' style="display:none"'}>
+                        <img src="${utils.getImageUrl("ward_observer", ImageType.Items)}" alt="" />
+                        <p>${player.supportItemsCount[42]}</p>
+                    </div>
+                    <div class="support_item"${player.supportItemsCount[43] > 0 ? "" : ' style="display:none"'}>
+                        <img src="${utils.getImageUrl("ward_sentry", ImageType.Items)}" alt="" />
+                        <p>${player.supportItemsCount[43]}</p>
+                    </div>
+                    <div class="support_item"${player.supportItemsCount[188] > 0 ? "" : ' style="display:none"'}>
+                        <img src="${utils.getImageUrl("smoke_of_deceit", ImageType.Items)}" alt="" />
+                        <p>${player.supportItemsCount[188]}</p>
+                    </div>
+                </div>
+            </div>
+        </div>`
         }
         <div class="details">
             <section>英雄伤害：<span class="hero_damage">${player.heroDamage}</span></section>
@@ -922,13 +916,11 @@ function genMatchImageHTML(match) {
     $(".ban_list").html(
         match.pickBans
             .filter((hero) => !hero.isPick)
-            .map(
-                (hero) =>
-                    `<div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/${/^npc_dota_hero_(?<name>.+)$/.exec(dotaconstants.heroes[hero.bannedHeroId].name)[1]}.png" alt="" /></div>`
-            )
+            .map((hero) => `<div class="ban_hero"><img src="${utils.getImageUrl(/^npc_dota_hero_(?<name>.+)$/.exec(dotaconstants.heroes[hero.bannedHeroId].name)[1], ImageType.Heroes)}" alt="" /></div>`)
             .join("")
     );
-    // fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
+    if (process.env.NODE_ENV==="development")
+    fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
     return $.html();
 }
 
@@ -937,8 +929,8 @@ function genHeroHTML(hero) {
 
     let html = `
     <div class="hero" id="${hero.id}">
-        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/${hero.shortName}.png" alt="" />
-        <img class="pri_attr" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/${d2a.primary_attrs[dotaconstants.heroes[hero.id].primary_attr]}.png" alt="" />
+        <img src="${utils.getImageUrl(hero.shortName, ImageType.Heroes)}" alt="" />
+        <img class="pri_attr" src="${utils.getImageUrl(d2a.primary_attrs[dotaconstants.heroes[hero.id].primary_attr], ImageType.Icons)}" alt="" />
         <div class="info">
             <p class="name">${hero.language.displayName}</p>
             <p class="roles">
@@ -1067,7 +1059,7 @@ function genHeroHTML(hero) {
                             : ""
                     }
                     <div class="img_stats">
-                        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/${item.ability.name}.png" alt="" />
+                        <img src="${utils.getImageUrl(item.ability.name, ImageType.Abilities)}" alt="" />
                         <div class="stats">
                             <p class="behavior">技能：${(Array.isArray(dotaconstants.abilities[item.ability.name].behavior) ? dotaconstants.abilities[item.ability.name].behavior : [dotaconstants.abilities[item.ability.name].behavior])
                                 .filter((beh) => beh !== "Hidden" || !(item.ability.stat.isGrantedByShard || item.ability.stat.isGrantedByScepter))
@@ -1151,7 +1143,8 @@ function genHeroHTML(hero) {
     </div>
     `;
     $(".wrapper").html(html);
-    // fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
+    if (process.env.NODE_ENV==="development")
+    fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
     return $.html();
 }
 
@@ -1251,7 +1244,7 @@ function genPlayerHTML(player) {
         player.steamAccount.seasonRank
             ? `
     <div class="rank">
-        <img class="medal" src="${utils.getBase64ImageFromLocal(
+        <img class="medal" src="${utils.getImageUrl(
             "medal_" +
                 (player.steamAccount.seasonLeaderboardRank
                     ? player.steamAccount.seasonLeaderboardRank <= 100
@@ -1264,14 +1257,14 @@ function genPlayerHTML(player) {
         ${
             !player.steamAccount.seasonLeaderboardRank
                 ? `
-        <img class="star" src="${utils.getBase64ImageFromLocal("star_" + player.steamAccount.seasonRank.toString().split("")[1])}" alt="" />`
+        <img class="star" src="${utils.getImageUrl("star_" + player.steamAccount.seasonRank.toString().split("")[1])}" alt="" />`
                 : `
         <p>${player.steamAccount.seasonLeaderboardRank}</p>`
         }
     </div>`
             : `
     <div class="rank">
-        <img class="medal" src="${utils.getBase64ImageFromLocal("medal_0")}" alt="" />
+        <img class="medal" src="${utils.getImageUrl("medal_0")}" alt="" />
     </div>`
     }`;
     const heroesCountPixels = 800 - ($(".tip:not(.row):not(.win_count):not(.lose_count)").length + 1) * 40;
@@ -1288,7 +1281,7 @@ function genPlayerHTML(player) {
         player.heroesPerformanceTop10
             .map(
                 (hero) =>
-                    `<span><img alt="" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/icons/${hero.hero.shortName}.png" /></span>
+                    `<span><img alt="" src="${utils.getImageUrl(hero.hero.shortName,ImageType.HeroIcons)}" /></span>
                 <span class="count">${hero.matchCount}</span>
                 <span class="win_rate">${((hero.winCount / hero.matchCount) * 100).toFixed(0)}%</span>
                 <span class="imp">${(hero.imp > 0 ? "+" : "") + hero.imp}</span>
@@ -1300,7 +1293,7 @@ function genPlayerHTML(player) {
             .filter((hero) => hero.matchCount > 1)
             .map(
                 (hero, index) =>
-                    `<span style="order:${index + 1};"><img alt="" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/icons/${hero.hero.shortName}.png" /></span>
+                    `<span style="order:${index + 1};"><img alt="" src="${utils.getImageUrl(hero.hero.shortName,ImageType.HeroIcons)}" /></span>
                 <span style="order:${index + 1};" class="count">${hero.matchCount}</span>
                 <span style="order:${index + 1};" class="win_rate">${((hero.winCount / hero.matchCount) * 100).toFixed(0)}%</span>
                 <span style="order:${index + 1};" class="imp">${(hero.imp > 0 ? "+" : "") + hero.imp}</span>
@@ -1320,7 +1313,7 @@ function genPlayerHTML(player) {
                     <p>${d2a.lobbyTypes[match.lobbyType] || match.lobbyType}</p>
                     <p>${d2a.gameMode[match.gameMode] || match.gameMode}</p>
                 </td>
-                <td><img alt="" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/icons/${match.players[0].hero.shortName}.png" /></td>
+                <td><img alt="" src="${utils.getImageUrl(match.players[0].hero.shortName,ImageType.HeroIcons)}" /></td>
                 <td style="line-height: 20px">
                     <p>${((match.players[0].kills + match.players[0].assists) / Math.max(1, match.players[0].deaths)).toFixed(2)} (${(
                 ((match.players[0].kills + match.players[0].assists) /
@@ -1337,7 +1330,7 @@ function genPlayerHTML(player) {
                     .slice(2)}</td>
                 <td>${sec2time(match.durationSeconds)}</td>
                 <td>${(match.players[0].imp > 0 ? "+" : "") + match.players[0].imp}</td>
-                <td><img class="medal" src="${utils.getBase64ImageFromLocal("medal_" + match.rank.toString().split("")[0])}" style="width: 100%" /></td>
+                <td><img class="medal" src="${utils.getImageUrl("medal_" + match.rank.toString().split("")[0])}" style="width: 100%" /></td>
             </tr>`
         )
         .join("");
@@ -1345,8 +1338,8 @@ function genPlayerHTML(player) {
         .map(
             (hero) => `
             <div class="hero">
-                <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/${hero.shortName}.png" alt="" />
-                <div class="level"><img src="${utils.getBase64ImageFromLocal("hero_badge_" + Math.ceil((hero.level + 1) / 6))}" alt="" /><span>${hero.level}</span></div>
+                <img src="${utils.getImageUrl(hero.shortName,ImageType.Heroes)}" alt="" />
+                <div class="level"><img src="${utils.getImageUrl("hero_badge_" + Math.ceil((hero.level + 1) / 6))}" alt="" /><span>${hero.level}</span></div>
                 <span>${((hero.winCount / hero.matchCount) * 100).toFixed(2)}%</span>
                 <span>${hero.matchCount}</span>
             </div>`
@@ -1358,7 +1351,8 @@ function genPlayerHTML(player) {
     if (player.streak > 1 || player.streak < -1) $(".streak").replaceWith(streakHTML);
     $(".matches tbody").html(matchesHTML);
     $(".plus").html(dotaPlusHTML);
-    // fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
+    if (process.env.NODE_ENV==="development")
+    fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
     return $.html();
 }
 

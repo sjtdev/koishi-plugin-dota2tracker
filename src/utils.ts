@@ -59,16 +59,20 @@ export async function query(query_str) {
     });
 }
 
-export async function getJoke() {
-    let t = await axios.get("https://apis.tianapi.com/joke/index?key=ab5a41ae8026d871548f72fe2375a543&num=1");
-    let joke = t.data.result.list[0];
-    return joke.title + "\n" + joke.content;
+export enum ImageType {
+    Icons = "icons",
+    Heroes = "heroes",
+    HeroIcons = "heroes/icons",
+    Items = "items",
+    Abilities = "abilities",
+    Local = "local",
 }
-
-export function getBase64ImageFromLocal(image) {
-    const imageData = fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/images/${image}.png`);
-    const base64Data = imageData.toString("base64");
-    return `data:image/png;base64,${base64Data}`;
+export function getImageUrl(image: string, type: ImageType = ImageType.Local) {
+    if (type === ImageType.Local) {
+        const imageData = fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/images/${image}.png`);
+        const base64Data = imageData.toString("base64");
+        return `data:image/png;base64,${base64Data}`;
+    } else return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/${type}/${image}.png`;
 }
 
 // 对比赛数据进行补充以供生成模板函数使用
