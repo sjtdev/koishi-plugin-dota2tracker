@@ -24,23 +24,23 @@ DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑�
 * <input type="checkbox" checked>`取消绑定`
 * <input type="checkbox" checked>`改名 <新玩家别名>`
 ##### 查询
-* <input type="checkbox" checked>`查询玩家 [SteamID|别名]`
+* <input type="checkbox" checked>`查询玩家 [SteamID|别名]`  
   返回一张图片，包含玩家各类信息。（缺省参数时并且调用者已绑定将自查）
-* <input type="checkbox" checked>`查询比赛 <比赛ID>`
+* <input type="checkbox" checked>`查询比赛 <比赛ID>`  
   返回一张图片，包含比赛对战信息。
-* <input type="checkbox" checked>`查询最近比赛 [SteamID|别名]`
+* <input type="checkbox" checked>`查询最近比赛 [SteamID|别名]`  
   查询指定玩家的最近一场比赛，效果同上。（缺省参数时并且调用者已绑定将自查）
-* <input type="checkbox" checked>`查询英雄 <英雄ID|英雄名|英雄常用别名>`
+* <input type="checkbox" checked>`查询英雄 <英雄ID|英雄名|英雄常用别名>`  
   返回一张图片，包含英雄属性与技能详情。（此处英雄名为中文名）
-* <input type="checkbox" checked><del>`查询英雄对战 <英雄ID|英雄名|英雄常用别名>`</del>
+* <input type="checkbox" checked><del>`查询英雄对战 <英雄ID|英雄名|英雄常用别名>`</del>  
   好像不是很实用
 
 ### Q&A
-Q: 为什么图片都这么难看！
-A: 作者实在是没有一丝的设计天分，欢迎有想法的设计大佬前来交流。
-
-Q: 发现bug/使用问题
-A: 本插件还在开发中，虽然基础功能都已实现，也难免会因业余作者低下的技术力堆出的shi山造成一些问题，欢迎指出。
+Q: 为什么图片都这么难看！  
+A: 作者实在是没有一丝的设计天分，欢迎有想法的设计大佬前来交流。  
+  
+Q: 发现bug/使用问题  
+A: 本插件还在开发中，虽然基础功能都已实现，也难免会因业余作者低下的技术力堆出的shi山造成一些问题，欢迎指出。  
 
 ## 灵感来源&鸣谢
 * 感谢[SonodaHanami](https://github.com/SonodaHanami)大佬的[Steam_watcher](https://github.com/SonodaHanami/Steam_watcher)项目，是本插件最重要的灵感来源，并授权提供了战报称号系统、英雄代称与播报信息的代码数据。
