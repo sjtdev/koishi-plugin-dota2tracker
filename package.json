@@ -11,10 +11,10 @@
     "contributors": [
         "sjtdev <sh1j1n9ta0@foxmail.com>"
     ],
-    "homepage": "https://github.com/sjtdev/@sjtdev/koishi-plugin-dota2tracker",
+    "homepage": "https://github.com/sjtdev/koishi-plugin-dota2tracker",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/sjtdev/@sjtdev/koishi-plugin-dota2tracker.git"
+        "url": "git+https://github.com/sjtdev/koishi-plugin-dota2tracker.git"
     },
     "license": "MIT",
     "keywords": [
