@@ -1320,7 +1320,7 @@ function genPlayerHTML(player) {
                     <p>${d2a.lobbyTypes[match.lobbyType] || match.lobbyType}</p>
                     <p>${d2a.gameMode[match.gameMode] || match.gameMode}</p>
                 </td>
-                <td><img alt="" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/icons/${match.players[0].hero.shortName}_icon.png" /></td>
+                <td><img alt="" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/icons/${match.players[0].hero.shortName}.png" /></td>
                 <td style="line-height: 20px">
                     <p>${((match.players[0].kills + match.players[0].assists) / Math.max(1, match.players[0].deaths)).toFixed(2)} (${(
                 ((match.players[0].kills + match.players[0].assists) /
