@@ -69,9 +69,14 @@ export enum ImageType {
 }
 export function getImageUrl(image: string, type: ImageType = ImageType.Local) {
     if (type === ImageType.Local) {
-        const imageData = fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/images/${image}.png`);
-        const base64Data = imageData.toString("base64");
-        return `data:image/png;base64,${base64Data}`;
+        try {
+            const imageData = fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/images/${image}.png`);
+            const base64Data = imageData.toString("base64");
+            return `data:image/png;base64,${base64Data}`;
+        } catch (error) {
+            console.error(error);
+            return "";
+        }
     } else return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/${type}/${image}.png`;
 }
 

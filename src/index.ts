@@ -116,7 +116,7 @@ export async function apply(ctx: Context, config: Config) {
         .action(async ({ session }, nick_name) => {
             if (session.guild) {
                 let sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.guild.id, platform: session.event.platform, userId: session.event.user.id }))[0];
-                if (!sessionPlayer) {
+                if (sessionPlayer) {
                     if (!nick_name) {
                         session.send("请输入你的别名。");
                         return;
@@ -919,8 +919,7 @@ function genMatchImageHTML(match) {
             .map((hero) => `<div class="ban_hero"><img src="${utils.getImageUrl(/^npc_dota_hero_(?<name>.+)$/.exec(dotaconstants.heroes[hero.bannedHeroId].name)[1], ImageType.Heroes)}" alt="" /></div>`)
             .join("")
     );
-    if (process.env.NODE_ENV==="development")
-    fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
+    if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
     return $.html();
 }
 
@@ -1143,8 +1142,7 @@ function genHeroHTML(hero) {
     </div>
     `;
     $(".wrapper").html(html);
-    if (process.env.NODE_ENV==="development")
-    fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
+    if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
     return $.html();
 }
 
@@ -1268,7 +1266,10 @@ function genPlayerHTML(player) {
     </div>`
     }`;
     const heroesCountPixels = 800 - ($(".tip:not(.row):not(.win_count):not(.lose_count)").length + 1) * 40;
-    const highestCountsTotal = { winCount: Math.max(...player.heroesPerformanceTop10.map((hero) => hero.winCount)), loseCount: Math.max(...player.heroesPerformanceTop10.map((hero) => hero.matchCount - hero.winCount)) };
+    const highestCountsTotal = {
+        winCount: Math.max(...player.heroesPerformanceTop10.map((hero) => hero.winCount)),
+        loseCount: Math.max(...player.heroesPerformanceTop10.map((hero) => hero.matchCount - hero.winCount)),
+    };
     const pixelOfPerMatchInTotal = heroesCountPixels / (highestCountsTotal.winCount + highestCountsTotal.loseCount);
     const highestCountsNear = {
         winCount: Math.max(...player.heroesPerformance?.filter((hero) => hero.matchCount > 1)?.map((hero) => hero.winCount)),
@@ -1280,8 +1281,8 @@ function genPlayerHTML(player) {
     const heroesTotalHTML =
         player.heroesPerformanceTop10
             .map(
-                (hero) =>
-                    `<span><img alt="" src="${utils.getImageUrl(hero.hero.shortName,ImageType.HeroIcons)}" /></span>
+                (hero) => `
+                <span><img alt="" src="${utils.getImageUrl(hero.hero.shortName, ImageType.HeroIcons)}" /></span>
                 <span class="count">${hero.matchCount}</span>
                 <span class="win_rate">${((hero.winCount / hero.matchCount) * 100).toFixed(0)}%</span>
                 <span class="imp">${(hero.imp > 0 ? "+" : "") + hero.imp}</span>
@@ -1292,15 +1293,15 @@ function genPlayerHTML(player) {
         player.heroesPerformance
             .filter((hero) => hero.matchCount > 1)
             .map(
-                (hero, index) =>
-                    `<span style="order:${index + 1};"><img alt="" src="${utils.getImageUrl(hero.hero.shortName,ImageType.HeroIcons)}" /></span>
+                (hero, index) => `
+                <span style="order:${index + 1};"><img alt="" src="${utils.getImageUrl(hero.hero.shortName, ImageType.HeroIcons)}" /></span>
                 <span style="order:${index + 1};" class="count">${hero.matchCount}</span>
                 <span style="order:${index + 1};" class="win_rate">${((hero.winCount / hero.matchCount) * 100).toFixed(0)}%</span>
                 <span style="order:${index + 1};" class="imp">${(hero.imp > 0 ? "+" : "") + hero.imp}</span>
                 <span class="win" style="order:${index + 1};${hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${hero.winCount * pixelOfPerMatchInNear}px">${hero.winCount}</span>
                 <span class="lose" style="order:${index + 1};${hero.matchCount - hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${(hero.matchCount - hero.winCount) * pixelOfPerMatchInNear}px">${
-                        hero.matchCount - hero.winCount
-                    }</span>`
+                    hero.matchCount - hero.winCount
+                }</span>`
             )
             .join("");
     const streakHTML = `<div class="streak" style="box-shadow:none;color:${winRateColor((player.streak + 10) / 20)};">${Math.abs(player.streak) + (player.streak > 0 ? "连胜" : "连败")}</div>`;
@@ -1313,7 +1314,7 @@ function genPlayerHTML(player) {
                     <p>${d2a.lobbyTypes[match.lobbyType] || match.lobbyType}</p>
                     <p>${d2a.gameMode[match.gameMode] || match.gameMode}</p>
                 </td>
-                <td><img alt="" src="${utils.getImageUrl(match.players[0].hero.shortName,ImageType.HeroIcons)}" /></td>
+                <td><img alt="" src="${utils.getImageUrl(match.players[0].hero.shortName, ImageType.HeroIcons)}" /></td>
                 <td style="line-height: 20px">
                     <p>${((match.players[0].kills + match.players[0].assists) / Math.max(1, match.players[0].deaths)).toFixed(2)} (${(
                 ((match.players[0].kills + match.players[0].assists) /
@@ -1338,7 +1339,7 @@ function genPlayerHTML(player) {
         .map(
             (hero) => `
             <div class="hero">
-                <img src="${utils.getImageUrl(hero.shortName,ImageType.Heroes)}" alt="" />
+                <img src="${utils.getImageUrl(hero.shortName, ImageType.Heroes)}" alt="" />
                 <div class="level"><img src="${utils.getImageUrl("hero_badge_" + Math.ceil((hero.level + 1) / 6))}" alt="" /><span>${hero.level}</span></div>
                 <span>${((hero.winCount / hero.matchCount) * 100).toFixed(2)}%</span>
                 <span>${hero.matchCount}</span>
@@ -1351,8 +1352,7 @@ function genPlayerHTML(player) {
     if (player.streak > 1 || player.streak < -1) $(".streak").replaceWith(streakHTML);
     $(".matches tbody").html(matchesHTML);
     $(".plus").html(dotaPlusHTML);
-    if (process.env.NODE_ENV==="development")
-    fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
+    if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
     return $.html();
 }
 
