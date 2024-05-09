@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            html,
+            body {
+                background-color: black;
+                color: white;
+                width: 800px;
+            }
+
+            img {
+                vertical-align: middle;
+            }
+
+            p {
+                margin: 0;
+            }
+
+            .wrapper {
+                width: 800px;
+                height: auto;
+                /* border: 10px solid white; */
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            .wrapper > div:not(.players) {
+                border-radius: 5px;
+                box-shadow: 0 0 5px #fff;
+                /* border: 5px solid #6cf; */
+                overflow: auto;
+                margin: 5px;
+                display: flex;
+            }
+
+            .players > div {
+                height: 1646px;
+            }
+
+            .match_info {
+                display: flex;
+                justify-content: space-around;
+                flex-wrap: wrap;
+                flex-direction: row;
+                position: relative;
+            }
+
+            .match_info .flag {
+                width: 100px;
+                height: 100px;
+                border-radius: 5px;
+                /* z-index: -1; */
+            }
+
+            .match_info .flag:not(.won) {
+                filter: grayscale(100%);
+            }
+
+            .match_info .rank,
+            .match_info .star {
+                position: absolute;
+                width: 64px;
+                bottom: 16px;
+            }
+
+            .match_info > p.won {
+                position: absolute;
+                width: 100px;
+                bottom: 0;
+                text-align: center;
+                left: 690px;
+                z-index: 1;
+            }
+
+            .match_info > p.won.radiant {
+                left: 0;
+            }
+
+            .match_info .details {
+                width: 590px;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                align-content: space-between;
+            }
+
+            .match_info div.score {
+                display: flex;
+                width: 590px;
+                flex-direction: row;
+                align-items: baseline;
+            }
+
+            .match_info div.score .score {
+                /* width: 280px; */
+                flex-grow: 1;
+                text-align: center;
+                vertical-align: bottom;
+                font-size: 32px;
+            }
+
+            .match_info div.score .time {
+                line-height: 1;
+                vertical-align: bottom;
+            }
+
+            .players {
+                display: flex;
+                /* flex-direction: row; */
+            }
+
+            .players > div {
+                width: 400px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .player {
+                width: 390px;
+                border-radius: 5px;
+                box-shadow: 0 0 5px #fff;
+                /* border: 5px solid #6cf; */
+                overflow: hidden;
+                margin: 5px;
+                /* display: flex; */
+                flex-grow: 1;
+            }
+
+            .player > div {
+                /* border: 5px solid #6cf; */
+                display: flex;
+                flex-direction: row;
+                line-height: 24px;
+            }
+
+            .hero {
+                margin-bottom: 4px;
+            }
+
+            .hero .player_avatar {
+                width: 112px;
+                height: 63px;
+                position: relative;
+                border-radius: 4px;
+                overflow: hidden;
+                flex-grow: 0;
+            }
+
+            .player.giveup .hero .player_avatar::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-size: contain;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-image: url("data:image/png;base64,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");
+            }
+
+            .hero .player_avatar p {
+                position: absolute;
+                /* width: 86px; */
+                /* line-height: 0; */
+                line-height: 1.5;
+                font-size: 10px;
+                margin: 0;
+            }
+
+            .hero .player_avatar .party_line {
+                height: 2px;
+                top: 0;
+                width: 100%;
+            }
+
+            .hero .player_avatar .party_mark {
+                line-height: 1.5;
+                text-align: center;
+                width: 16px;
+                font-size: 10px;
+                top: 3px;
+                left: 2px;
+                background-color: rgba(0, 0, 0, 0.8);
+            }
+
+            .hero .player_avatar .party_line.party_I {
+                background-color: #caffe5;
+            }
+
+            .hero .player_avatar .party_mark.party_I {
+                color: #caffe5;
+            }
+
+            .hero .player_avatar .party_mark.party_I::after {
+                content: "I";
+            }
+
+            .hero .player_avatar .party_line.party_II {
+                background-color: #ffe484;
+            }
+
+            .hero .player_avatar .party_mark.party_II {
+                color: #ffe484;
+            }
+
+            .hero .player_avatar .party_mark.party_II::after {
+                content: "II";
+            }
+
+            .hero .player_avatar .party_line.party_III {
+                background-color: #e19be2;
+            }
+
+            .hero .player_avatar .party_mark.party_III {
+                color: #e19be2;
+            }
+
+            .hero .player_avatar .party_mark.party_III::after {
+                content: "III";
+            }
+
+            .hero .player_avatar .party_line.party_IV {
+                background-color: #ccdaf4;
+            }
+
+            .hero .player_avatar .party_mark.party_IV {
+                color: #ccdaf4;
+            }
+
+            .hero .player_avatar .party_mark.party_IV::after {
+                content: "IV";
+            }
+
+            .hero .player_avatar img {
+                width: 100%;
+                height: 100%;
+                flex-grow: 0;
+            }
+
+            .hero .player_avatar .position {
+                /* width: auto; */
+                text-align: right;
+                bottom: 1px;
+                right: 0;
+                color: #cccccc;
+                text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.5), 1px -1px 0 rgba(0, 0, 0, 0.5), -1px 1px 0 rgba(0, 0, 0, 0.5), 1px 1px 0 rgba(0, 0, 0, 0.5); /* 描边效果 */
+            }
+
+            .hero .player_avatar .position.p1::first-line {
+                color: red;
+            }
+
+            .hero .player_avatar .position.p2::first-line {
+                color: yellow;
+            }
+
+            .hero .player_avatar .position.p3::first-line {
+                color: green;
+            }
+
+            .hero .player_avatar .level {
+                left: 2px;
+                bottom: 1px;
+                right: auto;
+                font-size: 12px;
+                color: rgba(255, 255, 255, 1);
+                /* color: #cccccc; */
+                text-shadow: 0 0 4px black;
+            }
+
+            .hero .player_info {
+                /* width: 210px; */
+                text-align: center;
+                margin: 0 18px;
+                flex-grow: 0;
+                height: 63px;
+                font-size: 15px;
+                line-height: 1.5;
+                width: 144px;
+            }
+
+            .hero .player_info .player_name {
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .hero .player_info .player_performance {
+                text-wrap: nowrap;
+            }
+
+            .hero .player_info .networth {
+                color: rgb(203, 176, 42);
+            }
+
+            .hero .player_lane {
+                margin-top: 6px;
+                width: 44px;
+                height: 100%;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .hero .player_lane svg {
+                width: 44px;
+                height: 44px;
+            }
+
+            .hero .player_lane svg path {
+                /* fill: red; */
+            }
+
+            .hero .player_lane::after {
+                width: 100%;
+                font-size: 10px;
+                line-height: 1;
+            }
+
+            .hero .player_lane.victory::after {
+                content: "对线优势";
+            }
+
+            .hero .player_lane.stomp::after {
+                content: "对线碾压";
+            }
+
+            .hero .player_lane.tie::after {
+                content: "对线平手";
+            }
+
+            .hero .player_lane.fail::after {
+                content: "对线劣势";
+            }
+
+            .hero .player_lane.stomped::after {
+                content: "对线被碾";
+            }
+
+            .hero .player_lane.victory svg path {
+                fill: lightgreen;
+            }
+
+            .hero .player_lane.stomp svg path {
+                fill: green;
+            }
+
+            .hero .player_lane.stomped svg path {
+                fill: red;
+            }
+
+            .hero .player_rank {
+                flex-grow: 1;
+                position: relative;
+            }
+
+            .hero .player_rank .rank .medal {
+                z-index: 1;
+            }
+
+            .hero .player_rank .rank .star {
+                z-index: 2;
+            }
+
+            .hero .player_rank .rank p {
+                z-index: 3;
+            }
+
+            .hero .player_rank div {
+                height: 36px;
+                width: 36px;
+                top: 0;
+                right: 0;
+                position: absolute;
+            }
+
+            .hero .player_rank img {
+                top: 0;
+                right: 0;
+                position: absolute;
+                height: 36px;
+            }
+
+            .hero .player_rank .dotaPlusLevel {
+                background-size: 100%;
+                position: absolute;
+                top: auto;
+                bottom: 0;
+            }
+
+            .hero .player_rank p {
+                font-size: 10px;
+                line-height: 1;
+                position: absolute;
+                text-align: center;
+                width: 36px;
+                bottom: 0;
+                /* background-color: #222; */
+                /* border: black 1px solid; */
+                box-sizing: border-box;
+                text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; /* 描边效果 */
+            }
+
+            .titles {
+                display: block;
+                margin-bottom: 4px;
+                padding-left: 4px;
+                height: 24px;
+                /* text-shadow: -1px -1px 2px #aaa, 1px -1px 2px #aaa, -1px 1px 2px #aaa, 1px 1px 2px #aaa; */ /*描边效果 */
+            }
+
+            .items {
+                margin-bottom: 2px;
+                position: relative;
+            }
+
+            .items > * {
+                /* margin-bottom: 14px; */
+                /* flex-basis: content; */
+                width: 0;
+            }
+
+            .items .item {
+                position: relative;
+                /* margin-bottom: 8px; */
+                width: 100%;
+                /* width: 54px; */
+                flex-grow: 1;
+            }
+
+            .item img {
+                width: 100%;
+            }
+
+            .item.recipe {
+                background-image: url("https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/recipe.png");
+                background-size: 100%;
+            }
+
+            .item.recipe img {
+                opacity: 0.75;
+                /* width: 50%; */
+                transform: scale(0.6);
+                transform-origin: top right;
+            }
+
+            .item .time {
+                text-align: center;
+                width: 100%;
+                margin: 0;
+                font-size: 12px;
+                line-height: 1;
+                position: absolute;
+                /* bottom: -8px; */
+                bottom: 0;
+                color: #ccc;
+                background-color: rgba(100, 100, 100, 0.75);
+            }
+
+            .items .items_normal {
+                flex-grow: 9;
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .items .items_normal .item {
+                /* flex-grow: 2; */
+                width: 33.33%;
+            }
+
+            .items .items_backpack {
+                flex-grow: 2;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .items .item.back {
+                filter: grayscale(100%);
+            }
+
+            .items .item.neutral {
+                flex-grow: 3;
+                width: 0;
+                background-repeat: no-repeat;
+                background-size: 100%;
+                background-position: center;
+            }
+
+            /* kkk */
+            .player.bear .items_buffs {
+                height: 73.78px;
+                /* margin-bottom: 4px; */
+                display: flex;
+                flex-direction: row;
+            }
+
+            .player.bear .items_buffs:nth-child(3) {
+                margin-bottom: 4.04px;
+            }
+
+            .player.bear .items {
+                display: flex;
+                height: 100%;
+                flex-wrap: wrap;
+                width: 250.74px;
+                margin-right: 4px;
+            }
+
+            .player.bear .items .item {
+                flex-grow: 0;
+                width: 41.79px;
+                position: relative;
+            }
+
+            .player.bear .ibs .item img {
+                width: 100%;
+            }
+
+            .player.bear .items .item.neutral {
+                margin-left: auto;
+            }
+
+            .player.bear .buffs,
+            .player.bear .support_items {
+                display: flex;
+                margin-left: auto;
+                width: 0;
+                flex-grow: 1;
+                flex-direction: row;
+                justify-content: flex-end;
+            }
+
+            .buffs_supportItems.slave {
+                width: 0;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .buffs_supportItems.slave > .support_items,
+            .buffs_supportItems.slave > .buffs {
+                flex-grow: 0;
+                width: auto;
+                height: 24px;
+                display: flex;
+                flex-direction: row;
+            }
+
+            .buffs {
+                margin-bottom: 4px;
+                height: 24px;
+            }
+
+            .buffs section {
+                text-align: center;
+            }
+
+            .buff img,
+            .support_item img {
+                height: 24px;
+            }
+
+            .buffs .buff,
+            .support_item {
+                /* display: inline; */
+                position: relative;
+            }
+
+            .buff p,
+            .support_item p {
+                text-align: center;
+                width: 100%;
+                margin: 0;
+                font-size: 12px;
+                line-height: 1;
+                position: absolute;
+                bottom: 0;
+                color: #aaa;
+                background-color: rgba(100, 100, 100, 0.5);
+            }
+
+            .buffs section {
+                display: flex;
+            }
+
+            .player .details,
+            .buffs {
+                font-size: 13px;
+                flex-wrap: wrap;
+                /* height: 400px; */
+                align-content: space-between;
+                justify-content: space-between;
+                flex-direction: row;
+                /* justify-content: space-around; */
+            }
+
+            .player .details {
+                margin-bottom: 0;
+            }
+
+            .player .details section {
+                flex-grow: 1;
+                text-align: center;
+                margin: 0 4px;
+            }
+
+            .ban_list {
+                flex-wrap: wrap;
+                flex-direction: row;
+            }
+
+            .ban_list div {
+                width: 79px;
+                height: 44px;
+                background-repeat: no-repeat;
+                background-size: 100%;
+                position: relative;
+            }
+
+            .ban_list div img {
+                filter: grayscale(100%);
+                width: 100%;
+                vertical-align: middle;
+            }
+
+            .ban_list div::before {
+                filter: none;
+                position: absolute;
+                display: block;
+                /* width: 40px; */
+                width: 100%;
+                height: 100%;
+                /* background-color: red; */
+                content: "";
+                z-index: 1;
+                background: linear-gradient(to bottom left, transparent calc(50% - 1px), red calc(50% - 1px), black calc(50% + 1px), transparent calc(50% + 1px));
+            }
+            /* --------------------------------------- */
+        </style>
+        <script>
+            window.onload = function () {
+                // 查找所有具有指定类名的img元素
+                var images = document.querySelectorAll(".item img");
+                // 为每个元素添加onerror处理器
+                images.forEach(function (image) {
+                    image.onerror = function () {
+                        this.onerror = null; // 防止无限循环
+                        this.classList.add("unload"); // 添加类
+                        this.src = "backup-image.jpg"; // 设置备用图片
+                    };
+                });
+            };
+        </script>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="match_info">
+                <img src="../images/flag_radiant.png" alt="" class="flag radiant won" style="order: 1" />
+                <img src="../images/flag_dire.png" alt="" class="flag dire" style="order: 3" />
+                <p class="won radiant">获胜</p>
+                <div class="details" style="order: 2">
+                    <p>比赛编号：<span class="mode">1234567890</span></p>
+                    <p>模式：<span class="mode">全英雄选择</span></p>
+                    <p>服务器：<span class="server">电信（上海）</span></p>
+                    <p>起始时间：<span class="start_time">24/04/04 11:11:11</span></p>
+                    <img src="../images/star_5.png" alt="" class="rank" />
+                    <img src="../images/medal_8.png" alt="" class="rank" />
+                    <p>结束时间：<span class="end_time">24/04/04 11:11:11</span></p>
+                    <div class="score">
+                        <p class="score radiant">22</p>
+                        <p class="time">22:22</p>
+                        <p class="score dire">33</p>
+                    </div>
+                </div>
+            </div>
+            <div class="players">
+                <div class="radiant_players">
+                    <div class="player giveup">
+                        <div class="hero">
+                            <div class="player_avatar">
+                                <img alt="" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" />
+                                <p class="party_line party_IV"></p>
+                                <p class="party_mark party_IV"></p>
+                                <p class="position p1">第1手<br />优势路</p>
+                                <p class="level">30</p>
+                            </div>
+                            <div class="player_info">
+                                <summary class="player_name">xxxxxxxxxxxxxxxxxxxxxx</summary>
+                                <summary class="player_performance"><span class="kda">10/10/10</span>&nbsp;&nbsp;<span class="kc">10%</span>&nbsp;&nbsp;<span class="dc">10%</span></summary>
+                                <summary class="player_net"><span class="networth">22222</span>&emsp;<span class="score">1.00</span></summary>
+                            </div>
+                            <div class="player_lane radiant victory"></div>
+                            <div class="player_rank">
+                                <div class="immortal"></div>
+                                <div class="rank">
+                                    <img class="medal" src="../images/medal_8.png" alt="" />
+                                    <img class="star" src="../images/star_5.png" alt="" />
+                                    <p>1</p>
+                                </div>
+                                <div class="dotaPlusLevel">
+                                    <img src="../images/hero_badge_1.png" alt="" class="badge" />
+                                    <p class="level">1</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="titles">
+                            <span style="color: #a00">破</span>
+                        </div>
+
+                        <div class="items">
+                            <div class="items_normal">
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/blink.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                            </div>
+                            <div class="items_backpack">
+                                <div class="item back recipe">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item back">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item back">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                            </div>
+                            <div class="item neutral" style="background-image: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/nemesis_curse.png)"></div>
+                        </div>
+                        <div class="buffs">
+                            <section>
+                                <div class="buff">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/aghanims_shard.png" alt="" />
+                                    <p></p>
+                                </div>
+                                <div class="buff">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/ultimate_scepter_2.png" alt="" />
+                                    <p></p>
+                                </div>
+                                <div class="buff">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pudge_flesh_heap.png" alt="" />
+                                    <p>20</p>
+                                </div>
+                            </section>
+                            <section>
+                                <div class="support_item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/gem.png" alt="" />
+                                    <p>1</p>
+                                </div>
+                                <div class="support_item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/ward_observer.png" alt="" />
+                                    <p>10</p>
+                                </div>
+                                <div class="support_item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/ward_sentry.png" alt="" />
+                                    <p>12</p>
+                                </div>
+                                <div class="support_item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/smoke_of_deceit.png" alt="" />
+                                    <p>1</p>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="details">
+                            <section>英雄伤害：<span class="hero_damage">12345</span></section>
+                            <section>建筑伤害：<span class="building_damage">21453</span></section>
+                            <section>受到伤害(减免后)：<span class="tak">55555</span></section>
+                            <section>补刀：<span class="lh">500</span>/<span class="dn">50</span></section>
+                            <section>GPM/XPM：<span class="gpm">500</span>/<span class="xpm">500</span></section>
+                            <section>治疗量：<span class="heal">5000</span></section>
+                            <section>控制时间：<span class="building_damage">15(5)</span>s</section>
+                        </div>
+                    </div>
+                </div>
+                <div class="dire_players">
+                    <div class="player bear">
+                        <div class="hero">
+                            <div class="player_avatar">
+                                <img alt="" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" />
+                                <p class="party_line party_IV"></p>
+                                <p class="party_mark party_IV"></p>
+                                <p class="position">第1手<br />优势路</p>
+                                <p class="level">30</p>
+                            </div>
+                            <div class="player_info">
+                                <summary class="player_name">xxxxxxxxxxxxxxxxxxxxxx</summary>
+                                <summary class="player_performance"><span class="kda">10/10/10</span>&nbsp;&nbsp;<span class="kc">10%</span>&nbsp;&nbsp;<span class="dc">10%</span></summary>
+                                <summary class="player_net"><span class="networth">22222</span>&emsp;<span class="score">1.00</span></summary>
+                            </div>
+                            <div class="player_rank">
+                                <div class="immortal"></div>
+                                <div class="other">
+                                    <img class="stars" src="../images/medal_7.png" alt="" />
+                                    <img class="rand" src="../images/star_5.png" alt="" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="items_buffs master">
+                            <div class="items master">
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/blink.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item back">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item back">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item back">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item neutral">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/nemesis_curse.png" alt="" />
+                                </div>
+                            </div>
+                            <div class="buffs master">
+                                <div class="buff">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/aghanims_shard.png" alt="" />
+                                    <p></p>
+                                </div>
+                                <div class="buff">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/ultimate_scepter_2.png" alt="" />
+                                    <p></p>
+                                </div>
+                                <div class="buff">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pudge_flesh_heap.png" alt="" />
+                                    <p>20</p>
+                                </div>
+                                <div class="buff">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pudge_flesh_heap.png" alt="" />
+                                    <p>20</p>
+                                </div>
+                                <div class="buff">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pudge_flesh_heap.png" alt="" />
+                                    <p>20</p>
+                                </div>
+                                <div class="buff">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pudge_flesh_heap.png" alt="" />
+                                    <p>20</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="items_buffs slave">
+                            <div class="items slave">
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/blink.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item back">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item back">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item back">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/phase_boots.png" alt="" />
+                                    <p class="time">33:33</p>
+                                </div>
+                                <div class="item neutral">
+                                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/nemesis_curse.png" alt="" />
+                                </div>
+                            </div>
+                            <div class="buffs_supportItems slave">
+                                <div class="buffs">
+                                    <div class="buff">
+                                        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/aghanims_shard.png" alt="" />
+                                        <p></p>
+                                    </div>
+                                    <div class="buff">
+                                        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/ultimate_scepter_2.png" alt="" />
+                                        <p></p>
+                                    </div>
+                                    <div class="buff">
+                                        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pudge_flesh_heap.png" alt="" />
+                                        <p>20</p>
+                                    </div>
+                                    <div class="buff">
+                                        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pudge_flesh_heap.png" alt="" />
+                                        <p>20</p>
+                                    </div>
+                                    <div class="buff">
+                                        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pudge_flesh_heap.png" alt="" />
+                                        <p>20</p>
+                                    </div>
+                                    <div class="buff">
+                                        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/pudge_flesh_heap.png" alt="" />
+                                        <p>20</p>
+                                    </div>
+                                </div>
+                                <div class="support_items">
+                                    <div class="support_item">
+                                        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/gem.png" alt="" />
+                                        <p>1</p>
+                                    </div>
+                                    <div class="support_item">
+                                        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/ward_observer.png" alt="" />
+                                        <p>10</p>
+                                    </div>
+                                    <div class="support_item">
+                                        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/ward_sentry.png" alt="" />
+                                        <p>12</p>
+                                    </div>
+                                    <div class="support_item">
+                                        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/smoke_of_deceit.png" alt="" />
+                                        <p>1</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="details">
+                            <section>英雄伤害：<span class="hero_damage">12345</span></section>
+                            <section>建筑伤害：<span class="building_damage">21453</span></section>
+                            <section>受到伤害(减免后)：<span class="tak">55555</span></section>
+                            <section>补刀：<span class="lh">500</span>/<span class="dn">50</span></section>
+                            <section>GPM/XPM：<span class="gpm">500</span>/<span class="xpm">500</span></section>
+                            <section>治疗量：<span class="heal">5000</span></section>
+                            <section>控制时间：<span class="building_damage">15(5)</span>s</section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ban_list">
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+                <div class="ban_hero"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" /></div>
+            </div>
+        </div>
+    </body>
+</html>

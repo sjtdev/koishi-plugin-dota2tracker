@@ -1,2 +1,9 @@
 .DS_Store
 tsconfig.tsbuildinfo
+
+node_modules
+src
+temp.html
+.editorconfig
+.gitattributes
+readme.md

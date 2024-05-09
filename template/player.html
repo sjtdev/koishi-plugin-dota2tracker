@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+        <style>
+            html,
+            body {
+                background-color: black;
+                color: white;
+                width: 800px;
+            }
+
+            .wrapper > * {
+                margin: 5px;
+                box-shadow: 0 0 5px #fff;
+                width: 790px;
+                border-radius: 5px;
+                overflow: hidden;
+            }
+
+            img {
+                width: auto;
+                vertical-align: middle;
+            }
+
+            p {
+                margin: 0;
+            }
+
+            .player {
+                display: flex;
+                position: relative;
+                height: 128px;
+            }
+
+            .player .avatar {
+                width: 128px;
+                height: 128px;
+                position: absolute;
+            }
+
+            .player .avatar img {
+                width: 100%;
+                border-radius: 5px;
+            }
+
+            .player .name {
+                font-size: 24px;
+            }
+
+            .player .info {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                /* line-height: 2; */
+                justify-content: space-around;
+            }
+
+            .player .info .guild.Copper {
+                color: #b4775f;
+            }
+            .player .info .guild.Silver {
+                color: #9a9593;
+            }
+            .player .info .guild.Gold {
+                color: #bda97f;
+            }
+            .player .info .guild.Diamond {
+                color: #a5cbcf;
+            }
+
+            .player .info p > span:not(:last-child) {
+                margin-right: 20px;
+            }
+
+            .player .info .matches span.win {
+                color: #006400;
+            }
+            .player .info .matches span.lose {
+                color: #8b0000;
+            }
+
+            .player .info .matches span.victory {
+                color: lightgreen;
+            }
+            .player .info .matches span.stomp {
+                color: green;
+                /* font-size: 8px; */
+            }
+            .player .info .matches span.fail {
+                color: #ff6961;
+            }
+            .player .info .matches span.stomped {
+                color: red;
+                /* font-size: 8px; */
+            }
+
+            .player .rank {
+                width: 64px;
+                height: 64px;
+                flex-grow: 1;
+                position: absolute;
+                top: 0;
+                right: 0;
+            }
+
+            .player .rank .medal {
+                z-index: 1;
+            }
+
+            .player .rank .star {
+                z-index: 2;
+            }
+
+            .player .rank p {
+                z-index: 4;
+            }
+
+            .player .rank div {
+                height: 100%;
+                width: 100%;
+                top: 0;
+                right: 0;
+                position: absolute;
+            }
+
+            .player .rank img {
+                top: 0;
+                right: 0;
+                position: absolute;
+                height: 64px;
+            }
+
+            .player .rank p {
+                font-size: 12px;
+                line-height: 1;
+                position: absolute;
+                text-align: center;
+                width: 64px;
+                bottom: 4px;
+                right: 0;
+                /* background-color: #222; */
+                /* border: black 1px solid; */
+                box-sizing: border-box;
+                text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; /* 描边效果 */
+            }
+
+            .hero_winrate > *:not(:last-child) {
+                /* margin-bottom: 10px; */
+            }
+
+            .hero_winrate .heroes {
+                display: grid;
+                /* line-height: 2; */
+                grid-template-columns: 32px auto auto auto auto auto;
+                /* grid-template-rows: repeat(auto-fill, 1fr); */
+                justify-content: start;
+                align-items: center;
+            }
+
+            .hero_winrate .heroes .hero {
+                width: 100%;
+                display: flex;
+                align-items: center;
+            }
+
+            .hero_winrate .heroes img {
+                width: auto;
+                height: 32px;
+                border-radius: 6px;
+                overflow: hidden;
+            }
+
+            .hero_winrate .heroes span.imp {
+                margin: 0 4px;
+            }
+
+            .hero_winrate .heroes span {
+                text-align: center;
+            }
+
+            .hero_winrate .heroes .tip.row {
+                grid-column: 1/-1;
+            }
+
+            .hero_winrate .heroes .win {
+                /* color: #000; */
+                text-align: right;
+                padding-right: 8px;
+                background-color: #006400;
+                border-radius: 16px 0 0 16px;
+                height: 16px;
+                justify-self: end;
+            }
+            .hero_winrate .heroes .lose {
+                /* color: #000; */
+                text-align: left;
+                padding-left: 8px;
+                background-color: #8b0000;
+                border-radius: 0 16px 16px 0;
+                height: 16px;
+                justify-self: start;
+            }
+
+            .matches {
+                table-layout: fixed;
+            }
+
+            .matches .match.win {
+                background-color: #006400;
+            }
+            .matches .match.lose {
+                background-color: #8b0000;
+            }
+
+            .matches .match td {
+                text-align: center;
+                /* line-height: 40px; */
+                height: 40px;
+                overflow: hidden;
+            }
+
+            .matches .match .player_lane {
+                width: 100%;
+                height: 100%;
+                justify-content: center; /* 水平居中 */
+                align-items: center; /* 垂直居中 */
+                display: flex;
+            }
+
+            .matches .match .player_lane:not(.tie) {
+                /* background-color: #000; */
+            }
+
+            .matches .match .player_lane svg {
+                width: 36px;
+                height: 36px;
+            }
+            .player_lane.victory svg path {
+                fill: lightgreen;
+            }
+
+            .player_lane.stomp svg path {
+                fill: green;
+            }
+
+            .player_lane.stomped svg path {
+                fill: red;
+            }
+
+            .plus {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+
+            .plus .hero {
+                width: 190px;
+                height: 190px;
+                border-radius: 5px;
+                position: relative;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: 118.75px auto;
+                justify-items: center;
+                align-items: center;
+            }
+            .plus .hero img {
+                width: 100%;
+                grid-column: 1/-1;
+            }
+
+            .plus .level {
+                position: absolute;
+                width: 50px;
+                height: 50px;
+                left: calc(50% - 25px);
+                top: calc(118.75px - 25px);
+            }
+
+            .plus .level span {
+                position: absolute;
+                width: 100%;
+                text-align: center;
+                left: 0;
+                bottom: 18px;
+                font-size: 14px;
+                text-shadow: -1px -1px 1px #000, 1px -1px 1px #000, -1px 1px 1px #000, 1px 1px 1px #000;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="player">
+                <div class="avatar"><img src="https://avatars.steamstatic.com/3e890ecfb44e0835f4c9d58d7fd8b1df7e628baa_full.jpg" alt="" /></div>
+                <div class="info">
+                    <p class="name">12345687 <span class="guild Diamond">[xx]</span></p>
+                    <p class="matches"><span>场次：4444（1234/4321）</span><span>胜率：55.55%</span></p>
+                    <p class="matches"><span>最近25场：11/22</span><span>胜率：55.55%</span><span>评分：111</span></p>
+                    <p class="matches"><span>对线：11-2-33</span><span>线优：55.55%</span></p>
+                </div>
+                <div class="rank">
+                    <img class="medal" src="../images/medal_8.png" alt="" />
+                    <img class="star" src="../iamges/star_5.png" alt="" />
+                    <p>1</p>
+                </div>
+            </div>
+            <div class="hero_winrate">
+                <div class="heroes">
+                    <p class="tip row total">全期场次前十的英雄：</p>
+                    <span class="tip">英雄</span>
+                    <span class="tip" style="margin: 0 4px">场次</span>
+                    <span class="tip" style="margin: 0 4px">胜率</span>
+                    <span class="tip" style="margin: 0 4px">表现</span>
+                    <span class="tip win_count" style="justify-self: end; margin-right: 2px">胜场</span>
+                    <span class="tip lose_count" style="justify-self: start; margin-left: 2px">败场</span>
+                    <span><img alt="" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/icons/morphling.png" /></span>
+                    <span class="count">15</span>
+                    <span class="win_rate">15%</span>
+                    <span class="imp">+123</span>
+                    <span class="win" style="width: 300px">10</span>
+                    <span class="lose" style="width: 150px">5</span>
+
+                    <p class="tip row near">近期使用场次大于1的英雄：</p>
+                    <span><img alt="" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/icons/morphling.png" /></span>
+                    <span class="count">15</span>
+                    <span class="win_rate">15%</span>
+                    <span class="imp">+123</span>
+                    <span class="win" style="width: 300px">10</span>
+                    <span class="lose" style="width: 150px">5</span>
+                </div>
+            </div>
+            <div class="streak"></div>
+            <table class="matches">
+                <colgroup>
+                    <col style="width: auto" />
+                    <col style="width: auto" />
+                    <col style="width: 40px" />
+                    <col style="width: auto" />
+                    <col style="width: 40px" />
+                    <col style="width: auto" />
+                    <col style="width: auto" />
+                    <col style="width: auto" />
+                    <col style="width: 40px" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>模式</th>
+                        <th>英雄</th>
+                        <th>KDA(参战率)</th>
+                        <th>对线</th>
+                        <th>结束于</th>
+                        <th>时长</th>
+                        <th>表现</th>
+                        <th>段位</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="match win">
+                        <td>1234567890</td>
+                        <td>
+                            <p>天梯</p>
+                            <p>全英雄选择</p>
+                        </td>
+                        <td><img alt="" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/icons/morphling.png" /></td>
+                        <td style="line-height: 20px">
+                            <p>22.22 (80%)</p>
+                            <p>10/10/10</p>
+                        </td>
+                        <td>
+                            <div class="player_lane tie"></div>
+                        </td>
+                        <td style="line-height: 20px">24/04/44 22:22:22</td>
+                        <td>44:44</td>
+                        <td>+11</td>
+                        <td><img class="medal" src="../images/medal_8.png" style="width: 100%" /></td>
+                    </tr>
+                    <tr class="match lose">
+                        <td>1234567890</td>
+                        <td>
+                            <p>天梯</p>
+                            <p>全英雄选择</p>
+                        </td>
+                        <td><img alt="" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/icons/morphling.png" /></td>
+                        <td style="line-height: 20px">
+                            <p>22.22 (80%)</p>
+                            <p>10/10/10</p>
+                        </td>
+                        <td>
+                            <div class="player_lane tie"></div>
+                        </td>
+                        <td style="line-height: 20px">24/04/44 22:22:22</td>
+                        <td>44:44</td>
+                        <td>+11</td>
+                        <td><img class="medal" src="../images/medal_8.png" style="width: 100%" /></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="plus">
+                <div class="hero">
+                    <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/storm_spirit.png" alt="" />
+                    <div class="level"><img src="../images/hero_badge_3.png" alt="" /><span>12</span></div>
+                    <span>55%</span>
+                    <span>55</span>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
