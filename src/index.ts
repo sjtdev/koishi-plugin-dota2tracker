@@ -1,5 +1,6 @@
 import { Context, Schema, h } from "koishi";
 import * as utils from "./utils.ts";
+import * as queries from "./queries.ts";
 import { ImageType } from "./utils.ts";
 import * as puppeteer from "koishi-plugin-puppeteer";
 import fs from "fs";
@@ -159,7 +160,7 @@ export async function apply(ctx: Context, config: Config) {
                     match = queryLocal[0].data;
                     ctx.database.set("dt_previous_query_results", match.id, { queryTime: new Date() });
                 } else {
-                    let queryRes = await utils.query(utils.MATCH_QUERY_GRAPHQL(match_id));
+                    let queryRes = await utils.query(queries.MATCH_INFO(match_id));
                     if (queryRes.status == 200) {
                         // console.log(query_res.data.data);
                         match = utils.getFormattedMatchData(queryRes.data.data.match);
@@ -205,7 +206,7 @@ export async function apply(ctx: Context, config: Config) {
                 let lastMatchId = 0;
                 try {
                     session.send("正在搜索对局详情，请稍后...");
-                    let queryRes = await utils.query(utils.PLAYERS_LASTMATCH_GRAPHQL([parseInt(flagBindedPlayer ? flagBindedPlayer.steamId : input_data)]));
+                    let queryRes = await utils.query(queries.PLAYERS_LASTMATCH([parseInt(flagBindedPlayer ? flagBindedPlayer.steamId : input_data)]));
                     lastMatchId = queryRes.data.data.players[0].matches[0].id;
                 } catch {
                     session.send("获取玩家最近比赛失败。");
@@ -217,7 +218,7 @@ export async function apply(ctx: Context, config: Config) {
                     if (queryLocal.length > 0) {
                         match = queryLocal[0].data;
                     } else {
-                        let queryRes = await utils.query(utils.MATCH_QUERY_GRAPHQL(lastMatchId));
+                        let queryRes = await utils.query(queries.MATCH_INFO(lastMatchId));
                         if (queryRes.status == 200) {
                             // console.log(query_res.data.data);
                             match = utils.getFormattedMatchData(queryRes.data.data.match);
@@ -263,11 +264,11 @@ export async function apply(ctx: Context, config: Config) {
                 let steamId = flagBindedPlayer?.steamId ?? input_data;
                 let player;
                 try {
-                    let queryRes = await utils.query(utils.PLAYER_INFO_WITH_25_MATCHES(steamId));
+                    let queryRes = await utils.query(queries.PLAYER_INFO_WITH_25_MATCHES(steamId));
                     if (queryRes.status == 200) {
                         player = queryRes.data.data.player;
                     } else throw 0;
-                    let queryRes2 = await utils.query(utils.PLAYER_EXTRA_INFO(steamId, player.matchCount, Object.keys(dotaconstants.heroes).length));
+                    let queryRes2 = await utils.query(queries.PLAYER_EXTRA_INFO(steamId, player.matchCount, Object.keys(dotaconstants.heroes).length));
                     if (queryRes2.status == 200) {
                         let playerExtra = queryRes2.data.data.player;
                         // 过滤和保留最高 level 的记录
@@ -339,13 +340,13 @@ export async function apply(ctx: Context, config: Config) {
 
                 try {
                     let AbilitiesConstantsCN;
-                    let queryRes = await utils.query(utils.CURRENT_GAMEVERSION());
+                    let queryRes = await utils.query(queries.CURRENT_GAMEVERSION());
                     if (queryRes.status == 200) {
                         let queryConstants = queryRes.data.data.constants;
                         AbilitiesConstantsCN = (await ctx.database.get("dt_constants_abilities_cn", [1]))[0];
                         if (!AbilitiesConstantsCN || AbilitiesConstantsCN.gameVersionsId < queryConstants.gameVersions[0].id) {
                             session.send("初次使用或版本更新，正在更新英雄技能数据中……");
-                            let queryRes2 = await utils.query(utils.ALL_ABILITIES_CHINESE_NAME());
+                            let queryRes2 = await utils.query(queries.ALL_ABILITIES_CHINESE_NAME());
 
                             if (queryRes2.status == 200) {
                                 AbilitiesConstantsCN.data = queryRes2.data.data.constants;
@@ -356,7 +357,7 @@ export async function apply(ctx: Context, config: Config) {
                         }
                     } else throw 0;
                     // hero
-                    let queryRes3 = await utils.query(utils.HEROINFO(findingHero.id));
+                    let queryRes3 = await utils.query(queries.HERO_INFO(findingHero.id));
                     if (queryRes3.status == 200) {
                         let hero = queryRes3.data.data.constants.hero;
                         hero.talents.forEach((talent) => (talent.name_cn = AbilitiesConstantsCN.data.abilities.find((item) => item.id == talent.abilityId).language.displayName));
@@ -401,7 +402,7 @@ export async function apply(ctx: Context, config: Config) {
                     return;
                 }
                 try {
-                    let queryRes = await utils.query(utils.HERO_MATCHUP_WINRATE(findingHero.id));
+                    let queryRes = await utils.query(queries.HERO_MATCHUP_WINRATE(findingHero.id));
                     if (queryRes.status == 200) {
                         let heroStats = queryRes.data.data.heroStats;
                         let withTopFive = heroStats.matchUp[0].with
@@ -497,7 +498,7 @@ export async function apply(ctx: Context, config: Config) {
             const subscribedPlayersInGuild = (await ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
             if (subscribedPlayersInGuild.length > 0) {
                 let queryRes = await utils.query(
-                    utils.PLAYERS_LASTMATCH_GRAPHQL(
+                    queries.PLAYERS_LASTMATCH(
                         subscribedPlayersInGuild
                             .map((player) => player.steamId)
                             .filter(function (value, index, self) {
@@ -530,7 +531,7 @@ export async function apply(ctx: Context, config: Config) {
                         match = queryLocal[0].data;
                         ctx.database.set("dt_previous_query_results", match.id, { queryTime: new Date() });
                     } else {
-                        let queryRes = await utils.query(utils.MATCH_QUERY_GRAPHQL(pendingMatch.matchId));
+                        let queryRes = await utils.query(queries.MATCH_INFO(pendingMatch.matchId));
                         if (queryRes.status == 200) {
                             match = queryRes.data.data.match.parsedDateTime ? utils.getFormattedMatchData(queryRes.data.data.match) : queryRes.data.data.match;
                         }
@@ -1358,7 +1359,7 @@ function genPlayerHTML(player) {
 
 async function playerIsInvalid(steamAccountId) {
     try {
-        let queryRes = await utils.query(utils.VERIFYING_PLAYER_GRAPHQL(steamAccountId));
+        let queryRes = await utils.query(queries.VERIFYING_PLAYER(steamAccountId));
         if (queryRes.status == 200) {
             if (queryRes.data.data.player.matchCount != null) return { isInvalid: true };
             else return { isInvalid: false, reason: "SteamID无效或无任何场次。" };
