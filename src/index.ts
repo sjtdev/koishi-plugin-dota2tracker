@@ -905,9 +905,9 @@ function genMatchImageHTML(match) {
             <section>补刀：<span class="lh">${player.numLastHits}</span>/<span class="dn">${player.numDenies}</span></section>
             <section>GPM/XPM：<span class="gpm">${player.goldPerMinute}</span>/<span class="xpm">${player.experiencePerMinute}</span></section>
             <section>治疗量：<span class="heal">${player.heroHealing}</span></section>
-            <section>控制时间：<span class="building_damage">${((player.stats?.heroDamageReport?.dealtTotal.stunDuration + player.stats?.heroDamageReport?.dealtTotal.disableDuration) / 100).toFixed(2)}(${(
-            player.stats?.heroDamageReport?.dealtTotal.slowDuration / 100
-        ).toFixed(2)})</span>s</section>
+            <section>控制时间：<span class="building_damage">${(player.stats?.heroDamageReport?.dealtTotal.stunDuration / 100).toFixed(2)}/${(player.stats?.heroDamageReport?.dealtTotal.slowDuration / 100).toFixed(2)}/${(
+            player.stats?.heroDamageReport?.dealtTotal.disableDuration / 100
+        ).toFixed(2)}</span>s</section>
         </div>
     </div>`;
     });
