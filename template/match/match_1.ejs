@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            html,
+            body {
+                background-color: black;
+                color: white;
+                width: 800px;
+            }
+
+            img {
+                vertical-align: middle;
+            }
+
+            p {
+                margin: 0;
+            }
+
+            .wrapper {
+                width: 800px;
+                height: auto;
+                /* border: 10px solid white; */
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            .wrapper > div:not(.players) {
+                border-radius: 5px;
+                box-shadow: 0 0 5px #fff;
+                /* border: 5px solid #6cf; */
+                overflow: auto;
+                margin: 5px;
+                display: flex;
+            }
+
+            .players > div {
+                height: 1646px;
+            }
+
+            .match_info {
+                display: flex;
+                justify-content: space-around;
+                flex-wrap: wrap;
+                flex-direction: row;
+                position: relative;
+            }
+
+            .match_info .flag {
+                width: 100px;
+                height: 100px;
+                border-radius: 5px;
+                /* z-index: -1; */
+            }
+
+            .match_info .flag:not(.won) {
+                filter: grayscale(100%);
+            }
+
+            .match_info .rank,
+            .match_info .star {
+                position: absolute;
+                width: 64px;
+                bottom: 16px;
+            }
+
+            .match_info > p.won {
+                position: absolute;
+                width: 100px;
+                bottom: 0;
+                text-align: center;
+                left: 690px;
+                z-index: 1;
+            }
+
+            .match_info > p.won.radiant {
+                left: 0;
+            }
+
+            .match_info .details {
+                width: 590px;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                align-content: space-between;
+            }
+
+            .match_info div.score {
+                display: flex;
+                width: 590px;
+                flex-direction: row;
+                align-items: baseline;
+            }
+
+            .match_info div.score .score {
+                /* width: 280px; */
+                flex-grow: 1;
+                text-align: center;
+                vertical-align: bottom;
+                font-size: 32px;
+            }
+
+            .match_info div.score .time {
+                line-height: 1;
+                vertical-align: bottom;
+            }
+
+            .players {
+                display: flex;
+                /* flex-direction: row; */
+            }
+
+            .players > div {
+                width: 400px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .player {
+                width: 390px;
+                border-radius: 5px;
+                box-shadow: 0 0 5px #fff;
+                /* border: 5px solid #6cf; */
+                overflow: hidden;
+                margin: 5px;
+                /* display: flex; */
+                flex-grow: 1;
+            }
+
+            .player > div {
+                /* border: 5px solid #6cf; */
+                display: flex;
+                flex-direction: row;
+                line-height: 24px;
+            }
+
+            .hero {
+                margin-bottom: 4px;
+            }
+
+            .hero .player_avatar {
+                width: 112px;
+                height: 63px;
+                position: relative;
+                border-radius: 4px;
+                overflow: hidden;
+                flex-grow: 0;
+            }
+
+            .player.giveup .hero .player_avatar::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-size: contain;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-image: url("data:image/png;base64,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");
+            }
+
+            .hero .player_avatar p {
+                position: absolute;
+                /* width: 86px; */
+                /* line-height: 0; */
+                line-height: 1.5;
+                font-size: 10px;
+                margin: 0;
+            }
+
+            .hero .player_avatar .party_line {
+                height: 2px;
+                top: 0;
+                width: 100%;
+            }
+
+            .hero .player_avatar .party_mark {
+                line-height: 1.5;
+                text-align: center;
+                width: 16px;
+                font-size: 10px;
+                top: 3px;
+                left: 2px;
+                background-color: rgba(0, 0, 0, 0.8);
+            }
+
+            .hero .player_avatar .party_line.party_I {
+                background-color: #caffe5;
+            }
+
+            .hero .player_avatar .party_mark.party_I {
+                color: #caffe5;
+            }
+
+            .hero .player_avatar .party_mark.party_I::after {
+                content: "I";
+            }
+
+            .hero .player_avatar .party_line.party_II {
+                background-color: #ffe484;
+            }
+
+            .hero .player_avatar .party_mark.party_II {
+                color: #ffe484;
+            }
+
+            .hero .player_avatar .party_mark.party_II::after {
+                content: "II";
+            }
+
+            .hero .player_avatar .party_line.party_III {
+                background-color: #e19be2;
+            }
+
+            .hero .player_avatar .party_mark.party_III {
+                color: #e19be2;
+            }
+
+            .hero .player_avatar .party_mark.party_III::after {
+                content: "III";
+            }
+
+            .hero .player_avatar .party_line.party_IV {
+                background-color: #ccdaf4;
+            }
+
+            .hero .player_avatar .party_mark.party_IV {
+                color: #ccdaf4;
+            }
+
+            .hero .player_avatar .party_mark.party_IV::after {
+                content: "IV";
+            }
+
+            .hero .player_avatar img {
+                width: 100%;
+                height: 100%;
+                flex-grow: 0;
+            }
+
+            .hero .player_avatar .position {
+                /* width: auto; */
+                text-align: right;
+                bottom: 1px;
+                right: 0;
+                color: #cccccc;
+                text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.5), 1px -1px 0 rgba(0, 0, 0, 0.5), -1px 1px 0 rgba(0, 0, 0, 0.5), 1px 1px 0 rgba(0, 0, 0, 0.5); /* 描边效果 */
+            }
+
+            .hero .player_avatar .position.p1::first-line {
+                color: red;
+            }
+
+            .hero .player_avatar .position.p2::first-line {
+                color: yellow;
+            }
+
+            .hero .player_avatar .position.p3::first-line {
+                color: green;
+            }
+
+            .hero .player_avatar .level {
+                left: 2px;
+                bottom: 1px;
+                right: auto;
+                font-size: 12px;
+                color: rgba(255, 255, 255, 1);
+                /* color: #cccccc; */
+                text-shadow: 0 0 4px black;
+            }
+
+            .hero .player_info {
+                /* width: 210px; */
+                text-align: center;
+                margin: 0 18px;
+                flex-grow: 0;
+                height: 63px;
+                font-size: 15px;
+                line-height: 1.5;
+                width: 144px;
+            }
+
+            .hero .player_info .player_name {
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .hero .player_info .player_performance {
+                text-wrap: nowrap;
+            }
+
+            .hero .player_info .networth {
+                color: rgb(203, 176, 42);
+            }
+
+            .hero .player_lane {
+                margin-top: 6px;
+                width: 44px;
+                height: 100%;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .hero .player_lane svg {
+                width: 44px;
+                height: 44px;
+            }
+
+            .hero .player_lane svg path {
+                /* fill: red; */
+            }
+
+            .hero .player_lane::after {
+                width: 100%;
+                font-size: 10px;
+                line-height: 1;
+            }
+
+            .hero .player_lane.victory::after {
+                content: "对线优势";
+            }
+
+            .hero .player_lane.stomp::after {
+                content: "对线碾压";
+            }
+
+            .hero .player_lane.tie::after {
+                content: "对线平手";
+            }
+
+            .hero .player_lane.fail::after {
+                content: "对线劣势";
+            }
+
+            .hero .player_lane.stomped::after {
+                content: "对线被碾";
+            }
+
+            .hero .player_lane.victory svg path {
+                fill: lightgreen;
+            }
+
+            .hero .player_lane.stomp svg path {
+                fill: green;
+            }
+
+            .hero .player_lane.stomped svg path {
+                fill: red;
+            }
+
+            .hero .player_rank {
+                flex-grow: 1;
+                position: relative;
+            }
+
+            .hero .player_rank .rank .medal {
+                z-index: 1;
+            }
+
+            .hero .player_rank .rank .star {
+                z-index: 2;
+            }
+
+            .hero .player_rank .rank p {
+                z-index: 3;
+            }
+
+            .hero .player_rank div {
+                height: 36px;
+                width: 36px;
+                top: 0;
+                right: 0;
+                position: absolute;
+            }
+
+            .hero .player_rank img {
+                top: 0;
+                right: 0;
+                position: absolute;
+                height: 36px;
+            }
+
+            .hero .player_rank .dotaPlusLevel {
+                background-size: 100%;
+                position: absolute;
+                top: auto;
+                bottom: 0;
+            }
+
+            .hero .player_rank p {
+                font-size: 10px;
+                line-height: 1;
+                position: absolute;
+                text-align: center;
+                width: 36px;
+                bottom: 0;
+                /* background-color: #222; */
+                /* border: black 1px solid; */
+                box-sizing: border-box;
+                text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; /* 描边效果 */
+            }
+
+            .titles {
+                display: block;
+                margin-bottom: 4px;
+                padding-left: 4px;
+                height: 24px;
+                /* text-shadow: -1px -1px 2px #aaa, 1px -1px 2px #aaa, -1px 1px 2px #aaa, 1px 1px 2px #aaa; */ /*描边效果 */
+            }
+
+            .items {
+                margin-bottom: 2px;
+                position: relative;
+            }
+
+            .items > * {
+                /* margin-bottom: 14px; */
+                /* flex-basis: content; */
+                width: 0;
+            }
+
+            .items .item {
+                position: relative;
+                /* margin-bottom: 8px; */
+                width: 100%;
+                /* width: 54px; */
+                flex-grow: 1;
+            }
+
+            .item img {
+                width: 100%;
+            }
+
+            .item.recipe {
+                background-image: url("https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/recipe.png");
+                background-size: 100%;
+            }
+
+            .item.recipe img {
+                opacity: 0.75;
+                /* width: 50%; */
+                transform: scale(0.6);
+                transform-origin: top right;
+            }
+
+            .item .time {
+                text-align: center;
+                width: 100%;
+                margin: 0;
+                font-size: 12px;
+                line-height: 1;
+                position: absolute;
+                /* bottom: -8px; */
+                bottom: 0;
+                color: #ccc;
+                background-color: rgba(100, 100, 100, 0.75);
+            }
+
+            .items .items_normal {
+                flex-grow: 9;
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .items .items_normal .item {
+                /* flex-grow: 2; */
+                width: 33.33%;
+            }
+
+            .items .items_backpack {
+                flex-grow: 2;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .items .item.back {
+                filter: grayscale(100%);
+            }
+
+            .items .item.neutral {
+                flex-grow: 3;
+                width: 0;
+                background-repeat: no-repeat;
+                background-size: 100%;
+                background-position: center;
+            }
+
+            /* kkk */
+            .player.bear .items_buffs {
+                height: 73.78px;
+                /* margin-bottom: 4px; */
+                display: flex;
+                flex-direction: row;
+            }
+
+            .player.bear .items_buffs:nth-child(3) {
+                margin-bottom: 4.04px;
+            }
+
+            .player.bear .items {
+                display: grid;
+                height: 100%;
+                flex-wrap: wrap;
+                width: 250.74px;
+                margin-right: 4px;
+                grid-template-columns: repeat(6,1fr);
+                grid-template-rows: repeat(2,40px);
+            }
+
+            .player.bear .items .item {
+                flex-grow: 0;
+                width: 41.79px;
+                position: relative;
+            }
+
+            .player.bear .ibs .item img {
+                width: 100%;
+            }
+
+            .player.bear .items .item.neutral {
+                margin-left: auto;
+            }
+
+            .player.bear .buffs,
+            .player.bear .support_items {
+                display: flex;
+                margin-left: auto;
+                width: 0;
+                flex-grow: 1;
+                flex-direction: row;
+                justify-content: flex-end;
+            }
+
+            .buffs_supportItems.slave {
+                width: 0;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .buffs_supportItems.slave > .support_items,
+            .buffs_supportItems.slave > .buffs {
+                flex-grow: 0;
+                width: auto;
+                height: 24px;
+                display: flex;
+                flex-direction: row;
+            }
+
+            .buffs {
+                margin-bottom: 4px;
+                height: 24px;
+            }
+
+            .buffs section {
+                text-align: center;
+            }
+
+            .buff img,
+            .support_item img {
+                height: 24px;
+            }
+
+            .buffs .buff,
+            .support_item {
+                /* display: inline; */
+                position: relative;
+            }
+
+            .buff p,
+            .support_item p {
+                text-align: center;
+                width: 100%;
+                margin: 0;
+                font-size: 12px;
+                line-height: 1;
+                position: absolute;
+                bottom: 0;
+                color: #aaa;
+                background-color: rgba(100, 100, 100, 0.5);
+            }
+
+            .buffs section {
+                display: flex;
+            }
+
+            .player .details,
+            .buffs {
+                font-size: 13px;
+                flex-wrap: wrap;
+                /* height: 400px; */
+                align-content: space-between;
+                justify-content: space-between;
+                flex-direction: row;
+                /* justify-content: space-around; */
+            }
+
+            .player .details {
+                margin-bottom: 0;
+            }
+
+            .player .details section {
+                flex-grow: 1;
+                text-align: center;
+                margin: 0 4px;
+            }
+
+            .ban_list {
+                flex-wrap: wrap;
+                flex-direction: row;
+            }
+
+            .ban_list div {
+                width: 79px;
+                height: 44px;
+                background-repeat: no-repeat;
+                background-size: 100%;
+                position: relative;
+            }
+
+            .ban_list div img {
+                filter: grayscale(100%);
+                width: 100%;
+                vertical-align: middle;
+            }
+
+            .ban_list div::before {
+                filter: none;
+                position: absolute;
+                display: block;
+                /* width: 40px; */
+                width: 100%;
+                height: 100%;
+                /* background-color: red; */
+                content: "";
+                z-index: 1;
+                background: linear-gradient(to bottom left, transparent calc(50% - 1px), red calc(50% - 1px), black calc(50% + 1px), transparent calc(50% + 1px));
+            }
+            /* --------------------------------------- */
+        </style>
+        <script>
+            window.onload = function () {
+                // 查找所有具有指定类名的img元素
+                var images = document.querySelectorAll(".item img");
+                // 为每个元素添加onerror处理器
+                images.forEach(function (image) {
+                    image.onerror = function () {
+                        this.onerror = null; // 防止无限循环
+                        this.classList.add("unload"); // 添加类
+                        this.src = "backup-image.jpg"; // 设置备用图片
+                    };
+                });
+            };
+        </script>
+    </head>
+    <body>
+        <% let kcndcStyle = {
+            kc: function (num) {
+                let red = (255 - (num * 255) / 100).toFixed(2);
+                return `rgb(255,${red},${red})`;
+            },
+            dc: function (num) {
+                let gray = ((50 - Math.min(num, 50)) * (255 / 50)).toFixed(2);
+                return `rgb(${gray},${gray},${gray})`;
+            },
+        };
+        // 对线结果的图标（来自免费SVG素材网）
+        const laneSVG = {
+            stomp: `<svg viewBox="0 0 24 24" class="hitagi__sc-1apuy4g-0 hmhZOG"><path d="M8.05731 22.3674L9.60454 22.8002L11.5974 21.6551L12.043 20.0773L13.5902 20.51L15.583 19.3649L16.0287 17.7871L17.5759 18.2199L19.5687 17.0748L20.0143 15.4969L21.5615 15.9297L23.5544 14.7846L24 13.2068L23.4492 12.2014L7.50651 21.3621L8.05731 22.3674ZM12.1328 3.50265L11.0312 1.49196C10.8798 1.21549 10.5316 1.11811 10.2576 1.27556L0.29345 7.00098C0.0194354 7.15843 -0.0808273 7.51346 0.0706444 7.78993L1.44766 10.3033L11.91 4.29159C12.184 4.13414 12.2843 3.77912 12.1328 3.50265ZM18.3935 8.4063L14.1658 9.60458L12.4221 10.6065C12.2851 10.6853 12.111 10.6366 12.0353 10.4983L11.7599 9.99565C11.6842 9.85742 11.7343 9.6799 11.8713 9.60118L13.615 8.59924L13.0642 7.59389L11.3205 8.59584C11.1835 8.67456 11.0094 8.62587 10.9337 8.48765L10.6583 7.98497C10.5826 7.84673 10.6327 7.66922 10.7697 7.5905L12.5134 6.58855L11.9626 5.58321L1.99846 11.3086L6.9557 20.3567L22.8984 11.196L22.2615 10.0336C21.5024 8.64813 19.9073 7.97847 18.3935 8.4063Z"></path></svg>`,
+            victory: `<svg viewBox="0 0 512 512"><path d="M198.844 64.75c-.985 0-1.974.03-2.97.094-15.915 1.015-32.046 11.534-37.78 26.937-34.072 91.532-51.085 128.865-61.5 222.876 14.633 13.49 31.63 26.45 50.25 38.125l66.406-196.467 17.688 5.968L163.28 362.5c19.51 10.877 40.43 20.234 62 27.28l75.407-201.53 17.5 6.53-74.937 200.282c19.454 5.096 39.205 8.2 58.78 8.875L381.345 225.5l17.094 7.594-75.875 170.656c21.82-1.237 43.205-5.768 63.437-14.28 43.317-53.844 72.633-109.784 84.5-172.69 5.092-26.992-14.762-53.124-54.22-54.81l-6.155-.282-2.188-5.75c-8.45-22.388-19.75-30.093-31.5-32.47-11.75-2.376-25.267 1.535-35.468 7.376l-13.064 7.47-.906-15c-.99-16.396-10.343-29.597-24.313-35.626-13.97-6.03-33.064-5.232-54.812 9.906l-10.438 7.25-3.812-12.125c-6.517-20.766-20.007-27.985-34.78-27.97zM103.28 188.344C71.143 233.448 47.728 299.56 51.407 359.656c27.54 21.84 54.61 33.693 80.063 35.438 14.155.97 27.94-1.085 41.405-6.438-35.445-17.235-67.36-39.533-92.594-63.53l-3.343-3.157.5-4.595c5.794-54.638 13.946-91.5 25.844-129.03z"/></svg>`,
+            fail: `<svg viewBox="0 0 36 36"><path fill="#ff6961" d="M36 32a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4h28a4 4 0 0 1 4 4v28z"></path><circle fill="#FFF" cx="27" cy="7" r="3"></circle><path fill="#FFF" d="M13.06 13.06l2.367-2.366l3.859 1.158l-2.635 2.847a10.018 10.018 0 0 1 4.392 3.379l5.017-5.017a1.5 1.5 0 0 0-.63-2.497l-9.999-3a1.495 1.495 0 0 0-1.492.376l-3 3a1.5 1.5 0 1 0 2.121 2.12zm16.065 4.949a1.496 1.496 0 0 0-1.262-.503l-6.786.617a9.966 9.966 0 0 1 1.464 2.879l3.548-.322l-1.554 6.995a1.499 1.499 0 1 0 2.928.65l2-9a1.5 1.5 0 0 0-.338-1.316zM13 16a8 8 0 1 0 0 16a8 8 0 0 0 0-16zm0 14a6 6 0 1 1 .002-12.002A6 6 0 0 1 13 30z"></path></svg>`,
+            stomped: `<svg viewBox="-1 0 19 19"><path d="M16.417 9.579A7.917 7.917 0 1 1 8.5 1.662a7.917 7.917 0 0 1 7.917 7.917zm-2.458 2.96a.396.396 0 0 0-.396-.397h-.667a1.527 1.527 0 0 0-1.249-1.114.777.777 0 0 0 .014-.145V9.378a.794.794 0 0 0-.792-.792H8.201a2.984 2.984 0 0 0-1.682-.516l-.11.002V7.42h2.997a.396.396 0 1 0 0-.792H6.41v-1.3a.396.396 0 0 0-.396-.397H4.891a.396.396 0 0 0 0 .792h.727V8.21a2.997 2.997 0 1 0 3.836 3.466h.71a1.526 1.526 0 1 0 2.732 1.26h.667a.396.396 0 0 0 .396-.397zM8.078 9.507a2.205 2.205 0 1 1-1.559-.646 2.19 2.19 0 0 1 1.559.646zm4.078 3.03a.734.734 0 1 1-.733-.734.735.735 0 0 1 .733.733z"/></svg>`,
+            tie: `<svg fill="#fff" viewBox="0 0 512.001 512.001"><g><g><path d="M120.988,239.868c-4.496,10.625-5.122,20.183-5.157,20.811c-0.267,4.607,3.243,8.547,7.849,8.829 c4.618,0.29,8.574-3.228,8.873-7.833c0.265-4.771,2.339-13.092,5.884-19.44C137.421,242.113,141.397,242.649,120.988,239.868z"/></g></g><g><g><path d="M391.178,255.418c-0.211,8.054-2.458,17.62-6.74,28.398c-1.708,4.299,0.393,9.168,4.692,10.875 c4.293,1.708,9.167-0.39,10.875-4.692c5.103-12.842,7.74-24.392,7.943-34.581H391.178z"/></g></g><g><g><path d="M164.769,210.51c1.046,3.339,1.397,6.953,0.893,10.65c-0.293,2.146-0.857,4.188-1.648,6.1c0,0,51.266,3.416,198.065,3.949 c-0.086-6.331,2.19-12.199,6.244-16.732C217.627,214.046,164.769,210.51,164.769,210.51z"/></g></g><g><g><circle cx="37.179" cy="128.669" r="29.491"/></g></g><g><g><path d="M510.146,391.511l-37.916-66.985c14.35-49.173,20.678-68.137,20.678-68.137l8.949-67.014 c1.502-10.977-6.248-21.075-17.235-22.468l-18.183-2.305c-10.984-1.393-20.996,6.445-22.293,17.431l-1.884,15.955l28.718-21.317 l-37.91,42.278h-46.432c-6.571,0-11.898,5.328-11.898,11.898c0,6.57,5.328,11.898,11.898,11.898h51.744 c3.381,0,6.601-1.438,8.859-3.956l41.456-46.234l-32.023,54.694c-5.28,9.018-14.374,8.169-18.293,8.167c-1.959,0-3.31,0-5.295,0 c-0.399,0.898,3.152-7.399-24.44,57.181c-0.548,1.284-0.907,2.642-1.06,4.031l-8.934,80.338 c-0.939,8.447,5.667,15.857,14.208,15.857c7.179,0,13.361-5.401,14.172-12.701l8.702-78.244l21.512-50.353l-14.121,50.463 c-1.158,3.756-0.718,7.823,1.218,11.243l40.949,72.345c3.885,6.864,12.596,9.276,19.459,5.392 C511.615,407.085,514.03,398.373,510.146,391.511z"/></g></g><g><g><circle cx="464.865" cy="128.702" r="29.491"/></g></g><g><g><path d="M142.923,206.051l-59.556-8.118l-39.135-18.451l13.626,2.292c-1.422-10.945-11.411-18.577-22.254-17.202l-18.182,2.305 C6.43,168.271-1.315,178.374,0.186,189.345l9.12,68.689l21.865,70.857l5.829,70.795c0.646,7.848,7.527,13.705,15.401,13.057 c7.859-0.647,13.705-7.542,13.058-15.401l-5.956-72.345c-0.084-1.031-0.281-2.05-0.585-3.039l-14.123-50.463l21.514,50.353 l8.702,78.244c0.873,7.86,7.96,13.486,15.768,12.612c7.838-0.871,13.483-7.931,12.612-15.768l-8.934-80.338 c-0.154-1.388-0.511-2.747-1.06-4.032l-27.336-61.43l-2.945-24.951l-29.029-25.179l40.79,19.231 c1.097,0.517,2.266,0.862,3.468,1.027l61.369,8.365c6.521,0.887,12.509-3.68,13.396-10.183 C153.994,212.936,149.435,206.939,142.923,206.051z"/></g></g></svg>`,
+        };
+         %>
+        <div class="wrapper">
+            <%- `
+            <div class="match_info">
+                <img src="${utils.getImageUrl("flag_radiant")}" alt="" class="flag radiant${match.didRadiantWin ? " won" : ""}" style="order: 1" />
+                <img src="${utils.getImageUrl("flag_dire")}" alt="" class="flag dire${match.didRadiantWin ? "" : " won"}" style="order: 3" />
+                <p class="won${match.didRadiantWin ? " radiant" : ""}">获胜</p>
+                <div class="details" style="order: 2">
+                    <p>比赛编号：<span class="match_id">${match.id}</span></p>
+                    <p>模式：<span class="mode">${d2a.lobbyTypes[match.lobbyType] || match.lobbyType}/${d2a.gameMode[match.gameMode] || match.gameMode}</span></p>
+                    <p>服务器：<span class="server">${d2a.region[match.regionId]}</span></p>
+                    <p>起始时间：<span class="start_time">${moment(new Date(match.startDateTime * 1000))
+                        .format("YYYY-MM-DD HH:mm:ss")
+                        .slice(2)}</span></p>
+                    <img src="${utils.getImageUrl("star_" + match.rank?.toString().split("")[1])}" alt="" class="star">
+                    <img src="${utils.getImageUrl("medal_" + match.rank?.toString().split("")[0])}" alt="" class="rank">
+                    <p>结束时间：<span class="end_time">${moment(new Date(match.endDateTime * 1000))
+                        .format("YYYY-MM-DD HH:mm:ss")
+                        .slice(2)}</span></p>
+                    <div class="score">
+                        <p class="score radiant">${match.radiant.killsCount}</p>
+                        <p class="time">${sec2time(match.durationSeconds)}</p>
+                        <p class="score dire">${match.dire.killsCount}</p>
+                    </div>
+                </div>
+            </div>
+            ` %>
+            <div class="players">
+                <%- match.players.map((player) =>`
+                <div class="player ${player.team}${player.hero.id == 80 ? " bear" : ""}${player.leaverStatus != "NONE" && player.leaverStatus != "DISCONNECTED" ? " giveup" : ""}" style="order:${player.position?.slice(-1)}">
+                    <div class="hero">
+                        <div class="player_avatar">
+                            <img alt="" src="${utils.getImageUrl(player.hero.shortName, ImageType.Heroes)}" />
+                            <p class="party_line${player.partyId != null ? " party_" + match.party[player.partyId] : ""}"></p>
+                            <p class="party_mark${player.partyId != null ? " party_" + match.party[player.partyId] : ""}"></p>
+                            <p class="position p${Math.floor(player.order / 4) + 1}">${player.isRandom ? "随机" : `第<span>${player.order == null ? "-" : player.order + 1}</span>手`}<br/>${d2a.position[player.position?.slice(-1)]}</p>
+                            <p class="level">${player.level}</p>
+                        </div>
+                        <div class="player_info">
+                            <summary class="player_name">${player.steamAccount.name}</summary>
+                            <summary class="player_performance">
+                                <span class="kda">${player.kills}/${player.deaths}/${player.assists}</span>&nbsp;&nbsp;
+                                <span class="kc" style="color:${kcndcStyle.kc(player.killContribution * 100)}">${Math.floor(player.killContribution * 100)}%</span>&nbsp;&nbsp;
+                                <span class="dc" style="color:${kcndcStyle.dc(player.deathContribution * 100)}">${Math.floor(player.deathContribution * 100)}%</span></summary>
+                            <summary class="player_net"><span class="networth">${player.networth}</span>&emsp;<span class="score">${(player.heroDamage / player.networth)?.toFixed(2)}</span></summary>
+                        </div>
+                        <div class="player_lane ${player.laneResult}">
+                            ${laneSVG[player.laneResult]}
+                        </div>
+                        <div class="player_rank">
+                            <div class="rank">
+                                <img class="medal" src="${utils.getImageUrl(
+                                    "medal_" +
+                                        ((player.steamAccount.seasonLeaderboardRank
+                                            ? player.steamAccount.seasonLeaderboardRank <= 100
+                                                ? player.steamAccount.seasonLeaderboardRank <= 10
+                                                    ? "8c"
+                                                    : "8b"
+                                                : player.steamAccount.seasonRank?.toString().split("")[0]
+                                            : player.steamAccount.seasonRank?.toString().split("")[0]) ?? "0")
+                                )}" alt="" />
+                                <img class="star" src="${utils.getImageUrl("star_" + (player.steamAccount.seasonRank?.toString().split("")[1] ?? "0"))}" alt="" />
+                                <p>${player.steamAccount.seasonLeaderboardRank ?? ""}</p>    
+                            </div>
+                            <div class="dotaPlusLevel"${!player.dotaPlus ? ` style="display:none"` : ""}>
+                                <img src="${utils.getImageUrl("hero_badge_" + (player.dotaPlus ? Math.ceil((player.dotaPlus?.level + 1) / 6) : 1))}" alt="" class="badge">
+                                <p class="level">${player.dotaPlus?.level}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="titles">
+                        ${player.titles.map((item) => `<span style="color: ${item.color};">${item.name}</span>`).join("&nbsp;")}
+                    </div>
+                        ${player.hero.id != 80 ? `
+                    <div class="items">
+                        <div class="items_normal">
+                        ${player.items
+                            .map((item) =>
+                                item
+                                    ? `
+                            <div class="item${item.isRecipe ? " recipe" : ""}">
+                                <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
+                                <p class="time">${sec2time(item.time)}</p>
+                            </div>`
+                                    : `
+                            <div class="item" style="visibility:hidden"}">
+                                <img src="${utils.getImageUrl("blink", ImageType.Items)}" alt="" />
+                                <p class="time">--:--</p>
+                            </div>`
+                            )
+                            .join("")}
+                        </div>
+                        <div class="items_backpack">
+                        ${player.backpacks
+                            .map((item) =>
+                                item
+                                    ? `
+                            <div class="item back${item.isRecipe ? " recipe" : ""}">
+                                <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
+                                <p class="time">${sec2time(item.time)}</p>
+                            </div>`
+                                    : `
+                            <div class="item back" style="visibility:hidden"}">
+                                <img src="${utils.getImageUrl("blink", ImageType.Items)}" alt="" />
+                                <p class="time">--:--</p>
+                            </div>`
+                            )
+                            .join("")}
+                        </div>
+                        <div class="item neutral" style="background-image: url(${utils.getImageUrl(dotaconstants.item_ids[player.neutral0Id], ImageType.Items)})"></div>
+                    </div>
+                    <div class="buffs">
+                        <section>
+                            ${player.stats?.matchPlayerBuffEvent
+                                ?.map(
+                                    (buff) => `
+                            <div class="buff">
+                                <img src="${utils.getImageUrl(dotaconstants[buff.abilityId ? "ability_ids" : "item_ids"][buff.abilityId ?? buff.itemId], buff.abilityId ? ImageType.Abilities : ImageType.Items)}" alt="" />
+                                <p>${buff.stackCount ?? ""}</p>
+                            </div>`
+                                )
+                                .join("")}
+                        </section>
+                        <section>
+                            <div class="support_item"${player.supportItemsCount[30] > 0 ? "" : ' style="display:none"'}>
+                                <img src="${utils.getImageUrl("gem", ImageType.Items)}" alt="" />
+                                <p>${player.supportItemsCount[30]}</p>
+                            </div>
+                            <div class="support_item"${player.supportItemsCount[40] > 0 ? "" : ' style="display:none"'}>
+                                <img src="${utils.getImageUrl("dust", ImageType.Items)}" alt="" />
+                                <p>${player.supportItemsCount[40]}</p>
+                            </div>
+                            <div class="support_item"${player.supportItemsCount[42] > 0 ? "" : ' style="display:none"'}>
+                                <img src="${utils.getImageUrl("ward_observer", ImageType.Items)}" alt="" />
+                                <p>${player.supportItemsCount[42]}</p>
+                            </div>
+                            <div class="support_item"${player.supportItemsCount[43] > 0 ? "" : ' style="display:none"'}>
+                                <img src="${utils.getImageUrl("ward_sentry", ImageType.Items)}" alt="" />
+                                <p>${player.supportItemsCount[43]}</p>
+                            </div>
+                            <div class="support_item"${player.supportItemsCount[188] > 0 ? "" : ' style="display:none"'}>
+                                <img src="${utils.getImageUrl("smoke_of_deceit", ImageType.Items)}" alt="" />
+                                <p>${player.supportItemsCount[188]}</p>
+                            </div>
+                        </section>
+                    </div>`
+                                : `
+                    <div class="items_buffs master">
+                        <div class="items master">
+                            ${player.items
+                                .map((item) =>
+                                    item
+                                        ? `
+                            <div class="item${item.isRecipe ? " recipe" : ""}">
+                                <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
+                                <p class="time">${sec2time(item.time)}</p>
+                            </div>`
+                                        : `
+                            <div class="item" style="visibility:hidden"}">
+                                <img src="${utils.getImageUrl("blink", ImageType.Items)}" alt="" />>
+                                <p class="time">--:--</p>
+                            </div>`
+                                )
+                                .join("")}
+                            ${player.backpacks
+                                .map((item) =>
+                                    item
+                                        ? `
+                            <div class="item back${item.isRecipe ? " recipe" : ""}">
+                                <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
+                                <p class="time">${sec2time(item.time)}</p>
+                            </div>`
+                                        : `
+                            <div class="item back" style="visibility:hidden"}">
+                                <img src="${utils.getImageUrl("blink", ImageType.Items)}" alt="" />
+                                <p class="time">--:--</p>
+                            </div>`
+                                )
+                                .join("")}
+                            <div class="item neutral">
+                                <img src="${utils.getImageUrl(dotaconstants.item_ids[player.neutral0Id], ImageType.Items)}" alt="" />
+                            </div>
+                        </div>
+                        <div class="buffs master">
+                            ${player.stats?.matchPlayerBuffEvent
+                                ?.map(
+                                    (buff) => `
+                            <div class="buff">
+                                <img src="${utils.getImageUrl(dotaconstants[buff.abilityId ? "ability_ids" : "item_ids"][buff.abilityId ?? buff.itemId], buff.abilityId ? ImageType.Abilities : ImageType.Items)}" alt="" />
+                                <p>${buff.stackCount ?? ""}</p>
+                            </div>`
+                                )
+                                .join("")}
+                        </div>
+                    </div>
+                    <div class="items_buffs slave">
+                        <div class="items slave">
+                            ${player.unitItems
+                                .map((item) =>
+                                    item
+                                        ? `
+                            <div class="item${item.isRecipe ? " recipe" : ""}">
+                                <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
+                                <p class="time">${sec2time(item.time)}</p>
+                            </div>`
+                                        : `
+                            <div class="item" style="visibility:hidden"}">
+                                <img src="${utils.getImageUrl("blink", ImageType.Items)}" alt="" />>
+                                <p class="time">--:--</p>
+                            </div>`
+                                )
+                                .join("")}
+                            ${player.unitBackpacks
+                                .map((item) =>
+                                    item
+                                        ? `
+                            <div class="item back${item.isRecipe ? " recipe" : ""}">
+                                <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
+                                <p class="time">${sec2time(item.time)}</p>
+                            </div>`
+                                        : `
+                            <div class="item back" style="visibility:hidden"}">
+                                <img src="${utils.getImageUrl("blink", ImageType.Items)}" alt="" />
+                                <p class="time">--:--</p>
+                            </div>`
+                                )
+                                .join("")}
+                            <div class="item neutral">
+                                <img src="${utils.getImageUrl(dotaconstants.item_ids[player.additionalUnit.neutral0Id], ImageType.Items)}" alt="" />
+                            </div>
+                        </div>
+                        <div class="buffs_supportItems slave">
+                            <div class="buffs">
+                                <!-- 无有效API获取熊灵buff -->
+                            </div>
+                            <div class="support_items">
+                                <div class="support_item"${player.supportItemsCount[30] > 0 ? "" : ' style="display:none"'}>
+                                    <img src="${utils.getImageUrl("gem", ImageType.Items)}" alt="" />
+                                    <p>${player.supportItemsCount[30]}</p>
+                                </div>
+                                <div class="support_item"${player.supportItemsCount[40] > 0 ? "" : ' style="display:none"'}>
+                                    <img src="${utils.getImageUrl("dust", ImageType.Items)}" alt="" />
+                                    <p>${player.supportItemsCount[40]}</p>
+                                </div>
+                                <div class="support_item"${player.supportItemsCount[42] > 0 ? "" : ' style="display:none"'}>
+                                    <img src="${utils.getImageUrl("ward_observer", ImageType.Items)}" alt="" />
+                                    <p>${player.supportItemsCount[42]}</p>
+                                </div>
+                                <div class="support_item"${player.supportItemsCount[43] > 0 ? "" : ' style="display:none"'}>
+                                    <img src="${utils.getImageUrl("ward_sentry", ImageType.Items)}" alt="" />
+                                    <p>${player.supportItemsCount[43]}</p>
+                                </div>
+                                <div class="support_item"${player.supportItemsCount[188] > 0 ? "" : ' style="display:none"'}>
+                                    <img src="${utils.getImageUrl("smoke_of_deceit", ImageType.Items)}" alt="" />
+                                    <p>${player.supportItemsCount[188]}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`}
+                    <div class="details">
+                        <section>英雄伤害：<span class="hero_damage">${player.heroDamage}</span></section>
+                        <section>建筑伤害：<span class="building_damage">${player.towerDamage}</span></section>
+                        <section>受到伤害(减免后)：<span class="tak">${
+                            player.stats?.heroDamageReport?.receivedTotal.physicalDamage + player.stats?.heroDamageReport?.receivedTotal.magicalDamage + player.stats?.heroDamageReport?.receivedTotal.pureDamage
+                        }</span></section>
+                        <section>补刀：<span class="lh">${player.numLastHits}</span>/<span class="dn">${player.numDenies}</span></section>
+                        <section>GPM/XPM：<span class="gpm">${player.goldPerMinute}</span>/<span class="xpm">${player.experiencePerMinute}</span></section>
+                        <section>治疗量：<span class="heal">${player.heroHealing}</span></section>
+                        <section>控制时间：<span class="building_damage">${(player.stats?.heroDamageReport?.dealtTotal.stunDuration / 100).toFixed(2)}/${(player.stats?.heroDamageReport?.dealtTotal.slowDuration / 100).toFixed(2)}/${(
+                        player.stats?.heroDamageReport?.dealtTotal.disableDuration / 100
+                    ).toFixed(2)}</span>s</section>
+                    </div>
+                </div>`).join("") %>
+            </div>
+            <div class="ban_list">
+                <%- match.pickBans
+                .filter((hero) => !hero.isPick)
+                .map((hero) => `<div class="ban_hero"><img src="${utils.getImageUrl(/^npc_dota_hero_(?<name>.+)$/.exec(dotaconstants.heroes[hero.bannedHeroId].name)[1], ImageType.Heroes)}" alt="" /></div>`)
+                .join("") %>
+            </div>
+        </div>
+    </body>
+</html>
+<script>
+        // 获取原始的玩家容器
+        const originalContainer = document.querySelector('.players');
+
+        // 创建新的容器
+        const radiantContainer = document.createElement('div');
+        radiantContainer.className = 'radiant_players';
+
+        const direContainer = document.createElement('div');
+        direContainer.className = 'dire_players';
+
+        // 获取所有玩家元素
+        const players = document.querySelectorAll('.player');
+
+        // 根据玩家类型将玩家移动到新的容器
+        players.forEach(player => {
+            if (player.classList.contains('radiant')) {
+                radiantContainer.appendChild(player);
+            } else if (player.classList.contains('dire')) {
+                direContainer.appendChild(player);
+            }
+        });
+
+        // 清空原始容器并添加新的分组容器
+        originalContainer.innerHTML = '';
+        originalContainer.appendChild(radiantContainer);
+        originalContainer.appendChild(direContainer);
+        
+</script>

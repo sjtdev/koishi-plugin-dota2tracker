@@ -70,7 +70,7 @@ export enum ImageType {
 export function getImageUrl(image: string, type: ImageType = ImageType.Local) {
     if (type === ImageType.Local) {
         try {
-            const imageData = fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/images/${image}.png`);
+            const imageData = fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/template/images/${image}.png`);
             const base64Data = imageData.toString("base64");
             return `data:image/png;base64,${base64Data}`;
         } catch (error) {
@@ -82,9 +82,11 @@ export function getImageUrl(image: string, type: ImageType = ImageType.Local) {
 
 // 对比赛数据进行补充以供生成模板函数使用
 export function getFormattedMatchData(match) {
-    // 获取到的团队击杀数是每分钟击杀数的数组，需要累加计算
-    match.radiantKillsCount = match.radiantKills ? match.radiantKills.reduce((acc: number, cva: number) => acc + cva, 0) : 0;
-    match.direKillsCount = match.direKills ? match.direKills.reduce((acc: number, cva: number) => acc + cva, 0) : 0;
+    // ↓ 累加团队击杀数，并初始化团队[总对英雄造成伤害]与[总受到伤害]
+    // 获取到的团队击杀数是每分钟击杀数的数组，需要累加计算，由radiantKills/direKills累加计算存为match.radiant.KillsCount/match.dire.KillsCount
+    ["radiant", "dire"].forEach((team) => {
+        match[team] = { killsCount: match[team + "Kills"]?.reduce((acc: number, cva: number) => acc + cva, 0) ?? 0, damageReceived: 0, heroDamage: 0, networth: 0, experience: 0 };
+    });
     // 定义开黑小队相关变量
     match.party = {};
     let party_index = 0;
@@ -118,9 +120,26 @@ export function getFormattedMatchData(match) {
 
     // 遍历所有玩家，为需要的数据进行处理
     match.players.forEach((player) => {
+        // 储存玩家所属队伍（字符串类型非队伍对象）
+        player.team = player.isRadiant ? "radiant" : "dire";
+        // 储存玩家分段
+        player.rank = {
+            medal: parseInt(player.steamAccount.seasonRank?.toString().split("")[0] ?? 0),
+            star: parseInt(player.steamAccount.seasonRank?.toString().split("")[1] ?? 0),
+            leaderboard: player.steamAccount.seasonLeaderboardRank,
+            inTop100: player.steamAccount.seasonLeaderboardRank ? (player.steamAccount.seasonLeaderboardRank <= 10 ? "8c" : player.steamAccount.seasonLeaderboardRank <= 100 ? "8b" : undefined) : undefined,
+        };
         // 参战率与参葬率
-        player.killContribution = (player.kills + player.assists) / (player.isRadiant ? match.radiantKillsCount : match.direKillsCount);
-        player.deathContribution = player.deaths / (player.isRadiant ? match.direKillsCount : match.radiantKillsCount);
+        player.killContribution = (player.kills + player.assists) / match[player.team].killsCount;
+        player.deathContribution = player.deaths / match[player.team === "radiant" ? "dire" : player.team].killsCount;
+        // 受到伤害计算
+        player.damageReceived = player.stats?.heroDamageReport?.receivedTotal.physicalDamage + player.stats?.heroDamageReport?.receivedTotal.magicalDamage + player.stats?.heroDamageReport?.receivedTotal.pureDamage ?? 0;
+        // 团队造成英雄伤害与受到伤害累加
+        match[player.team].heroDamage = (match[player.team].heroDamage ?? 0) + player.heroDamage;
+        match[player.team].damageReceived = (match[player.team].damageReceived ?? 0) + player.damageReceived;
+        // 团队经济经验累加（无有效API获取总经验，仅能通过每分钟经验数据推算）
+        match[player.team].networth += player.networth;
+        match[player.team].experience += Math.floor((player.experiencePerMinute / 60) * match.durationSeconds);
         player.titles = []; // 添加空的称号数组
         player.mvpScore = // 计算MVP分数
             player.kills * 5 +
@@ -131,6 +150,7 @@ export function getFormattedMatchData(match) {
             player.towerDamage * 0.01 +
             player.heroHealing * 0.002 +
             player.imp * 0.25;
+        // 直接储存pick顺序（从0开始）
         player.order = heroOrderList[player.hero.id];
         if (player.partyId != null) {
             if (!match.party[player.partyId]) match.party[player.partyId] = party_mark[party_index++];
@@ -152,13 +172,13 @@ export function getFormattedMatchData(match) {
 
         switch (player.lane) {
             case "SAFE_LANE":
-                player.laneResult = laneResult[player.isRadiant ? "bottom" : "top"][player.isRadiant ? "radiant" : "dire"];
+                player.laneResult = laneResult[player.isRadiant ? "bottom" : "top"][player.team];
                 break;
             case "OFF_LANE":
-                player.laneResult = laneResult[!player.isRadiant ? "bottom" : "top"][player.isRadiant ? "radiant" : "dire"];
+                player.laneResult = laneResult[!player.isRadiant ? "bottom" : "top"][player.team];
                 break;
             default:
-                player.laneResult = laneResult.mid[player.isRadiant ? "radiant" : "dire"];
+                player.laneResult = laneResult.mid[player.team];
                 break;
         }
 
@@ -327,8 +347,8 @@ export function getFormattedMatchData(match) {
         .titles.push({ name: "耐", color: "#84A1C7" });
     match.players
         .reduce((lowest, player) => {
-            const currentContribution = (player.kills + player.assists) / (player.isRadiant ? match.radiantKillsCount : match.direKillsCount);
-            const lowestContribution = (lowest.kills + lowest.assists) / (lowest.isRadiant ? match.radiantKillsCount : match.direKillsCount);
+            const currentContribution = (player.kills + player.assists) / match[player.team].KillsCount;
+            const lowestContribution = (lowest.kills + lowest.assists) / match[lowest.team].KillsCount;
 
             if (currentContribution < lowestContribution) {
                 return player; // 当前玩家的贡献比最低的还低

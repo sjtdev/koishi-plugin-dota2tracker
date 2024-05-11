@@ -507,11 +507,13 @@
             }
 
             .player.bear .items {
-                display: flex;
+                display: grid;
                 height: 100%;
                 flex-wrap: wrap;
                 width: 250.74px;
                 margin-right: 4px;
+                grid-template-columns: repeat(6,1fr);
+                grid-template-rows: repeat(2,40px);
             }
 
             .player.bear .items .item {
