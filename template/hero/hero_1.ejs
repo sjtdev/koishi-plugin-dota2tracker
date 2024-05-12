@@ -193,7 +193,6 @@
             }
 
             .skill {
-                position: relative;
                 background-color: #141b1f;
                 margin: 5px;
                 box-shadow: 0 0 5px #fff;
@@ -206,22 +205,20 @@
             }
 
             .skill > .title {
+                position: relative;
                 background-color: #1f272b;
                 padding: 8px;
                 font-weight: 100;
                 font-family: "KaiTi", "楷体", "楷体_GB2312", "STKaiti", serif;
             }
 
-            .skill svg.scepter {
+            .skill img.scepter,
+            .skill img.shard {
                 position: absolute;
+                width: 24px;
                 right: 8px;
-                top: 4.57px;
-            }
-
-            .skill svg.shard {
-                position: absolute;
-                right: 8px;
-                top: 13.88px;
+                top: 50%;
+                transform: translateY(-50%);
             }
 
             .skill .img_stats {
@@ -296,6 +293,11 @@
                 display: block;
             }
 
+            .skill .aghanim_description img{
+                position: unset;
+                transform: none;
+            }
+
             .skill .notes {
                 padding: 12px;
                 margin-bottom: 12px;
@@ -360,49 +362,47 @@
     </head>
     <body>
         <div class="wrapper">
-            <div class="hero">
-                <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="" />
-                <img class="pri_attr" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/hero_universal.png" alt="" />
+            <%- `
+            <div class="hero" id="${hero.id}">
+                <img src="${utils.getImageUrl(hero.shortName, ImageType.Heroes)}" alt="" />
+                <img class="pri_attr" src="${utils.getImageUrl(d2a.primary_attrs[dotaconstants.heroes[hero.id].primary_attr], ImageType.Icons)}" alt="" />
                 <div class="info">
-                    <p class="name">森海飞霞</p>
+                    <p class="name">${hero.language.displayName}</p>
                     <p class="roles">
-                        <span class="role level2">ESCAPE</span>
-                        <span class="role level2">NUKER</span>
-                        <span class="role level1">DISABLER</span>
-                        <span class="role level2">SUPPORT</span>
+                        ${hero.roles.map((item) => `<span class="role level${item.level}">${d2a.roles[item.roleId]}</span>`).join("")}
                     </p>
                     <p class="attrs">
-                        <span class="str">17 <span class="gain">+2.0</span></span> <span class="agi">17 <span class="gain">+2.0</span></span>
-                        <span class="int">17 <span class="gain">+2.0</span></span>
+                        <span class="str">${dotaconstants.heroes[hero.id].base_str} <span class="gain">+${dotaconstants.heroes[hero.id].str_gain.toFixed(1)}</span></span>
+                        <span class="agi">${dotaconstants.heroes[hero.id].base_agi} <span class="gain">+${dotaconstants.heroes[hero.id].agi_gain.toFixed(1)}</span></span>
+                        <span class="int">${dotaconstants.heroes[hero.id].base_int} <span class="gain">+${dotaconstants.heroes[hero.id].int_gain.toFixed(1)}</span></span>
                     </p>
                 </div>
             </div>
             <div class="details">
                 <div class="hype_talents">
                     <div class="hype">
-                        麻烦来临时森海飞霞总是身在左近，她的生活就是与自己视为家乡的诡异林渊中充斥的威胁纠缠不清。
-                        携带着<b>巨大的弩机</b>，同时仍能<b>在密林中轻松奔走</b>，森海飞霞在战斗中来去自如。只要有一瞬间没见到她，她就会从你背后现身——而你目瞪口呆的尸体已经挂在她的<b>一张网</b>里。
+                        ${hero.language.hype}
                     </div>
                     <div class="talents">
                         <div class="talent">
-                            <div class="left">+10 zuobiantianfu</div>
+                            <div class="left">${hero.talents[7].name_cn}</div>
                             <div class="level">25</div>
-                            <div class="right">+20 youbiantianfu</div>
+                            <div class="right">${hero.talents[6].name_cn}</div>
                         </div>
                         <div class="talent">
-                            <div class="left">+10 zuobiantianfu</div>
+                            <div class="left">${hero.talents[5].name_cn}</div>
                             <div class="level">20</div>
-                            <div class="right">+20 youbiantianfu</div>
+                            <div class="right">${hero.talents[4].name_cn}</div>
                         </div>
                         <div class="talent">
-                            <div class="left">+10 zuobiantianfu</div>
+                            <div class="left">${hero.talents[3].name_cn}</div>
                             <div class="level">15</div>
-                            <div class="right">+20 youbiantianfu</div>
+                            <div class="right">${hero.talents[2].name_cn}</div>
                         </div>
                         <div class="talent">
-                            <div class="left">+10 zzz</div>
+                            <div class="left">${hero.talents[1].name_cn}</div>
                             <div class="level">10</div>
-                            <div class="right">+40% 密林奔走开启时闪避</div>
+                            <div class="right">${hero.talents[0].name_cn}</div>
                         </div>
                     </div>
                 </div>
@@ -410,107 +410,133 @@
                     <tbody>
                         <tr>
                             <td>初始生命值</td>
-                            <td>123</td>
+                            <td>${dotaconstants.heroes[hero.id].base_health + dotaconstants.heroes[hero.id].base_str * 22}</td>
                         </tr>
                         <tr>
                             <td>初始生命回复</td>
-                            <td>1.23</td>
+                            <td>${dotaconstants.heroes[hero.id].base_health_regen}</td>
                         </tr>
                         <tr>
                             <td>初始魔法值</td>
-                            <td>123</td>
+                            <td>${dotaconstants.heroes[hero.id].base_mana + dotaconstants.heroes[hero.id].base_int * 12}</td>
                         </tr>
                         <tr>
                             <td>初始魔法回复</td>
-                            <td>1.23</td>
+                            <td>${dotaconstants.heroes[hero.id].base_mana_regen}</td>
                         </tr>
                         <tr>
                             <td>初始攻击力</td>
-                            <td>55（11~22）</td>
+                            <td>${dotaconstants.heroes[hero.id].base_mr + Math.round(dotaconstants.heroes[hero.id].primary_attr == "all" ? 
+                                (dotaconstants.heroes[hero.id].base_str + dotaconstants.heroes[hero.id].base_agi + dotaconstants.heroes[hero.id].base_int) * 0.7
+                                : dotaconstants.heroes[hero.id]["base_" + dotaconstants.heroes[hero.id].primary_attr])}
+                                （${dotaconstants.heroes[hero.id].base_attack_min + Math.round(dotaconstants.heroes[hero.id].primary_attr == "all" ?
+                                (dotaconstants.heroes[hero.id].base_str + dotaconstants.heroes[hero.id].base_agi + dotaconstants.heroes[hero.id].base_int) * 0.7
+                                : dotaconstants.heroes[hero.id]["base_" + dotaconstants.heroes[hero.id].primary_attr])}
+                                ~${dotaconstants.heroes[hero.id].base_attack_max + Math.round(dotaconstants.heroes[hero.id].primary_attr == "all" ?
+                                (dotaconstants.heroes[hero.id].base_str + dotaconstants.heroes[hero.id].base_agi + dotaconstants.heroes[hero.id].base_int) * 0.7
+                                : dotaconstants.heroes[hero.id]["base_" + dotaconstants.heroes[hero.id].primary_attr])}）
+                            </td>
                         </tr>
                         <tr>
                             <td>基础攻击间隔</td>
-                            <td>2.0</td>
+                            <td>${dotaconstants.heroes[hero.id].attack_rate.toFixed(1)}</td>
                         </tr>
                         <tr>
                             <td>基础攻击前摇</td>
-                            <td>0.4</td>
+                            <td>${dotaconstants.heroes[hero.id].attack_point.toFixed(1)}</td>
                         </tr>
                         <tr>
                             <td>攻击范围</td>
-                            <td>575</td>
+                            <td>${dotaconstants.heroes[hero.id].attack_range}</td>
                         </tr>
                         <tr>
                             <td>护甲</td>
-                            <td>2（11%）</td>
+                            <td>${(Math.round((dotaconstants.heroes[hero.id].base_armor + dotaconstants.heroes[hero.id].base_agi * 0.167) * 10) / 10).toFixed(1)}</td>
                         </tr>
                         <tr>
                             <td>移动速度</td>
-                            <td>333</td>
+                            <td>${dotaconstants.heroes[hero.id].move_speed}</td>
                         </tr>
                         <tr>
                             <td>视野范围</td>
-                            <td>1800（800）</td>
+                            <td>${dotaconstants.heroes[hero.id].day_vision}（${dotaconstants.heroes[hero.id].night_vision}）</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <div class="skills">
+                ${hero.abilities.filter((item) => dotaconstants.abilities[item.ability.name].behavior != "Hidden")
+                .map((item) => `
                 <div class="skill">
-                    <p class="title">爆栗出击</p>
-                    <svg class="shard" viewBox="0 0 19 10" fill="hsla(0,0%,100%,0.16)" width="24">
-                        <path
-                            d="M0.259504 4.54746C0.272981 4.60325 0.326002 4.64198 0.386194 4.64198C0.831857 4.62418 2.60461 4.45628 3.91732 2.90727C4.49956 2.22054 4.37916 1.21884 3.64777 0.671532C2.91819 0.125197 1.85256 0.238284 1.27032 0.924899C-0.0423919 2.47305 0.17864 4.13525 0.259504 4.54746Z"
-                            fill="url(#activeAghanimLeftShardGradient)"
-                        ></path>
-                        <path
-                            d="M9.46713 9.98081C9.42698 10.0064 9.37572 10.0064 9.33559 9.98081C8.88968 9.67166 6.33212 7.75166 6.33212 4.38581C6.33212 2.96661 7.70742 1.81406 9.40136 1.81406C11.0953 1.81406 12.4706 2.96661 12.4706 4.38581C12.4706 7.75166 9.91303 9.67166 9.46713 9.98081Z"
-                            fill="url(#activeAghanimMidShardGradient)"
-                        ></path>
-                        <path
-                            d="M18.6888 4.54746C18.6753 4.60325 18.6232 4.64198 18.5631 4.64198C18.1173 4.62418 16.3445 4.45628 15.0317 2.90727C14.4494 2.22054 14.5697 1.21884 15.3003 0.671532C16.0308 0.125197 17.0966 0.238284 17.6788 0.924899C18.9917 2.47305 18.7707 4.13525 18.6888 4.54746Z"
-                            fill="url(#activeAghanimRightShardGradient)"
-                        ></path>
-                        <defs>
-                            <radialGradient id="activeAghanimMidShardGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(9.01787 2.49983) rotate(90) scale(7.50029 5.21143)">
-                                <stop stop-color="#00CEFF"></stop>
-                                <stop offset="1" stop-color="#3443C4"></stop>
-                            </radialGradient>
-                            <radialGradient id="activeAghanimLeftShardGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(3.98746 0.625367) rotate(128.66) scale(6.00315 4.79432)">
-                                <stop stop-color="#00CEFF"></stop>
-                                <stop offset="1" stop-color="#3443C4"></stop>
-                            </radialGradient>
-                            <radialGradient id="activeAghanimRightShardGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(14.2996 0.625367) rotate(51.3402) scale(6.00316 4.7942)">
-                                <stop stop-color="#00CEFF"></stop>
-                                <stop offset="1" stop-color="#3443C4"></stop>
-                            </radialGradient>
-                        </defs>
-                    </svg>
-                    <div class="img_stats">
-                        <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/hoodwink_acorn_shot.png" alt="" />
-                        <div class="stats">
-                            <p class="stat">技能：点目标</p>
-                            <p class="dmg_type Magical">伤害类型：</p>
-                        </div>
+                    <p class="title">
+                        <span>${item.ability.language.displayName}</span>
+                        ${item.ability.stat.isGrantedByScepter ?`<img src="${utils.getImageUrl("scepter")}" alt="" class="scepter"></p>`:""}
+                        ${item.ability.stat.isGrantedByShard ?`<img src="${utils.getImageUrl("shard")}" alt="" class="shard"></p>`:""}
+                    </p>
+                <div class="img_stats">
+                    <img src="${utils.getImageUrl(item.ability.name, ImageType.Abilities)}" alt="" />
+                    <div class="stats">
+                        <p class="behavior">技能：${(Array.isArray(dotaconstants.abilities[item.ability.name].behavior) ? dotaconstants.abilities[item.ability.name].behavior : [dotaconstants.abilities[item.ability.name].behavior])
+                            .filter((beh) => beh !== "Hidden" || !(item.ability.stat.isGrantedByShard || item.ability.stat.isGrantedByScepter))
+                            .map((beh) => d2a.behavior[beh])
+                            .join("/")}</p>
+                        ${dotaconstants.abilities[item.ability.name].target_team
+                                ? `<p class="target_team">影响：${(Array.isArray(dotaconstants.abilities[item.ability.name].target_team)
+                                ? dotaconstants.abilities[item.ability.name].target_team
+                                : [dotaconstants.abilities[item.ability.name].target_team])
+                                .map((tt) => d2a.target_team[tt])
+                                .join("/")}</p>`
+                                : ""}
+                        ${!Array.isArray(dotaconstants.abilities[item.ability.name].dmg_type) && dotaconstants.abilities[item.ability.name].dmg_type
+                                ? `<p class="dmg_type ${dotaconstants.abilities[item.ability.name].dmg_type}">伤害类型：</p>`
+                                : ""}
+                        ${dotaconstants.abilities[item.ability.name].dispellable
+                                ? `<p class="dispellable ${dotaconstants.abilities[item.ability.name].dispellable == "Strong Dispels Only" ? "Strong" : dotaconstants.abilities[item.ability.name].dispellable}">能否驱散：</p>`
+                                : ""}
+                        ${!Array.isArray(dotaconstants.abilities[item.ability.name].bkbpierce) && dotaconstants.abilities[item.ability.name].bkbpierce
+                                ? `<p class="bkbpierce">无视减益免疫： ${dotaconstants.abilities[item.ability.name].bkbpierce == "Yes" ? "是" : "否"}</p>`
+                                : ""}
                     </div>
-                    <p class="description">森海飞霞向目标单位发射一颗橡栗，可以弹射至附近敌人，减缓他们的移动速度，并造成攻击伤害的一定百分比和额外伤害。</p>
-                    <p class="description">可以对地面施放，在目标地点种出一棵树，而橡栗会弹射至附近目标。设为多样施法后会强制沿用该行为。</p>
-                    <p class="shard aghanim_description"><span class="title"> 阿哈利姆魔晶</span><span class="desc">可以对地面施放，在目标地点种出一棵树，而橡栗会弹射至附近目标。设为多样施法后会强制沿用该行为。</span></p>
-                    <div class="notes">
-                        <p>同一个目标可以被击中超过一次。</p>
-                        <p>弹射会搜寻525范围内战争迷雾中的单位，但无视隐身单位。</p>
-                        <p>种下的树持续20秒。</p>
-                        <p>爆栗出击可以享受攻击距离加成效果。</p>
-                    </div>
-                    <div class="attributes"><span class="item">额外攻击距离</span><span class="values"> 125 / 200 / 275 / 350</span></div>
-                    <p><span class="cooldown"> 16 / 14 / 12 / 10 </span><span class="mana_cost" style="padding-left: 12px"> 70 / 75 / 80 / 85 </span></p>
-                    <p class="lore">虽然她几乎什么都能凑合着用，不过橡树和铁树之木的栗子是最有效的炮弹——也是森海飞霞大部分的存货来源。</p>
                 </div>
-            </div>
-            <div class="lore">
-                在云硝国的边界，绿色的森林绵延不绝，生活悠然自得，森海飞霞的早年时光就是在这里度过的。但是随着王国的发展，居民和军队的需求急剧增加，互相竞争的矿石和木材大亨拼命地你追我赶，疯狂地进行扩张来满足日新月异的需求，而边界森林的自然美景不断遭到蚕食。
-                <br /><br />生活在古老林地中的人们别无选择，摆在面前的选择有跟随一众难民进入和平地带，或者在保卫自己的房屋时倒在云硝国的火药和铁器之下，又或者继续北上，逃往云雾缭绕的托莫干森林，在幽谷和密林中碰碰运气。<br /><br />而正是在这片危险的北方林渊中，森海飞霞时刻都在躲避托莫干中可怕的捕食者，拉拢当地一些匪徒时也对其他帮派施以颜色，还会想尽一切办法来引发有意思的恶作剧——<i>听说</i>她常常就是罪魁祸首。就这样，她一路长大成年。<br /><br />但云硝国的大火终于有一丝气味飘到了她第二个故乡，森海飞霞的思绪落在侵略下存活的亲友身上——如今他们在被夷平的土地上苟延残喘，这让她心如刀割——她禁不住想前往文明的边际，看一眼摧毁她过去生活的恶魔。<br /><br />到了目的地之后，她亲眼见到了。她看到她童年里的怪物根本就不是怪物。他们只是……普通人。士兵，工人，商贩……还有难民。而士兵，就算配备了火药和铁器，也根本比不上托莫干的危险——那是真正的危险，有着触角和利齿——她像不停转动的枫子围绕着这些危险翩翩起舞。<br /><br />永远笼罩着浓雾的森林让多数热血的人们不敢涉足，而森海飞霞对其中盘根错节的小路了如指掌，现在她会对胆敢威胁林野的人出手——开心地从他们手里拿走自己喜爱的东西，摧毁她不感兴趣的，还有帮助幸存的同胞重拾森林中的生活。
-            </div>
+                ${item.ability.language.description.map((desc) => `<p class="description">${desc}</p>`).join("")}
+                ${item.ability.language.aghanimDescription
+                ? `<p class="aghanim_description">
+                    <span class="title"><img src="${utils.getImageUrl("scepter")}" alt="" class="scepter">阿哈利姆神杖</span>
+                    <span class="desc">${item.ability.language.aghanimDescription}</span>
+                </p>` : ""}
+                ${item.ability.language.shardDescription
+                ? `<p class="aghanim_description">
+                    <span class="title"><img src="${utils.getImageUrl("shard")}" alt="" class="shard">阿哈利姆魔晶</span>
+                    <span class="desc">${item.ability.language.shardDescription}</span>
+                </p>` : ""}
+                <div class="notes"${!item.ability.language.notes.length ? ` style="display:none;"` : ""}>
+                    ${item.ability.language.notes.map((note) => `<p>${note}</p>`).join("")}
+                </div>
+                <div class="attributes">
+                ${item.ability.language.attributes
+                    .map((attr) => {
+                        const parts = attr.split("：");
+                        return `<p><span class="item">${parts[0]}</span><span class="values">${parts[1]}</span></p>`;
+                    })
+                    .join("")}
+                </div>
+                <p>
+                    ${dotaconstants.abilities[item.ability.name].cd ?
+                    `<span class="cooldown"> ${(Array.isArray(dotaconstants.abilities[item.ability.name].cd)
+                        ? dotaconstants.abilities[item.ability.name].cd
+                        : [dotaconstants.abilities[item.ability.name].cd]).join(" / ")}
+                    </span>` : ""}
+                    ${dotaconstants.abilities[item.ability.name].mc ?
+                    `<span class="mana_cost"> ${(Array.isArray(dotaconstants.abilities[item.ability.name].mc)
+                        ? dotaconstants.abilities[item.ability.name].mc
+                        : [dotaconstants.abilities[item.ability.name].mc]).join(" / ")}
+                    </span>` : ""}
+                </p>
+                <p class="lore"${!item.ability.language.lore ? ` style="display:none;"` : ""}>${item.ability.language.lore}</p>
+            </div>`).join("")}
         </div>
+        <div class="lore">
+            ${hero.language.lore}
+        </div>` %>
     </body>
 </html>

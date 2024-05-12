@@ -24,7 +24,9 @@ export interface Config {
 }
 export const Config: Schema<Config> = Schema.object({
     STRATZ_API_TOKEN: Schema.string().required().description("※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取"),
-    template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)]).default("match_1").description("生成比赛图片使用的模板，见 https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki 有模板展示。"),
+    template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)])
+        .default("match_1")
+        .description("生成比赛图片使用的模板，见 https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki 有模板展示。"),
 });
 
 let pendingMatches = []; // 待发布的比赛，当获取到的比赛未被解析时存入此数组，在计时器中定时查询，直到该比赛已被解析则生成图片发布
@@ -155,7 +157,7 @@ export async function apply(ctx: Context, config: Config) {
                 }
             }
             if (match && match.parsedDateTime) {
-                session.send(await ctx.puppeteer.render(newGenMatchImageHTML(match,config.template_match)));
+                session.send(await ctx.puppeteer.render(newGenMatchImageHTML(match, config.template_match)));
                 ctx.database.upsert("dt_previous_query_results", (row) => [{ matchId: match.id, data: match, queryTime: new Date() }]);
             } else {
                 pendingMatches.push({ matchId: matchId, platform: session.event.platform, guildId: session.event.guild.id });
@@ -347,7 +349,7 @@ export async function apply(ctx: Context, config: Config) {
                     if (queryRes3.status == 200) {
                         let hero = queryRes3.data.data.constants.hero;
                         hero.talents.forEach((talent) => (talent.name_cn = AbilitiesConstantsCN.data.abilities.find((item) => item.id == talent.abilityId).language.displayName));
-                        await session.send(await ctx.puppeteer.render(genHeroHTML(hero)));
+                        await session.send(await ctx.puppeteer.render(newGenHeroImageHTML(hero)));
                     } else throw 0;
                 } catch (error) {
                     console.error(error);
@@ -543,7 +545,7 @@ export async function apply(ctx: Context, config: Config) {
                         // await session.send(await ctx.puppeteer.render(genMatchImageHTML(match)));
 
                         let broadMatchMessage = "";
-                        const img = await ctx.puppeteer.render(newGenMatchImageHTML(match,config.template_match));
+                        const img = await ctx.puppeteer.render(newGenMatchImageHTML(match, config.template_match));
                         for (let comming of realCommingMatches) {
                             let commingSubscribedPlayers = subscribedPlayersInGuild.filter((item) => item.platform == comming.platform && item.guildId == comming.guildId);
                             let idsToFind = commingSubscribedPlayers.map((item) => item.steamId);
@@ -599,7 +601,7 @@ function newGenMatchImageHTML(match, template = "match_1") {
         ImageType: ImageType,
         d2a: d2a,
         dotaconstants: dotaconstants,
-        moment: moment
+        moment: moment,
     };
 
     let result = "";
@@ -612,227 +614,28 @@ function newGenMatchImageHTML(match, template = "match_1") {
     return result;
 }
 
-function genHeroHTML(hero) {
-    let $ = cheerio.load(fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/hero.html`, "utf-8"));
+function newGenHeroImageHTML(hero, template = "hero_1"){
+    // 模板文件的路径
+    const templatePath = path.join(`./node_modules/@sjtdev/koishi-plugin-${name}/template/hero`, template + ".ejs");
 
-    let html = `
-    <div class="hero" id="${hero.id}">
-        <img src="${utils.getImageUrl(hero.shortName, ImageType.Heroes)}" alt="" />
-        <img class="pri_attr" src="${utils.getImageUrl(d2a.primary_attrs[dotaconstants.heroes[hero.id].primary_attr], ImageType.Icons)}" alt="" />
-        <div class="info">
-            <p class="name">${hero.language.displayName}</p>
-            <p class="roles">
-                ${hero.roles.map((item) => `<span class="role level${item.level}">${d2a.roles[item.roleId]}</span>`).join("")}
-            </p>
-            <p class="attrs">
-                <span class="str">${dotaconstants.heroes[hero.id].base_str} <span class="gain">+${dotaconstants.heroes[hero.id].str_gain.toFixed(1)}</span></span>
-                <span class="agi">${dotaconstants.heroes[hero.id].base_agi} <span class="gain">+${dotaconstants.heroes[hero.id].agi_gain.toFixed(1)}</span></span>
-                <span class="int">${dotaconstants.heroes[hero.id].base_int} <span class="gain">+${dotaconstants.heroes[hero.id].int_gain.toFixed(1)}</span></span>
-            </p>
-        </div>
-    </div>
-    <div class="details">
-        <div class="hype_talents">
-            <div class="hype">
-                ${hero.language.hype}
-            </div>
-            <div class="talents">
-                <div class="talent">
-                    <div class="left">${hero.talents[7].name_cn}</div>
-                    <div class="level">25</div>
-                    <div class="right">${hero.talents[6].name_cn}</div>
-                </div>
-                <div class="talent">
-                    <div class="left">${hero.talents[5].name_cn}</div>
-                    <div class="level">20</div>
-                    <div class="right">${hero.talents[4].name_cn}</div>
-                </div>
-                <div class="talent">
-                    <div class="left">${hero.talents[3].name_cn}</div>
-                    <div class="level">15</div>
-                    <div class="right">${hero.talents[2].name_cn}</div>
-                </div>
-                <div class="talent">
-                    <div class="left">${hero.talents[1].name_cn}</div>
-                    <div class="level">10</div>
-                    <div class="right">${hero.talents[0].name_cn}</div>
-                </div>
-            </div>
-        </div>
-        <table class="list">
-            <tbody>
-                <tr>
-                    <td>初始生命值</td>
-                    <td>${dotaconstants.heroes[hero.id].base_health + dotaconstants.heroes[hero.id].base_str * 22}</td>
-                </tr>
-                <tr>
-                    <td>初始生命回复</td>
-                    <td>${dotaconstants.heroes[hero.id].base_health_regen}</td>
-                </tr>
-                <tr>
-                    <td>初始魔法值</td>
-                    <td>${dotaconstants.heroes[hero.id].base_mana + dotaconstants.heroes[hero.id].base_int * 12}</td>
-                </tr>
-                <tr>
-                    <td>初始魔法回复</td>
-                    <td>${dotaconstants.heroes[hero.id].base_mana_regen}</td>
-                </tr>
-                <tr>
-                    <td>初始攻击力</td>
-                    <td>${
-                        dotaconstants.heroes[hero.id].base_mr +
-                        Math.round(
-                            dotaconstants.heroes[hero.id].primary_attr == "all"
-                                ? (dotaconstants.heroes[hero.id].base_str + dotaconstants.heroes[hero.id].base_agi + dotaconstants.heroes[hero.id].base_int) * 0.7
-                                : dotaconstants.heroes[hero.id]["base_" + dotaconstants.heroes[hero.id].primary_attr]
-                        )
-                    }（${
-        dotaconstants.heroes[hero.id].base_attack_min +
-        Math.round(
-            dotaconstants.heroes[hero.id].primary_attr == "all"
-                ? (dotaconstants.heroes[hero.id].base_str + dotaconstants.heroes[hero.id].base_agi + dotaconstants.heroes[hero.id].base_int) * 0.7
-                : dotaconstants.heroes[hero.id]["base_" + dotaconstants.heroes[hero.id].primary_attr]
-        )
-    }~${
-        dotaconstants.heroes[hero.id].base_attack_max +
-        Math.round(
-            dotaconstants.heroes[hero.id].primary_attr == "all"
-                ? (dotaconstants.heroes[hero.id].base_str + dotaconstants.heroes[hero.id].base_agi + dotaconstants.heroes[hero.id].base_int) * 0.7
-                : dotaconstants.heroes[hero.id]["base_" + dotaconstants.heroes[hero.id].primary_attr]
-        )
-    }）</td>
-                </tr>
-                <tr>
-                    <td>基础攻击间隔</td>
-                    <td>${dotaconstants.heroes[hero.id].attack_rate.toFixed(1)}</td>
-                </tr>
-                <tr>
-                    <td>基础攻击前摇</td>
-                    <td>${dotaconstants.heroes[hero.id].attack_point.toFixed(1)}</td>
-                </tr>
-                <tr>
-                    <td>攻击范围</td>
-                    <td>${dotaconstants.heroes[hero.id].attack_range}</td>
-                </tr>
-                <tr>
-                    <td>护甲</td>
-                    <td>${(Math.round((dotaconstants.heroes[hero.id].base_armor + dotaconstants.heroes[hero.id].base_agi * 0.167) * 10) / 10).toFixed(1)}</td>
-                </tr>
-                <tr>
-                    <td>移动速度</td>
-                    <td>${dotaconstants.heroes[hero.id].move_speed}</td>
-                </tr>
-                <tr>
-                    <td>视野范围</td>
-                    <td>${dotaconstants.heroes[hero.id].day_vision}（${dotaconstants.heroes[hero.id].night_vision}）</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="skills">
-        ${hero.abilities
-            .filter((item) => dotaconstants.abilities[item.ability.name].behavior != "Hidden")
-            .map(
-                (item) => `
-                <div class="skill">
-                    <p class="title">${item.ability.language.displayName}</p>
-                    ${
-                        item.ability.stat.isGrantedByScepter
-                            ? `<svg class="scepter" viewBox="0 0 19 20" fill="hsla(0,0%,100%,0.16)" width="24"><path d="M4.795 14.99a2.06 2.06 0 00-.96-.388c-1.668-.204-2.506.518-3.107 1.008.464.128.879.364.867.97 2.347-1.605 4.159.84 2.415 2.666-.14.147.65.929.767.718.203-.365.79-1.064 1.445-1.064.964 0 1.529.68 1.823.838.267.144.793-.372.642-.675-.03-.06-.229-.204-.569-.438-1.407-.197-1.935-1.093-2.37-2.026-.276-.593-.503-1.206-.953-1.61zm9.41 0a2.06 2.06 0 01.96-.388c1.668-.204 2.507.518 3.107 1.008-.464.128-.879.364-.867.97-2.347-1.605-4.158.84-2.415 2.666.14.147-.65.929-.768.718-.202-.365-.79-1.064-1.444-1.064-.965 0-1.529.68-1.823.838-.267.144-.793-.372-.642-.675.03-.06.229-.204.569-.438 1.407-.197 1.935-1.093 2.37-2.026.276-.593.503-1.206.953-1.61zm-3.919-2.211c0-.233-.175-.423-.392-.423h-.788c-.217 0-.392.19-.392.423v5.665c0 .232.175.421.392.421h.788c.216 0 .392-.189.392-.421v-5.665zm-1.989 2.543c-.553-.139-2.074-.563-2.702-1.17-.814-.784-1.107-3.135-2.655-3.52-1.29-.32-2.448.27-2.924 1.05-.06.101.055.241.252.178 2.786-.884 2.957 1.674 2.672 2.215a.275.275 0 00-.024.057c.87-.106 1.462.043 1.893.328.447.294.732.738.975 1.231.515 1.042.822 2.335 2.513 2.512v-2.88zm2.406 0c.553-.139 2.074-.563 2.703-1.17.812-.784 1.106-3.135 2.654-3.52 1.29-.32 2.448.27 2.924 1.05.06.101-.055.241-.252.178-2.786-.884-2.957 1.674-2.672 2.215a.27.27 0 01.024.057c-.87-.106-1.462.043-1.893.328-.447.294-.732.738-.975 1.231-.515 1.042-.822 2.335-2.513 2.512v-2.88z" fill="hsla(0,0%,100%,0.6)"></path><path d="M9.753.093a.39.39 0 00-.506 0C8.461.747 6.08 2.946 5.515 3.417a.434.434 0 00-.15.262c-.162.895-.949 4.817-1.12 5.764a.46.46 0 00.067.333c.37.564 1.665 2.752 2.071 3.37a.404.404 0 00.336.187h.768c.19 0 .356-.14.4-.337l.35-1.577a.416.416 0 01.399-.336h1.728c.19 0 .356.139.399.336l.35 1.577a.416.416 0 00.4.337h.768c.133 0 .259-.07.336-.187.406-.618 1.7-2.806 2.07-3.37a.457.457 0 00.067-.333c-.17-.947-.957-4.87-1.118-5.764a.435.435 0 00-.15-.262C12.92 2.946 10.537.747 9.752.093z" fill="url(#activeAghanimScepterGradient)"></path><defs><radialGradient id="activeAghanimScepterGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(9.03623 10.4684) rotate(-90) scale(9.38905 7.0456)"><stop stop-color="#00CEFF"></stop><stop offset="1" stop-color="#3443C4"></stop></radialGradient></defs></svg>`
-                            : ""
-                    }
-                    ${
-                        item.ability.stat.isGrantedByShard
-                            ? `<svg class="shard" viewBox="0 0 19 10" fill="hsla(0,0%,100%,0.16)" width="24"><path d="M0.259504 4.54746C0.272981 4.60325 0.326002 4.64198 0.386194 4.64198C0.831857 4.62418 2.60461 4.45628 3.91732 2.90727C4.49956 2.22054 4.37916 1.21884 3.64777 0.671532C2.91819 0.125197 1.85256 0.238284 1.27032 0.924899C-0.0423919 2.47305 0.17864 4.13525 0.259504 4.54746Z" fill="url(#activeAghanimLeftShardGradient)"></path><path d="M9.46713 9.98081C9.42698 10.0064 9.37572 10.0064 9.33559 9.98081C8.88968 9.67166 6.33212 7.75166 6.33212 4.38581C6.33212 2.96661 7.70742 1.81406 9.40136 1.81406C11.0953 1.81406 12.4706 2.96661 12.4706 4.38581C12.4706 7.75166 9.91303 9.67166 9.46713 9.98081Z" fill="url(#activeAghanimMidShardGradient)"></path><path d="M18.6888 4.54746C18.6753 4.60325 18.6232 4.64198 18.5631 4.64198C18.1173 4.62418 16.3445 4.45628 15.0317 2.90727C14.4494 2.22054 14.5697 1.21884 15.3003 0.671532C16.0308 0.125197 17.0966 0.238284 17.6788 0.924899C18.9917 2.47305 18.7707 4.13525 18.6888 4.54746Z" fill="url(#activeAghanimRightShardGradient)"></path><defs><radialGradient id="activeAghanimMidShardGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(9.01787 2.49983) rotate(90) scale(7.50029 5.21143)"><stop stop-color="#00CEFF"></stop><stop offset="1" stop-color="#3443C4"></stop></radialGradient><radialGradient id="activeAghanimLeftShardGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(3.98746 0.625367) rotate(128.66) scale(6.00315 4.79432)"><stop stop-color="#00CEFF"></stop><stop offset="1" stop-color="#3443C4"></stop></radialGradient><radialGradient id="activeAghanimRightShardGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(14.2996 0.625367) rotate(51.3402) scale(6.00316 4.7942)"><stop stop-color="#00CEFF"></stop><stop offset="1" stop-color="#3443C4"></stop></radialGradient></defs></svg>`
-                            : ""
-                    }
-                    <div class="img_stats">
-                        <img src="${utils.getImageUrl(item.ability.name, ImageType.Abilities)}" alt="" />
-                        <div class="stats">
-                            <p class="behavior">技能：${(Array.isArray(dotaconstants.abilities[item.ability.name].behavior) ? dotaconstants.abilities[item.ability.name].behavior : [dotaconstants.abilities[item.ability.name].behavior])
-                                .filter((beh) => beh !== "Hidden" || !(item.ability.stat.isGrantedByShard || item.ability.stat.isGrantedByScepter))
-                                .map((beh) => d2a.behavior[beh])
-                                .join("/")}</p>
-                            ${
-                                dotaconstants.abilities[item.ability.name].target_team
-                                    ? `<p class="target_team">影响：${(Array.isArray(dotaconstants.abilities[item.ability.name].target_team)
-                                          ? dotaconstants.abilities[item.ability.name].target_team
-                                          : [dotaconstants.abilities[item.ability.name].target_team]
-                                      )
-                                          .map((tt) => d2a.target_team[tt])
-                                          .join("/")}</p>`
-                                    : ""
-                            }
-                            ${
-                                !Array.isArray(dotaconstants.abilities[item.ability.name].dmg_type) && dotaconstants.abilities[item.ability.name].dmg_type
-                                    ? `<p class="dmg_type ${dotaconstants.abilities[item.ability.name].dmg_type}">伤害类型：</p>`
-                                    : ""
-                            }
-                            ${
-                                dotaconstants.abilities[item.ability.name].dispellable
-                                    ? `<p class="dispellable ${dotaconstants.abilities[item.ability.name].dispellable == "Strong Dispels Only" ? "Strong" : dotaconstants.abilities[item.ability.name].dispellable}">能否驱散：</p>`
-                                    : ""
-                            }
-                            ${
-                                !Array.isArray(dotaconstants.abilities[item.ability.name].bkbpierce) && dotaconstants.abilities[item.ability.name].bkbpierce
-                                    ? `<p class="bkbpierce">无视减益免疫： ${dotaconstants.abilities[item.ability.name].bkbpierce == "Yes" ? "是" : "否"}</p>`
-                                    : ""
-                            }
-                        </div>
-                    </div>
-                    ${item.ability.language.description.map((desc) => `<p class="description">${desc}</p>`).join("")}
-                    ${
-                        item.ability.language.aghanimDescription
-                            ? `<p class="aghanim_description"><span class="title"><svg viewBox="0 0 19 20" fill="hsla(0,0%,100%,0.16)" width="24"><path d="M4.795 14.99a2.06 2.06 0 00-.96-.388c-1.668-.204-2.506.518-3.107 1.008.464.128.879.364.867.97 2.347-1.605 4.159.84 2.415 2.666-.14.147.65.929.767.718.203-.365.79-1.064 1.445-1.064.964 0 1.529.68 1.823.838.267.144.793-.372.642-.675-.03-.06-.229-.204-.569-.438-1.407-.197-1.935-1.093-2.37-2.026-.276-.593-.503-1.206-.953-1.61zm9.41 0a2.06 2.06 0 01.96-.388c1.668-.204 2.507.518 3.107 1.008-.464.128-.879.364-.867.97-2.347-1.605-4.158.84-2.415 2.666.14.147-.65.929-.768.718-.202-.365-.79-1.064-1.444-1.064-.965 0-1.529.68-1.823.838-.267.144-.793-.372-.642-.675.03-.06.229-.204.569-.438 1.407-.197 1.935-1.093 2.37-2.026.276-.593.503-1.206.953-1.61zm-3.919-2.211c0-.233-.175-.423-.392-.423h-.788c-.217 0-.392.19-.392.423v5.665c0 .232.175.421.392.421h.788c.216 0 .392-.189.392-.421v-5.665zm-1.989 2.543c-.553-.139-2.074-.563-2.702-1.17-.814-.784-1.107-3.135-2.655-3.52-1.29-.32-2.448.27-2.924 1.05-.06.101.055.241.252.178 2.786-.884 2.957 1.674 2.672 2.215a.275.275 0 00-.024.057c.87-.106 1.462.043 1.893.328.447.294.732.738.975 1.231.515 1.042.822 2.335 2.513 2.512v-2.88zm2.406 0c.553-.139 2.074-.563 2.703-1.17.812-.784 1.106-3.135 2.654-3.52 1.29-.32 2.448.27 2.924 1.05.06.101-.055.241-.252.178-2.786-.884-2.957 1.674-2.672 2.215a.27.27 0 01.024.057c-.87-.106-1.462.043-1.893.328-.447.294-.732.738-.975 1.231-.515 1.042-.822 2.335-2.513 2.512v-2.88z" fill="hsla(0,0%,100%,0.6)"></path><path d="M9.753.093a.39.39 0 00-.506 0C8.461.747 6.08 2.946 5.515 3.417a.434.434 0 00-.15.262c-.162.895-.949 4.817-1.12 5.764a.46.46 0 00.067.333c.37.564 1.665 2.752 2.071 3.37a.404.404 0 00.336.187h.768c.19 0 .356-.14.4-.337l.35-1.577a.416.416 0 01.399-.336h1.728c.19 0 .356.139.399.336l.35 1.577a.416.416 0 00.4.337h.768c.133 0 .259-.07.336-.187.406-.618 1.7-2.806 2.07-3.37a.457.457 0 00.067-.333c-.17-.947-.957-4.87-1.118-5.764a.435.435 0 00-.15-.262C12.92 2.946 10.537.747 9.752.093z" fill="url(#activeAghanimScepterGradient)"></path><defs><radialGradient id="activeAghanimScepterGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(9.03623 10.4684) rotate(-90) scale(9.38905 7.0456)"><stop stop-color="#00CEFF"></stop><stop offset="1" stop-color="#3443C4"></stop></radialGradient></defs></svg>
-                            &nbsp;阿哈利姆神杖</span><span class="desc">${item.ability.language.aghanimDescription}</span></p>`
-                            : ""
-                    }
-                    ${
-                        item.ability.language.shardDescription
-                            ? `<p class="aghanim_description"><span class="title"><svg viewBox="0 0 19 10" fill="hsla(0,0%,100%,0.16)" width="24"><path d="M0.259504 4.54746C0.272981 4.60325 0.326002 4.64198 0.386194 4.64198C0.831857 4.62418 2.60461 4.45628 3.91732 2.90727C4.49956 2.22054 4.37916 1.21884 3.64777 0.671532C2.91819 0.125197 1.85256 0.238284 1.27032 0.924899C-0.0423919 2.47305 0.17864 4.13525 0.259504 4.54746Z" fill="url(#activeAghanimLeftShardGradient)"></path><path d="M9.46713 9.98081C9.42698 10.0064 9.37572 10.0064 9.33559 9.98081C8.88968 9.67166 6.33212 7.75166 6.33212 4.38581C6.33212 2.96661 7.70742 1.81406 9.40136 1.81406C11.0953 1.81406 12.4706 2.96661 12.4706 4.38581C12.4706 7.75166 9.91303 9.67166 9.46713 9.98081Z" fill="url(#activeAghanimMidShardGradient)"></path><path d="M18.6888 4.54746C18.6753 4.60325 18.6232 4.64198 18.5631 4.64198C18.1173 4.62418 16.3445 4.45628 15.0317 2.90727C14.4494 2.22054 14.5697 1.21884 15.3003 0.671532C16.0308 0.125197 17.0966 0.238284 17.6788 0.924899C18.9917 2.47305 18.7707 4.13525 18.6888 4.54746Z" fill="url(#activeAghanimRightShardGradient)"></path><defs><radialGradient id="activeAghanimMidShardGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(9.01787 2.49983) rotate(90) scale(7.50029 5.21143)"><stop stop-color="#00CEFF"></stop><stop offset="1" stop-color="#3443C4"></stop></radialGradient><radialGradient id="activeAghanimLeftShardGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(3.98746 0.625367) rotate(128.66) scale(6.00315 4.79432)"><stop stop-color="#00CEFF"></stop><stop offset="1" stop-color="#3443C4"></stop></radialGradient><radialGradient id="activeAghanimRightShardGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(14.2996 0.625367) rotate(51.3402) scale(6.00316 4.7942)"><stop stop-color="#00CEFF"></stop><stop offset="1" stop-color="#3443C4"></stop></radialGradient></defs></svg>
-                            &nbsp;阿哈利姆魔晶</span><span class="desc">${item.ability.language.shardDescription}</span></p>`
-                            : ""
-                    }
-                    <div class="notes"${!item.ability.language.notes.length ? ` style="display:none;"` : ""}>
-                        ${item.ability.language.notes.map((note) => `<p>${note}</p>`).join("")}
-                    </div>
-                    <div class="attributes">
-                    ${item.ability.language.attributes
-                        .map((attr) => {
-                            const parts = attr.split("：");
-                            return `<p><span class="item">${parts[0]}</span><span class="values">${parts[1]}</span></p>`;
-                        })
-                        .join("")}
-                    </div>
-                    <p>
-                        ${
-                            dotaconstants.abilities[item.ability.name].cd
-                                ? `<span class="cooldown"> ${(Array.isArray(dotaconstants.abilities[item.ability.name].cd) ? dotaconstants.abilities[item.ability.name].cd : [dotaconstants.abilities[item.ability.name].cd]).join(
-                                      " / "
-                                  )} </span>`
-                                : ""
-                        }
-                        ${
-                            dotaconstants.abilities[item.ability.name].mc
-                                ? `<span class="mana_cost"> ${(Array.isArray(dotaconstants.abilities[item.ability.name].mc) ? dotaconstants.abilities[item.ability.name].mc : [dotaconstants.abilities[item.ability.name].mc]).join(
-                                      " / "
-                                  )} </span>`
-                                : ""
-                        }
-                    </p>
-                    <p class="lore"${!item.ability.language.lore ? ` style="display:none;"` : ""}>${item.ability.language.lore}</p>
-                </div>
-                `
-            )
-            .join("")}
-    </div>
-    <div class="lore">
-        ${hero.language.lore}
-    </div>
-    `;
-    $(".wrapper").html(html);
-    if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
-    return $.html();
+    // 要传入模板的数据
+    const data = {
+        hero: hero,
+        utils: utils,
+        ImageType: ImageType,
+        d2a: d2a,
+        dotaconstants: dotaconstants,
+        moment: moment,
+    };
+
+    let result = "";
+    // 渲染EJS模板
+    ejs.renderFile(templatePath, data, (err, html) => {
+        if (err) throw err;
+        else result = html;
+    });
+    if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", result);
+    return result;
 }
 
 function genPlayerHTML(player) {
