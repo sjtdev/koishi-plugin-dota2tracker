@@ -703,7 +703,7 @@
                         .slice(2)}</span></p>
                     <div class="score">
                         <p class="score radiant">${match.radiant.killsCount}</p>
-                        <p class="time">${sec2time(match.durationSeconds)}</p>
+                        <p class="time">${utils.sec2time(match.durationSeconds)}</p>
                         <p class="score dire">${match.dire.killsCount}</p>
                     </div>
                 </div>
@@ -764,7 +764,7 @@
                                     ? `
                             <div class="item${item.isRecipe ? " recipe" : ""}">
                                 <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
-                                <p class="time">${sec2time(item.time)}</p>
+                                <p class="time">${utils.sec2time(item.time)}</p>
                             </div>`
                                     : `
                             <div class="item" style="visibility:hidden"}">
@@ -781,7 +781,7 @@
                                     ? `
                             <div class="item back${item.isRecipe ? " recipe" : ""}">
                                 <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
-                                <p class="time">${sec2time(item.time)}</p>
+                                <p class="time">${utils.sec2time(item.time)}</p>
                             </div>`
                                     : `
                             <div class="item back" style="visibility:hidden"}">
@@ -837,7 +837,7 @@
                                         ? `
                             <div class="item${item.isRecipe ? " recipe" : ""}">
                                 <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
-                                <p class="time">${sec2time(item.time)}</p>
+                                <p class="time">${utils.sec2time(item.time)}</p>
                             </div>`
                                         : `
                             <div class="item" style="visibility:hidden"}">
@@ -852,7 +852,7 @@
                                         ? `
                             <div class="item back${item.isRecipe ? " recipe" : ""}">
                                 <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
-                                <p class="time">${sec2time(item.time)}</p>
+                                <p class="time">${utils.sec2time(item.time)}</p>
                             </div>`
                                         : `
                             <div class="item back" style="visibility:hidden"}">
@@ -885,7 +885,7 @@
                                         ? `
                             <div class="item${item.isRecipe ? " recipe" : ""}">
                                 <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
-                                <p class="time">${sec2time(item.time)}</p>
+                                <p class="time">${utils.sec2time(item.time)}</p>
                             </div>`
                                         : `
                             <div class="item" style="visibility:hidden"}">
@@ -900,7 +900,7 @@
                                         ? `
                             <div class="item back${item.isRecipe ? " recipe" : ""}">
                                 <img src="${utils.getImageUrl(item.name, ImageType.Items)}" alt="" />
-                                <p class="time">${sec2time(item.time)}</p>
+                                <p class="time">${utils.sec2time(item.time)}</p>
                             </div>`
                                         : `
                             <div class="item back" style="visibility:hidden"}">

@@ -338,7 +338,7 @@
             </div>
             <div class="duration">
                 <p>持续时间</p>
-                <p><%-sec2time(match.durationSeconds)%></p>
+                <p><%-utils.sec2time(match.durationSeconds)%></p>
             </div>
             <div class="region">
                 <p>地区</p>
@@ -390,7 +390,7 @@
                 </div>
                 <p class="pick">${player.isRandom?'随机':`第${player.order == null ? "-" : player.order + 1}手`} ${d2a.position[player.position?.slice(-1)]??''}</p>
                 <p class="networth">
-                    <span class="gold">${formatNumber(player.networth)}</span>
+                    <span class="gold">${utils.formatNumber(player.networth)}</span>
                     (${(player.heroDamage / player.networth)?.toFixed(2)})
                 </p>
                 <p class="hero_damage">造成伤害：${player.heroDamage} (${(player.heroDamage/match[player.team].heroDamage*100).toFixed(2)}%)</p>
@@ -405,7 +405,7 @@
                         ${player.items.map((item) =>`
                         <div class="item${item?.isRecipe ? " recipe" : ""}" data-id="${item?.id??0}">
                             <img src="${item ? utils.getImageUrl(item.name, ImageType.Items) : ""}" alt="" />
-                            ${item ? `<p class="time">${sec2time(item?.time) ?? ""}</p>` : ""}
+                            ${item ? `<p class="time">${utils.sec2time(item?.time) ?? ""}</p>` : ""}
                         </div>`).join("")}
                     </div>
                     ${player.hero.id != 80?`
@@ -420,7 +420,7 @@
                         ${player.unitItems.map((item) =>`
                         <div class="item${item?.isRecipe ? " recipe" : ""}" data-id="${item?.id??0}">
                             <img src="${item ? utils.getImageUrl(item.name, ImageType.Items) : ""}" alt="" />
-                            ${item ? `<p class="time">${sec2time(item?.time) ?? ""}</p>` : ""}
+                            ${item ? `<p class="time">${utils.sec2time(item?.time) ?? ""}</p>` : ""}
                         </div>`).join("")}
                     </div>
                     <div class="neutral_item" style="background-image: url(${utils.getImageUrl(dotaconstants.item_ids[player.additionalUnit.neutral0Id], ImageType.Items)})"></div>`

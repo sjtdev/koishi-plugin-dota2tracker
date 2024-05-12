@@ -5,6 +5,7 @@ import fs from "fs";
 import * as dotaconstants from "dotaconstants";
 import os from "os";
 import path from "path";
+import * as queries from "./queries.ts";
 
 declare module "koishi" {
     interface Tables {
@@ -368,4 +369,72 @@ export function getFormattedMatchData(match) {
         })
         .titles.push({ name: "摸", color: "#DDDDDD" });
     return match;
+}
+
+/** 秒数格式化，返回"分钟:秒数"，运算失败返回"--:--"。 */
+export function sec2time(sec: number) {
+    return sec ? (sec < 0 ? "-" : "") + Math.floor(Math.abs(sec) / 60) + ":" + ("00" + (Math.abs(sec) % 60)).slice(-2) : "--:--";
+}
+
+/** 数字格式化，返回带千分位数字 */
+export function formatNumber(num: number): string {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+/** 读取目录下所有文件名去除后缀名后返回文件名数组。 */
+export function readDirectoryFilesSync(directoryPath) {
+    try {
+        // 同步读取目录下的所有文件名
+        const files = fs.readdirSync(directoryPath);
+
+        // 使用 map 函数去除每个文件名的扩展名
+        const fileNames = files.map((file) => path.basename(file, path.extname(file)));
+
+        return fileNames;
+    } catch (error) {
+        console.error("Error reading directory:", error);
+        return []; // 发生错误时返回空数组
+    }
+}
+
+/** 根据输入的胜率（0.00~1.00）返回HEX颜色值。0.5时为白色，靠近0向纯红转变，靠近1向纯绿转变。 */
+export function winRateColor(value) {
+    value = value * 100;
+    value = Math.max(0, Math.min(100, value));
+
+    let red, green, blue;
+
+    if (value <= 50) {
+        // 从纯红到纯白
+        let scale = Math.round(255 * (value / 50)); // Scale of 0 to 255
+        red = 255;
+        green = scale;
+        blue = scale;
+    } else {
+        // 从纯白到纯绿
+        let scale = Math.round(255 * ((value - 50) / 50)); // Scale of 0 to 255
+        red = 255 - scale;
+        green = 255;
+        blue = 255 - scale;
+    }
+
+    // 将RGB值转换为两位十六进制代码
+    const toHex = (color) => color.toString(16).padStart(2, "0").toUpperCase();
+
+    return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
+}
+
+/** 使用stratzAPI查询，根据传入的SteamID验证此Steam账号是否为有效的DOTA2玩家账号，返回对象{isValid:boolean,reason:"如果失败此处为失败原因"}。 */
+export async function playerisValid(steamAccountId): Promise<{ isValid: boolean; reason?: string }> {
+    try {
+        let queryRes = await query(queries.VERIFYING_PLAYER(steamAccountId));
+        if (queryRes.status == 200) {
+            if (queryRes.data.data.player.matchCount != null) return { isValid: true };
+            else return { isValid: false, reason: "SteamID无效或无任何场次。" };
+        }
+    } catch (error) {
+        console.error(error);
+        return { isValid: false, reason: "网络状况不佳SteamID验证失败，请稍后重试。" };
+        // session.send("获取比赛信息失败。");
+    }
 }

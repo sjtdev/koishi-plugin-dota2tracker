@@ -25,7 +25,7 @@ export interface Config {
 
 export const Config: Schema<Config> = Schema.object({
     STRATZ_API_TOKEN: Schema.string().required().description("※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取"),
-    template_match: Schema.union([...readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)]).default("match_1").description("生成比赛图片使用的模板，见 https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki 有模板展示。"),
+    template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)]).default("match_1").description("生成比赛图片使用的模板，见 https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki 有模板展示。"),
 });
 
 let pendingMatches = []; // 待发布的比赛，当获取到的比赛未被解析时存入此数组，在计时器中定时查询，直到该比赛已被解析则生成图片发布
@@ -89,8 +89,8 @@ export async function apply(ctx: Context, config: Config) {
                     return;
                 }
                 // 此处执行玩家验证函数，调用API查询玩家比赛数据，若SteamID无效或无场次都将返回
-                let verifyRes = await playerIsInvalid(steam_id);
-                if (!verifyRes.isInvalid) {
+                let verifyRes = await utils.playerisValid(steam_id);
+                if (!verifyRes.isValid) {
                     session.send(`绑定失败，${verifyRes.reason}`);
                     return;
                 }
@@ -600,9 +600,7 @@ function newGenMatchImageHTML(match, template = "match_1") {
         ImageType: ImageType,
         d2a: d2a,
         dotaconstants: dotaconstants,
-        moment: moment,
-        sec2time: sec2time,
-        formatNumber: formatNumber,
+        moment: moment
     };
 
     let result = "";
@@ -917,16 +915,16 @@ function genPlayerHTML(player) {
     <div class="avatar"><img src="${player.steamAccount.avatar}" alt="" /></div>
     <div class="info">
         <p class="name">${player.steamAccount.name}${player.guildMember ? ` <span class="guild ${guildLevel(player.guildMember.guild.currentPercentile)}">[${player.guildMember.guild.tag}]</span></p>` : ""}
-        <p class="matches"><span>场次：${player.matchCount}（<span class="win">${player.winCount}</span>/<span class="lose">${player.matchCount - player.winCount}</span>）</span>胜率：<span style="color:${winRateColor(
+        <p class="matches"><span>场次：${player.matchCount}（<span class="win">${player.winCount}</span>/<span class="lose">${player.matchCount - player.winCount}</span>）</span>胜率：<span style="color:${utils.winRateColor(
         player.winCount / player.matchCount
     )};">${((player.winCount / player.matchCount) * 100).toFixed(2)}%</span></p>
-        <p class="matches"><span>最近25场：<span class="win">${nearWinCount}</span>/<span class="lose">${nearMatchCount - nearWinCount}</span></span><span>胜率：<span style="color:${winRateColor(nearWinCount / nearMatchCount)};">${(
+        <p class="matches"><span>最近25场：<span class="win">${nearWinCount}</span>/<span class="lose">${nearMatchCount - nearWinCount}</span></span><span>胜率：<span style="color:${utils.winRateColor(nearWinCount / nearMatchCount)};">${(
         (nearWinCount / nearMatchCount) *
         100
     ).toFixed(2)}%</span></span><span>评分：${player.performance.imp}</span></span></p>
         <p class="matches"><span>对线：<span class="victory">${outcomeCounts.victory + outcomeCounts.stomp}(<span class="stomp">${outcomeCounts.stomp}</span>)</span>-<span class="tie">${outcomeCounts.tie}</span>-<span class="fail">${
         outcomeCounts.fail + outcomeCounts.stomped
-    }(<span class="stomped">${outcomeCounts.stomped}</span>)</span></span><span>线优：<span style="color:${winRateColor(
+    }(<span class="stomped">${outcomeCounts.stomped}</span>)</span></span><span>线优：<span style="color:${utils.winRateColor(
         (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.tie / 2) / (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.tie + outcomeCounts.fail + outcomeCounts.stomped)
     )};">${(((outcomeCounts.victory + outcomeCounts.stomp) / (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.fail + outcomeCounts.stomped)) * 100).toFixed(2)}%</span></span></p>
     </div>
@@ -983,7 +981,7 @@ function genPlayerHTML(player) {
                 }</span>`
             )
             .join("");
-    const streakHTML = `<div class="streak" style="box-shadow:none;color:${winRateColor((player.streak + 10) / 20)};">${Math.abs(player.streak) + (player.streak > 0 ? "连胜" : "连败")}</div>`;
+    const streakHTML = `<div class="streak" style="box-shadow:none;color:${utils.winRateColor((player.streak + 10) / 20)};">${Math.abs(player.streak) + (player.streak > 0 ? "连胜" : "连败")}</div>`;
     const matchesHTML = player.matches
         .map(
             (match) => `
@@ -1008,7 +1006,7 @@ function genPlayerHTML(player) {
                 <td style="line-height: 20px">${moment(new Date(match.endDateTime * 1000))
                     .format("YYYY-MM-DD HH:mm:ss")
                     .slice(2)}</td>
-                <td>${sec2time(match.durationSeconds)}</td>
+                <td>${utils.sec2time(match.durationSeconds)}</td>
                 <td>${(match.players[0].imp > 0 ? "+" : "") + match.players[0].imp}</td>
                 <td><img class="medal" src="${utils.getImageUrl("medal_" + match.rank.toString().split("")[0])}" style="width: 100%" /></td>
             </tr>`
@@ -1033,77 +1031,4 @@ function genPlayerHTML(player) {
     $(".plus").html(dotaPlusHTML);
     if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
     return $.html();
-}
-
-async function playerIsInvalid(steamAccountId) {
-    try {
-        let queryRes = await utils.query(queries.VERIFYING_PLAYER(steamAccountId));
-        if (queryRes.status == 200) {
-            if (queryRes.data.data.player.matchCount != null) return { isInvalid: true };
-            else return { isInvalid: false, reason: "SteamID无效或无任何场次。" };
-        }
-    } catch (error) {
-        console.error(error);
-        return { isInvalid: false, reason: "网络状况不佳SteamID验证失败，请稍后重试。" };
-        // session.send("获取比赛信息失败。");
-    }
-}
-
-function sec2time(sec: number) {
-    return sec ? (sec < 0 ? "-" : "") + Math.floor(Math.abs(sec) / 60) + ":" + ("00" + (Math.abs(sec) % 60)).slice(-2) : "--:--";
-}
-
-function winRateColor(value) {
-    value = value * 100;
-    value = Math.max(0, Math.min(100, value));
-
-    let red, green, blue;
-
-    if (value <= 50) {
-        // 从纯红到纯白
-        let scale = Math.round(255 * (value / 50)); // Scale of 0 to 255
-        red = 255;
-        green = scale;
-        blue = scale;
-    } else {
-        // 从纯白到纯绿
-        let scale = Math.round(255 * ((value - 50) / 50)); // Scale of 0 to 255
-        red = 255 - scale;
-        green = 255;
-        blue = 255 - scale;
-    }
-
-    // 将RGB值转换为两位十六进制代码
-    const toHex = (color) => color.toString(16).padStart(2, "0").toUpperCase();
-
-    return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
-}
-
-function sanitizeHTML(strings, ...values) {
-    // 处理并构建最终字符串
-    return strings.reduce((result, string, i) => {
-        // 获取当前插入值，如果为null或undefined，则替换为"--"
-        let value = values[i] ?? "--";
-        // 连接当前字符串片段和处理后的值
-        return result + string + (i < values.length ? value : "");
-    }, "");
-}
-
-function formatNumber(num) {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-function readDirectoryFilesSync(directoryPath) {
-    try {
-        // 同步读取目录下的所有文件名
-        const files = fs.readdirSync(directoryPath);
-
-        // 使用 map 函数去除每个文件名的扩展名
-        const fileNames = files.map(file => path.basename(file, path.extname(file)));
-        
-        return fileNames;
-    } catch (error) {
-        console.error('Error reading directory:', error);
-        return []; // 发生错误时返回空数组
-    }
 }
