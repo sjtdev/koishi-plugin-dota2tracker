@@ -664,7 +664,8 @@
         </script>
     </head>
     <body>
-        <% let kcndcStyle = {
+        <%  const match = data;
+            let kcndcStyle = {
             kc: function (num) {
                 let red = (255 - (num * 255) / 100).toFixed(2);
                 return `rgb(255,${red},${red})`;

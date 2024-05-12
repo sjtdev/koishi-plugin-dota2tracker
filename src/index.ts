@@ -21,12 +21,20 @@ export const inject = ["database", "puppeteer", "cron"]; // 声明依赖
 export interface Config {
     STRATZ_API_TOKEN: string;
     template_match: string;
+    template_player: string;
+    template_hero: string;
 }
 export const Config: Schema<Config> = Schema.object({
     STRATZ_API_TOKEN: Schema.string().required().description("※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取"),
     template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)])
         .default("match_1")
-        .description("生成比赛图片使用的模板，见 https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki 有模板展示。"),
+        .description("生成比赛信息图片使用的模板，见 https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki 有模板展示。"),
+    template_player: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/player`)])
+        .default("player_1")
+        .description("生成玩家信息图片使用的模板。（目前仅有一张模板）"),
+    template_hero: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/hero`)])
+        .default("hero_1")
+        .description("生成英雄信息图片使用的模板。（目前仅有一张模板）"),
 });
 
 let pendingMatches = []; // 待发布的比赛，当获取到的比赛未被解析时存入此数组，在计时器中定时查询，直到该比赛已被解析则生成图片发布
@@ -157,7 +165,7 @@ export async function apply(ctx: Context, config: Config) {
                 }
             }
             if (match && match.parsedDateTime) {
-                session.send(await ctx.puppeteer.render(newGenMatchImageHTML(match, config.template_match)));
+                session.send(await ctx.puppeteer.render(genImageHTML(match, config.template_match, TemplateType.Match)));
                 ctx.database.upsert("dt_previous_query_results", (row) => [{ matchId: match.id, data: match, queryTime: new Date() }]);
             } else {
                 pendingMatches.push({ matchId: matchId, platform: session.event.platform, guildId: session.event.guild.id });
@@ -291,7 +299,7 @@ export async function apply(ctx: Context, config: Config) {
                         // 取场次前十的英雄表现数据附加到原player对象中
                         player.heroesPerformanceTop10 = playerExtra.heroesPerformance.slice(0, 10);
                     } else throw 0;
-                    session.send(await ctx.puppeteer.render(genPlayerHTML(player)));
+                    session.send(await ctx.puppeteer.render(genImageHTML(player, config.template_player, TemplateType.Player)));
                 } catch (error) {
                     console.error(error);
                     session.send("获取玩家信息失败。");
@@ -349,7 +357,7 @@ export async function apply(ctx: Context, config: Config) {
                     if (queryRes3.status == 200) {
                         let hero = queryRes3.data.data.constants.hero;
                         hero.talents.forEach((talent) => (talent.name_cn = AbilitiesConstantsCN.data.abilities.find((item) => item.id == talent.abilityId).language.displayName));
-                        await session.send(await ctx.puppeteer.render(newGenHeroImageHTML(hero)));
+                        await session.send(await ctx.puppeteer.render(genImageHTML(hero, config.template_hero, TemplateType.Hero)));
                     } else throw 0;
                 } catch (error) {
                     console.error(error);
@@ -545,7 +553,7 @@ export async function apply(ctx: Context, config: Config) {
                         // await session.send(await ctx.puppeteer.render(genMatchImageHTML(match)));
 
                         let broadMatchMessage = "";
-                        const img = await ctx.puppeteer.render(newGenMatchImageHTML(match, config.template_match));
+                        const img = await ctx.puppeteer.render(genImageHTML(match, config.template_match, TemplateType.Match));
                         for (let comming of realCommingMatches) {
                             let commingSubscribedPlayers = subscribedPlayersInGuild.filter((item) => item.platform == comming.platform && item.guildId == comming.guildId);
                             let idsToFind = commingSubscribedPlayers.map((item) => item.steamId);
@@ -590,13 +598,17 @@ export async function apply(ctx: Context, config: Config) {
     // save_database(ctx)
 }
 
-function newGenMatchImageHTML(match, template = "match_1") {
-    // 模板文件的路径
-    const templatePath = path.join(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`, template + ".ejs");
+enum TemplateType {
+    Match = "match",
+    Player = "player",
+    Hero = "hero",
+}
 
-    // 要传入模板的数据
-    const data = {
-        match: match,
+function genImageHTML(data, template, type: TemplateType) {
+    // 模板文件的路径
+    const templatePath = path.join(`./node_modules/@sjtdev/koishi-plugin-${name}/template/${type}`, template + ".ejs");
+    const templateData = {
+        data: data,
         utils: utils,
         ImageType: ImageType,
         d2a: d2a,
@@ -606,231 +618,10 @@ function newGenMatchImageHTML(match, template = "match_1") {
 
     let result = "";
     // 渲染EJS模板
-    ejs.renderFile(templatePath, data, (err, html) => {
+    ejs.renderFile(templatePath, templateData, (err, html) => {
         if (err) throw err;
         else result = html;
     });
     if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", result);
     return result;
-}
-
-function newGenHeroImageHTML(hero, template = "hero_1"){
-    // 模板文件的路径
-    const templatePath = path.join(`./node_modules/@sjtdev/koishi-plugin-${name}/template/hero`, template + ".ejs");
-
-    // 要传入模板的数据
-    const data = {
-        hero: hero,
-        utils: utils,
-        ImageType: ImageType,
-        d2a: d2a,
-        dotaconstants: dotaconstants,
-        moment: moment,
-    };
-
-    let result = "";
-    // 渲染EJS模板
-    ejs.renderFile(templatePath, data, (err, html) => {
-        if (err) throw err;
-        else result = html;
-    });
-    if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", result);
-    return result;
-}
-
-function genPlayerHTML(player) {
-    let $ = cheerio.load(fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/player.html`, "utf-8"));
-    const guildLevel = (percent) => {
-        if (percent <= 25) {
-            return "Copper";
-        } else if (percent <= 50) {
-            return "Silver";
-        } else if (percent <= 75) {
-            return "Gold";
-        } else {
-            return "Diamond";
-        }
-    };
-    const laneSVG = {
-        stomp: `<svg viewBox="0 0 24 24" class="hitagi__sc-1apuy4g-0 hmhZOG"><path d="M8.05731 22.3674L9.60454 22.8002L11.5974 21.6551L12.043 20.0773L13.5902 20.51L15.583 19.3649L16.0287 17.7871L17.5759 18.2199L19.5687 17.0748L20.0143 15.4969L21.5615 15.9297L23.5544 14.7846L24 13.2068L23.4492 12.2014L7.50651 21.3621L8.05731 22.3674ZM12.1328 3.50265L11.0312 1.49196C10.8798 1.21549 10.5316 1.11811 10.2576 1.27556L0.29345 7.00098C0.0194354 7.15843 -0.0808273 7.51346 0.0706444 7.78993L1.44766 10.3033L11.91 4.29159C12.184 4.13414 12.2843 3.77912 12.1328 3.50265ZM18.3935 8.4063L14.1658 9.60458L12.4221 10.6065C12.2851 10.6853 12.111 10.6366 12.0353 10.4983L11.7599 9.99565C11.6842 9.85742 11.7343 9.6799 11.8713 9.60118L13.615 8.59924L13.0642 7.59389L11.3205 8.59584C11.1835 8.67456 11.0094 8.62587 10.9337 8.48765L10.6583 7.98497C10.5826 7.84673 10.6327 7.66922 10.7697 7.5905L12.5134 6.58855L11.9626 5.58321L1.99846 11.3086L6.9557 20.3567L22.8984 11.196L22.2615 10.0336C21.5024 8.64813 19.9073 7.97847 18.3935 8.4063Z"></path></svg>`,
-        victory: `<svg viewBox="0 0 512 512"><path d="M198.844 64.75c-.985 0-1.974.03-2.97.094-15.915 1.015-32.046 11.534-37.78 26.937-34.072 91.532-51.085 128.865-61.5 222.876 14.633 13.49 31.63 26.45 50.25 38.125l66.406-196.467 17.688 5.968L163.28 362.5c19.51 10.877 40.43 20.234 62 27.28l75.407-201.53 17.5 6.53-74.937 200.282c19.454 5.096 39.205 8.2 58.78 8.875L381.345 225.5l17.094 7.594-75.875 170.656c21.82-1.237 43.205-5.768 63.437-14.28 43.317-53.844 72.633-109.784 84.5-172.69 5.092-26.992-14.762-53.124-54.22-54.81l-6.155-.282-2.188-5.75c-8.45-22.388-19.75-30.093-31.5-32.47-11.75-2.376-25.267 1.535-35.468 7.376l-13.064 7.47-.906-15c-.99-16.396-10.343-29.597-24.313-35.626-13.97-6.03-33.064-5.232-54.812 9.906l-10.438 7.25-3.812-12.125c-6.517-20.766-20.007-27.985-34.78-27.97zM103.28 188.344C71.143 233.448 47.728 299.56 51.407 359.656c27.54 21.84 54.61 33.693 80.063 35.438 14.155.97 27.94-1.085 41.405-6.438-35.445-17.235-67.36-39.533-92.594-63.53l-3.343-3.157.5-4.595c5.794-54.638 13.946-91.5 25.844-129.03z"/></svg>`,
-        fail: `<svg viewBox="0 0 36 36"><path fill="#ff6961" d="M36 32a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4h28a4 4 0 0 1 4 4v28z"></path><circle fill="#FFF" cx="27" cy="7" r="3"></circle><path fill="#FFF" d="M13.06 13.06l2.367-2.366l3.859 1.158l-2.635 2.847a10.018 10.018 0 0 1 4.392 3.379l5.017-5.017a1.5 1.5 0 0 0-.63-2.497l-9.999-3a1.495 1.495 0 0 0-1.492.376l-3 3a1.5 1.5 0 1 0 2.121 2.12zm16.065 4.949a1.496 1.496 0 0 0-1.262-.503l-6.786.617a9.966 9.966 0 0 1 1.464 2.879l3.548-.322l-1.554 6.995a1.499 1.499 0 1 0 2.928.65l2-9a1.5 1.5 0 0 0-.338-1.316zM13 16a8 8 0 1 0 0 16a8 8 0 0 0 0-16zm0 14a6 6 0 1 1 .002-12.002A6 6 0 0 1 13 30z"></path></svg>`,
-        stomped: `<svg viewBox="-1 0 19 19"><path d="M16.417 9.579A7.917 7.917 0 1 1 8.5 1.662a7.917 7.917 0 0 1 7.917 7.917zm-2.458 2.96a.396.396 0 0 0-.396-.397h-.667a1.527 1.527 0 0 0-1.249-1.114.777.777 0 0 0 .014-.145V9.378a.794.794 0 0 0-.792-.792H8.201a2.984 2.984 0 0 0-1.682-.516l-.11.002V7.42h2.997a.396.396 0 1 0 0-.792H6.41v-1.3a.396.396 0 0 0-.396-.397H4.891a.396.396 0 0 0 0 .792h.727V8.21a2.997 2.997 0 1 0 3.836 3.466h.71a1.526 1.526 0 1 0 2.732 1.26h.667a.396.396 0 0 0 .396-.397zM8.078 9.507a2.205 2.205 0 1 1-1.559-.646 2.19 2.19 0 0 1 1.559.646zm4.078 3.03a.734.734 0 1 1-.733-.734.735.735 0 0 1 .733.733z"/></svg>`,
-        tie: `<svg fill="#fff" viewBox="0 0 512.001 512.001"><g><g><path d="M120.988,239.868c-4.496,10.625-5.122,20.183-5.157,20.811c-0.267,4.607,3.243,8.547,7.849,8.829 c4.618,0.29,8.574-3.228,8.873-7.833c0.265-4.771,2.339-13.092,5.884-19.44C137.421,242.113,141.397,242.649,120.988,239.868z"/></g></g><g><g><path d="M391.178,255.418c-0.211,8.054-2.458,17.62-6.74,28.398c-1.708,4.299,0.393,9.168,4.692,10.875 c4.293,1.708,9.167-0.39,10.875-4.692c5.103-12.842,7.74-24.392,7.943-34.581H391.178z"/></g></g><g><g><path d="M164.769,210.51c1.046,3.339,1.397,6.953,0.893,10.65c-0.293,2.146-0.857,4.188-1.648,6.1c0,0,51.266,3.416,198.065,3.949 c-0.086-6.331,2.19-12.199,6.244-16.732C217.627,214.046,164.769,210.51,164.769,210.51z"/></g></g><g><g><circle cx="37.179" cy="128.669" r="29.491"/></g></g><g><g><path d="M510.146,391.511l-37.916-66.985c14.35-49.173,20.678-68.137,20.678-68.137l8.949-67.014 c1.502-10.977-6.248-21.075-17.235-22.468l-18.183-2.305c-10.984-1.393-20.996,6.445-22.293,17.431l-1.884,15.955l28.718-21.317 l-37.91,42.278h-46.432c-6.571,0-11.898,5.328-11.898,11.898c0,6.57,5.328,11.898,11.898,11.898h51.744 c3.381,0,6.601-1.438,8.859-3.956l41.456-46.234l-32.023,54.694c-5.28,9.018-14.374,8.169-18.293,8.167c-1.959,0-3.31,0-5.295,0 c-0.399,0.898,3.152-7.399-24.44,57.181c-0.548,1.284-0.907,2.642-1.06,4.031l-8.934,80.338 c-0.939,8.447,5.667,15.857,14.208,15.857c7.179,0,13.361-5.401,14.172-12.701l8.702-78.244l21.512-50.353l-14.121,50.463 c-1.158,3.756-0.718,7.823,1.218,11.243l40.949,72.345c3.885,6.864,12.596,9.276,19.459,5.392 C511.615,407.085,514.03,398.373,510.146,391.511z"/></g></g><g><g><circle cx="464.865" cy="128.702" r="29.491"/></g></g><g><g><path d="M142.923,206.051l-59.556-8.118l-39.135-18.451l13.626,2.292c-1.422-10.945-11.411-18.577-22.254-17.202l-18.182,2.305 C6.43,168.271-1.315,178.374,0.186,189.345l9.12,68.689l21.865,70.857l5.829,70.795c0.646,7.848,7.527,13.705,15.401,13.057 c7.859-0.647,13.705-7.542,13.058-15.401l-5.956-72.345c-0.084-1.031-0.281-2.05-0.585-3.039l-14.123-50.463l21.514,50.353 l8.702,78.244c0.873,7.86,7.96,13.486,15.768,12.612c7.838-0.871,13.483-7.931,12.612-15.768l-8.934-80.338 c-0.154-1.388-0.511-2.747-1.06-4.032l-27.336-61.43l-2.945-24.951l-29.029-25.179l40.79,19.231 c1.097,0.517,2.266,0.862,3.468,1.027l61.369,8.365c6.521,0.887,12.509-3.68,13.396-10.183 C153.994,212.936,149.435,206.939,142.923,206.051z"/></g></g></svg>`,
-    };
-    const outcomeCounts = {
-        victory: 0,
-        stomp: 0,
-        fail: 0,
-        stomped: 0,
-        tie: 0,
-    };
-    const processLaneOutcome = (outcome) => {
-        switch (outcome) {
-            case "RADIANT_VICTORY":
-                return { radiant: "victory", dire: "fail" };
-            case "RADIANT_STOMP":
-                return { radiant: "stomp", dire: "stomped" };
-            case "DIRE_VICTORY":
-                return { radiant: "fail", dire: "victory" };
-            case "DIRE_STOMP":
-                return { radiant: "stomped", dire: "stomp" };
-            default:
-                return { radiant: "tie", dire: "tie" };
-        }
-    };
-    let nearMatchCount = 25,
-        nearWinCount = 0,
-        streak = 0;
-    player.matches.forEach((match) => {
-        const innerPlayer = match.players[0];
-        nearWinCount += match.didRadiantWin == innerPlayer.isRadiant ? 1 : 0;
-        const didWin = match.didRadiantWin === innerPlayer.isRadiant;
-        if (!player.streak) {
-            if (streak != 0) {
-                if (didWin && streak > 0) streak++;
-                else if (!didWin && streak < 0) streak--;
-                else player.streak = streak;
-            } else streak = didWin ? 1 : -1;
-        }
-
-        const laneResult = {
-            top: processLaneOutcome(match.topLaneOutcome),
-            mid: processLaneOutcome(match.midLaneOutcome),
-            bottom: processLaneOutcome(match.bottomLaneOutcome),
-        };
-
-        let laneKey = "mid"; // 默认中路
-        if (innerPlayer.lane === "SAFE_LANE") {
-            laneKey = innerPlayer.isRadiant ? "bottom" : "top";
-        } else if (innerPlayer.lane === "OFF_LANE") {
-            laneKey = innerPlayer.isRadiant ? "top" : "bottom";
-        }
-
-        match.laneResult = laneResult[laneKey][innerPlayer.isRadiant ? "radiant" : "dire"];
-        if (match.laneResult in outcomeCounts) {
-            outcomeCounts[match.laneResult]++;
-        }
-    });
-
-    const playerHTML = `
-    <div class="avatar"><img src="${player.steamAccount.avatar}" alt="" /></div>
-    <div class="info">
-        <p class="name">${player.steamAccount.name}${player.guildMember ? ` <span class="guild ${guildLevel(player.guildMember.guild.currentPercentile)}">[${player.guildMember.guild.tag}]</span></p>` : ""}
-        <p class="matches"><span>场次：${player.matchCount}（<span class="win">${player.winCount}</span>/<span class="lose">${player.matchCount - player.winCount}</span>）</span>胜率：<span style="color:${utils.winRateColor(
-        player.winCount / player.matchCount
-    )};">${((player.winCount / player.matchCount) * 100).toFixed(2)}%</span></p>
-        <p class="matches"><span>最近25场：<span class="win">${nearWinCount}</span>/<span class="lose">${nearMatchCount - nearWinCount}</span></span><span>胜率：<span style="color:${utils.winRateColor(nearWinCount / nearMatchCount)};">${(
-        (nearWinCount / nearMatchCount) *
-        100
-    ).toFixed(2)}%</span></span><span>评分：${player.performance.imp}</span></span></p>
-        <p class="matches"><span>对线：<span class="victory">${outcomeCounts.victory + outcomeCounts.stomp}(<span class="stomp">${outcomeCounts.stomp}</span>)</span>-<span class="tie">${outcomeCounts.tie}</span>-<span class="fail">${
-        outcomeCounts.fail + outcomeCounts.stomped
-    }(<span class="stomped">${outcomeCounts.stomped}</span>)</span></span><span>线优：<span style="color:${utils.winRateColor(
-        (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.tie / 2) / (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.tie + outcomeCounts.fail + outcomeCounts.stomped)
-    )};">${(((outcomeCounts.victory + outcomeCounts.stomp) / (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.fail + outcomeCounts.stomped)) * 100).toFixed(2)}%</span></span></p>
-    </div>
-    <div class="rank">
-        <img class="medal" src="${utils.getImageUrl(
-            "medal_" +
-                ((player.steamAccount.seasonLeaderboardRank
-                    ? player.steamAccount.seasonLeaderboardRank <= 100
-                        ? player.steamAccount.seasonLeaderboardRank <= 10
-                            ? "8c"
-                            : "8b"
-                        : player.steamAccount.seasonRank?.toString().split("")[0]
-                    : player.steamAccount.seasonRank?.toString().split("")[0]) ?? "0")
-        )}" alt="" />
-        <img class="star" src="${utils.getImageUrl("star_" + (player.steamAccount.seasonRank?.toString().split("")[1] ?? "0"))}" alt="" />
-        <p>${player.steamAccount.seasonLeaderboardRank ?? ""}</p>    
-    </div>`;
-    const heroesCountPixels = 800 - ($(".tip:not(.row):not(.win_count):not(.lose_count)").length + 1) * 40;
-    const highestCountsTotal = {
-        winCount: Math.max(...player.heroesPerformanceTop10.map((hero) => hero.winCount)),
-        loseCount: Math.max(...player.heroesPerformanceTop10.map((hero) => hero.matchCount - hero.winCount)),
-    };
-    const pixelOfPerMatchInTotal = heroesCountPixels / (highestCountsTotal.winCount + highestCountsTotal.loseCount);
-    const highestCountsNear = {
-        winCount: Math.max(...player.heroesPerformance?.filter((hero) => hero.matchCount > 1)?.map((hero) => hero.winCount)),
-        loseCount: Math.max(...player.heroesPerformance?.filter((hero) => hero.matchCount > 1)?.map((hero) => hero.matchCount - hero.winCount)),
-    };
-    const nearAdjustmentFactor = Math.min(highestCountsTotal.winCount / (highestCountsTotal.winCount + highestCountsTotal.loseCount), highestCountsTotal.loseCount / (highestCountsTotal.winCount + highestCountsTotal.loseCount));
-
-    const pixelOfPerMatchInNear = (heroesCountPixels / (highestCountsNear?.winCount + highestCountsNear?.loseCount ?? 1)) * nearAdjustmentFactor;
-    const heroesTotalHTML =
-        player.heroesPerformanceTop10
-            .map(
-                (hero) => `
-                <span><img alt="" src="${utils.getImageUrl(hero.hero.shortName, ImageType.HeroIcons)}" /></span>
-                <span class="count">${hero.matchCount}</span>
-                <span class="win_rate">${((hero.winCount / hero.matchCount) * 100).toFixed(0)}%</span>
-                <span class="imp">${(hero.imp > 0 ? "+" : "") + hero.imp}</span>
-                <span class="win" style="${hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${hero.winCount * pixelOfPerMatchInTotal}px">${hero.winCount}</span>
-                <span class="lose" style="${hero.matchCount - hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${(hero.matchCount - hero.winCount) * pixelOfPerMatchInTotal}px">${hero.matchCount - hero.winCount}</span>`
-            )
-            .join("") +
-        player.heroesPerformance
-            .filter((hero) => hero.matchCount > 1)
-            .map(
-                (hero, index) => `
-                <span style="order:${index + 1};"><img alt="" src="${utils.getImageUrl(hero.hero.shortName, ImageType.HeroIcons)}" /></span>
-                <span style="order:${index + 1};" class="count">${hero.matchCount}</span>
-                <span style="order:${index + 1};" class="win_rate">${((hero.winCount / hero.matchCount) * 100).toFixed(0)}%</span>
-                <span style="order:${index + 1};" class="imp">${(hero.imp > 0 ? "+" : "") + hero.imp}</span>
-                <span class="win" style="order:${index + 1};${hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${hero.winCount * pixelOfPerMatchInNear}px">${hero.winCount}</span>
-                <span class="lose" style="order:${index + 1};${hero.matchCount - hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${(hero.matchCount - hero.winCount) * pixelOfPerMatchInNear}px">${
-                    hero.matchCount - hero.winCount
-                }</span>`
-            )
-            .join("");
-    const streakHTML = `<div class="streak" style="box-shadow:none;color:${utils.winRateColor((player.streak + 10) / 20)};">${Math.abs(player.streak) + (player.streak > 0 ? "连胜" : "连败")}</div>`;
-    const matchesHTML = player.matches
-        .map(
-            (match) => `
-            <tr class="match ${match.didRadiantWin == match.players[0].isRadiant ? "win" : "lose"}">
-                <td>${match.id}</td>
-                <td>
-                    <p>${d2a.lobbyTypes[match.lobbyType] || match.lobbyType}</p>
-                    <p>${d2a.gameMode[match.gameMode] || match.gameMode}</p>
-                </td>
-                <td><img alt="" src="${utils.getImageUrl(match.players[0].hero.shortName, ImageType.HeroIcons)}" /></td>
-                <td style="line-height: 20px">
-                    <p>${((match.players[0].kills + match.players[0].assists) / Math.max(1, match.players[0].deaths)).toFixed(2)} (${(
-                ((match.players[0].kills + match.players[0].assists) /
-                    (match.players[0].isRadiant ? match.radiantKills.reduce((acc: number, cva: number) => acc + cva, 0) : match.direKills.reduce((acc: number, cva: number) => acc + cva, 0))) *
-                100
-            ).toFixed(0)}%)</p>
-                    <p>${match.players[0].kills}/${match.players[0].deaths}/${match.players[0].assists}</p>
-                </td>
-                <td>
-                    <div class="player_lane ${match.laneResult}">${laneSVG[match.laneResult]}</div>
-                </td>
-                <td style="line-height: 20px">${moment(new Date(match.endDateTime * 1000))
-                    .format("YYYY-MM-DD HH:mm:ss")
-                    .slice(2)}</td>
-                <td>${utils.sec2time(match.durationSeconds)}</td>
-                <td>${(match.players[0].imp > 0 ? "+" : "") + match.players[0].imp}</td>
-                <td><img class="medal" src="${utils.getImageUrl("medal_" + match.rank.toString().split("")[0])}" style="width: 100%" /></td>
-            </tr>`
-        )
-        .join("");
-    const dotaPlusHTML = player.dotaPlus
-        .map(
-            (hero) => `
-            <div class="hero">
-                <img src="${utils.getImageUrl(hero.shortName, ImageType.Heroes)}" alt="" />
-                <div class="level"><img src="${utils.getImageUrl("hero_badge_" + Math.ceil((hero.level + 1) / 6))}" alt="" /><span>${hero.level}</span></div>
-                <span>${((hero.winCount / hero.matchCount) * 100).toFixed(2)}%</span>
-                <span>${hero.matchCount}</span>
-            </div>`
-        )
-        .join("");
-    $(".player").html(playerHTML);
-    $(".heroes > span:not(.tip)").remove();
-    $(".heroes .tip.near").before(heroesTotalHTML);
-    if (player.streak > 1 || player.streak < -1) $(".streak").replaceWith(streakHTML);
-    $(".matches tbody").html(matchesHTML);
-    $(".plus").html(dotaPlusHTML);
-    if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", $.html());
-    return $.html();
 }
