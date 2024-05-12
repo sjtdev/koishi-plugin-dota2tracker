@@ -17,12 +17,11 @@ export const name = "dota2tracker";
 export const usage = "DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑定），以及一系列查询功能。";
 export const inject = ["database", "puppeteer", "cron"]; // 声明依赖
 
+// 配置项
 export interface Config {
-    // 配置项
     STRATZ_API_TOKEN: string;
     template_match: string;
 }
-
 export const Config: Schema<Config> = Schema.object({
     STRATZ_API_TOKEN: Schema.string().required().description("※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取"),
     template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)]).default("match_1").description("生成比赛图片使用的模板，见 https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki 有模板展示。"),
