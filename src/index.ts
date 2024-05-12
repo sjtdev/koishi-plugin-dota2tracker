@@ -24,18 +24,22 @@ export interface Config {
     template_player: string;
     template_hero: string;
 }
-export const Config: Schema<Config> = Schema.object({
-    STRATZ_API_TOKEN: Schema.string().required().description("※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取"),
-    template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)])
-        .default("match_1")
-        .description("生成比赛信息图片使用的模板，见 https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki 有模板展示。"),
-    template_player: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/player`)])
-        .default("player_1")
-        .description("生成玩家信息图片使用的模板。（目前仅有一张模板）"),
-    template_hero: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/hero`)])
-        .default("hero_1")
-        .description("生成英雄信息图片使用的模板。（目前仅有一张模板）"),
-});
+export const Config: Schema<Config> = Schema.intersect([
+    Schema.object({
+        STRATZ_API_TOKEN: Schema.string().required().description("※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取"),
+    }).description("基础设置"),
+    Schema.object({
+        template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)])
+            .default("match_1")
+            .description("生成比赛信息图片使用的模板，见 https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki 有模板展示。"),
+        template_player: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/player`)])
+            .default("player_1")
+            .description("生成玩家信息图片使用的模板。（目前仅有一张模板）"),
+        template_hero: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/hero`)])
+            .default("hero_1")
+            .description("生成英雄信息图片使用的模板。（目前仅有一张模板）"),
+    }).description("模板设置"),
+]);
 
 let pendingMatches = []; // 待发布的比赛，当获取到的比赛未被解析时存入此数组，在计时器中定时查询，直到该比赛已被解析则生成图片发布
 // var subscribedGuilds = []; // 已订阅群组
@@ -602,6 +606,7 @@ enum TemplateType {
     Match = "match",
     Player = "player",
     Hero = "hero",
+    GuildMember = "guild_member",
 }
 
 function genImageHTML(data, template, type: TemplateType) {
