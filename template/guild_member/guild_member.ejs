@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+        <title>Document</title>
+        <style>
+            html,
+            body {
+                background-color: black;
+                color: white;
+                width: 800px;
+            }
+            p {
+                margin: 0;
+            }
+            img {
+                width: 100%;
+                vertical-align: middle;
+            }
+            .player.full {
+                width: 100%;
+                border: 1px #fff solid;
+                border-radius: 5px;
+                box-sizing: border-box;
+            }
+
+            .player.full .info {
+                display: grid;
+                grid-template-columns: repeat(2, 64px) auto 64px;
+                align-items: center;
+                /* border-bottom: #fff 1px solid; */
+                position: relative;
+                padding-bottom: 1px;
+            }
+            .player.full .info > .name {
+                line-height: 20px;
+                display: grid;
+                grid-template-rows: 24px repeat(2, 20px);
+                text-align: center;
+            }
+            .player.full .info > .name > .nick_name {
+                font-size: 18px;
+                line-height: 24px;
+            }
+            .player.full .info > .name >p{
+                display: flex;justify-content: space-around;
+            }
+            .player.full .last_match_date {
+                position: relative;
+                padding-top: 1px;
+            }
+            .player.full .last_match_date::before {
+                content: "";
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                top: 0;
+                width: 80%;
+                height: 1px;
+                background-color: #666;
+            }
+
+            .player.full .last10match {
+                display: grid;
+                gap: 5px;
+                grid-template-columns: repeat(5, 1fr);
+                grid-template-rows: repeat(2, 1fr);
+                align-items: center;
+                justify-items: center;
+                margin: 4px;
+            }
+
+            .player.full .last10match .match {
+                width: 150px;
+                height: 36px;
+                border-radius: 36px;
+                padding: 0 6px;
+                display: flex;
+                box-sizing: border-box;
+                align-items: center;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .player.full .last10match .match.win {
+                background-color: #006400;
+            }
+            .player.full .last10match .match.lose {
+                background-color: #8b0000;
+            }
+            .player.full .last10match img {
+                width: 32px;
+            }
+        </style>
+    </head>
+    <body>
+        <% const users = data; %>
+        <%-users.map(user=>`
+        <div class="player full">
+            <div class="info">
+                <img class="avatar user" src="${user?.user?.avatar}" alt="" />
+                <img class="avatar steam" src="${user.steamAccount.avatar}" alt="" />
+                <div class="name">
+                    <p class="nick_name">
+                        <span>${user.nickName}</span>
+                    </p>
+                    <p class="user">
+                        <span>账号：${user.userId}</span>
+                        <span>用户名：${user?.user?.name}</span>
+                    </p>
+                    <p class="steam">
+                        <span>SteamID：${user.steamId}</span>
+                        <span>Steam用户名：${user.steamAccount.name}</span>
+                    </p>
+                </div>
+                <img class="rank" src="${utils.getImageUrl("medal_"+((!user.steamAccount.seasonRank)?0:Math.floor(user.steamAccount.seasonRank/10)))}" alt="" />
+            </div>
+            ${users.length<10?
+            `<div class="last10match">
+                ${user.matches.map(match=>{
+                    let playerInMatch = match.players.find(player=>player.steamAccount.id==user.steamId)
+                    return `
+                <div class="match ${match.didRadiantWin==playerInMatch.isRadiant?"win":"lose"}">
+                    <img src="${utils.getImageUrl(playerInMatch.hero.shortName,ImageType.HeroIcons)}" alt="" />
+                    <span>${playerInMatch.kills}/${playerInMatch.deaths}/${playerInMatch.assists}</span>
+                    <span>${(playerInMatch.imp > 0 ? "+" : "") + playerInMatch.imp}</span>
+                </div>`}).join("")}
+            </div>`:0}
+            <div class="last_match_date">最近游戏: ${moment(new Date(user.matches[0].startDateTime * 1000)).format("YYYY-MM-DD HH:mm:ss")}</div>
+        </div>`).join("")
+        %>
+    </body>
+</html>

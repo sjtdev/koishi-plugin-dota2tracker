@@ -107,7 +107,7 @@ export async function apply(ctx: Context, config: Config) {
                     return;
                 }
                 if (!/^(?:.{1,20})?$/.test(nick_name ?? "")) {
-                    session.send('别名过长，请限制在20个字符以内。（也可以留空）')
+                    session.send("别名过长，请限制在20个字符以内。（也可以留空）");
                     return;
                 }
                 // 以上判定都通过则绑定成功
@@ -143,7 +143,7 @@ export async function apply(ctx: Context, config: Config) {
                         return;
                     }
                     if (!/^.{1,20}$/.test(nick_name ?? "")) {
-                        session.send('别名过长，请限制在20个字符以内。')
+                        session.send("别名过长，请限制在20个字符以内。");
                         return;
                     }
                     sessionPlayer.nickName = nick_name;
@@ -157,8 +157,33 @@ export async function apply(ctx: Context, config: Config) {
 
     ctx.command("查询群友", "查询本群已绑定的玩家").action(async ({ session }) => {
         if (session.guild) {
-            let queryRes = await ctx.database.get("dt_subscribed_players", { guildId: session.event.guild.id });
-            session.send("开发中，未来此功能会重写。\n" + queryRes.map((item) => `${item.nickName ?? ""}，ID：${item.userId}，SteamID：${item.steamId}`).join("\n"));
+            const subscribedPlayers = await ctx.database.get("dt_subscribed_players", { guildId: session.event.guild.id, platform: session.platform });
+            if (!subscribedPlayers.length) {
+                session.send("本群尚无绑定玩家。");
+                return;
+            }
+            if (subscribedPlayers.length <= 20) {
+                try {
+                    const memberList = await session.bot.getGuildMemberList(session.event.guild.id);
+                    ctx.logger.info(JSON.stringify(memberList.data));
+                    // const memberList = { data: [{ user: { id: "1243792285", name: "不醒梦", userId: "1243792285", avatar: "http://q.qlogo.cn/headimg_dl?dst_uin=1243792285&spec=640", username: "不醒梦" }, nick: "mian", roles: ["owner"] }] };
+                    let queryRes = await utils.query(queries.PLAYERS_INFO_WITH_10_MATCHES_FOR_GUILD(subscribedPlayers.map((player) => player.steamId)));
+                    if (queryRes.status == 200) {
+                        const users = subscribedPlayers.map((subscribedPlayer) => {
+                            const queryPlayer = queryRes.data.data.players.find((player) => player.steamAccount.id == subscribedPlayer.steamId);
+                            const queryMember = memberList.data.find((member) => member.user?.id == subscribedPlayer.userId);
+                            return { ...subscribedPlayer, ...queryPlayer, ...queryMember };
+                        });
+                        console.log(users);
+
+                        session.send(await ctx.puppeteer.render(genImageHTML(users, TemplateType.GuildMember, TemplateType.GuildMember)));
+                    } else throw 0;
+                } catch (error) {
+                    console.error(error);
+                    session.send("查询群友失败。");
+                }
+            }
+            // session.send("开发中，未来此功能会重写。\n" + queryRes.map((item) => `${item.nickName ?? ""}，ID：${item.userId}，SteamID：${item.steamId}`).join("\n"));
         }
     });
     // 查询比赛与查询最近比赛的共用代码块

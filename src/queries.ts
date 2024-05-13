@@ -190,7 +190,7 @@ export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId) {
 			rank
       lobbyType
       gameMode
-			endDateTime
+			startDateTime
 			durationSeconds
 			didRadiantWin
 			topLaneOutcome
@@ -239,6 +239,37 @@ export function PLAYER_EXTRA_INFO(steamAccountId, matchCount, totalHeroCount) {
         }
       }
       `;
+}
+
+export function PLAYERS_INFO_WITH_10_MATCHES_FOR_GUILD(steamAccountIds){
+  return `{
+    players(steamAccountIds: [${steamAccountIds.join()}]) {
+      steamAccount {
+        id
+        avatar
+        name
+        seasonRank
+      }
+      matches(request: {take: 10}) {
+        didRadiantWin
+        startDateTime
+        players {
+          isRadiant
+          kills
+          deaths
+          assists
+          steamAccount {
+            id
+          }
+          hero {
+            shortName
+          }
+          imp
+        }
+      }
+    }
+  }
+  `
 }
 
 export function CURRENT_GAMEVERSION() {

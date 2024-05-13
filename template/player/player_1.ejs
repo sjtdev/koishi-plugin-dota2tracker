@@ -501,7 +501,7 @@
                         <th>英雄</th>
                         <th>KDA(参战率)</th>
                         <th>对线</th>
-                        <th>结束于</th>
+                        <th>时间</th>
                         <th>时长</th>
                         <th>表现</th>
                         <th>段位</th>
@@ -522,7 +522,7 @@
                             <p>${match.players[0].kills}/${match.players[0].deaths}/${match.players[0].assists}</p>
                         </td>
                         <td><div class="player_lane ${match.laneResult}">${laneSVG[match.laneResult]}</div></td>
-                        <td style="line-height: 20px">${moment(new Date(match.endDateTime * 1000)).format("YYYY-MM-DD HH:mm:ss").slice(2)}</td>
+                        <td style="line-height: 20px">${moment(new Date(match.startDateTime * 1000)).format("YYYY-MM-DD HH:mm:ss").slice(2)}</td>
                         <td>${utils.sec2time(match.durationSeconds)}</td>
                         <td>${(match.players[0].imp > 0 ? "+" : "") + match.players[0].imp}</td>
                         <td><img class="medal" src="${utils.getImageUrl("medal_" + match.rank.toString().split("")[0])}" style="width: 100%" /></td>
