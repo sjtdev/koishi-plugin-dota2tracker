@@ -395,7 +395,7 @@
                 matchCount : currentPositionMatches.length,
                 winCount : winCount,
                 loseCount : currentPositionMatches.length - winCount,
-                imp : Math.round(currentPositionMatches.reduce((acc,match)=>acc+match.players[0].imp,0)/currentPositionMatches.length)
+                imp : currentPositionMatches.length ? Math.round(currentPositionMatches.reduce((acc,match)=>acc+match.players[0].imp,0)/currentPositionMatches.length) : '-'
             })
         }
         const highestCountsPosition = {
@@ -454,7 +454,7 @@
                     <span class="imp">${(hero.imp > 0 ? "+" : "") + hero.imp}</span>
                     <span class="win" style="${hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${hero.winCount * pixelOfPerMatchInTotal}px">${hero.winCount}</span>
                     <span class="lose" style="${hero.matchCount - hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${(hero.matchCount - hero.winCount) * pixelOfPerMatchInTotal}px">${hero.matchCount - hero.winCount}</span>`).join("") %>
-                    <p class="tip row near">近期使用场次大于1的英雄：</p>
+                    <p class="tip row near">近25场使用场次大于1的英雄：</p>
                     <%- player.heroesPerformance
                     .filter((hero) => hero.matchCount > 1)
                     .map((hero, index) => `
@@ -475,7 +475,7 @@
                     .map((position) => `
                     <span><img src="${utils.getImageUrl(position.icon,ImageType.Items)}"></span>
                     <span class="count">${position.matchCount}</span>
-                    <span class="win_rate">${((position.winCount / position.matchCount) * 100).toFixed(0)}%</span>
+                    <span class="win_rate">${position.matchCount?(((position.winCount / position.matchCount) * 100).toFixed(0)):"-"}%</span>
                     <span class="imp">${(position.imp > 0 ? "+" : "") + position.imp}</span>
                     <span class="win" style="${position.winCount == 0 ? "visibility:hidden;" : ""}width: ${position.winCount * pixelOfPerMatchInPosition}px">${position.winCount}</span>
                     <span class="lose" style="${position.matchCount - position.winCount == 0 ? "visibility:hidden;" : ""}width: ${(position.matchCount - position.winCount) * pixelOfPerMatchInPosition}px">${position.matchCount - position.winCount}</span>`).join("") %>
