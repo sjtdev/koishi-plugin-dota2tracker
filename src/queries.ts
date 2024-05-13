@@ -204,6 +204,7 @@ export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId) {
 			  kills
 			  deaths
 			  assists
+        position
 			  award
 			  imp
 			  hero {

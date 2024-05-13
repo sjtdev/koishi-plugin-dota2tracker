@@ -169,8 +169,8 @@
             }
 
             .hero_winrate .heroes img {
-                width: auto;
-                height: 32px;
+                width: 100%;
+                /* height: 32px; */
                 border-radius: 6px;
                 overflow: hidden;
             }
@@ -382,6 +382,27 @@
         const nearAdjustmentFactor = Math.min(highestCountsTotal.winCount / (highestCountsTotal.winCount + highestCountsTotal.loseCount), highestCountsTotal.loseCount / (highestCountsTotal.winCount + highestCountsTotal.loseCount));
 
         const pixelOfPerMatchInNear = (heroesCountPixels / (highestCountsNear?.winCount + highestCountsNear?.loseCount ?? 1)) * nearAdjustmentFactor;
+        
+        player.positionPerformance=[];
+        // 瞎j8定义的各位置代表物品，以后看情况调整
+        const positionItems=["greater_crit","dagon_5","heart","hand_of_midas","ward_observer"];
+        for (let index = 0; index < 5; index++) {
+            let currentPositionMatches = player.matches.filter(match=>match.players[0].position == ("POSITION_"+(index+1)))
+            let winCount = currentPositionMatches.filter(match=>match.didRadiantWin == match.players[0].isRadiant).length;
+            player.positionPerformance.push({
+                position : (index + 1),
+                icon : positionItems[index],
+                matchCount : currentPositionMatches.length,
+                winCount : winCount,
+                loseCount : currentPositionMatches.length - winCount,
+                imp : Math.round(currentPositionMatches.reduce((acc,match)=>acc+match.players[0].imp,0)/currentPositionMatches.length)
+            })
+        }
+        const highestCountsPosition = {
+            winCount: Math.max(...player.positionPerformance.filter((position) => position.matchCount > 1)?.map((position) => position.winCount)),
+            loseCount: Math.max(...player.positionPerformance.filter((position) => position.matchCount > 1)?.map((position) => position.matchCount - position.winCount)),
+        };
+        const pixelOfPerMatchInPosition = (heroesCountPixels / (highestCountsPosition.winCount + highestCountsPosition.loseCount ?? 1)) * nearAdjustmentFactor;
         %>
 
         <div class="wrapper">
@@ -394,9 +415,7 @@
                     player.winCount / player.matchCount
                 )};">${((player.winCount / player.matchCount) * 100).toFixed(2)}%</span></p>
                     <p class="matches"><span>最近25场：<span class="win">${nearWinCount}</span>/<span class="lose">${nearMatchCount - nearWinCount}</span></span><span>胜率：<span style="color:${utils.winRateColor(nearWinCount / nearMatchCount)};">${(
-                    (nearWinCount / nearMatchCount) *
-                    100
-                ).toFixed(2)}%</span></span><span>评分：${player.performance.imp}</span></span></p>
+                    (nearWinCount / nearMatchCount) * 100).toFixed(2)}%</span></span><span>评分：${player.performance.imp}</span></span></p>
                     <p class="matches"><span>对线：<span class="victory">${outcomeCounts.victory + outcomeCounts.stomp}(<span class="stomp">${outcomeCounts.stomp}</span>)</span>-<span class="tie">${outcomeCounts.tie}</span>-<span class="fail">${
                     outcomeCounts.fail + outcomeCounts.stomped
                 }(<span class="stomped">${outcomeCounts.stomped}</span>)</span></span><span>线优：<span style="color:${utils.winRateColor(
@@ -439,15 +458,30 @@
                     <%- player.heroesPerformance
                     .filter((hero) => hero.matchCount > 1)
                     .map((hero, index) => `
-                    <span style="order:${index + 1};"><img alt="" src="${utils.getImageUrl(hero.hero.shortName, ImageType.HeroIcons)}" /></span>
-                    <span style="order:${index + 1};" class="count">${hero.matchCount}</span>
-                    <span style="order:${index + 1};" class="win_rate">${((hero.winCount / hero.matchCount) * 100).toFixed(0)}%</span>
-                    <span style="order:${index + 1};" class="imp">${(hero.imp > 0 ? "+" : "") + hero.imp}</span>
-                    <span class="win" style="order:${index + 1};${hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${hero.winCount * pixelOfPerMatchInNear}px">${hero.winCount}</span>
-                    <span class="lose" style="order:${index + 1};${hero.matchCount - hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${(hero.matchCount - hero.winCount) * pixelOfPerMatchInNear}px">${hero.matchCount - hero.winCount}</span>`).join("") %>
+                    <span><img alt="" src="${utils.getImageUrl(hero.hero.shortName, ImageType.HeroIcons)}" /></span>
+                    <span class="count">${hero.matchCount}</span>
+                    <span class="win_rate">${((hero.winCount / hero.matchCount) * 100).toFixed(0)}%</span>
+                    <span class="imp">${(hero.imp > 0 ? "+" : "") + hero.imp}</span>
+                    <span class="win" style="${hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${hero.winCount * pixelOfPerMatchInNear}px">${hero.winCount}</span>
+                    <span class="lose" style="${hero.matchCount - hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${(hero.matchCount - hero.winCount) * pixelOfPerMatchInNear}px">${hero.matchCount - hero.winCount}</span>`).join("") %>
+                    <p class="tip row near">近25场各个位置的表现：</p>
+                    <span class="tip">位置</span>
+                    <span class="tip" style="margin: 0 4px">场次</span>
+                    <span class="tip" style="margin: 0 4px">胜率</span>
+                    <span class="tip" style="margin: 0 4px">表现</span>
+                    <span class="tip win_count" style="justify-self: end; margin-right: 2px">胜场</span>
+                    <span class="tip lose_count" style="justify-self: start; margin-left: 2px">败场</span>
+                    <%- player.positionPerformance
+                    .map((position) => `
+                    <span><img src="${utils.getImageUrl(position.icon,ImageType.Items)}"></span>
+                    <span class="count">${position.matchCount}</span>
+                    <span class="win_rate">${((position.winCount / position.matchCount) * 100).toFixed(0)}%</span>
+                    <span class="imp">${(position.imp > 0 ? "+" : "") + position.imp}</span>
+                    <span class="win" style="${position.winCount == 0 ? "visibility:hidden;" : ""}width: ${position.winCount * pixelOfPerMatchInPosition}px">${position.winCount}</span>
+                    <span class="lose" style="${position.matchCount - position.winCount == 0 ? "visibility:hidden;" : ""}width: ${(position.matchCount - position.winCount) * pixelOfPerMatchInPosition}px">${position.matchCount - position.winCount}</span>`).join("") %>
                 </div>
             </div>
-            <%- `<div class="streak" style="box-shadow:none;color:${utils.winRateColor((player.streak + 10) / 20)};">${Math.abs(player.streak) + (player.streak > 0 ? "连胜" : "连败")}</div>` %>
+            <%- player.streak>1?`<div class="streak" style="box-shadow:none;color:${utils.winRateColor((player.streak + 10) / 20)};">${Math.abs(player.streak) + (player.streak > 0 ? "连胜" : "连败")}</div>`:"" %>
             <table class="matches">
                 <colgroup>
                     <col style="width: auto" />
