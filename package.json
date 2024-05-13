@@ -27,7 +27,6 @@
   ],
   "dependencies": {
     "axios": "^1.6.8",
-    "cheerio": "^1.0.0-rc.12",
     "dotaconstants": "^8.5.0",
     "ejs": "^3.1.10",
     "moment": "^2.30.1"
