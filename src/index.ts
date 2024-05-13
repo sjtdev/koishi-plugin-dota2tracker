@@ -4,14 +4,13 @@ import * as queries from "./queries.ts";
 import { ImageType } from "./utils.ts";
 import * as puppeteer from "koishi-plugin-puppeteer";
 import fs from "fs";
-import * as cheerio from "cheerio";
+import path from "path";
 import moment from "moment";
 import * as dotaconstants from "dotaconstants";
 import * as d2a from "./dotaconstants_add.json";
 import { Random } from "koishi";
 import * as cron from "koishi-plugin-cron";
 import * as ejs from "ejs";
-import path from "path";
 
 export const name = "dota2tracker";
 export const usage = "DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑定），以及一系列查询功能。";
@@ -107,6 +106,10 @@ export async function apply(ctx: Context, config: Config) {
                     session.send(`绑定失败，${verifyRes.reason}`);
                     return;
                 }
+                if (!/^(?:.{1,20})?$/.test(nick_name ?? "")) {
+                    session.send('别名过长，请限制在20个字符以内。（也可以留空）')
+                    return;
+                }
                 // 以上判定都通过则绑定成功
                 session.send(
                     `
@@ -137,6 +140,10 @@ export async function apply(ctx: Context, config: Config) {
                 if (sessionPlayer) {
                     if (!nick_name) {
                         session.send("请输入你的别名。");
+                        return;
+                    }
+                    if (!/^.{1,20}$/.test(nick_name ?? "")) {
+                        session.send('别名过长，请限制在20个字符以内。')
                         return;
                     }
                     sessionPlayer.nickName = nick_name;
