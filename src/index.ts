@@ -342,6 +342,7 @@ export async function apply(ctx: Context, config: Config) {
                         // 取场次前十的英雄表现数据附加到原player对象中
                         player.heroesPerformanceTop10 = playerExtra.heroesPerformance.slice(0, 10);
                     } else throw 0;
+                    console.log(player)
                     session.send(await ctx.puppeteer.render(genImageHTML(player, config.template_player, TemplateType.Player)));
                 } catch (error) {
                     ctx.logger.error(error);

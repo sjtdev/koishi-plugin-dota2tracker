@@ -408,7 +408,7 @@
         <div class="wrapper">
             <div class="player">
                 <%- `
-                <div class="avatar"><img src="${player.steamAccount.avatar}" alt="" /></div>
+                <div class="avatar"><img src="${player.steamAccount?.avatar}" alt="" /></div>
                 <div class="info">
                     <p class="name">${player.steamAccount.name}${player.guildMember ? ` <span class="guild ${guildLevel(player.guildMember.guild.currentPercentile)}">[${player.guildMember.guild.tag}]</span></p>` : ""}
                     <p class="matches"><span>场次：${player.matchCount}（<span class="win">${player.winCount}</span>/<span class="lose">${player.matchCount - player.winCount}</span>）</span>胜率：<span style="color:${utils.winRateColor(
@@ -518,14 +518,14 @@
                         <td><img alt="" src="${utils.getImageUrl(match.players[0].hero.shortName, ImageType.HeroIcons)}" /></td>
                         <td style="line-height: 20px">
                             <p>${((match.players[0].kills + match.players[0].assists) / Math.max(1, match.players[0].deaths)).toFixed(2)} (${(((match.players[0].kills + match.players[0].assists) /
-                            (match.players[0].isRadiant ? match.radiantKills.reduce((acc, cva) => acc + cva, 0) : match.direKills.reduce((acc, cva) => acc + cva, 0))) * 100).toFixed(0)}%)</p>
+                            (match.players[0].isRadiant ? match.radiantKills?.reduce((acc, cva) => acc + cva, 0) : match.direKills?.reduce((acc, cva) => acc + cva, 0))) * 100)?.toFixed(0)}%)</p>
                             <p>${match.players[0].kills}/${match.players[0].deaths}/${match.players[0].assists}</p>
                         </td>
                         <td><div class="player_lane ${match.laneResult}">${laneSVG[match.laneResult]}</div></td>
                         <td style="line-height: 20px">${moment(new Date(match.startDateTime * 1000)).format("YYYY-MM-DD HH:mm:ss").slice(2)}</td>
                         <td>${utils.sec2time(match.durationSeconds)}</td>
                         <td>${(match.players[0].imp > 0 ? "+" : "") + match.players[0].imp}</td>
-                        <td><img class="medal" src="${utils.getImageUrl("medal_" + match.rank.toString().split("")[0])}" style="width: 100%" /></td>
+                        <td><img class="medal" src="${utils.getImageUrl("medal_" + match.rank?.toString().split("")[0])}" style="width: 100%" /></td>
                     </tr>`).join("")%>
                 </tbody>
             </table>
