@@ -40,7 +40,15 @@ export const Config: Schema<Config> = Schema.intersect([
     }).description("模板设置"),
 ]);
 
-let pendingMatches = []; // 待发布的比赛，当获取到的比赛未被解析时存入此数组，在计时器中定时查询，直到该比赛已被解析则生成图片发布
+interface PendingMatch {
+    matchId: number;
+    guilds: Array<{
+        guildId: string;
+        platform: string;
+        players: Array<utils.dt_subscribed_players>;
+    }>;
+}
+let pendingMatches: PendingMatch[] = []; // 待发布的比赛，当获取到的比赛未被解析时存入此数组，在计时器中定时查询，直到该比赛已被解析则生成图片发布
 // var subscribedGuilds = []; // 已订阅群组
 // var subscribedPlayers = []; // 已绑定玩家
 // var sendedMatches = []; // 已发布比赛
@@ -204,7 +212,7 @@ export async function apply(ctx: Context, config: Config) {
                 session.send(await ctx.puppeteer.render(genImageHTML(match, config.template_match, TemplateType.Match)));
                 ctx.database.upsert("dt_previous_query_results", (row) => [{ matchId: match.id, data: match, queryTime: new Date() }]);
             } else {
-                pendingMatches.push({ matchId: matchId, platform: session.event.platform, guildId: session.event.guild.id });
+                pendingMatches.push({ matchId: matchId, guilds: [{ platform: session.event.platform, guildId: session.event.guild.id, players: [] }] });
                 session.send("比赛尚未解析，将在解析完成后发布。");
             }
         } catch (error) {
@@ -524,8 +532,6 @@ export async function apply(ctx: Context, config: Config) {
         // 每分钟执行一次查询玩家最近比赛记录，若未发布过则进入待发布列表；检查待发布列表，若满足发布条件（比赛已被解析）则生成图片并发布。
         ctx.cron("* * * * *", async function () {
             // 获取注册玩家ID，每分钟获取玩家最新比赛，判定是否播报过
-
-            const scanningMatches = [...pendingMatches];
             const subscribedGuilds = await ctx.database.get("dt_subscribed_guilds", undefined);
             const subscribedPlayersInGuild = (await ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
             if (subscribedPlayersInGuild.length > 0) {
@@ -538,24 +544,37 @@ export async function apply(ctx: Context, config: Config) {
                             })
                     )
                 );
-
-                for (let player of queryRes.data.data.players) {
-                    let lastMatch = player.matches[0];
-                    if ((await ctx.database.get("dt_sended_match_id", { matchId: lastMatch.id })).length) continue;
-                    // if (pendingMatches.find((item) => item.matchId === lastMatch.id) != undefined) continue;
-                    if (moment.unix(lastMatch.startDateTime).isBefore(moment().subtract(1, "days"))) continue;
-                    for (let subscribed_player of subscribedPlayersInGuild) {
-                        if (player.steamAccount.id == subscribed_player.steamId) {
-                            scanningMatches.push({ matchId: lastMatch.id, platform: subscribed_player.platform, guildId: subscribed_player.guildId });
-                            ctx.logger.info(`追踪到来自群组${subscribed_player.platform}:${subscribed_player.guildId}-用户${subscribed_player.nickName ?? ""}(${subscribed_player.steamId})的尚未播报过的最新比赛 ${lastMatch.id}。`);
-                        }
-                    }
-                }
+                // 获取所有查询到的玩家最新比赛并根据match.id去重
+                const lastMatches = queryRes.data.data.players
+                    .map((player) => player.matches[0])
+                    .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id))
+                    .filter((match) => !pendingMatches.some((pendingMatch) => pendingMatch.matchId == match.id));
+                const sendedMatchesIds = (await ctx.database.get("dt_sended_match_id", { matchId: lastMatches.map((match) => match.id) }, ["matchId"])).map((match) => match.matchId);
+                // 遍历去重后的match，若match未在pendingMatches中，则获取match中与subscribedPlayersInGuild中SteamID相符的玩家push入pendingMatches中
+                lastMatches
+                    .filter((match) => !sendedMatchesIds.includes(match.id))
+                    .forEach((match) => {
+                        const tempGuilds: Array<{ guildId: string; platform: string; players: Array<utils.dt_subscribed_players> }> = [];
+                        match.players.forEach((player) => {
+                            const subscribedPlayer = subscribedPlayersInGuild.find((subscribedPlayer) => subscribedPlayer.steamId === player.steamAccount.id);
+                            if (subscribedPlayer) {
+                                const tempGuild = tempGuilds.find((guild) => guild.guildId == subscribedPlayer.guildId && guild.platform == subscribedPlayer.platform);
+                                if (tempGuild) tempGuild.players.push(subscribedPlayer);
+                                else tempGuilds.push({ guildId: subscribedPlayer.guildId, platform: subscribedPlayer.platform, players: [subscribedPlayer] });
+                            }
+                        });
+                        pendingMatches.push({ matchId: match.id, guilds: tempGuilds });
+                        ctx.logger.info(
+                            tempGuilds
+                                .map((guild) => `追踪到来自群组${guild.platform}:${guild.guildId}的用户${guild.players.map((player) => `[${player.nickName ?? ""}(${player.steamId})]`).join("、")}的尚未播报过的最新比赛 ${match.id}。`)
+                                .join("")
+                        );
+                    });
             }
 
             // 获取待解析比赛列表并发布 (若待解析列表数量不止一场，每分钟只取第一位进行尝试防止同时高并发调用API)
-            if (scanningMatches.length > 0) {
-                const pendingMatch = scanningMatches[0];
+            if (pendingMatches.length > 0) {
+                const pendingMatch = pendingMatches[0];
                 try {
                     let match;
                     let queryLocal = await ctx.database.get("dt_previous_query_results", pendingMatch.matchId, ["data"]);
@@ -569,9 +588,7 @@ export async function apply(ctx: Context, config: Config) {
                         }
                     }
                     if (match.parsedDateTime || moment.unix(match.startDateTime).isBefore(moment().subtract(1, "years"))) {
-                        const commingMatches = scanningMatches.filter((item) => item.matchId == match.id);
-                        // pendingMatches = pendingMatches.filter((item) => item.matchId != match.id);
-                        const realCommingMatches = commingMatches.filter((commingMatch, index, self) => index === self.findIndex((t) => t.guildId === commingMatch.guildId && t.platform === commingMatch.platform));
+                        pendingMatches = pendingMatches.filter((item) => item.matchId != match.id);
 
                         // let realCommingMatches = [];
                         // for (let commingMatch of commingMatches) {
@@ -588,11 +605,10 @@ export async function apply(ctx: Context, config: Config) {
                         // pendingMatches.shift();
                         // await session.send(await ctx.puppeteer.render(genMatchImageHTML(match)));
 
-                        let broadMatchMessage = "";
                         const img = await ctx.puppeteer.render(genImageHTML(match, config.template_match, TemplateType.Match));
-                        for (let comming of realCommingMatches) {
-                            let commingSubscribedPlayers = subscribedPlayersInGuild.filter((item) => item.platform == comming.platform && item.guildId == comming.guildId);
-                            let idsToFind = commingSubscribedPlayers.map((item) => item.steamId);
+                        for (let commingGuild of pendingMatch.guilds) {
+                            let broadMatchMessage = "";
+                            let idsToFind = commingGuild.players.map((player) => player.steamId);
                             let broadPlayers = match.players.filter((item) => idsToFind.includes(item.steamAccountId));
                             for (let player of broadPlayers) {
                                 let broadPlayerMessage = `${player.steamAccount.name}的${random.pick(d2a.HEROES_CHINESE[player.hero.id])}`;
@@ -605,7 +621,6 @@ export async function apply(ctx: Context, config: Config) {
                                         broadPlayerMessage += random.pick(d2a.LOSE_POSITIVE);
                                     else broadPlayerMessage += random.pick(d2a.LOSE_NEGATIVE);
                                 }
-                                // (ノ°口°)ノ（使用虚无之灵, KDA: 1.43[3/7/7], GPM/XPM: 388/574, 补刀数: 134, 总伤害: 18059(24.92%), 参战率: 45.45%, 参葬率: 13.73%
                                 broadPlayerMessage += `。\nKDA：${((player.kills + player.assists) / (player.deaths || 1)).toFixed(2)} [${player.kills}/${player.deaths}/${player.assists}]，GPM/XPM：${player.goldPerMinute}/${
                                     player.experiencePerMinute
                                 }，补刀数：${player.numLastHits}/${player.numDenies}，伤害/塔伤：${player.heroDamage}/${player.towerDamage}，参战/参葬率：${(player.killContribution * 100).toFixed(2)}%/${(
@@ -613,7 +628,7 @@ export async function apply(ctx: Context, config: Config) {
                                 ).toFixed(2)}%`;
                                 broadMatchMessage += broadPlayerMessage + "\n";
                             }
-                            await ctx.broadcast([`${comming.platform}:${comming.guildId}`], broadMatchMessage + img);
+                            await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + img);
                         }
                         ctx.database.upsert("dt_previous_query_results", (row) => [{ matchId: match.id, data: match, queryTime: new Date() }]);
                         ctx.database.create("dt_sended_match_id", { matchId: match.id, sendTime: new Date() });
