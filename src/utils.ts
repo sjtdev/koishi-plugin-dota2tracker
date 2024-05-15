@@ -146,7 +146,8 @@ export function getFormattedMatchData(match) {
             player.kills * 5 +
             player.assists * 3 +
             (player.stats.heroDamageReport.dealtTotal.stunDuration / 100) * 0.1 +
-            ((player.stats.heroDamageReport.dealtTotal.slowDuration + player.stats.heroDamageReport.dealtTotal.disableDuration) / 100) * 0.05 +
+            (player.stats.heroDamageReport.dealtTotal.disableDuration / 100) * 0.05 +
+            (player.stats.heroDamageReport.dealtTotal.slowDuration / 100) * 0.025 +
             player.heroDamage * 0.001 +
             player.towerDamage * 0.01 +
             player.heroHealing * 0.002 +
@@ -326,8 +327,8 @@ export function getFormattedMatchData(match) {
     findMaxByProperty("experiencePerMinute").titles.push({ name: "睿", color: "#8888FF" });
     match.players
         .reduce((max, player) =>
-            player.stats.heroDamageReport.dealtTotal.stunDuration + player.stats.heroDamageReport.dealtTotal.disableDuration + player.stats.heroDamageReport.dealtTotal.slowDuration / 2 >
-            max.stats.heroDamageReport.dealtTotal.stunDuration + max.stats.heroDamageReport.dealtTotal.disableDuration + max.stats.heroDamageReport.dealtTotal.slowDuration / 2
+            player.stats.heroDamageReport.dealtTotal.stunDuration + player.stats.heroDamageReport.dealtTotal.disableDuration / 2 + player.stats.heroDamageReport.dealtTotal.slowDuration / 4 >
+            max.stats.heroDamageReport.dealtTotal.stunDuration + max.stats.heroDamageReport.dealtTotal.disableDuration / 2 + max.stats.heroDamageReport.dealtTotal.slowDuration / 4
                 ? player
                 : max
         )
