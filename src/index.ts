@@ -173,7 +173,7 @@ export async function apply(ctx: Context, config: Config) {
             if (subscribedPlayers.length <= 20) {
                 try {
                     const memberList = await session.bot.getGuildMemberList(session.event.guild.id);
-                    ctx.logger.info(JSON.stringify(memberList.data));
+                    // ctx.logger.info(JSON.stringify(memberList.data));
                     // const memberList = { data: [{ user: { id: "1243792285", name: "不醒梦", userId: "1243792285", avatar: "http://q.qlogo.cn/headimg_dl?dst_uin=1243792285&spec=640", username: "不醒梦" }, nick: "mian", roles: ["owner"] }] };
                     let queryRes = await utils.query(queries.PLAYERS_INFO_WITH_10_MATCHES_FOR_GUILD(subscribedPlayers.map((player) => player.steamId)));
                     if (queryRes.status == 200) {
@@ -182,12 +182,11 @@ export async function apply(ctx: Context, config: Config) {
                             const queryMember = memberList.data.find((member) => member.user?.id == subscribedPlayer.userId);
                             return { ...subscribedPlayer, ...queryPlayer, ...queryMember };
                         });
-                        console.log(users);
 
                         session.send(await ctx.puppeteer.render(genImageHTML(users, TemplateType.GuildMember, TemplateType.GuildMember)));
                     } else throw 0;
                 } catch (error) {
-                    console.error(error);
+                    ctx.logger.error(error);
                     session.send("查询群友失败。");
                 }
             }
@@ -216,7 +215,7 @@ export async function apply(ctx: Context, config: Config) {
                 session.send("比赛尚未解析，将在解析完成后发布。");
             }
         } catch (error) {
-            console.error(error);
+            ctx.logger.error(error);
             session.send("获取比赛信息失败。");
             ctx.database.remove("dt_previous_query_results", { matchId: parseInt(matchId) });
         }
@@ -345,7 +344,7 @@ export async function apply(ctx: Context, config: Config) {
                     } else throw 0;
                     session.send(await ctx.puppeteer.render(genImageHTML(player, config.template_player, TemplateType.Player)));
                 } catch (error) {
-                    console.error(error);
+                    ctx.logger.error(error);
                     session.send("获取玩家信息失败。");
                 }
             }
@@ -404,7 +403,7 @@ export async function apply(ctx: Context, config: Config) {
                         await session.send(await ctx.puppeteer.render(genImageHTML(hero, config.template_hero, TemplateType.Hero)));
                     } else throw 0;
                 } catch (error) {
-                    console.error(error);
+                    ctx.logger.error(error);
                     session.send("获取数据失败");
                     return;
                 }
@@ -470,7 +469,7 @@ export async function apply(ctx: Context, config: Config) {
                         );
                     }
                 } catch (error) {
-                    console.error(error);
+                    ctx.logger.error(error);
                     session.send("获取数据失败");
                     return;
                 }
@@ -634,7 +633,7 @@ export async function apply(ctx: Context, config: Config) {
                         ctx.database.create("dt_sended_match_id", { matchId: match.id, sendTime: new Date() });
                     } else ctx.logger.info("比赛 %d 尚未解析完成，继续等待。", match.id);
                 } catch (error) {
-                    console.error(error);
+                    ctx.logger.error(error);
                     // session.send("获取比赛信息失败。");
                     ctx.database.remove("dt_previous_query_results", { matchId: pendingMatch.matchId });
                 }
