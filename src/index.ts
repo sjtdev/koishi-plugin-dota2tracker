@@ -342,7 +342,6 @@ export async function apply(ctx: Context, config: Config) {
                         // 取场次前十的英雄表现数据附加到原player对象中
                         player.heroesPerformanceTop10 = playerExtra.heroesPerformance.slice(0, 10);
                     } else throw 0;
-                    console.log(player)
                     session.send(await ctx.puppeteer.render(genImageHTML(player, config.template_player, TemplateType.Player)));
                 } catch (error) {
                     ctx.logger.error(error);
@@ -629,6 +628,7 @@ export async function apply(ctx: Context, config: Config) {
                                 broadMatchMessage += broadPlayerMessage + "\n";
                             }
                             await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + img);
+                            ctx.logger.info(`已解析${match.id}并发布于${commingGuild.platform}:${commingGuild.guildId}。`)
                         }
                         ctx.database.upsert("dt_previous_query_results", (row) => [{ matchId: match.id, data: match, queryTime: new Date() }]);
                         ctx.database.create("dt_sended_match_id", { matchId: match.id, sendTime: new Date() });
