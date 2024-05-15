@@ -148,6 +148,11 @@ export function PLAYERS_LASTMATCH(steamAccountIds) {
             id
             parsedDateTime
             startDateTime
+            players{
+              steamAccount{
+                id
+              }
+            }
           }
         }
       }
