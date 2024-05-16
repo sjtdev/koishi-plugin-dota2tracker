@@ -13,7 +13,9 @@ import * as cron from "koishi-plugin-cron";
 import * as ejs from "ejs";
 
 export const name = "dota2tracker";
-export const usage = "DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑定），以及一系列查询功能。";
+export const usage = `
+DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑定），以及一系列查询功能。  
+**更多信息请进入插件主页查看。**`;
 export const inject = ["database", "puppeteer", "cron"]; // 声明依赖
 
 // 配置项
