@@ -481,7 +481,7 @@
                     <span class="lose" style="${position.matchCount - position.winCount == 0 ? "visibility:hidden;" : ""}width: ${(position.matchCount - position.winCount) * pixelOfPerMatchInPosition}px">${position.matchCount - position.winCount}</span>`).join("") %>
                 </div>
             </div>
-            <%- player.streak>1?`<div class="streak" style="box-shadow:none;color:${utils.winRateColor((player.streak + 10) / 20)};">${Math.abs(player.streak) + (player.streak > 0 ? "连胜" : "连败")}</div>`:"" %>
+            <%- Math.abs(player.streak)>1?`<div class="streak" style="box-shadow:none;color:${utils.winRateColor((player.streak + 10) / 20)};">${Math.abs(player.streak) + (player.streak > 0 ? "连胜" : "连败")}</div>`:"" %>
             <table class="matches">
                 <colgroup>
                     <col style="width: auto" />
