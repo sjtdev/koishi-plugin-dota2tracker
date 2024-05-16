@@ -388,7 +388,7 @@ export async function apply(ctx: Context, config: Config) {
                             let queryRes2 = await utils.query(queries.ALL_ABILITIES_CHINESE_NAME());
 
                             if (queryRes2.status == 200) {
-                                AbilitiesConstantsCN.data = queryRes2.data.data.constants;
+                                AbilitiesConstantsCN = { data: queryRes2.data.data.constants };
                                 await ctx.database.upsert("dt_constants_abilities_cn", (row) => [
                                     { id: 1, data: AbilitiesConstantsCN, gameVersionId: queryConstants.gameVersions[0].id, gameVersionName: queryConstants.gameVersions[0].name },
                                 ]);
@@ -628,7 +628,7 @@ export async function apply(ctx: Context, config: Config) {
                                 broadMatchMessage += broadPlayerMessage + "\n";
                             }
                             await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + img);
-                            ctx.logger.info(`已解析${match.id}并发布于${commingGuild.platform}:${commingGuild.guildId}。`)
+                            ctx.logger.info(`已解析${match.id}并发布于${commingGuild.platform}:${commingGuild.guildId}。`);
                         }
                         ctx.database.upsert("dt_previous_query_results", (row) => [{ matchId: match.id, data: match, queryTime: new Date() }]);
                         ctx.database.create("dt_sended_match_id", { matchId: match.id, sendTime: new Date() });
