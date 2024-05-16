@@ -11,7 +11,8 @@
     "template"
   ],
   "contributors": [
-    "sjtdev <sh1j1n9ta0@foxmail.com>"
+    "sjtdev <sh1j1n9ta0@foxmail.com>",
+    "sjtdev"
   ],
   "homepage": "https://github.com/sjtdev/koishi-plugin-dota2tracker",
   "repository": {
