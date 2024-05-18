@@ -128,6 +128,32 @@ export function MATCH_INFO(matchId) {
 `;
 }
 
+export function MATCHES_FOR_DAILY(steamAccountIds,seconds){
+  return `
+  {
+    players(steamAccountIds:${JSON.stringify(steamAccountIds)}) {
+      steamAccount{id name}
+      matches(request:{startDateTime:${seconds} take:50}){
+        id
+        didRadiantWin
+        parsedDateTime
+        startDateTime
+        players {
+          kills
+          deaths
+          assists
+          imp
+          isRadiant
+          steamAccount {
+            id
+          }
+        }
+      }
+    }
+  }
+  `
+}
+
 export function VERIFYING_PLAYER(steamAccountId) {
     return `
     {
@@ -160,7 +186,7 @@ export function PLAYERS_LASTMATCH(steamAccountIds) {
     `;
 }
 
-export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId) {
+export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId,heroId?) {
     return `
     {
 		player(steamAccountId: ${steamAccountId}) {
@@ -181,7 +207,7 @@ export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId) {
 		  performance {
 			imp
 		  }
-		  heroesPerformance(take: 25, request: {matchGroupOrderBy: WIN_COUNT, take: 25}) {
+		  heroesPerformance(take: 25, request: {matchGroupOrderBy: WIN_COUNT take: 25 ${heroId?("heroIds:"+heroId):""}}) {
 			hero {
 			  id
 			  shortName
@@ -190,7 +216,7 @@ export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId) {
 			winCount
 			matchCount
 		  }
-		  matches(request: {take: 25}) {
+		  matches(request: {take: 25 ${heroId?("heroIds:"+heroId):""}}) {
 			id
 			rank
       lobbyType
@@ -225,10 +251,10 @@ export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId) {
       `;
 }
 
-export function PLAYER_EXTRA_INFO(steamAccountId, matchCount, totalHeroCount) {
+export function PLAYER_EXTRA_INFO(steamAccountId, matchCount, totalHeroCount,heroId?) {
     return `{
         player(steamAccountId: ${steamAccountId}) {
-          heroesPerformance(take: ${totalHeroCount}, request: {matchGroupOrderBy: MATCH_COUNT, take: ${matchCount}}) {
+          heroesPerformance(take: ${totalHeroCount}, request: {matchGroupOrderBy: MATCH_COUNT, take: ${matchCount} ${heroId?("heroIds:"+heroId):""}}) {
             hero {
               id
               shortName

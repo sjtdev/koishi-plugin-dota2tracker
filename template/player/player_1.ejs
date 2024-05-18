@@ -530,13 +530,14 @@
                 </tbody>
             </table>
             <div class="plus">
-                <%- player.dotaPlus.map((hero) => `
+                <%- !player.genHero?
+                player.dotaPlus.map((hero) => `
                 <div class="hero">
                     <img src="${utils.getImageUrl(hero.shortName, ImageType.Heroes)}" alt="" />
                     <div class="level"><img src="${utils.getImageUrl("hero_badge_" + Math.ceil((hero.level + 1) / 6))}" alt="" /><span>${hero.level}</span></div>
                     <span>${((hero.winCount / hero.matchCount) * 100).toFixed(2)}%</span>
                     <span>${hero.matchCount}</span>
-                </div>`).join("") %>
+                </div>`).join(""):"" %>
             </div>
         </div>
     </body>

@@ -21,14 +21,26 @@ export const inject = ["database", "puppeteer", "cron"]; // 声明依赖
 // 配置项
 export interface Config {
     STRATZ_API_TOKEN: string;
+    dailyReportSwitch: boolean;
+    dailyReportHours: number;
     template_match: string;
     template_player: string;
     template_hero: string;
 }
-export const Config: Schema<Config> = Schema.intersect([
+export const Config: Schema = Schema.intersect([
     Schema.object({
         STRATZ_API_TOKEN: Schema.string().required().description("※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取"),
     }).description("基础设置"),
+    Schema.object({
+        dailyReportSwitch: Schema.boolean().default(false).description("日报功能").experimental(),
+    }),
+    Schema.union([
+        Schema.object({
+            dailyReportSwitch: Schema.const(true).required(),
+            dailyReportHours: Schema.number().min(0).max(23).default(6).description("日报时间小时"),
+        }),
+        Schema.object({}),
+    ]),
     Schema.object({
         template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)])
             .default("match_1")
@@ -41,6 +53,8 @@ export const Config: Schema<Config> = Schema.intersect([
             .description("生成英雄信息图片使用的模板。（目前仅有一张模板）"),
     }).description("模板设置"),
 ]);
+
+function init() {}
 
 interface PendingMatch {
     matchId: number;
@@ -59,6 +73,8 @@ const random = new Random(() => Math.random());
 export async function apply(ctx: Context, config: Config) {
     // write your plugin here
     utils.CONFIGS.STRATZ_API.TOKEN = config.STRATZ_API_TOKEN; // 读取配置API_TOKEN
+
+    // ctx.on()
 
     ctx.command("订阅本群", "订阅后还需玩家在本群绑定SteamID")
         .usage("订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。")
@@ -279,11 +295,13 @@ export async function apply(ctx: Context, config: Config) {
             }
         });
 
-    ctx.command("查询玩家 <input_data>", "查询玩家信息")
+    ctx.command("查询玩家 <input_data>", "查询玩家信息，可指定英雄")
         .usage("查询指定玩家的个人信息与最近战绩，生成图片发布。\n参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID")
+        .option("hero", "-o <value:string> 查询玩家指定英雄使用情况（同其他英雄查询，可用简称与ID）")
         .example("-查询玩家 123456789")
         .example("-查询玩家 张三")
-        .action(async ({ session }, input_data) => {
+        .example("-查询玩家 张三 hero 敌法师")
+        .action(async ({ session, options }, input_data) => {
             if (session.guild) {
                 let sessionPlayer;
                 if (!input_data) {
@@ -302,14 +320,15 @@ export async function apply(ctx: Context, config: Config) {
                 }
                 session.send("正在获取玩家数据，请稍后...");
                 // let steamId = flagBindedPlayer ? flagBindedPlayer.steamId : input_data;
+                let hero = findingHero(options.hero);
                 let steamId = flagBindedPlayer?.steamId ?? input_data;
                 let player;
                 try {
-                    let queryRes = await utils.query(queries.PLAYER_INFO_WITH_25_MATCHES(steamId));
+                    let queryRes = await utils.query(queries.PLAYER_INFO_WITH_25_MATCHES(steamId, hero.id));
                     if (queryRes.status == 200) {
                         player = queryRes.data.data.player;
                     } else throw 0;
-                    let queryRes2 = await utils.query(queries.PLAYER_EXTRA_INFO(steamId, player.matchCount, Object.keys(dotaconstants.heroes).length));
+                    let queryRes2 = await utils.query(queries.PLAYER_EXTRA_INFO(steamId, player.matchCount, Object.keys(dotaconstants.heroes).length, hero.id));
                     if (queryRes2.status == 200) {
                         let playerExtra = queryRes2.data.data.player;
                         // 过滤和保留最高 level 的记录
@@ -344,6 +363,7 @@ export async function apply(ctx: Context, config: Config) {
                         // 取场次前十的英雄表现数据附加到原player对象中
                         player.heroesPerformanceTop10 = playerExtra.heroesPerformance.slice(0, 10);
                     } else throw 0;
+                    player.genHero = hero ? true : false;
                     session.send(await ctx.puppeteer.render(genImageHTML(player, config.template_player, TemplateType.Player)));
                 } catch (error) {
                     ctx.logger.error(error);
@@ -359,22 +379,8 @@ export async function apply(ctx: Context, config: Config) {
         .example("-查询英雄 电魂")
         .action(async ({ session }, input_data) => {
             if (input_data) {
-                let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
-                let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
-                    id: parseInt(key),
-                    names_cn: d2a.HEROES_CHINESE[key],
-                }));
-                const mergedMap = new Map();
-                [dc_heroes, cn_heroes].forEach((array) => {
-                    array.forEach((item) => {
-                        const existingItem = mergedMap.get(item.id);
-                        if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
-                        else mergedMap.set(item.id, item);
-                    });
-                });
-                let heroes = Array.from(mergedMap.values());
-                let findingHero = heroes.find((hero) => hero.names_cn.includes(input_data) || hero.shortName === input_data.toLowerCase() || hero.id == input_data);
-                if (!findingHero) {
+                let hero = findingHero(input_data);
+                if (!hero) {
                     session.send("未找到输入的英雄，请确认后重新输入。");
                     return;
                 }
@@ -398,7 +404,7 @@ export async function apply(ctx: Context, config: Config) {
                         }
                     } else throw 0;
                     // hero
-                    let queryRes3 = await utils.query(queries.HERO_INFO(findingHero.id));
+                    let queryRes3 = await utils.query(queries.HERO_INFO(hero.id));
                     if (queryRes3.status == 200) {
                         let hero = queryRes3.data.data.constants.hero;
                         hero.talents.forEach((talent) => (talent.name_cn = AbilitiesConstantsCN.data.abilities.find((item) => item.id == talent.abilityId).language.displayName));
@@ -423,27 +429,13 @@ export async function apply(ctx: Context, config: Config) {
         .example("-查询英雄对战 敌法师 -l 10 -f 1\t（等同于上例，参数接空格也可使用）")
         .action(async ({ session, options }, input_data) => {
             if (input_data) {
-                let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
-                let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
-                    id: parseInt(key),
-                    names_cn: d2a.HEROES_CHINESE[key],
-                }));
-                const mergedMap = new Map();
-                [dc_heroes, cn_heroes].forEach((array) => {
-                    array.forEach((item) => {
-                        const existingItem = mergedMap.get(item.id);
-                        if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
-                        else mergedMap.set(item.id, item);
-                    });
-                });
-                let heroes = Array.from(mergedMap.values());
-                let findingHero = heroes.find((hero) => hero.names_cn.includes(input_data) || hero.shortName === input_data.toLowerCase() || hero.id == input_data);
-                if (!findingHero) {
+                let hero = findingHero(input_data);
+                if (!hero) {
                     session.send("未找到输入的英雄，请确认后重新输入。");
                     return;
                 }
                 try {
-                    let queryRes = await utils.query(queries.HERO_MATCHUP_WINRATE(findingHero.id));
+                    let queryRes = await utils.query(queries.HERO_MATCHUP_WINRATE(hero.id));
                     if (queryRes.status == 200) {
                         let heroStats = queryRes.data.data.heroStats;
                         let withTopFive = heroStats.matchUp[0].with
@@ -478,6 +470,24 @@ export async function apply(ctx: Context, config: Config) {
             }
         });
 
+    function findingHero(input) {
+        if (!input) return;
+        let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
+        let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
+            id: parseInt(key),
+            names_cn: d2a.HEROES_CHINESE[key],
+        }));
+        const mergedMap = new Map();
+        [dc_heroes, cn_heroes].forEach((array) => {
+            array.forEach((item) => {
+                const existingItem = mergedMap.get(item.id);
+                if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
+                else mergedMap.set(item.id, item);
+            });
+        });
+        let heroes = Array.from(mergedMap.values());
+        return heroes.find((hero) => hero.names_cn.includes(input) || hero.shortName === input.toLowerCase() || hero.id == input);
+    }
     // ctx.command("来个笑话").action(async ({ session }) => {
     //     session.send(await utils.getJoke());
     // });
@@ -530,6 +540,98 @@ export async function apply(ctx: Context, config: Config) {
             ctx.database.remove("dt_sended_match_id", { sendTime: { $lt: oneMonthAgo } });
             ctx.database.remove("dt_previous_query_results", { queryTime: { $lt: oneMonthAgo } });
         });
+        // 日报功能
+        if (config.dailyReportSwitch) {
+            ctx.cron(`0 ${config.dailyReportHours} * * *`, async function () {
+                const oneDayAgo = moment().subtract(1, "days").unix();
+                const subscribedGuilds = await ctx.database.get("dt_subscribed_guilds", undefined);
+                const subscribedPlayersInGuild: any[] = (await ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
+
+                let queryRes = await utils.query(
+                    queries.MATCHES_FOR_DAILY(
+                        subscribedPlayersInGuild.map((player) => player.steamId).filter((value, index, self) => self.indexOf(value) === index),
+                        oneDayAgo
+                    )
+                );
+
+                const players = queryRes.data.data.players.filter((player) => player.matches.length > 0);
+                const matches = players
+                    .map((player) => player.matches.map((match) => match))
+                    .flat()
+                    .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+                for (let subPlayer of subscribedPlayersInGuild) {
+                    let player = players.find((player) => subPlayer.steamId == player.steamAccount.id);
+                    if (!player) continue;
+                    const guildMember = await ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember(subPlayer.guildId, subPlayer.userId);
+                    subPlayer.name = subPlayer.nickName || (guildMember?.nick ?? players.find((player) => player.steamAccount.id == subPlayer.steamId)?.steamAccount.name);
+
+                    player.winCount = player.matches.filter((match) => match.didRadiantWin == match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).isRadiant).length;
+                    player.loseCount = player.matches.length - player.winCount;
+                    player.avgKills = utils.roundToDecimalPlaces(player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).kills, 0) / player.matches.length, 2);
+                    player.avgDeaths = utils.roundToDecimalPlaces(player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).deaths, 0) / player.matches.length, 2);
+                    player.avgAssists = utils.roundToDecimalPlaces(
+                        player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).assists, 0) / player.matches.length,
+                        2
+                    );
+                    player.avgKDA = utils.roundToDecimalPlaces((player.avgKills + player.avgAssists) / (player.avgDeaths || 1), 2);
+                    player.avgImp = utils.roundToDecimalPlaces(player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).imp, 0) / player.matches.length, 0);
+
+                    subPlayer = Object.assign(subPlayer, player);
+                }
+
+                for (let guild of subscribedGuilds) {
+                    const currentsubscribedPlayers = subscribedPlayersInGuild.filter((player) => player.platform == guild.platform && player.guildId == guild.guildId && player.matches?.length);
+                    if (currentsubscribedPlayers.length) {
+                        const currentsubscribedPlayersIds = currentsubscribedPlayers.map((player) => player.steamId);
+                        const combinationsMap = new Map();
+
+                        matches.forEach((match) => {
+                            const sortedPlayerIds = match.players
+                                .map((player) => player.steamAccount.id)
+                                .filter((id) => currentsubscribedPlayersIds.includes(id))
+                                .sort((a, b) => a.steamId - b.steamId);
+                            const key = sortedPlayerIds.join(",");
+
+                            if (!combinationsMap.has(key)) {
+                                const players = currentsubscribedPlayers.filter((subPlayer) => sortedPlayerIds.includes(subPlayer.steamId));
+                                // console.log(players);
+                                if (players.length > 0) {
+                                    const name = players.map((subPlayer) => subPlayer.name).join("/");
+                                    combinationsMap.set(key, {
+                                        players,
+                                        name,
+                                        winCount: match.didRadiantWin == match.players.find((innerPlayer) => innerPlayer.steamAccount.id == players[0].steamId).isRadiant ? 1 : 0,
+                                        matches: [match],
+                                    });
+                                }
+                            } else {
+                                const combi = combinationsMap.get(key);
+                                combi.matches.push(match);
+                                combi.winCount += match.didRadiantWin == match.players.find((innerPlayer) => innerPlayer.steamAccount.id == combi.players[0].steamId).isRadiant ? 1 : 0;
+                            }
+                        });
+
+                        const combinations = Array.from(combinationsMap.values());
+                        await ctx.broadcast(
+                            [`${guild.platform}:${guild.guildId}`],
+                            `昨日总结：
+                            ${currentsubscribedPlayers
+                                .map(
+                                    (player) =>
+                                        `${player.name}: ${player.winCount}胜${player.loseCount}负 胜率${Math.round((player.winCount / player.matches.length) * 100)}%，平均KDA: [${player.avgKills}/${player.avgDeaths}/${
+                                            player.avgAssists
+                                        }](${player.avgKDA})，平均表现: ${player.avgImp > 0 ? "+" : ""}${player.avgImp}`
+                                )
+                                .join("\n")}
+                            ${combinations.map((combi) => `组合[${combi.name}]: ${combi.winCount}胜${combi.matches.length - combi.winCount}负 胜率${Math.round((combi.winCount / combi.matches.length) * 100)}%`).join("\n")}`.replace(
+                                /\s*\n\s*/g,
+                                "\n"
+                            )
+                        );
+                    }
+                }
+            });
+        }
         // 每分钟执行一次查询玩家最近比赛记录，若未发布过则进入待发布列表；检查待发布列表，若满足发布条件（比赛已被解析）则生成图片并发布。
         ctx.cron("* * * * *", async function () {
             // 获取注册玩家ID，每分钟获取玩家最新比赛，判定是否播报过
@@ -548,12 +650,13 @@ export async function apply(ctx: Context, config: Config) {
                 // 获取所有查询到的玩家最新比赛并根据match.id去重
                 const lastMatches = queryRes.data.data.players
                     .map((player) => player.matches[0])
-                    .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id))
-                    .filter((match) => !pendingMatches.some((pendingMatch) => pendingMatch.matchId == match.id));
+                    .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id)) // 根据match.id去重
+                    .filter((match) => !pendingMatches.some((pendingMatch) => pendingMatch.matchId == match.id)); // 判断是否已加入待发布列表
+                // 在发布过的比赛id中查找以上比赛
                 const sendedMatchesIds = (await ctx.database.get("dt_sended_match_id", { matchId: lastMatches.map((match) => match.id) }, ["matchId"])).map((match) => match.matchId);
                 // 遍历去重后的match，若match未在pendingMatches中，则获取match中与subscribedPlayersInGuild中SteamID相符的玩家push入pendingMatches中
                 lastMatches
-                    .filter((match) => !sendedMatchesIds.includes(match.id))
+                    .filter((match) => !sendedMatchesIds.includes(match.id)) // 判断是否发布过
                     .forEach((match) => {
                         const tempGuilds: Array<{ guildId: string; platform: string; players: Array<utils.dt_subscribed_players> }> = [];
                         match.players.forEach((player) => {

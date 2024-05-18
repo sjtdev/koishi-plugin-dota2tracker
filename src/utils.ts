@@ -439,3 +439,13 @@ export async function playerisValid(steamAccountId): Promise<{ isValid: boolean;
         // session.send("获取比赛信息失败。");
     }
 }
+
+/** 四舍五入小数
+ * @param decimalPlaces 保留位数
+ * @param number 进行四舍五入的数值
+ * @returns 四舍五入后的数值
+ */
+export function roundToDecimalPlaces(number, decimalPlaces) {
+    const factor = Math.pow(10, decimalPlaces);
+    return Math.round(number * factor) / factor;
+}
