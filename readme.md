@@ -25,8 +25,8 @@ DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑�
 * <input type="checkbox" checked>`取消绑定`
 * <input type="checkbox" checked>`改名 <新玩家别名>`
 ##### 查询
-* <input type="checkbox" checked>`查询玩家 [SteamID|别名]`  
-  返回一张图片，包含玩家各类信息。（缺省参数时并且调用者已绑定将自查）
+* <input type="checkbox" checked>`查询玩家 [SteamID|别名] [<--hero|-o> <英雄ID|英雄名|英雄常用别名>]`  
+  返回一张图片，包含玩家各类信息。（缺省参数时并且调用者已绑定将自查）（输入--hero或-o并跟上查询英雄的参数时，将查询玩家指定英雄）
 * <input type="checkbox" checked>`查询比赛 <比赛ID>`  
   返回一张图片，包含比赛对战信息。
 * <input type="checkbox" checked>`查询最近比赛 [SteamID|别名]`  
