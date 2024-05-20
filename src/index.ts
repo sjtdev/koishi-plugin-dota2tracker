@@ -665,6 +665,7 @@ export async function apply(ctx: Context, config: Config) {
                 const lastMatches = queryRes.data.data.players
                     .map((player) => player.matches[0])
                     .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id)) // 根据match.id去重
+                    .filter((match) => moment.unix(match.startDateTime).isAfter(moment().subtract(1, "days"))) // 排除1天以前的比赛，防止弃坑数年群友绑定时突然翻出上古战报
                     .filter((match) => !pendingMatches.some((pendingMatch) => pendingMatch.matchId == match.id)); // 判断是否已加入待发布列表
                 // 在发布过的比赛id中查找以上比赛
                 const sendedMatchesIds = (await ctx.database.get("dt_sended_match_id", { matchId: lastMatches.map((match) => match.id) }, ["matchId"])).map((match) => match.matchId);
