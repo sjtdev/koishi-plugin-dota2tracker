@@ -350,6 +350,13 @@ export async function apply(ctx: Context, config: Config) {
                                 filteredDotaPlus[hero.hero.id].matchCount = hero.matchCount;
                             }
                         });
+                        // 储存玩家分段
+                        player.rank = {
+                            medal: parseInt(player.steamAccount.seasonRank?.toString().split("")[0] ?? 0),
+                            star: parseInt(player.steamAccount.seasonRank?.toString().split("")[1] ?? 0),
+                            leaderboard: player.steamAccount.seasonLeaderboardRank,
+                            inTop100: player.steamAccount.seasonLeaderboardRank ? (player.steamAccount.seasonLeaderboardRank <= 10 ? "8c" : player.steamAccount.seasonLeaderboardRank <= 100 ? "8b" : undefined) : undefined,
+                        };
 
                         // 转换为数组
                         player.dotaPlus = Object.values(filteredDotaPlus); // 排序 dotaPlus 数组
@@ -363,7 +370,14 @@ export async function apply(ctx: Context, config: Config) {
                         // 取场次前十的英雄表现数据附加到原player对象中
                         player.heroesPerformanceTop10 = playerExtra.heroesPerformance.slice(0, 10);
                     } else throw 0;
-                    player.genHero = hero ? true : false;
+                    if (hero) {
+                        const { matchCount, winCount, imp } = player.heroesPerformanceTop10[0];
+                        player.matchCount = matchCount;
+                        player.winCount = winCount;
+                        player.performance.imp = imp;
+                        player.dotaPlus = player.dotaPlus.filter((dpHero) => dpHero.heroId == hero.id);
+                    }
+                    player.genHero = hero;
                     session.send(await ctx.puppeteer.render(genImageHTML(player, config.template_player, TemplateType.Player)));
                 } catch (error) {
                     ctx.logger.error(error);

@@ -410,12 +410,10 @@
                 <%- `
                 <div class="avatar"><img src="${player.steamAccount?.avatar}" alt="" /></div>
                 <div class="info">
-                    <p class="name">${player.steamAccount.name}${player.guildMember ? ` <span class="guild ${guildLevel(player.guildMember.guild.currentPercentile)}">[${player.guildMember.guild.tag}]</span></p>` : ""}
-                    <p class="matches"><span>场次：${player.matchCount}（<span class="win">${player.winCount}</span>/<span class="lose">${player.matchCount - player.winCount}</span>）</span>胜率：<span style="color:${utils.winRateColor(
-                    player.winCount / player.matchCount
-                )};">${((player.winCount / player.matchCount) * 100).toFixed(2)}%</span></p>
+                    <p class="name">${player.steamAccount.name}${player.guildMember ? ` <span class="guild ${guildLevel(player.guildMember.guild.currentPercentile)}">[${player.guildMember.guild.tag}]</span>${player.genHero?` >${player.genHero.names_cn[0]}<`:""}</p>` : ""}
+                    <p class="matches"><span>场次：${player.matchCount}（<span class="win">${player.winCount}</span>/<span class="lose">${player.matchCount - player.winCount}</span>）</span>胜率：<span style="color:${utils.winRateColor(player.winCount / player.matchCount)};">${((player.winCount / player.matchCount) * 100).toFixed(2)}%</span></p>
                     <p class="matches"><span>最近25场：<span class="win">${nearWinCount}</span>/<span class="lose">${nearMatchCount - nearWinCount}</span></span><span>胜率：<span style="color:${utils.winRateColor(nearWinCount / nearMatchCount)};">${(
-                    (nearWinCount / nearMatchCount) * 100).toFixed(2)}%</span></span><span>评分：${player.performance.imp}</span></span></p>
+                    (nearWinCount / nearMatchCount) * 100).toFixed(2)}%</span></span><span>评分：${(player.performance.imp > 0 ? "+" : "") + player.performance.imp}</span></span></p>
                     <p class="matches"><span>对线：<span class="victory">${outcomeCounts.victory + outcomeCounts.stomp}(<span class="stomp">${outcomeCounts.stomp}</span>)</span>-<span class="tie">${outcomeCounts.tie}</span>-<span class="fail">${
                     outcomeCounts.fail + outcomeCounts.stomped
                 }(<span class="stomped">${outcomeCounts.stomped}</span>)</span></span><span>线优：<span style="color:${utils.winRateColor(
@@ -423,23 +421,17 @@
                 )};">${(((outcomeCounts.victory + outcomeCounts.stomp) / (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.fail + outcomeCounts.stomped)) * 100).toFixed(2)}%</span></span></p>
                 </div>
                 <div class="rank">
-                    <img class="medal" src="${utils.getImageUrl(
-                        "medal_" +
-                            ((player.steamAccount.seasonLeaderboardRank
-                                ? player.steamAccount.seasonLeaderboardRank <= 100
-                                    ? player.steamAccount.seasonLeaderboardRank <= 10
-                                        ? "8c"
-                                        : "8b"
-                                    : player.steamAccount.seasonRank?.toString().split("")[0]
-                                : player.steamAccount.seasonRank?.toString().split("")[0]) ?? "0")
-                    )}" alt="" />
-                    <img class="star" src="${utils.getImageUrl("star_" + (player.steamAccount.seasonRank?.toString().split("")[1] ?? "0"))}" alt="" />
+                    <img class="medal" src="${utils.getImageUrl('medal_' +(player.inTop100??player.rank.medal))}" alt="" />
+                    <img class="star" src="${utils.getImageUrl('star_' + player.rank.star)}" alt="" />
                     <p>${player.steamAccount.seasonLeaderboardRank ?? ""}</p>    
                 </div>` %>
             </div>
             <div class="hero_winrate">
                 <div class="heroes">
-                    <p class="tip row total">全期场次前十的英雄：</p>
+                    <%- !player.genHero ?
+                    `<p class="tip row total">全期场次前十的英雄：</p>`:
+                    `<p class="tip row total">全期场次：</p>`
+                    %>
                     <span class="tip">英雄</span>
                     <span class="tip" style="margin: 0 4px">场次</span>
                     <span class="tip" style="margin: 0 4px">胜率</span>
@@ -454,7 +446,10 @@
                     <span class="imp">${(hero.imp > 0 ? "+" : "") + hero.imp}</span>
                     <span class="win" style="${hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${hero.winCount * pixelOfPerMatchInTotal}px">${hero.winCount}</span>
                     <span class="lose" style="${hero.matchCount - hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${(hero.matchCount - hero.winCount) * pixelOfPerMatchInTotal}px">${hero.matchCount - hero.winCount}</span>`).join("") %>
-                    <p class="tip row near">近期使用场次大于1的英雄：</p>
+                    <%- !player.genHero ?
+                    `<p class="tip row near">近期使用场次大于1的英雄：</p>`:
+                    `<p class="tip row total">近25场：</p>`
+                    %>
                     <%- player.heroesPerformance
                     .filter((hero) => hero.matchCount > 1)
                     .map((hero, index) => `
@@ -530,14 +525,13 @@
                 </tbody>
             </table>
             <div class="plus">
-                <%- !player.genHero?
-                player.dotaPlus.map((hero) => `
+                <%- player.dotaPlus.map((hero) => `
                 <div class="hero">
                     <img src="${utils.getImageUrl(hero.shortName, ImageType.Heroes)}" alt="" />
                     <div class="level"><img src="${utils.getImageUrl("hero_badge_" + Math.ceil((hero.level + 1) / 6))}" alt="" /><span>${hero.level}</span></div>
                     <span>${((hero.winCount / hero.matchCount) * 100).toFixed(2)}%</span>
                     <span>${hero.matchCount}</span>
-                </div>`).join(""):"" %>
+                </div>`).join("") %>
             </div>
         </div>
     </body>
