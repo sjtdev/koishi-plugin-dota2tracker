@@ -324,11 +324,11 @@ export async function apply(ctx: Context, config: Config) {
                 let steamId = flagBindedPlayer?.steamId ?? input_data;
                 let player;
                 try {
-                    let queryRes = await utils.query(queries.PLAYER_INFO_WITH_25_MATCHES(steamId, hero.id));
+                    let queryRes = await utils.query(queries.PLAYER_INFO_WITH_25_MATCHES(steamId, hero?.id));
                     if (queryRes.status == 200) {
                         player = queryRes.data.data.player;
                     } else throw 0;
-                    let queryRes2 = await utils.query(queries.PLAYER_EXTRA_INFO(steamId, player.matchCount, Object.keys(dotaconstants.heroes).length, hero.id));
+                    let queryRes2 = await utils.query(queries.PLAYER_EXTRA_INFO(steamId, player.matchCount, Object.keys(dotaconstants.heroes).length, hero?.id));
                     if (queryRes2.status == 200) {
                         let playerExtra = queryRes2.data.data.player;
                         // 过滤和保留最高 level 的记录
@@ -484,9 +484,14 @@ export async function apply(ctx: Context, config: Config) {
             }
         });
 
-    function findingHero(input): { id: number; name: string; shortName: string; names_cn: Array<string> } {
+    function findingHero(input): { id: number; name: string; shortName: string; names_cn: Array<string>; localized_name: string } {
         if (!input) return;
-        let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
+        let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({
+            id: hero["id"],
+            name: hero["name"],
+            shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1],
+            localized_name: hero["localized_name"].toLowerCase().replace(/\s+/g, ""),
+        }));
         let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
             id: parseInt(key),
             names_cn: d2a.HEROES_CHINESE[key],
@@ -505,64 +510,156 @@ export async function apply(ctx: Context, config: Config) {
     // ctx.command("来个笑话").action(async ({ session }) => {
     //     session.send(await utils.getJoke());
     // });
-    ctx.command("7.36 <input_data>","查询7.36改动")
-    .usage("可查询英雄改动并生成图片返回")
-    .example("7.36 小松许")
-    .action(async ({ session }, input_data) => {
-        if (input_data) {
-            const page = await ctx.puppeteer.page();
+    ctx.command("7.36 <input_data>", "查询7.36改动")
+        .option("refresh", "-f 重新获取数据")
+        .usage("可查询英雄改动并生成图片返回")
+        .example("7.36 小松许")
+        .action(async ({ session, options }, input_data) => {
+            if (!("dt_7_36" in ctx.database.tables) || options.refresh) {
+                session.send((!("dt_7_36" in ctx.database.tables) ? "初次使用，" : "") + "正在获取数据……");
 
-            await page.goto("https://www.dota2.com/patches/7.36");
-            await page.waitForSelector("body > div:nth-of-type(3) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1)");
+                await ctx.model.extend("dt_7_36", { id: "integer", data: "string" });
+                // await ctx.puppeteer.browser.process()
+                const page = await ctx.puppeteer.page();
+                await page.setExtraHTTPHeaders({
+                    'Accept-Language': 'zh-CN,zh;q=0.9'
+                });
+            
+                await page.goto("https://www.dota2.com/patches/7.36");
+                await page.waitForSelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1)");
+                await page.evaluate(() => {
+                    const scripts = document.querySelectorAll("script");
+                    scripts.forEach((script) => script.remove());
+                });
+                // 提取并处理特定的div元素
+                const result = await page.evaluate(() => {
+                    const divs = document.querySelectorAll("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div");
+                    const divArray = [];
 
-            const hero = findingHero(input_data);
+                    divs.forEach((div) => {
+                        const subDiv: any = div.querySelector("a > div");
+                        const match = subDiv?.style.backgroundImage.match(/url\("https:\/\/cdn\.cloudflare\.steamstatic\.com\/apps\/dota2\/images\/dota_react\/heroes\/([^"]+)\.png"\)/);
 
-            await page.evaluate((hero) => {
-                const divs = document.querySelectorAll("body > div:nth-of-type(3) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(2) > div");
-                for (const div of divs) {
-                    const firstChild = div.firstElementChild;
-                    if (firstChild && firstChild.tagName === "A" && firstChild.getAttribute("href") === "/hero/" + hero.shortName) {
-                        div.classList.add("selector");
-                    }
-                }
-                return null;
-            }, hero);
-            const testE = await page.$("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div.selector");
-            const res = await testE.screenshot();
-            // 将Buffer对象转换为base64编码的字符串
-            const base64String = Buffer.from(res).toString("base64");
-            // 创建一个包含base64编码字符串的img标签
-            const imgTag = `<img src="data:image/png;base64,${base64String}" alt="Image" />`;
-            if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.png", res);
-            session.send(imgTag);
-        } else session.send("https://www.dota2.com/patches/7.36");
-    });
+                        divArray.push({ heroName: match[1], div: div.outerHTML });
+                    });
+                    document.querySelectorAll("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div:not(:first-of-type)").forEach((node) => node.remove());
+                    document.querySelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div").classList.add("placeholder");
 
-    ctx.command("test <input_data>").action(async ({ session }, input_data) => {
-        // if (input_data) {
-        //     let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
-        //     let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
-        //         id: parseInt(key),
-        //         names_cn: d2a.HEROES_CHINESE[key],
-        //     }));
-        //     const mergedMap = new Map();
-        //     [dc_heroes, cn_heroes].forEach((array) => {
-        //         array.forEach((item) => {
-        //             const existingItem = mergedMap.get(item.id);
-        //             if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
-        //             else mergedMap.set(item.id, item);
-        //         });
-        //     });
-        //     let heroes = Array.from(mergedMap.values());
-        //     let hero = heroes.find((hero) => hero.names_cn.includes(input_data) || hero.shortName === input_data.toLowerCase() || hero.id == input_data);
-        //     session.send(JSON.stringify(hero));
-        // }
-        // session.send(`${random.pick(["嗯", "啊", "蛤", "啥", "咋", "咦", "哦"])}？`);
-        // ctx.broadcast(["chronocat:304996520"], "-test");
-        // ctx.broadcast(["chronocat:304996520"], "-test1");
-        // session.send();
-        // await ctx.puppeteer.()
-    });
+                    // 将处理后的div数组和剩余的HTML内容返回
+                    const remainingContent = document.documentElement.outerHTML;
+
+                    return {
+                        divArray,
+                        remainingContent,
+                    };
+                });
+                const heroes = [];
+                result.divArray.forEach((hero) => {
+                    const res: any = Object.values(dotaconstants.heroes).find((Chero: any) => Chero.name.match(/^npc_dota_hero_(.+)$/)[1] == hero.heroName);
+                    heroes.push({ id: res.id, data: hero.div });
+                });
+                heroes.push({ id: 0, data: result.remainingContent });
+                await ctx.database.upsert("dt_7_36", (row) => heroes);
+                // fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/divArray.json", JSON.stringify(heroes, null, 2));
+                fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/remainingContent.html", result.remainingContent);
+                await session.send("数据获取完成。");
+                await page.close();
+            }
+            if (input_data) {
+                await session.send("正在查询，请耐心等待……");
+                const page = await ctx.puppeteer.page();
+
+                // await page.goto("https://www.dota2.com/patches/7.36");
+                await page.setContent((await ctx.database.get("dt_7_36", [0]))[0].data);
+                await page.waitForSelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1)");
+
+                const hero = findingHero(input_data);
+
+                const placeholder = await page.$("div.placeholder");
+                await page.waitForSelector("div.placeholder");
+                const newHeroHTML = (await ctx.database.get("dt_7_36", [hero.id]))[0].data;
+                await page.evaluate(
+                    (element, html) => {
+                        element.outerHTML = html;
+                        // const fallbackImage = "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png";
+                        // document.querySelectorAll("img").forEach((img) => {
+                        //     img.onerror = function () {
+                        //         this.onerror = null;
+                        //         this.src = fallbackImage;
+                        //     };
+                        // });
+                    },
+                    placeholder,
+                    newHeroHTML
+                );
+                // Wait for all images to load
+                await page.evaluate(async () => {
+                    const images = Array.from(document.querySelectorAll("img"));
+                    await Promise.all(
+                        images.map((img) => {
+                            if (img.complete) {
+                                // If the image is already complete, resolve immediately
+                                return Promise.resolve();
+                            } else {
+                                // Otherwise, wait for the 'load' or 'error' event
+                                return new Promise((resolve, reject) => {
+                                    img.onload = resolve;
+                                    img.onerror = () => {
+                                        // Replace the failed image with a placeholder
+                                        const placeholderSrc = "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png"; // Change this to your placeholder URL
+                                        img.src = placeholderSrc;
+
+                                        // Wait for the placeholder image to load
+                                        img.onload = resolve;
+                                        img.onerror = resolve; // Resolve even if the placeholder fails to load
+                                    };
+                                });
+                            }
+                        })
+                    );
+                });
+
+                const testE = await page.$("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div");
+                const res = await testE.screenshot();
+                // // 将Buffer对象转换为base64编码的字符串
+                const base64String = Buffer.from(res).toString("base64");
+                // // 创建一个包含base64编码字符串的img标签
+                const imgTag = `<img src="data:image/png;base64,${base64String}" alt="Image" />`;
+                if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.png", res);
+                if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", await page.content());
+                session.send(imgTag);
+                page.close();
+            } else session.send("https://www.dota2.com/patches/7.36");
+        });
+
+    ctx.command("test <input_data>")
+        .option("a", "a")
+        .action(async ({ session, options }, input_data) => {
+            // if (input_data) {
+            //     let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
+            //     let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
+            //         id: parseInt(key),
+            //         names_cn: d2a.HEROES_CHINESE[key],
+            //     }));
+            //     const mergedMap = new Map();
+            //     [dc_heroes, cn_heroes].forEach((array) => {
+            //         array.forEach((item) => {
+            //             const existingItem = mergedMap.get(item.id);
+            //             if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
+            //             else mergedMap.set(item.id, item);
+            //         });
+            //     });
+            //     let heroes = Array.from(mergedMap.values());
+            //     let hero = heroes.find((hero) => hero.names_cn.includes(input_data) || hero.shortName === input_data.toLowerCase() || hero.id == input_data);
+            //     session.send(JSON.stringify(hero));
+            // }
+            // session.send(`${random.pick(["嗯", "啊", "蛤", "啥", "咋", "咦", "哦"])}？`);
+            // ctx.broadcast(["chronocat:304996520"], "-test");
+            // ctx.broadcast(["chronocat:304996520"], "-test1");
+            // session.send();
+            // await ctx.puppeteer.()
+            console.log((await ctx.database.get("dt_7_36", [0]))[0].data);
+        });
 
     ctx.on("ready", async () => {
         const tables = await ctx.database.tables;

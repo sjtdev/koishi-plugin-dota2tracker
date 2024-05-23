@@ -14,6 +14,7 @@ declare module "koishi" {
         dt_sended_match_id: dt_sended_match_id;
         dt_previous_query_results: dt_previous_query_results;
         dt_constants_abilities_cn: dt_constants_abilities_cn;
+        dt_7_36: dt_7_36;
     }
 }
 export interface dt_subscribed_players {
@@ -49,6 +50,11 @@ export interface dt_constants_abilities_cn {
     gameVersionName: string;
 }
 
+export interface dt_7_36 {
+    id: number;
+    data: string;
+}
+
 export const CONFIGS = { STRATZ_API: { URL: "https://api.stratz.com/graphql", TOKEN: "" } };
 
 export async function query(query_str) {
@@ -61,7 +67,7 @@ export async function query(query_str) {
 }
 
 export async function testGetHtml(URL: string) {
-    return await axios.get(URL)
+    return await axios.get(URL);
 }
 
 export enum ImageType {
