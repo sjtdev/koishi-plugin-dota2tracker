@@ -17,4 +17,4 @@ tsconfig.tsbuildinfo
 *.njsproj
 *.sln
 
-temp.html
+temp.*

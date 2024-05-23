@@ -60,6 +60,10 @@ export async function query(query_str) {
     });
 }
 
+export async function testGetHtml(URL: string) {
+    return await axios.get(URL)
+}
+
 export enum ImageType {
     Icons = "icons",
     Heroes = "heroes",
