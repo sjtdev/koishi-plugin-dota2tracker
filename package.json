@@ -1,7 +1,7 @@
 {
   "name": "@sjtdev/koishi-plugin-dota2tracker",
   "description": "",
-  "version": "1.1.5-beta.4",
+  "version": "1.1.5",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -11,8 +11,7 @@
     "template"
   ],
   "contributors": [
-    "sjtdev <sh1j1n9ta0@foxmail.com>",
-    "sjtdev"
+    "sjtdev <sh1j1n9ta0@foxmail.com>"
   ],
   "homepage": "https://github.com/sjtdev/koishi-plugin-dota2tracker",
   "repository": {
@@ -24,7 +23,7 @@
     "chatbot",
     "koishi",
     "plugin",
-    "dota"
+    "dota2"
   ],
   "dependencies": {
     "axios": "^1.6.8",

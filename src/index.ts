@@ -522,9 +522,9 @@ export async function apply(ctx: Context, config: Config) {
                 // await ctx.puppeteer.browser.process()
                 const page = await ctx.puppeteer.page();
                 await page.setExtraHTTPHeaders({
-                    'Accept-Language': 'zh-CN,zh;q=0.9'
+                    "Accept-Language": "zh-CN,zh;q=0.9",
                 });
-            
+
                 await page.goto("https://www.dota2.com/patches/7.36");
                 await page.waitForSelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1)");
                 await page.evaluate(() => {
@@ -566,14 +566,17 @@ export async function apply(ctx: Context, config: Config) {
                 await page.close();
             }
             if (input_data) {
-                await session.send("正在查询，请耐心等待……");
+                const hero = findingHero(input_data);
+                if (!hero) {
+                    session.send("英雄参数输入有误，请检查后重试。");
+                    return;
+                }
+                session.send("正在查询，请耐心等待……");
                 const page = await ctx.puppeteer.page();
 
                 // await page.goto("https://www.dota2.com/patches/7.36");
                 await page.setContent((await ctx.database.get("dt_7_36", [0]))[0].data);
                 await page.waitForSelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1)");
-
-                const hero = findingHero(input_data);
 
                 const placeholder = await page.$("div.placeholder");
                 await page.waitForSelector("div.placeholder");
@@ -581,13 +584,6 @@ export async function apply(ctx: Context, config: Config) {
                 await page.evaluate(
                     (element, html) => {
                         element.outerHTML = html;
-                        // const fallbackImage = "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png";
-                        // document.querySelectorAll("img").forEach((img) => {
-                        //     img.onerror = function () {
-                        //         this.onerror = null;
-                        //         this.src = fallbackImage;
-                        //     };
-                        // });
                     },
                     placeholder,
                     newHeroHTML
