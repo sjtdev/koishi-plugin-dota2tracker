@@ -511,7 +511,7 @@ export async function apply(ctx: Context, config: Config) {
     //     session.send(await utils.getJoke());
     // });
     ctx.command("7.36 <input_data>", "查询7.36改动")
-        .option("refresh", "-f 重新获取数据")
+        .option("refresh", "-r 重新获取数据")
         .usage("可查询英雄改动并生成图片返回")
         .example("7.36 小松许")
         .action(async ({ session, options }, input_data) => {
