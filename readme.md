@@ -17,24 +17,32 @@ DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑�
 指令 <必填参数> [可选参数]
 ##### 订阅
 （bot仅向已订阅群组推送信息）
-* <input type="checkbox" checked>`订阅本群`
-* <input type="checkbox" checked>`取消订阅`
+* `订阅本群`
+* `取消订阅`
 ##### 绑定
 （bot会追踪每位绑定玩家的最新对局）
-* <input type="checkbox" checked>`绑定 <玩家SteamID> [玩家别名]`
-* <input type="checkbox" checked>`取消绑定`
-* <input type="checkbox" checked>`改名 <新玩家别名>`
+* `绑定 <玩家SteamID> [玩家别名]`
+* `取消绑定`
+* `改名 <新玩家别名>`
 ##### 查询
-* <input type="checkbox" checked>`查询玩家 [SteamID|别名] [<--hero|-o> <英雄ID|英雄名|英雄常用别名>]`  
+* `查询玩家 [SteamID|别名] [<--hero|-o> <英雄ID|英雄名|英雄常用别名>]`  
   返回一张图片，包含玩家各类信息。（缺省参数时并且调用者已绑定将自查）（输入--hero或-o并跟上查询英雄的参数时，将查询玩家指定英雄）
-* <input type="checkbox" checked>`查询比赛 <比赛ID>`  
+* `查询比赛 <比赛ID>`  
   返回一张图片，包含比赛对战信息。
-* <input type="checkbox" checked>`查询最近比赛 [SteamID|别名]`  
+* `查询最近比赛 [SteamID|别名]`  
   查询指定玩家的最近一场比赛，效果同上。（缺省参数时并且调用者已绑定将自查）
-* <input type="checkbox" checked>`查询英雄 <英雄ID|英雄名|英雄常用别名>`  
+* `查询英雄 <英雄ID|英雄名|英雄常用别名>`  
   返回一张图片，包含英雄属性与技能详情。（此处英雄名为中文名）
-* <input type="checkbox" checked><del>`查询英雄对战 <英雄ID|英雄名|英雄常用别名>`</del>  
+* <del>`查询英雄对战 <英雄ID|英雄名|英雄常用别名>`</del>  
   好像不是很实用
+* `7.36 [英雄ID|英雄名|英雄常用别名] [--refresh|-r]`  
+  查询官网7.36更新日志中指定英雄的改动信息  
+  无英雄参数时直接返回官网7.36更新日志网址  
+  首次使用时将缓存更新日志网页，若读取失败或出错，可添加`--refresh`或`-r`指令重新缓存  
+
+### 英雄ID|英雄名|英雄常用别名 列表
+[dotaconstants_add.json](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/src/dotaconstants_add.json#L102-L226)  
+补充或纠错请提issue
 
 ### 图片模板列表
 展示见[wiki](./wiki)  
