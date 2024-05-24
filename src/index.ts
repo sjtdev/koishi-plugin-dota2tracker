@@ -628,34 +628,34 @@ export async function apply(ctx: Context, config: Config) {
             } else session.send("https://www.dota2.com/patches/7.36");
         });
 
-    ctx.command("test <input_data>")
-        .option("a", "a")
-        .action(async ({ session, options }, input_data) => {
-            // if (input_data) {
-            //     let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
-            //     let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
-            //         id: parseInt(key),
-            //         names_cn: d2a.HEROES_CHINESE[key],
-            //     }));
-            //     const mergedMap = new Map();
-            //     [dc_heroes, cn_heroes].forEach((array) => {
-            //         array.forEach((item) => {
-            //             const existingItem = mergedMap.get(item.id);
-            //             if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
-            //             else mergedMap.set(item.id, item);
-            //         });
-            //     });
-            //     let heroes = Array.from(mergedMap.values());
-            //     let hero = heroes.find((hero) => hero.names_cn.includes(input_data) || hero.shortName === input_data.toLowerCase() || hero.id == input_data);
-            //     session.send(JSON.stringify(hero));
-            // }
-            // session.send(`${random.pick(["嗯", "啊", "蛤", "啥", "咋", "咦", "哦"])}？`);
-            // ctx.broadcast(["chronocat:304996520"], "-test");
-            // ctx.broadcast(["chronocat:304996520"], "-test1");
-            // session.send();
-            // await ctx.puppeteer.()
-            console.log((await ctx.database.get("dt_7_36", [0]))[0].data);
-        });
+    // ctx.command("test <input_data>")
+    //     .option("a", "a")
+    //     .action(async ({ session, options }, input_data) => {
+    //         // if (input_data) {
+    //         //     let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
+    //         //     let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
+    //         //         id: parseInt(key),
+    //         //         names_cn: d2a.HEROES_CHINESE[key],
+    //         //     }));
+    //         //     const mergedMap = new Map();
+    //         //     [dc_heroes, cn_heroes].forEach((array) => {
+    //         //         array.forEach((item) => {
+    //         //             const existingItem = mergedMap.get(item.id);
+    //         //             if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
+    //         //             else mergedMap.set(item.id, item);
+    //         //         });
+    //         //     });
+    //         //     let heroes = Array.from(mergedMap.values());
+    //         //     let hero = heroes.find((hero) => hero.names_cn.includes(input_data) || hero.shortName === input_data.toLowerCase() || hero.id == input_data);
+    //         //     session.send(JSON.stringify(hero));
+    //         // }
+    //         // session.send(`${random.pick(["嗯", "啊", "蛤", "啥", "咋", "咦", "哦"])}？`);
+    //         // ctx.broadcast(["chronocat:304996520"], "-test");
+    //         // ctx.broadcast(["chronocat:304996520"], "-test1");
+    //         // session.send();
+    //         // await ctx.puppeteer.()
+    //         console.log((await ctx.database.get("dt_7_36", [0]))[0].data);
+    //     });
 
     ctx.on("ready", async () => {
         const tables = await ctx.database.tables;
