@@ -505,7 +505,7 @@ export async function apply(ctx: Context, config: Config) {
             });
         });
         let heroes = Array.from(mergedMap.values());
-        return heroes.find((hero) => hero.names_cn.includes(input) || hero.shortName === input.toLowerCase() || hero.id == input);
+        return heroes.find((hero) => hero.names_cn.some(cn => cn.toLowerCase()==input.toLowerCase()) || hero.shortName === input.toLowerCase() || hero.id == input);
     }
     // ctx.command("来个笑话").action(async ({ session }) => {
     //     session.send(await utils.getJoke());
