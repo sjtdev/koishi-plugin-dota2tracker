@@ -396,11 +396,11 @@
                     (${(player.heroDamage / player.networth)?.toFixed(2)})
                 </p>
                 <p class="hero_damage">造成伤害：${player.heroDamage} (${(player.heroDamage/match[player.team].heroDamage*100).toFixed(2)}%)</p>
-                <p class="damage_received">承受伤害：${player.damageReceived} (${(player.damageReceived/match[player.team].damageReceived*100).toFixed(2)}%)</p>
+                <p class="damage_received">承受伤害：${player.damageReceived} (${match[player.team].damageReceived>0?((player.damageReceived/match[player.team].damageReceived*100).toFixed(2)):"0.00"}%)</p>
                 <p class="tower_damage">建筑伤害：${player.towerDamage}</p>
                 <p class="kda row-1">${player.kills}/${player.deaths}/${player.assists} (${((player.kills + player.assists) / (player.deaths || 1)).toFixed(2)})</p>
                 <p class="kill_contribution">参战率：${(player.killContribution * 100).toFixed(2)}%</p>
-                <p class="stun_duration">控制时间：${(player.stats.heroDamageReport.dealtTotal.stunDuration / 100).toFixed(2)}s</p>
+                <p class="stun_duration">控制时间：${((player.stats.heroDamageReport?.dealtTotal.stunDuration ?? 0)/ 100).toFixed(2)}s</p>
                 <p class="heal">治疗量：${player.heroHealing}</p>
                 <div class="items row-1">
                     <div class="normal">
@@ -430,8 +430,8 @@
                 </div>
                 <div class="neutral_item row-1" style="background-image: url(${utils.getImageUrl(dotaconstants.item_ids[player.neutral0Id], ImageType.Items)})"></div>
                 <div class="ahgs row-1">
-                    <img src="${utils.getImageUrl("scepter_"+((player.items.concat(player.backpacks).find(item=>item?.id==108)||player.stats.matchPlayerBuffEvent.find(buff=>buff.itemId==108))?1:0))}" alt="" />
-                    <img src="${utils.getImageUrl("shard_"+(player.stats.matchPlayerBuffEvent.find(buff=>buff.itemId==609)?1:0))}" alt="" />
+                    <img src="${utils.getImageUrl("scepter_"+((player.items.concat(player.backpacks).find(item=>item?.id==108)||(player.stats?.matchPlayerBuffEvent||[]).find(buff=>buff.itemId==108))?1:0))}" alt="" />
+                    <img src="${utils.getImageUrl("shard_"+((player.stats?.matchPlayerBuffEvent||[]).find(buff=>buff.itemId==609)?1:0))}" alt="" />
                 </div>
             </div>
             `).join("") %>

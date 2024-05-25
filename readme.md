@@ -45,7 +45,7 @@ DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑�
 补充或纠错请提issue
 
 ### 图片模板列表
-展示见[wiki](./wiki)  
+展示见[wiki](https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki)  
 生成图片已使用ejs模板实现，所有模板都在[template]文件夹下，若是有大佬想自己设计模板欢迎联系我完善数据接口。（当前有很多在模板中后处理的数据，不是很友好）  
 
 ### 其他问题

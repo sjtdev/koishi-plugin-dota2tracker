@@ -93,18 +93,31 @@ export function getImageUrl(image: string, type: ImageType = ImageType.Local) {
 
 // 对比赛数据进行补充以供生成模板函数使用
 export function getFormattedMatchData(match) {
+    // if (!match.parsedDateTime)
+    //     return match;
     // ↓ 累加团队击杀数，并初始化团队[总对英雄造成伤害]与[总受到伤害]
     // 获取到的团队击杀数是每分钟击杀数的数组，需要累加计算，由radiantKills/direKills累加计算存为match.radiant.KillsCount/match.dire.KillsCount
     ["radiant", "dire"].forEach((team) => {
         match[team] = { killsCount: match[team + "Kills"]?.reduce((acc: number, cva: number) => acc + cva, 0) ?? 0, damageReceived: 0, heroDamage: 0, networth: 0, experience: 0 };
     });
+    // 未解析比赛时radiantKills/direKills为null，需要遍历玩家数组
+    if (!match.parsedDateTime) {
+        match.players.reduce((acc, player) => {
+            if (player.isRadiant) {
+                acc.radiant.killsCount += player.kills;
+            } else {
+                acc.dire.killsCount += player.kills;
+            }
+            return acc;
+        }, match);
+    }
     // 定义开黑小队相关变量
     match.party = {};
     let party_index = 0;
     const party_mark = ["I", "II", "III", "IV"];
     // 定义禁选相关变量并填充禁用英雄模板
     let heroOrderList = {};
-    for (let hero of match.pickBans) {
+    for (let hero of match.pickBans ?? []) {
         if (hero.isPick) heroOrderList[hero.heroId] = hero.order;
     }
     // 对线模块
@@ -144,7 +157,7 @@ export function getFormattedMatchData(match) {
         player.killContribution = (player.kills + player.assists) / match[player.team].killsCount;
         player.deathContribution = player.deaths / match[player.team === "radiant" ? "dire" : player.team].killsCount;
         // 受到伤害计算
-        player.damageReceived = player.stats?.heroDamageReport?.receivedTotal.physicalDamage + player.stats?.heroDamageReport?.receivedTotal.magicalDamage + player.stats?.heroDamageReport?.receivedTotal.pureDamage ?? 0;
+        player.damageReceived = (player.stats?.heroDamageReport?.receivedTotal?.physicalDamage ?? 0) + (player.stats?.heroDamageReport?.receivedTotal?.magicalDamage ?? 0) + (player.stats?.heroDamageReport?.receivedTotal?.pureDamage ?? 0);
         // 团队造成英雄伤害与受到伤害累加
         match[player.team].heroDamage = (match[player.team].heroDamage ?? 0) + player.heroDamage;
         match[player.team].damageReceived = (match[player.team].damageReceived ?? 0) + player.damageReceived;
@@ -155,9 +168,9 @@ export function getFormattedMatchData(match) {
         player.mvpScore = // 计算MVP分数
             player.kills * 5 +
             player.assists * 3 +
-            (player.stats.heroDamageReport.dealtTotal.stunDuration / 100) * 0.1 +
-            (player.stats.heroDamageReport.dealtTotal.disableDuration / 100) * 0.05 +
-            (player.stats.heroDamageReport.dealtTotal.slowDuration / 100) * 0.025 +
+            ((player.stats.heroDamageReport?.dealtTotal.stunDuration ?? 0) / 100) * 0.1 +
+            ((player.stats.heroDamageReport?.dealtTotal.disableDuration ?? 0) / 100) * 0.05 +
+            ((player.stats.heroDamageReport?.dealtTotal.slowDuration ?? 0) / 100) * 0.025 +
             player.heroDamage * 0.001 +
             player.towerDamage * 0.01 +
             player.heroHealing * 0.002 +
@@ -169,18 +182,20 @@ export function getFormattedMatchData(match) {
         }
 
         // 对player.stats.matchPlayerBuffEvent（buff列表）进行处理，取stackCount（叠加层数）最高的对象并去重
-        // 使用reduce方法处理数组，以abilityId或itemId作为键，并保留stackCount最大的对象
-        const maxStackCountsByAbilityOrItem = player.stats.matchPlayerBuffEvent.reduce((acc, event) => {
-            // 创建一个唯一键，能力ID或物品ID，取决于哪一个不为null
-            const key = event.abilityId !== null ? `ability-${event.abilityId}` : `item-${event.itemId}`;
-            // 如果当前key还未存在于accumulator中，或当前event的stackCount更大，则更新记录
-            if (!acc[key] || event.stackCount > acc[key].stackCount) {
-                acc[key] = event;
-            }
-            return acc;
-        }, {});
-        // 将结果对象转换为数组，并重新赋值给原数组
-        player.stats.matchPlayerBuffEvent.splice(0, player.stats.matchPlayerBuffEvent.length, ...Object.values(maxStackCountsByAbilityOrItem));
+        if (match.parsedDateTime) {
+            // 使用reduce方法处理数组，以abilityId或itemId作为键，并保留stackCount最大的对象
+            const maxStackCountsByAbilityOrItem = player.stats.matchPlayerBuffEvent.reduce((acc, event) => {
+                // 创建一个唯一键，能力ID或物品ID，取决于哪一个不为null
+                const key = event.abilityId !== null ? `ability-${event.abilityId}` : `item-${event.itemId}`;
+                // 如果当前key还未存在于accumulator中，或当前event的stackCount更大，则更新记录
+                if (!acc[key] || event.stackCount > acc[key].stackCount) {
+                    acc[key] = event;
+                }
+                return acc;
+            }, {});
+            // 将结果对象转换为数组，并重新赋值给原数组
+            player.stats.matchPlayerBuffEvent.splice(0, player.stats.matchPlayerBuffEvent.length, ...Object.values(maxStackCountsByAbilityOrItem));
+        }
 
         switch (player.lane) {
             case "SAFE_LANE":
@@ -335,28 +350,30 @@ export function getFormattedMatchData(match) {
     ).titles.push({ name: "魂", color: "#6cf" });
     findMaxByProperty("networth").titles.push({ name: "富", color: "#FFD700" });
     findMaxByProperty("experiencePerMinute").titles.push({ name: "睿", color: "#8888FF" });
-    match.players
-        .reduce((max, player) =>
-            player.stats.heroDamageReport.dealtTotal.stunDuration + player.stats.heroDamageReport.dealtTotal.disableDuration / 2 + player.stats.heroDamageReport.dealtTotal.slowDuration / 4 >
-            max.stats.heroDamageReport.dealtTotal.stunDuration + max.stats.heroDamageReport.dealtTotal.disableDuration / 2 + max.stats.heroDamageReport.dealtTotal.slowDuration / 4
-                ? player
-                : max
-        )
-        .titles.push({ name: "控", color: "#FF00FF" });
+    if (match.parsedDateTime) {
+        match.players
+            .reduce((max, player) =>
+                player.stats.heroDamageReport.dealtTotal.stunDuration + player.stats.heroDamageReport.dealtTotal.disableDuration / 2 + player.stats.heroDamageReport.dealtTotal.slowDuration / 4 >
+                max.stats.heroDamageReport.dealtTotal.stunDuration + max.stats.heroDamageReport.dealtTotal.disableDuration / 2 + max.stats.heroDamageReport.dealtTotal.slowDuration / 4
+                    ? player
+                    : max
+            )
+            .titles.push({ name: "控", color: "#FF00FF" });
+        match.players
+            .reduce((max, player) =>
+                player.stats.heroDamageReport.receivedTotal.physicalDamage + player.stats.heroDamageReport.receivedTotal.magicalDamage + player.stats.heroDamageReport.receivedTotal.pureDamage >
+                max.stats.heroDamageReport.receivedTotal.physicalDamage + max.stats.heroDamageReport.receivedTotal.magicalDamage + max.stats.heroDamageReport.receivedTotal.pureDamage
+                    ? player
+                    : max
+            )
+            .titles.push({ name: "耐", color: "#84A1C7" });
+    }
     findMaxByProperty("heroDamage").titles.push({ name: "爆", color: "#CC0088" });
     findMaxByProperty("kills", "heroDamage").titles.push({ name: "破", color: "#DD0000" });
     findMaxByProperty("deaths", "networth", undefined, undefined, ComparisonMode.Min).titles.push({ name: "鬼", color: "#CCCCCC" });
     findMaxByProperty("assists", "heroDamage").titles.push({ name: "助", color: "#006400" });
     findMaxByProperty("towerDamage", "heroDamage").titles.push({ name: "拆", color: "#FEDCBA" });
     findMaxByProperty("heroHealing").titles.push({ name: "奶", color: "#00FF00" });
-    match.players
-        .reduce((max, player) =>
-            player.stats.heroDamageReport.receivedTotal.physicalDamage + player.stats.heroDamageReport.receivedTotal.magicalDamage + player.stats.heroDamageReport.receivedTotal.pureDamage >
-            max.stats.heroDamageReport.receivedTotal.physicalDamage + max.stats.heroDamageReport.receivedTotal.magicalDamage + max.stats.heroDamageReport.receivedTotal.pureDamage
-                ? player
-                : max
-        )
-        .titles.push({ name: "耐", color: "#84A1C7" });
     match.players
         .reduce((lowest, player) => {
             const currentContribution = (player.kills + player.assists) / match[player.team].KillsCount;

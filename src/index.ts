@@ -225,9 +225,11 @@ export async function apply(ctx: Context, config: Config) {
                     match = utils.getFormattedMatchData(queryRes.data.data.match);
                 }
             }
-            if (match && match.parsedDateTime) {
+            if (match && (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(moment().subtract(1, "hours")))) {
                 session.send(await ctx.puppeteer.render(genImageHTML(match, config.template_match, TemplateType.Match)));
-                ctx.database.upsert("dt_previous_query_results", (row) => [{ matchId: match.id, data: match, queryTime: new Date() }]);
+                if (match.parsedDateTime)
+                    // 当比赛数据已解析时才进行缓存
+                    ctx.database.upsert("dt_previous_query_results", (row) => [{ matchId: match.id, data: match, queryTime: new Date() }]);
             } else {
                 pendingMatches.push({ matchId: matchId, guilds: [{ platform: session.event.platform, guildId: session.event.guild.id, players: [] }] });
                 session.send("比赛尚未解析，将在解析完成后发布。");
@@ -505,7 +507,7 @@ export async function apply(ctx: Context, config: Config) {
             });
         });
         let heroes = Array.from(mergedMap.values());
-        return heroes.find((hero) => hero.names_cn.some(cn => cn.toLowerCase()==input.toLowerCase()) || hero.shortName === input.toLowerCase() || hero.id == input);
+        return heroes.find((hero) => hero.names_cn.some((cn) => cn.toLowerCase() == input.toLowerCase()) || hero.shortName === input.toLowerCase() || hero.id == input);
     }
     // ctx.command("来个笑话").action(async ({ session }) => {
     //     session.send(await utils.getJoke());
@@ -829,10 +831,10 @@ export async function apply(ctx: Context, config: Config) {
                     } else {
                         let queryRes = await utils.query(queries.MATCH_INFO(pendingMatch.matchId));
                         if (queryRes.status == 200) {
-                            match = queryRes.data.data.match.parsedDateTime ? utils.getFormattedMatchData(queryRes.data.data.match) : queryRes.data.data.match;
+                            match = utils.getFormattedMatchData(queryRes.data.data.match);
                         }
                     }
-                    if (match.parsedDateTime || moment.unix(match.startDateTime).isBefore(moment().subtract(1, "years"))) {
+                    if (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(moment().subtract(1, "hours"))) {
                         pendingMatches = pendingMatches.filter((item) => item.matchId != match.id);
 
                         // let realCommingMatches = [];
@@ -874,9 +876,11 @@ export async function apply(ctx: Context, config: Config) {
                                 broadMatchMessage += broadPlayerMessage + "\n";
                             }
                             await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + img);
-                            ctx.logger.info(`已解析${match.id}并发布于${commingGuild.platform}:${commingGuild.guildId}。`);
+                            ctx.logger.info(`${match.id}${match.parsedDateTime ? "已解析，" : "已结束超过1小时仍未被解析，放弃解析直接"}生成图片并发布于${commingGuild.platform}:${commingGuild.guildId}。`);
                         }
-                        ctx.database.upsert("dt_previous_query_results", (row) => [{ matchId: match.id, data: match, queryTime: new Date() }]);
+                        if (match.parsedDateTime)
+                            // 当比赛数据已解析时才进行缓存
+                            ctx.database.upsert("dt_previous_query_results", (row) => [{ matchId: match.id, data: match, queryTime: new Date() }]);
                         ctx.database.create("dt_sended_match_id", { matchId: match.id, sendTime: new Date() });
                     } else ctx.logger.info("比赛 %d 尚未解析完成，继续等待。", match.id);
                 } catch (error) {
@@ -916,7 +920,7 @@ function genImageHTML(data, template, type: TemplateType) {
 
     let result = "";
     // 渲染EJS模板
-    ejs.renderFile(templatePath, templateData, (err, html) => {
+    ejs.renderFile(templatePath, templateData, { strict: false }, (err, html) => {
         if (err) throw err;
         else result = html;
     });

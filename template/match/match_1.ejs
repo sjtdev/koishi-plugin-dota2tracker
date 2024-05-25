@@ -718,7 +718,7 @@
                             <img alt="" src="${utils.getImageUrl(player.hero.shortName, ImageType.Heroes)}" />
                             <p class="party_line${player.partyId != null ? " party_" + match.party[player.partyId] : ""}"></p>
                             <p class="party_mark${player.partyId != null ? " party_" + match.party[player.partyId] : ""}"></p>
-                            <p class="position p${Math.floor(player.order / 4) + 1}">${player.isRandom ? "随机" : `第<span>${player.order == null ? "-" : player.order + 1}</span>手`}<br/>${d2a.position[player.position?.slice(-1)]}</p>
+                            <p class="position p${Math.floor(player.order / 4) + 1}">${player.isRandom ? "随机" : `第<span>${player.order == null ? "-" : player.order + 1}</span>手`}<br/>${d2a.position[player.position?.slice(-1)]??""}</p>
                             <p class="level">${player.level}</p>
                         </div>
                         <div class="player_info">
@@ -804,7 +804,7 @@
                                 <p>${buff.stackCount ?? ""}</p>
                             </div>`
                                 )
-                                .join("")}
+                                .join("")??""}
                         </section>
                         <section>
                             <div class="support_item"${player.supportItemsCount[30] > 0 ? "" : ' style="display:none"'}>
@@ -946,19 +946,19 @@
                         <section>英雄伤害：<span class="hero_damage">${player.heroDamage}</span></section>
                         <section>建筑伤害：<span class="building_damage">${player.towerDamage}</span></section>
                         <section>受到伤害(减免后)：<span class="tak">${
-                            player.stats?.heroDamageReport?.receivedTotal.physicalDamage + player.stats?.heroDamageReport?.receivedTotal.magicalDamage + player.stats?.heroDamageReport?.receivedTotal.pureDamage
+                            (player.stats?.heroDamageReport?.receivedTotal.physicalDamage??0) + (player.stats?.heroDamageReport?.receivedTotal.magicalDamage??0) + (player.stats?.heroDamageReport?.receivedTotal.pureDamage??0)
                         }</span></section>
                         <section>补刀：<span class="lh">${player.numLastHits}</span>/<span class="dn">${player.numDenies}</span></section>
                         <section>GPM/XPM：<span class="gpm">${player.goldPerMinute}</span>/<span class="xpm">${player.experiencePerMinute}</span></section>
                         <section>治疗量：<span class="heal">${player.heroHealing}</span></section>
-                        <section>控制时间：<span class="building_damage">${(player.stats?.heroDamageReport?.dealtTotal.stunDuration / 100).toFixed(2)}/${(player.stats?.heroDamageReport?.dealtTotal.slowDuration / 100).toFixed(2)}/${(
-                        player.stats?.heroDamageReport?.dealtTotal.disableDuration / 100
+                        <section>控制时间：<span class="building_damage">${((player.stats?.heroDamageReport?.dealtTotal.stunDuration ?? 0) / 100).toFixed(2)}/${((player.stats?.heroDamageReport?.dealtTotal.slowDuration ?? 0) / 100).toFixed(2)}/${(
+                        (player.stats?.heroDamageReport?.dealtTotal.disableDuration ?? 0) / 100
                     ).toFixed(2)}</span>s</section>
                     </div>
                 </div>`).join("") %>
             </div>
             <div class="ban_list">
-                <%- match.pickBans
+                <%- (match.pickBans??[])
                 .filter((hero) => !hero.isPick)
                 .map((hero) => `<div class="ban_hero"><img src="${utils.getImageUrl(/^npc_dota_hero_(?<name>.+)$/.exec(dotaconstants.heroes[hero.bannedHeroId].name)[1], ImageType.Heroes)}" alt="" /></div>`)
                 .join("") %>
