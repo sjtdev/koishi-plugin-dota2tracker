@@ -1,6 +1,5 @@
 "use strict";
-import { Schema } from "koishi";
-import axios from "axios";
+import { HTTP, Schema } from "koishi";
 import fs from "fs";
 import * as dotaconstants from "dotaconstants";
 import os from "os";
@@ -56,18 +55,18 @@ export interface dt_7_36 {
 }
 
 export const CONFIGS = { STRATZ_API: { URL: "https://api.stratz.com/graphql", TOKEN: "" } };
-
+let http: HTTP = null;
+export function setHttp(newHttp: HTTP) {
+    http = newHttp;
+}
 export async function query(query_str) {
-    return await axios.post(CONFIGS.STRATZ_API.URL, query_str, {
+    return await http.post(CONFIGS.STRATZ_API.URL, query_str, {
+        responseType: "json",
         headers: {
             "Content-Type": "application/graphql",
             Authorization: `Bearer ${CONFIGS.STRATZ_API.TOKEN}`,
         },
     });
-}
-
-export async function testGetHtml(URL: string) {
-    return await axios.get(URL);
 }
 
 export enum ImageType {

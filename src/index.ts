@@ -16,7 +16,7 @@ export const name = "dota2tracker";
 export const usage = `
 DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑定），以及一系列查询功能。  
 **更多信息请进入插件主页（github本项目仓库）查看。**`;
-export const inject = ["database", "puppeteer", "cron"]; // 声明依赖
+export const inject = ["http", "database", "cron", "puppeteer"]; // 声明依赖
 
 // 配置项
 export interface Config {
@@ -73,6 +73,7 @@ const random = new Random(() => Math.random());
 export async function apply(ctx: Context, config: Config) {
     // write your plugin here
     utils.CONFIGS.STRATZ_API.TOKEN = config.STRATZ_API_TOKEN; // 读取配置API_TOKEN
+    utils.setHttp(ctx.http);
 
     // ctx.on()
 
@@ -193,16 +194,27 @@ export async function apply(ctx: Context, config: Config) {
                     const memberList = await session.bot.getGuildMemberList(session.event.guild.id);
                     // ctx.logger.info(JSON.stringify(memberList.data));
                     // const memberList = { data: [{ user: { id: "1243792285", name: "不醒梦", userId: "1243792285", avatar: "http://q.qlogo.cn/headimg_dl?dst_uin=1243792285&spec=640", username: "不醒梦" }, nick: "mian", roles: ["owner"] }] };
-                    let queryRes = await utils.query(queries.PLAYERS_INFO_WITH_10_MATCHES_FOR_GUILD(subscribedPlayers.map((player) => player.steamId)));
-                    if (queryRes.status == 200) {
-                        const users = subscribedPlayers.map((subscribedPlayer) => {
-                            const queryPlayer = queryRes.data.data.players.find((player) => player.steamAccount.id == subscribedPlayer.steamId);
-                            const queryMember = memberList.data.find((member) => member.user?.id == subscribedPlayer.userId);
-                            return { ...subscribedPlayer, ...queryPlayer, ...queryMember };
-                        });
 
-                        session.send(await ctx.puppeteer.render(genImageHTML(users, TemplateType.GuildMember, TemplateType.GuildMember)));
-                    } else throw 0;
+                    async function getUsers(subscribedPlayers: any[], utils: any, queries: any, memberList: any) {
+                        const playerSteamIds = subscribedPlayers.map((player) => player.steamId);
+                        const queryResult = await utils.query(queries.PLAYERS_INFO_WITH_10_MATCHES_FOR_GUILD(playerSteamIds));
+                        const playersInfo = queryResult.data.players;
+
+                        const users = [];
+
+                        for (const subscribedPlayer of subscribedPlayers) {
+                            const queryPlayer = playersInfo.find((player) => player.steamAccount.id == subscribedPlayer.steamId);
+                            const queryMember = memberList.data.find((member) => member.user?.id == subscribedPlayer.userId);
+                            users.push({ ...subscribedPlayer, ...queryPlayer, ...queryMember });
+                        }
+
+                        return users;
+                    }
+
+                    // Usage
+                    const users = await getUsers(subscribedPlayers, utils, queries, memberList);
+
+                    session.send(await ctx.puppeteer.render(genImageHTML(users, TemplateType.GuildMember, TemplateType.GuildMember)));
                 } catch (error) {
                     ctx.logger.error(error);
                     session.send("查询群友失败。");
@@ -220,10 +232,7 @@ export async function apply(ctx: Context, config: Config) {
                 match = queryLocal[0].data;
                 ctx.database.set("dt_previous_query_results", match.id, { queryTime: new Date() });
             } else {
-                let queryRes = await utils.query(queries.MATCH_INFO(matchId));
-                if (queryRes.status == 200) {
-                    match = utils.getFormattedMatchData(queryRes.data.data.match);
-                }
+                match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO(matchId))).data.match);
             }
             if (match && (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(moment().subtract(1, "hours")))) {
                 session.send(await ctx.puppeteer.render(genImageHTML(match, config.template_match, TemplateType.Match)));
@@ -287,8 +296,7 @@ export async function apply(ctx: Context, config: Config) {
                 let lastMatchId = 0;
                 try {
                     session.send("正在搜索对局详情，请稍后...");
-                    let queryRes = await utils.query(queries.PLAYERS_LASTMATCH([parseInt(flagBindedPlayer ? flagBindedPlayer.steamId : input_data)]));
-                    lastMatchId = queryRes.data.data.players[0].matches[0].id;
+                    lastMatchId = (await utils.query(queries.PLAYERS_LASTMATCH([parseInt(flagBindedPlayer ? flagBindedPlayer.steamId : input_data)]))).data.players[0].matches[0].id;
                 } catch {
                     session.send("获取玩家最近比赛失败。");
                     return;
@@ -326,52 +334,47 @@ export async function apply(ctx: Context, config: Config) {
                 let steamId = flagBindedPlayer?.steamId ?? input_data;
                 let player;
                 try {
-                    let queryRes = await utils.query(queries.PLAYER_INFO_WITH_25_MATCHES(steamId, hero?.id));
-                    if (queryRes.status == 200) {
-                        player = queryRes.data.data.player;
-                    } else throw 0;
-                    let queryRes2 = await utils.query(queries.PLAYER_EXTRA_INFO(steamId, player.matchCount, Object.keys(dotaconstants.heroes).length, hero?.id));
-                    if (queryRes2.status == 200) {
-                        let playerExtra = queryRes2.data.data.player;
-                        // 过滤和保留最高 level 的记录
-                        let filteredDotaPlus = {};
-                        playerExtra.dotaPlus.forEach((item) => {
-                            if (!filteredDotaPlus[item.heroId] || filteredDotaPlus[item.heroId].level < item.level) {
-                                filteredDotaPlus[item.heroId] = {
-                                    heroId: item.heroId,
-                                    level: item.level,
-                                };
-                            }
-                        });
+                    player = (await utils.query(queries.PLAYER_INFO_WITH_25_MATCHES(steamId, hero?.id))).data.player;
+                    let playerExtra = (await utils.query(queries.PLAYER_EXTRA_INFO(steamId, player.matchCount, Object.keys(dotaconstants.heroes).length, hero?.id))).data.player;
+                    // 过滤和保留最高 level 的记录
+                    let filteredDotaPlus = {};
+                    playerExtra.dotaPlus.forEach((item) => {
+                        if (!filteredDotaPlus[item.heroId] || filteredDotaPlus[item.heroId].level < item.level) {
+                            filteredDotaPlus[item.heroId] = {
+                                heroId: item.heroId,
+                                level: item.level,
+                            };
+                        }
+                    });
 
-                        // 合并 heroesPerformance 数据
-                        playerExtra.heroesPerformance.forEach((hero) => {
-                            if (filteredDotaPlus[hero.hero.id]) {
-                                filteredDotaPlus[hero.hero.id].shortName = hero.hero.shortName;
-                                filteredDotaPlus[hero.hero.id].winCount = hero.winCount;
-                                filteredDotaPlus[hero.hero.id].matchCount = hero.matchCount;
-                            }
-                        });
-                        // 储存玩家分段
-                        player.rank = {
-                            medal: parseInt(player.steamAccount.seasonRank?.toString().split("")[0] ?? 0),
-                            star: parseInt(player.steamAccount.seasonRank?.toString().split("")[1] ?? 0),
-                            leaderboard: player.steamAccount.seasonLeaderboardRank,
-                            inTop100: player.steamAccount.seasonLeaderboardRank ? (player.steamAccount.seasonLeaderboardRank <= 10 ? "8c" : player.steamAccount.seasonLeaderboardRank <= 100 ? "8b" : undefined) : undefined,
-                        };
+                    // 合并 heroesPerformance 数据
+                    playerExtra.heroesPerformance.forEach((hero) => {
+                        if (filteredDotaPlus[hero.hero.id]) {
+                            filteredDotaPlus[hero.hero.id].shortName = hero.hero.shortName;
+                            filteredDotaPlus[hero.hero.id].winCount = hero.winCount;
+                            filteredDotaPlus[hero.hero.id].matchCount = hero.matchCount;
+                        }
+                    });
+                    // 储存玩家分段
+                    player.rank = {
+                        medal: parseInt(player.steamAccount.seasonRank?.toString().split("")[0] ?? 0),
+                        star: parseInt(player.steamAccount.seasonRank?.toString().split("")[1] ?? 0),
+                        leaderboard: player.steamAccount.seasonLeaderboardRank,
+                        inTop100: player.steamAccount.seasonLeaderboardRank ? (player.steamAccount.seasonLeaderboardRank <= 10 ? "8c" : player.steamAccount.seasonLeaderboardRank <= 100 ? "8b" : undefined) : undefined,
+                    };
 
-                        // 转换为数组
-                        player.dotaPlus = Object.values(filteredDotaPlus); // 排序 dotaPlus 数组
-                        player.dotaPlus.sort((a, b) => {
-                            if (b.level !== a.level) {
-                                return b.level - a.level;
-                            }
-                            return a.heroId - b.heroId;
-                        });
+                    // 转换为数组
+                    player.dotaPlus = Object.values(filteredDotaPlus); // 排序 dotaPlus 数组
+                    player.dotaPlus.sort((a, b) => {
+                        if (b.level !== a.level) {
+                            return b.level - a.level;
+                        }
+                        return a.heroId - b.heroId;
+                    });
 
-                        // 取场次前十的英雄表现数据附加到原player对象中
-                        player.heroesPerformanceTop10 = playerExtra.heroesPerformance.slice(0, 10);
-                    } else throw 0;
+                    // 取场次前十的英雄表现数据附加到原player对象中
+                    player.heroesPerformanceTop10 = playerExtra.heroesPerformance.slice(0, 10);
+
                     if (hero) {
                         const { matchCount, winCount, imp } = player.heroesPerformanceTop10[0];
                         player.matchCount = matchCount;
@@ -395,37 +398,26 @@ export async function apply(ctx: Context, config: Config) {
         .example("-查询英雄 电魂")
         .action(async ({ session }, input_data) => {
             if (input_data) {
-                let hero = findingHero(input_data);
-                if (!hero) {
+                let fhero = findingHero(input_data);
+                if (!fhero) {
                     session.send("未找到输入的英雄，请确认后重新输入。");
                     return;
                 }
 
                 try {
                     let AbilitiesConstantsCN;
-                    let queryRes = await utils.query(queries.CURRENT_GAMEVERSION());
-                    if (queryRes.status == 200) {
-                        let queryConstants = queryRes.data.data.constants;
-                        AbilitiesConstantsCN = (await ctx.database.get("dt_constants_abilities_cn", [1]))[0];
-                        if (!AbilitiesConstantsCN || AbilitiesConstantsCN.gameVersionsId < queryConstants.gameVersions[0].id) {
-                            session.send("初次使用或版本更新，正在更新英雄技能数据中……");
-                            let queryRes2 = await utils.query(queries.ALL_ABILITIES_CHINESE_NAME());
+                    let queryConstants = (await utils.query(queries.CURRENT_GAMEVERSION())).data.constants;
+                    AbilitiesConstantsCN = (await ctx.database.get("dt_constants_abilities_cn", [1]))[0];
+                    if (!AbilitiesConstantsCN || AbilitiesConstantsCN.gameVersionsId < queryConstants.gameVersions[0].id) {
+                        session.send("初次使用或版本更新，正在更新英雄技能数据中……");
 
-                            if (queryRes2.status == 200) {
-                                AbilitiesConstantsCN = { data: queryRes2.data.data.constants };
-                                await ctx.database.upsert("dt_constants_abilities_cn", (row) => [
-                                    { id: 1, data: AbilitiesConstantsCN, gameVersionId: queryConstants.gameVersions[0].id, gameVersionName: queryConstants.gameVersions[0].name },
-                                ]);
-                            } else throw 0;
-                        }
-                    } else throw 0;
+                        AbilitiesConstantsCN = { data: (await utils.query(queries.ALL_ABILITIES_CHINESE_NAME())).data.constants };
+                        await ctx.database.upsert("dt_constants_abilities_cn", (row) => [{ id: 1, data: AbilitiesConstantsCN, gameVersionId: queryConstants.gameVersions[0].id, gameVersionName: queryConstants.gameVersions[0].name }]);
+                    }
                     // hero
-                    let queryRes3 = await utils.query(queries.HERO_INFO(hero.id));
-                    if (queryRes3.status == 200) {
-                        let hero = queryRes3.data.data.constants.hero;
-                        hero.talents.forEach((talent) => (talent.name_cn = AbilitiesConstantsCN.data.abilities.find((item) => item.id == talent.abilityId).language.displayName));
-                        await session.send(await ctx.puppeteer.render(genImageHTML(hero, config.template_hero, TemplateType.Hero)));
-                    } else throw 0;
+                    let hero = (await utils.query(queries.HERO_INFO(fhero.id))).data.constants.hero;
+                    hero.talents.forEach((talent) => (talent.name_cn = AbilitiesConstantsCN.data.abilities.find((item) => item.id == talent.abilityId).language.displayName));
+                    await session.send(await ctx.puppeteer.render(genImageHTML(hero, config.template_hero, TemplateType.Hero)));
                 } catch (error) {
                     ctx.logger.error(error);
                     session.send("获取数据失败");
@@ -451,33 +443,30 @@ export async function apply(ctx: Context, config: Config) {
                     return;
                 }
                 try {
-                    let queryRes = await utils.query(queries.HERO_MATCHUP_WINRATE(hero.id));
-                    if (queryRes.status == 200) {
-                        let heroStats = queryRes.data.data.heroStats;
-                        let withTopFive = heroStats.matchUp[0].with
-                            .filter((item) => item.matchCount / heroStats.matchUp[0].matchCountWith > Math.max(0, Math.min(5, options.filter)) / 100)
-                            .map((item) => {
-                                const winRate = item.winCount / item.matchCount;
-                                return { ...item, winRate: winRate.toFixed(3) };
-                            })
-                            .sort((a, b) => b.winRate - a.winRate)
-                            .slice(0, Math.max(1, Math.min(Object.keys(dotaconstants.heroes).length - 1, options.limit)));
-                        let vsBottomFive = heroStats.matchUp[0].vs
-                            .filter((item) => item.matchCount / heroStats.matchUp[0].matchCountVs > Math.max(0, Math.min(5, options.filter)) / 100)
-                            .map((item) => {
-                                const winRate = item.winCount / item.matchCount;
-                                return { ...item, winRate: winRate.toFixed(3) };
-                            })
-                            .sort((a, b) => a.winRate - b.winRate)
-                            .slice(0, Math.max(1, Math.min(Object.keys(dotaconstants.heroes).length - 1, options.limit)));
-                        session.send(
-                            `你查询的英雄是${d2a.HEROES_CHINESE[heroStats.matchUp[0].heroId][0]}（ID：${heroStats.matchUp[0].heroId}），\n以下是7天内传奇-万古分段比赛数据总结而来的搭档与克制关系\n最佳搭档（组合胜率前${
-                                options.limit
-                            }）：${withTopFive.map((item) => `${d2a.HEROES_CHINESE[item.heroId2][0]}(胜率${(item.winRate * 100).toFixed(1)}%)`).join("、")}\n最佳克星（对抗胜率倒${options.limit}）：${vsBottomFive
-                                .map((item) => `${d2a.HEROES_CHINESE[item.heroId2][0]}(胜率${(item.winRate * 100).toFixed(1)}%)`)
-                                .join("、")}`
-                        );
-                    }
+                    let heroStats = (await utils.query(queries.HERO_MATCHUP_WINRATE(hero.id))).data.heroStats;
+                    let withTopFive = heroStats.matchUp[0].with
+                        .filter((item) => item.matchCount / heroStats.matchUp[0].matchCountWith > Math.max(0, Math.min(5, options.filter)) / 100)
+                        .map((item) => {
+                            const winRate = item.winCount / item.matchCount;
+                            return { ...item, winRate: winRate.toFixed(3) };
+                        })
+                        .sort((a, b) => b.winRate - a.winRate)
+                        .slice(0, Math.max(1, Math.min(Object.keys(dotaconstants.heroes).length - 1, options.limit)));
+                    let vsBottomFive = heroStats.matchUp[0].vs
+                        .filter((item) => item.matchCount / heroStats.matchUp[0].matchCountVs > Math.max(0, Math.min(5, options.filter)) / 100)
+                        .map((item) => {
+                            const winRate = item.winCount / item.matchCount;
+                            return { ...item, winRate: winRate.toFixed(3) };
+                        })
+                        .sort((a, b) => a.winRate - b.winRate)
+                        .slice(0, Math.max(1, Math.min(Object.keys(dotaconstants.heroes).length - 1, options.limit)));
+                    session.send(
+                        `你查询的英雄是${d2a.HEROES_CHINESE[heroStats.matchUp[0].heroId][0]}（ID：${heroStats.matchUp[0].heroId}），\n以下是7天内传奇-万古分段比赛数据总结而来的搭档与克制关系\n最佳搭档（组合胜率前${
+                            options.limit
+                        }）：${withTopFive.map((item) => `${d2a.HEROES_CHINESE[item.heroId2][0]}(胜率${(item.winRate * 100).toFixed(1)}%)`).join("、")}\n最佳克星（对抗胜率倒${options.limit}）：${vsBottomFive
+                            .map((item) => `${d2a.HEROES_CHINESE[item.heroId2][0]}(胜率${(item.winRate * 100).toFixed(1)}%)`)
+                            .join("、")}`
+                    );
                 } catch (error) {
                     ctx.logger.error(error);
                     session.send("获取数据失败");
@@ -689,14 +678,14 @@ export async function apply(ctx: Context, config: Config) {
                 const subscribedGuilds = await ctx.database.get("dt_subscribed_guilds", undefined);
                 const subscribedPlayersInGuild: any[] = (await ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
 
-                let queryRes = await utils.query(
-                    queries.MATCHES_FOR_DAILY(
-                        subscribedPlayersInGuild.map((player) => player.steamId).filter((value, index, self) => self.indexOf(value) === index),
-                        oneDayAgo
+                const players = (
+                    await utils.query(
+                        queries.MATCHES_FOR_DAILY(
+                            subscribedPlayersInGuild.map((player) => player.steamId).filter((value, index, self) => self.indexOf(value) === index),
+                            oneDayAgo
+                        )
                     )
-                );
-
-                const players = queryRes.data.data.players.filter((player) => player.matches.length > 0);
+                ).data.players.filter((player) => player.matches.length > 0);
                 const matches = players
                     .map((player) => player.matches.map((match) => match))
                     .flat()
@@ -780,17 +769,15 @@ export async function apply(ctx: Context, config: Config) {
             const subscribedGuilds = await ctx.database.get("dt_subscribed_guilds", undefined);
             const subscribedPlayersInGuild = (await ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
             if (subscribedPlayersInGuild.length > 0) {
-                let queryRes = await utils.query(
-                    queries.PLAYERS_LASTMATCH(
-                        subscribedPlayersInGuild
-                            .map((player) => player.steamId)
-                            .filter(function (value, index, self) {
-                                return self.indexOf(value) === index;
-                            })
-                    )
+                const subscribedPlayersSteamIds = queries.PLAYERS_LASTMATCH(
+                    subscribedPlayersInGuild
+                        .map((player) => player.steamId)
+                        .filter(function (value, index, self) {
+                            return self.indexOf(value) === index;
+                        })
                 );
                 // 获取所有查询到的玩家最新比赛并根据match.id去重
-                const lastMatches = queryRes.data.data.players
+                const lastMatches = (await utils.query(subscribedPlayersSteamIds)).data.players
                     .map((player) => player.matches[0])
                     .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id)) // 根据match.id去重
                     .filter((match) => moment.unix(match.startDateTime).isAfter(moment().subtract(1, "days"))) // 排除1天以前的比赛，防止弃坑数年群友绑定时突然翻出上古战报
@@ -828,12 +815,7 @@ export async function apply(ctx: Context, config: Config) {
                     if (queryLocal.length > 0) {
                         match = queryLocal[0].data;
                         ctx.database.set("dt_previous_query_results", match.id, { queryTime: new Date() });
-                    } else {
-                        let queryRes = await utils.query(queries.MATCH_INFO(pendingMatch.matchId));
-                        if (queryRes.status == 200) {
-                            match = utils.getFormattedMatchData(queryRes.data.data.match);
-                        }
-                    }
+                    } else match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO(pendingMatch.matchId))).data.match);
                     if (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(moment().subtract(1, "hours"))) {
                         pendingMatches = pendingMatches.filter((item) => item.matchId != match.id);
 
