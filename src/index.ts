@@ -15,7 +15,7 @@ import * as ejs from "ejs";
 export const name = "dota2tracker";
 export const usage = `
 DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑定），以及一系列查询功能。  
-**更多信息请进入插件主页查看。**`;
+**更多信息请进入插件主页（github本项目仓库）查看。**`;
 export const inject = ["database", "puppeteer", "cron"]; // 声明依赖
 
 // 配置项
@@ -563,7 +563,7 @@ export async function apply(ctx: Context, config: Config) {
                 heroes.push({ id: 0, data: result.remainingContent });
                 await ctx.database.upsert("dt_7_36", (row) => heroes);
                 // fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/divArray.json", JSON.stringify(heroes, null, 2));
-                fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/remainingContent.html", result.remainingContent);
+                // fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/remainingContent.html", result.remainingContent);
                 await session.send("数据获取完成。");
                 await page.close();
             }

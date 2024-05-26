@@ -1,7 +1,7 @@
 {
   "name": "@sjtdev/koishi-plugin-dota2tracker",
   "description": "",
-  "version": "1.1.6-hotfix",
+  "version": "1.1.7",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
