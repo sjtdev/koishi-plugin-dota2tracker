@@ -72,6 +72,7 @@ export async function testGetHtml(URL: string) {
 
 export enum ImageType {
     Icons = "icons",
+    IconsFacets = "icons/facets",
     Heroes = "heroes",
     HeroIcons = "heroes/icons",
     Items = "items",

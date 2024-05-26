@@ -385,13 +385,13 @@
         
         player.positionPerformance=[];
         // 瞎j8定义的各位置代表物品，以后看情况调整
-        const positionItems=["greater_crit","dagon_5","heart","hand_of_midas","ward_observer"];
+        const positionIcons = ["damage","nuke","armor","speed","healing"];
         for (let index = 0; index < 5; index++) {
             let currentPositionMatches = player.matches.filter(match=>match.players[0].position == ("POSITION_"+(index+1)))
             let winCount = currentPositionMatches.filter(match=>match.didRadiantWin == match.players[0].isRadiant).length;
             player.positionPerformance.push({
                 position : (index + 1),
-                icon : positionItems[index],
+                icon : positionIcons[index],
                 matchCount : currentPositionMatches.length,
                 winCount : winCount,
                 loseCount : currentPositionMatches.length - winCount,
@@ -468,7 +468,7 @@
                     <span class="tip lose_count" style="justify-self: start; margin-left: 2px">败场</span>
                     <%- player.positionPerformance
                     .map((position) => `
-                    <span><img src="${utils.getImageUrl(position.icon,ImageType.Items)}"></span>
+                    <span><img src="${utils.getImageUrl(position.icon,ImageType.IconsFacets)}"></span>
                     <span class="count">${position.matchCount}</span>
                     <span class="win_rate">${position.matchCount>0?(((position.winCount / position.matchCount) * 100).toFixed(0)):"-"}%</span>
                     <span class="imp">${(position.imp > 0 ? "+" : "") + position.imp}</span>
