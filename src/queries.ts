@@ -191,60 +191,60 @@ export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId,heroId?) {
     {
 		player(steamAccountId: ${steamAccountId}) {
 		  steamAccount {
-			avatar
-			name
-			seasonRank
-			seasonLeaderboardRank
-			id
+        avatar
+        name
+        seasonRank
+        seasonLeaderboardRank
+        id
 		  }
 		  guildMember {
-			guild {
-			  tag
-			}
+        guild {
+          tag
+        }
 		  }
 		  matchCount
 		  winCount
 		  performance {
-			imp
+			  imp
 		  }
 		  heroesPerformance(take: 25, request: {matchGroupOrderBy: WIN_COUNT take: 25 ${heroId?("heroIds:"+heroId):""}}) {
-			hero {
-			  id
-			  shortName
-			}
-			imp
-			winCount
-			matchCount
+        hero {
+          id
+          shortName
+        }
+        imp
+        winCount
+        matchCount
 		  }
 		  matches(request: {take: 25 ${heroId?("heroIds:"+heroId):""}}) {
-			id
-			rank
-      lobbyType
-      gameMode
-			startDateTime
-			durationSeconds
-			didRadiantWin
-			topLaneOutcome
-			midLaneOutcome
-			bottomLaneOutcome
-			radiantKills
-			direKills
-			players(steamAccountId: ${steamAccountId}) {
-			  isRadiant
-			  lane
-			  kills
-			  deaths
-			  assists
-        position
-			  award
-			  imp
-			  hero {
-				id
-				shortName
-			  }
-			}
-		  }
-		}
+        id
+        rank
+        lobbyType
+        gameMode
+        startDateTime
+        durationSeconds
+        didRadiantWin
+        topLaneOutcome
+        midLaneOutcome
+        bottomLaneOutcome
+        radiantKills
+        direKills
+        players(steamAccountId: ${steamAccountId}) {
+          isRadiant
+          lane
+          kills
+          deaths
+          assists
+          position
+          award
+          imp
+          hero {
+          id
+          shortName
+          }
+        }
+        }
+      }
 		
 	  }
 	  
