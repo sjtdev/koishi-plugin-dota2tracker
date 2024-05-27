@@ -15,7 +15,7 @@ import * as ejs from "ejs";
 export const name = "dota2tracker";
 export const usage = `
 DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑定），以及一系列查询功能。  
-**更多信息请进入插件主页（github本项目仓库）查看。**`;
+**更多信息请进入[插件主页](https://github.com/sjtdev/koishi-plugin-dota2tracker)与[更新日志](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md)查看。**`;
 export const inject = ["http", "database", "cron", "puppeteer"]; // 声明依赖
 
 // 配置项
