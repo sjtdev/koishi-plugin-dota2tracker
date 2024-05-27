@@ -192,9 +192,6 @@ export async function apply(ctx: Context, config: Config) {
             if (subscribedPlayers.length <= 20) {
                 try {
                     const memberList = await session.bot.getGuildMemberList(session.event.guild.id);
-                    // ctx.logger.info(JSON.stringify(memberList.data));
-                    // const memberList = { data: [{ user: { id: "1243792285", name: "不醒梦", userId: "1243792285", avatar: "http://q.qlogo.cn/headimg_dl?dst_uin=1243792285&spec=640", username: "不醒梦" }, nick: "mian", roles: ["owner"] }] };
-
                     async function getUsers(subscribedPlayers: any[], utils: any, queries: any, memberList: any) {
                         const playerSteamIds = subscribedPlayers.map((player) => player.steamId);
                         const queryResult = await utils.query(queries.PLAYERS_INFO_WITH_10_MATCHES_FOR_GUILD(playerSteamIds));
