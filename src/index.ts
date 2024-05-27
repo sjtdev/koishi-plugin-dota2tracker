@@ -763,18 +763,19 @@ export async function apply(ctx: Context, config: Config) {
         // 每分钟执行一次查询玩家最近比赛记录，若未发布过则进入待发布列表；检查待发布列表，若满足发布条件（比赛已被解析）则生成图片并发布。
         ctx.cron("* * * * *", async function () {
             // 获取注册玩家ID，每分钟获取玩家最新比赛，判定是否播报过
+            // 获取所有订阅群组
             const subscribedGuilds = await ctx.database.get("dt_subscribed_guilds", undefined);
+            // 获取所有绑定玩家，过滤出在订阅群组中的绑定玩家
             const subscribedPlayersInGuild = (await ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
             if (subscribedPlayersInGuild.length > 0) {
-                const subscribedPlayersSteamIds = queries.PLAYERS_LASTMATCH(
-                    subscribedPlayersInGuild
-                        .map((player) => player.steamId)
-                        .filter(function (value, index, self) {
-                            return self.indexOf(value) === index;
-                        })
-                );
+                // 获取这些玩家的SteamID并去重
+                const subscribedPlayersSteamIds = subscribedPlayersInGuild
+                    .map((player) => player.steamId)
+                    .filter(function (value, index, self) {
+                        return self.indexOf(value) === index;
+                    });
                 // 获取所有查询到的玩家最新比赛并根据match.id去重
-                const lastMatches = (await utils.query(subscribedPlayersSteamIds)).data.players
+                const lastMatches = (await utils.query(queries.PLAYERS_LASTMATCH(subscribedPlayersSteamIds))).data.players
                     .map((player) => player.matches[0])
                     .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id)) // 根据match.id去重
                     .filter((match) => moment.unix(match.startDateTime).isAfter(moment().subtract(1, "days"))) // 排除1天以前的比赛，防止弃坑数年群友绑定时突然翻出上古战报
