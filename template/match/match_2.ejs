@@ -140,7 +140,7 @@
                 grid-column: 1;
                 position: relative;
             }
-            .player > .hero_avatar > p {
+            .player > .hero_avatar > .level {
                 width: 20px;
                 height: 15px;
                 background-color: #323232;
@@ -151,6 +151,72 @@
                 line-height: 15px;
                 color: #fff;
                 text-align: center;
+            }
+
+            .player > .hero_avatar > .party_line {
+                position: absolute;
+                height: 100%;
+                top: 0;
+                width: 3px;
+            }
+
+            .player > .hero_avatar > .party_mark {
+                position: absolute;
+                line-height: 1.5;
+                text-align: center;
+                width: 16px;
+                font-size: 10px;
+                top: 2px;
+                left: 5px;
+                background-color: rgba(0, 0, 0, 0.8);
+            }
+
+            .player > .hero_avatar.party_I > .party_line {
+                background-color: #caffe5;
+            }
+
+            .player > .hero_avatar.party_I > .party_mark {
+                color: #caffe5;
+            }
+
+            .player > .hero_avatar.party_I > .party_mark::after {
+                content: "I";
+            }
+
+            .player > .hero_avatar.party_II > .party_line {
+                background-color: #ffe484;
+            }
+
+            .player > .hero_avatar.party_II > .party_mark {
+                color: #ffe484;
+            }
+
+            .player > .hero_avatar.party_II > .party_mark::after {
+                content: "II";
+            }
+
+            .player > .hero_avatar.party_III > .party_line {
+                background-color: #e19be2;
+            }
+
+            .player > .hero_avatar.party_III > .party_mark {
+                color: #e19be2;
+            }
+
+            .player > .hero_avatar.party_III > .party_mark::after {
+                content: "III";
+            }
+
+            .player > .hero_avatar.party_IV > .party_line {
+                background-color: #ccdaf4;
+            }
+
+            .player > .hero_avatar.party_IV > .party_mark {
+                color: #ccdaf4;
+            }
+
+            .player > .hero_avatar.party_IV > .party_mark::after {
+                content: "IV";
             }
 
             .player > .rank {
@@ -182,6 +248,9 @@
             .player > .player_name {
                 grid-row: 1;
                 grid-column: 3 / span 2;
+                white-space: nowrap;        /* 禁止换行 */
+                overflow: hidden;           /* 隐藏溢出部分 */
+                text-overflow: ellipsis;    /* 用省略号表示溢出的文本 */
             }
             .player > .player_name > .rank {
                 color: #aaa;
@@ -373,9 +442,11 @@
             %>
             <%- match.players.map(player=> `
             <div class="player ${player.team}${player.hero.id==80?" bear":""}" style="order: ${player.team==="radiant"?1:100};">
-                <div class="hero_avatar row-1">
+                <div class="hero_avatar row-1${player.partyId != null ? " party_" + match.party[player.partyId] : ""}">
                     <img src="${utils.getImageUrl(player.hero.shortName, ImageType.Heroes)}" />
                     <p class="level">${player.level}</p>
+                    <p class="party_line"></p>
+                    <p class="party_mark"></p>
                 </div>
                 <div class="rank">
                     <img
