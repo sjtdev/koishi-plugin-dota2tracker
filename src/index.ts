@@ -21,6 +21,7 @@ export const inject = ["http", "database", "cron", "puppeteer"]; // 声明依赖
 // 配置项
 export interface Config {
     STRATZ_API_TOKEN: string;
+    dataParsingTimeoutMinutes: number;
     dailyReportSwitch: boolean;
     dailyReportHours: number;
     template_match: string;
@@ -29,7 +30,8 @@ export interface Config {
 }
 export const Config: Schema = Schema.intersect([
     Schema.object({
-        STRATZ_API_TOKEN: Schema.string().required().description("※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取"),
+        STRATZ_API_TOKEN: Schema.string().required().description("※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取。"),
+        dataParsingTimeoutMinutes: Schema.number().default(60).min(0).max(1440).description("等待比赛数据解析的时间（单位：分钟）。如果数据解析时间超过等待时间，将直接生成战报而不再等待解析完成。"),
     }).description("基础设置"),
     Schema.object({
         dailyReportSwitch: Schema.boolean().default(false).description("日报功能").experimental(),
@@ -231,7 +233,7 @@ export async function apply(ctx: Context, config: Config) {
             } else {
                 match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO(matchId))).data.match);
             }
-            if (match && (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(moment().subtract(1, "hours")))) {
+            if (match && (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(moment().subtract(config.dataParsingTimeoutMinutes, "minutes")))) {
                 session.send(await ctx.puppeteer.render(genImageHTML(match, config.template_match, TemplateType.Match)));
                 if (match.parsedDateTime)
                     // 当比赛数据已解析时才进行缓存
@@ -814,7 +816,7 @@ export async function apply(ctx: Context, config: Config) {
                         match = queryLocal[0].data;
                         ctx.database.set("dt_previous_query_results", match.id, { queryTime: new Date() });
                     } else match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO(pendingMatch.matchId))).data.match);
-                    if (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(moment().subtract(1, "hours"))) {
+                    if (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(moment().subtract(config.dataParsingTimeoutMinutes, "minutes"))) {
                         pendingMatches = pendingMatches.filter((item) => item.matchId != match.id);
 
                         // let realCommingMatches = [];
