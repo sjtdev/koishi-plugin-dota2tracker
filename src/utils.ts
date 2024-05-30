@@ -456,10 +456,8 @@ export function winRateColor(value) {
 export async function playerisValid(steamAccountId): Promise<{ isValid: boolean; reason?: string }> {
     try {
         let queryRes = await query(queries.VERIFYING_PLAYER(steamAccountId));
-        if (queryRes.status == 200) {
-            if (queryRes.data.data.player.matchCount != null) return { isValid: true };
-            else return { isValid: false, reason: "SteamID无效或无任何场次。" };
-        }
+        if (queryRes.data.player.matchCount != null) return { isValid: true };
+        else return { isValid: false, reason: "SteamID无效或无任何场次。" };
     } catch (error) {
         console.error(error);
         return { isValid: false, reason: "网络状况不佳SteamID验证失败，请稍后重试。" };

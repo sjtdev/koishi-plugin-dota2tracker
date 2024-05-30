@@ -83,11 +83,11 @@ export async function apply(ctx: Context, config: Config) {
         .usage("订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。")
         .action(async ({ session }) => {
             if (session.guild) {
-                // let currentGuild = subscribedGuilds.find((item) => item.id == session.event.guild.id && item.platform == session.event.platform);
-                let currentGuild = (await ctx.database.get("dt_subscribed_guilds", { guildId: session.event.guild.id, platform: session.event.platform }))[0];
+                // let currentGuild = subscribedGuilds.find((item) => item.id == session.event.channel.id && item.platform == session.event.platform);
+                let currentGuild = (await ctx.database.get("dt_subscribed_guilds", { guildId: session.event.channel.id, platform: session.event.platform }))[0];
                 if (currentGuild) session.send("本群已订阅，无需重复订阅。");
                 else {
-                    ctx.database.create("dt_subscribed_guilds", { guildId: session.event.guild.id, platform: session.event.platform });
+                    ctx.database.create("dt_subscribed_guilds", { guildId: session.event.channel.id, platform: session.event.platform });
                     session.send("订阅成功。");
                 }
             }
@@ -95,9 +95,9 @@ export async function apply(ctx: Context, config: Config) {
 
     ctx.command("取消订阅", "取消订阅本群").action(async ({ session }) => {
         if (session.guild) {
-            let cancelingGuild = (await ctx.database.get("dt_subscribed_guilds", { guildId: session.event.guild.id, platform: session.event.platform }))[0];
+            let cancelingGuild = (await ctx.database.get("dt_subscribed_guilds", { guildId: session.event.channel.id, platform: session.event.platform }))[0];
             if (cancelingGuild) {
-                ctx.database.remove("dt_subscribed_guilds", session.event.guild.id);
+                ctx.database.remove("dt_subscribed_guilds", session.event.channel.id);
                 session.send("取消订阅成功。");
                 return;
             }
@@ -116,8 +116,8 @@ export async function apply(ctx: Context, config: Config) {
                     return;
                 }
                 // 若在已绑定玩家中找到调用指令用户则返回
-                // let sessionPlayer = subscribedPlayers.find((item) => item.guildId == session.event.guild.id && item.platform == session.event.platform && item.userId == session.event.user.id);
-                let sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.guild.id, platform: session.event.platform, userId: session.event.user.id }))[0];
+                // let sessionPlayer = subscribedPlayers.find((item) => item.guildId == session.event.channel.id && item.platform == session.event.platform && item.userId == session.event.user.id);
+                let sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.channel.id, platform: session.event.platform, userId: session.event.user.id }))[0];
                 if (sessionPlayer) {
                     session.send(
                         `
@@ -147,13 +147,13 @@ export async function apply(ctx: Context, config: Config) {
                     别名：${nick_name || ""}
                     SteamID：${steam_id}`.replace(/\n\s+/g, " ")
                 );
-                ctx.database.create("dt_subscribed_players", { userId: session.event.user.id, guildId: session.event.guild.id, platform: session.event.platform, steamId: parseInt(steam_id), nickName: nick_name || null });
+                ctx.database.create("dt_subscribed_players", { userId: session.event.user.id, guildId: session.event.channel.id, platform: session.event.platform, steamId: parseInt(steam_id), nickName: nick_name || null });
             }
         });
     ctx.command("取消绑定", "取消绑定你的个人信息").action(async ({ session }) => {
         if (session.guild) {
             // 在已绑定玩家中查找当前玩家
-            let sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.guild.id, platform: session.event.platform, userId: session.event.user.id }))[0];
+            let sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.channel.id, platform: session.event.platform, userId: session.event.user.id }))[0];
             if (sessionPlayer) {
                 await ctx.database.remove("dt_subscribed_players", sessionPlayer.id); // 从数据库中删除
                 session.send("取消绑定成功。");
@@ -165,7 +165,7 @@ export async function apply(ctx: Context, config: Config) {
         .example("-改名 李四")
         .action(async ({ session }, nick_name) => {
             if (session.guild) {
-                let sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.guild.id, platform: session.event.platform, userId: session.event.user.id }))[0];
+                let sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.channel.id, platform: session.event.platform, userId: session.event.user.id }))[0];
                 if (sessionPlayer) {
                     if (!nick_name) {
                         session.send("请输入你的别名。");
@@ -186,14 +186,14 @@ export async function apply(ctx: Context, config: Config) {
 
     ctx.command("查询群友", "查询本群已绑定的玩家").action(async ({ session }) => {
         if (session.guild) {
-            const subscribedPlayers = await ctx.database.get("dt_subscribed_players", { guildId: session.event.guild.id, platform: session.platform });
+            const subscribedPlayers = await ctx.database.get("dt_subscribed_players", { guildId: session.event.channel.id, platform: session.platform });
             if (!subscribedPlayers.length) {
                 session.send("本群尚无绑定玩家。");
                 return;
             }
             if (subscribedPlayers.length <= 20) {
                 try {
-                    const memberList = await session.bot.getGuildMemberList(session.event.guild.id);
+                    const memberList = await session.bot.getGuildMemberList(session.event.channel.id);
                     async function getUsers(subscribedPlayers: any[], utils: any, queries: any, memberList: any) {
                         const playerSteamIds = subscribedPlayers.map((player) => player.steamId);
                         const queryResult = await utils.query(queries.PLAYERS_INFO_WITH_10_MATCHES_FOR_GUILD(playerSteamIds));
@@ -239,7 +239,7 @@ export async function apply(ctx: Context, config: Config) {
                     // 当比赛数据已解析时才进行缓存
                     ctx.database.upsert("dt_previous_query_results", (row) => [{ matchId: match.id, data: match, queryTime: new Date() }]);
             } else {
-                pendingMatches.push({ matchId: matchId, guilds: [{ platform: session.event.platform, guildId: session.event.guild.id, players: [] }] });
+                pendingMatches.push({ matchId: matchId, guilds: [{ platform: session.event.platform, guildId: session.event.channel.id, players: [] }] });
                 session.send("比赛尚未解析，将在解析完成后发布。");
             }
         } catch (error) {
@@ -278,14 +278,14 @@ export async function apply(ctx: Context, config: Config) {
             if (session.guild) {
                 let sessionPlayer;
                 if (!input_data) {
-                    sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.guild.id, platform: session.event.platform, userId: session.event.user.id }))[0];
+                    sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.channel.id, platform: session.event.platform, userId: session.event.user.id }))[0];
                     if (!sessionPlayer) {
                         session.send("无参数时默认从已绑定SteamID玩家中寻找你的信息，但你似乎并没有绑定。\n请在本群绑定SteamID。（可输入【-绑定 -h】获取帮助）\n或在指令后跟上希望查询的SteamID或已绑定玩家的别名。");
                         return;
                     }
                 }
 
-                let flagBindedPlayer = sessionPlayer || (await ctx.database.get("dt_subscribed_players", { guildId: session.event.guild.id, platform: session.event.platform, nickName: input_data }))[0];
+                let flagBindedPlayer = sessionPlayer || (await ctx.database.get("dt_subscribed_players", { guildId: session.event.channel.id, platform: session.event.platform, nickName: input_data }))[0];
 
                 if (!(flagBindedPlayer || /^\d{1,11}$/.test(input_data))) {
                     session.send("SteamID不合法并且未在本群找到此玩家。");
@@ -314,14 +314,14 @@ export async function apply(ctx: Context, config: Config) {
             if (session.guild) {
                 let sessionPlayer;
                 if (!input_data) {
-                    sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.guild.id, platform: session.event.platform, userId: session.event.user.id }))[0];
+                    sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.channel.id, platform: session.event.platform, userId: session.event.user.id }))[0];
                     if (!sessionPlayer) {
                         session.send("无参数时默认从已绑定SteamID玩家中寻找你的信息，但你似乎并没有绑定。\n请在本群绑定SteamID。（可输入【-绑定 -h】获取帮助）\n或在指令后跟上希望查询的SteamID或已绑定玩家的别名。");
                         return;
                     }
                 }
 
-                let flagBindedPlayer = sessionPlayer || (await ctx.database.get("dt_subscribed_players", { guildId: session.event.guild.id, platform: session.event.platform, nickName: input_data }))[0];
+                let flagBindedPlayer = sessionPlayer || (await ctx.database.get("dt_subscribed_players", { guildId: session.event.channel.id, platform: session.event.platform, nickName: input_data }))[0];
 
                 if (!(flagBindedPlayer || /^\d{1,11}$/.test(input_data))) {
                     session.send("SteamID不合法并且未在本群找到此玩家。");
@@ -407,7 +407,7 @@ export async function apply(ctx: Context, config: Config) {
                     let AbilitiesConstantsCN;
                     let queryConstants = (await utils.query(queries.CURRENT_GAMEVERSION())).data.constants;
                     AbilitiesConstantsCN = (await ctx.database.get("dt_constants_abilities_cn", [1]))[0];
-                    if (!AbilitiesConstantsCN || AbilitiesConstantsCN.gameVersionsId < queryConstants.gameVersions[0].id) {
+                    if (!AbilitiesConstantsCN || (AbilitiesConstantsCN.gameVersionId < queryConstants.gameVersions[0].id)) {
                         session.send("初次使用或版本更新，正在更新英雄技能数据中……");
 
                         AbilitiesConstantsCN = { data: (await utils.query(queries.ALL_ABILITIES_CHINESE_NAME())).data.constants };
@@ -618,34 +618,36 @@ export async function apply(ctx: Context, config: Config) {
             } else session.send("https://www.dota2.com/patches/7.36");
         });
 
-    // ctx.command("test <input_data>")
-    //     .option("a", "a")
-    //     .action(async ({ session, options }, input_data) => {
-    //         // if (input_data) {
-    //         //     let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
-    //         //     let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
-    //         //         id: parseInt(key),
-    //         //         names_cn: d2a.HEROES_CHINESE[key],
-    //         //     }));
-    //         //     const mergedMap = new Map();
-    //         //     [dc_heroes, cn_heroes].forEach((array) => {
-    //         //         array.forEach((item) => {
-    //         //             const existingItem = mergedMap.get(item.id);
-    //         //             if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
-    //         //             else mergedMap.set(item.id, item);
-    //         //         });
-    //         //     });
-    //         //     let heroes = Array.from(mergedMap.values());
-    //         //     let hero = heroes.find((hero) => hero.names_cn.includes(input_data) || hero.shortName === input_data.toLowerCase() || hero.id == input_data);
-    //         //     session.send(JSON.stringify(hero));
-    //         // }
-    //         // session.send(`${random.pick(["嗯", "啊", "蛤", "啥", "咋", "咦", "哦"])}？`);
-    //         // ctx.broadcast(["chronocat:304996520"], "-test");
-    //         // ctx.broadcast(["chronocat:304996520"], "-test1");
-    //         // session.send();
-    //         // await ctx.puppeteer.()
-    //         console.log((await ctx.database.get("dt_7_36", [0]))[0].data);
-    //     });
+    ctx.command("test <input_data>")
+        .option("a", "a")
+        .action(async ({ session, options }, input_data) => {
+            // if (input_data) {
+            //     let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
+            //     let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
+            //         id: parseInt(key),
+            //         names_cn: d2a.HEROES_CHINESE[key],
+            //     }));
+            //     const mergedMap = new Map();
+            //     [dc_heroes, cn_heroes].forEach((array) => {
+            //         array.forEach((item) => {
+            //             const existingItem = mergedMap.get(item.id);
+            //             if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
+            //             else mergedMap.set(item.id, item);
+            //         });
+            //     });
+            //     let heroes = Array.from(mergedMap.values());
+            //     let hero = heroes.find((hero) => hero.names_cn.includes(input_data) || hero.shortName === input_data.toLowerCase() || hero.id == input_data);
+            //     session.send(JSON.stringify(hero));
+            // }
+            // session.send(`${random.pick(["嗯", "啊", "蛤", "啥", "咋", "咦", "哦"])}？`);
+            // ctx.broadcast(["chronocat:304996520"], "-test");
+            // ctx.broadcast(["chronocat:304996520"], "-test1");
+            // session.send();
+            // await ctx.puppeteer.()
+            // console.log((await ctx.database.get("dt_7_36", [0]))[0].data);
+            console.log(session)
+            ctx.broadcast(["kook:9510442027074966"],"test")
+        });
 
     ctx.on("ready", async () => {
         const tables = await ctx.database.tables;
