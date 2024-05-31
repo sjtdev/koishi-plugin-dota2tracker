@@ -506,10 +506,10 @@ export async function apply(ctx: Context, config: Config) {
         .example("7.36 小松许")
         .action(async ({ session, options }, input_data) => {
             if (!("dt_7_36" in ctx.database.tables)) await ctx.model.extend("dt_7_36", { id: "integer", data: "string" });
-            const tem = await ctx.database.get("dt_7_36",undefined,["id"])
-            if (!(tem.length) || options.refresh) {
+            const tem = await ctx.database.get("dt_7_36", undefined, ["id"]);
+            if (!tem.length || options.refresh) {
                 try {
-                    session.send((!(tem.length) ? "初次使用，" : "") + "正在获取数据……");
+                    session.send((!tem.length ? "初次使用，" : "") + "正在获取数据……");
 
                     await ctx.model.extend("dt_7_36", { id: "integer", data: "string" });
                     // await ctx.puppeteer.browser.process()
@@ -613,21 +613,7 @@ export async function apply(ctx: Context, config: Config) {
                             const bg = window.getComputedStyle(element).backgroundImage;
                             return bg && bg !== "none";
                         });
-                        const loadImage = (src) => {
-                            return new Promise((resolve) => {
-                                const img = new Image();
-                                img.onload = resolve;
-                                img.onerror = () => {
-                                    // Replace the failed image with a placeholder
-                                    const placeholderSrc = "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png";
-                                    img.src = placeholderSrc;
-                                    img.onload = resolve;
-                                    img.onerror = resolve; // Resolve even if the placeholder fails to load
-                                };
-                                img.src = src;
-                            });
-                        };
-
+                    
                         await Promise.all([
                             ...images.map((img) => {
                                 if (img.complete) return Promise.resolve();
@@ -648,10 +634,22 @@ export async function apply(ctx: Context, config: Config) {
                                 const urlMatch = bg.match(/url\(["']?([^"')]+)["']?\)/);
                                 if (urlMatch && urlMatch[1]) {
                                     const src = urlMatch[1];
-                                    return loadImage(src);
+                                    return new Promise((resolve) => {
+                                        const img = new Image();
+                                        img.onload = resolve;
+                                        img.onerror = () => {
+                                            // Replace the failed image with a placeholder
+                                            const placeholderSrc = "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png";
+                                            img.src = placeholderSrc;
+                                            img.onload = resolve;
+                                            img.onerror = resolve; // Resolve even if the placeholder fails to load
+                                        };
+                                        img.src = src;
+                                    });
                                 } else return Promise.resolve();
                             }),
                         ]);
+                    
                         await new Promise((resolve) => setTimeout(resolve, 500));
                     });
 
