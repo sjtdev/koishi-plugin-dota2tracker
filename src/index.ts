@@ -407,7 +407,7 @@ export async function apply(ctx: Context, config: Config) {
                     let AbilitiesConstantsCN;
                     let queryConstants = (await utils.query(queries.CURRENT_GAMEVERSION())).data.constants;
                     AbilitiesConstantsCN = (await ctx.database.get("dt_constants_abilities_cn", [1]))[0];
-                    if (!AbilitiesConstantsCN || (AbilitiesConstantsCN.gameVersionId < queryConstants.gameVersions[0].id)) {
+                    if (!AbilitiesConstantsCN || AbilitiesConstantsCN.gameVersionId < queryConstants.gameVersions[0].id) {
                         session.send("初次使用或版本更新，正在更新英雄技能数据中……");
 
                         AbilitiesConstantsCN = { data: (await utils.query(queries.ALL_ABILITIES_CHINESE_NAME())).data.constants };
@@ -415,7 +415,7 @@ export async function apply(ctx: Context, config: Config) {
                     }
                     // hero
                     let hero = (await utils.query(queries.HERO_INFO(fhero.id))).data.constants.hero;
-                    hero.talents.forEach((talent) => (talent.name_cn = AbilitiesConstantsCN.data.abilities.find((item) => item.id == talent.abilityId).language.displayName));
+                    hero.talents.forEach((talent) => (talent.name_cn = AbilitiesConstantsCN.data.abilities?.find((item) => item.id == talent.abilityId)?.language?.displayName));
                     await session.send(await ctx.puppeteer.render(genImageHTML(hero, config.template_hero, TemplateType.Hero)));
                 } catch (error) {
                     ctx.logger.error(error);
@@ -505,116 +505,170 @@ export async function apply(ctx: Context, config: Config) {
         .usage("可查询英雄改动并生成图片返回")
         .example("7.36 小松许")
         .action(async ({ session, options }, input_data) => {
-            if (!("dt_7_36" in ctx.database.tables) || options.refresh) {
-                session.send((!("dt_7_36" in ctx.database.tables) ? "初次使用，" : "") + "正在获取数据……");
+            if (!("dt_7_36" in ctx.database.tables)) await ctx.model.extend("dt_7_36", { id: "integer", data: "string" });
+            const tem = await ctx.database.get("dt_7_36",undefined,["id"])
+            if (!(tem.length) || options.refresh) {
+                try {
+                    session.send((!(tem.length) ? "初次使用，" : "") + "正在获取数据……");
 
-                await ctx.model.extend("dt_7_36", { id: "integer", data: "string" });
-                // await ctx.puppeteer.browser.process()
-                const page = await ctx.puppeteer.page();
-                await page.setExtraHTTPHeaders({
-                    "Accept-Language": "zh-CN,zh;q=0.9",
-                });
-
-                await page.goto("https://www.dota2.com/patches/7.36");
-                await page.waitForSelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1)");
-                await page.evaluate(() => {
-                    const scripts = document.querySelectorAll("script");
-                    scripts.forEach((script) => script.remove());
-                });
-                // 提取并处理特定的div元素
-                const result = await page.evaluate(() => {
-                    const divs = document.querySelectorAll("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div");
-                    const divArray = [];
-
-                    divs.forEach((div) => {
-                        const subDiv: any = div.querySelector("a > div");
-                        const match = subDiv?.style.backgroundImage.match(/url\("https:\/\/cdn\.cloudflare\.steamstatic\.com\/apps\/dota2\/images\/dota_react\/heroes\/([^"]+)\.png"\)/);
-
-                        divArray.push({ heroName: match[1], div: div.outerHTML });
+                    await ctx.model.extend("dt_7_36", { id: "integer", data: "string" });
+                    // await ctx.puppeteer.browser.process()
+                    const page = await ctx.puppeteer.page();
+                    await page.setExtraHTTPHeaders({
+                        "Accept-Language": "zh-CN,zh;q=0.9",
                     });
-                    document.querySelectorAll("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div:not(:first-of-type)").forEach((node) => node.remove());
-                    document.querySelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div").classList.add("placeholder");
 
-                    // 将处理后的div数组和剩余的HTML内容返回
-                    const remainingContent = document.documentElement.outerHTML;
+                    await page.goto("https://www.dota2.com/patches/7.36");
+                    await page.waitForSelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1)");
+                    await page.evaluate(() => {
+                        const scripts = document.querySelectorAll("script");
+                        scripts.forEach((script) => script.remove());
+                    });
+                    // 提取并处理特定的div元素
+                    const result = await page.evaluate(() => {
+                        try {
+                            const divs = document.querySelectorAll("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div");
+                            const divArray = [];
 
-                    return {
-                        divArray,
-                        remainingContent,
-                    };
-                });
-                const heroes = [];
-                result.divArray.forEach((hero) => {
-                    const res: any = Object.values(dotaconstants.heroes).find((Chero: any) => Chero.name.match(/^npc_dota_hero_(.+)$/)[1] == hero.heroName);
-                    heroes.push({ id: res.id, data: hero.div });
-                });
-                heroes.push({ id: 0, data: result.remainingContent });
-                await ctx.database.upsert("dt_7_36", (row) => heroes);
-                // fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/divArray.json", JSON.stringify(heroes, null, 2));
-                // fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/remainingContent.html", result.remainingContent);
-                await session.send("数据获取完成。");
-                await page.close();
-            }
-            if (input_data) {
-                const hero = findingHero(input_data);
-                if (!hero) {
-                    session.send("英雄参数输入有误，请检查后重试。");
+                            divs.forEach((div) => {
+                                const subDiv: any = div.querySelector("a > div");
+                                console.log(subDiv);
+                                const match = subDiv?.style.backgroundImage.match(/\/apps\/dota2\/images\/dota_react\/heroes\/([^"]+)\.png"\)/);
+                                console.log(match);
+
+                                divArray.push({ heroName: match[1], div: div.outerHTML });
+                            });
+                            document
+                                .querySelectorAll("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div:not(:first-of-type)")
+                                .forEach((node) => node.remove());
+                            document.querySelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div").classList.add("placeholder");
+
+                            const prepareToRemovesNodes = [
+                                document.querySelector("body > div:first-of-type"),
+                                document.querySelector("body > div:nth-of-type(2) > div:first-of-type > div:first-of-type"),
+                                document.querySelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(1)"),
+                                document.querySelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(2)"),
+                                document.querySelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(1)"),
+                                ...document.querySelectorAll("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:not(:last-of-type)"),
+                            ];
+
+                            prepareToRemovesNodes.forEach((node) => node?.remove());
+
+                            // 将处理后的div数组和剩余的HTML内容返回
+                            const remainingContent = document.documentElement.outerHTML;
+
+                            return {
+                                divArray,
+                                remainingContent,
+                            };
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    });
+                    page.close();
+                    const heroes = [];
+                    result.divArray.forEach((hero) => {
+                        const res: any = Object.values(dotaconstants.heroes).find((Chero: any) => Chero.name.match(/^npc_dota_hero_(.+)$/)[1] == hero.heroName);
+                        heroes.push({ id: res.id, data: hero.div });
+                    });
+                    heroes.push({ id: 0, data: result.remainingContent });
+                    await ctx.database.upsert("dt_7_36", (row) => heroes);
+                    await session.send("数据获取完成。");
+                } catch (error) {
+                    ctx.logger.error(error);
+                    session.send("数据获取失败。");
                     return;
                 }
-                session.send("正在查询，请耐心等待……");
-                const page = await ctx.puppeteer.page();
+            }
+            if (input_data) {
+                try {
+                    const hero = findingHero(input_data);
+                    if (!hero) {
+                        session.send("英雄参数输入有误，请检查后重试。");
+                        return;
+                    }
+                    session.send("正在查询，请耐心等待……");
+                    const page = await ctx.puppeteer.page();
+                    // 禁用网络拦截器
+                    await page.setRequestInterception(false);
 
-                // await page.goto("https://www.dota2.com/patches/7.36");
-                await page.setContent((await ctx.database.get("dt_7_36", [0]))[0].data);
-                await page.waitForSelector("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1)");
+                    // await page.goto("https://www.dota2.com/patches/7.36");
+                    const [wrapperHTML, newHeroHTML] = (await ctx.database.get("dt_7_36", [0, hero.id])).map((data) => data.data);
+                    await page.setContent(wrapperHTML);
+                    await page.waitForSelector("div.placeholder");
 
-                const placeholder = await page.$("div.placeholder");
-                await page.waitForSelector("div.placeholder");
-                const newHeroHTML = (await ctx.database.get("dt_7_36", [hero.id]))[0].data;
-                await page.evaluate(
-                    (element, html) => {
-                        element.outerHTML = html;
-                    },
-                    placeholder,
-                    newHeroHTML
-                );
-                // Wait for all images to load
-                await page.evaluate(async () => {
-                    const images = Array.from(document.querySelectorAll("img"));
-                    await Promise.all(
-                        images.map((img) => {
-                            if (img.complete) {
-                                // If the image is already complete, resolve immediately
-                                return Promise.resolve();
-                            } else {
-                                // Otherwise, wait for the 'load' or 'error' event
-                                return new Promise((resolve, reject) => {
-                                    img.onload = resolve;
-                                    img.onerror = () => {
-                                        // Replace the failed image with a placeholder
-                                        const placeholderSrc = "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png"; // Change this to your placeholder URL
-                                        img.src = placeholderSrc;
-
-                                        // Wait for the placeholder image to load
-                                        img.onload = resolve;
-                                        img.onerror = resolve; // Resolve even if the placeholder fails to load
-                                    };
-                                });
-                            }
-                        })
+                    const placeholder = await page.$("div.placeholder");
+                    await page.waitForSelector("div.placeholder");
+                    await page.evaluate(
+                        (element, html) => {
+                            element.outerHTML = html;
+                        },
+                        placeholder,
+                        newHeroHTML
                     );
-                });
+                    // Wait for all images to load
+                    await page.evaluate(async () => {
+                        const images = Array.from(document.querySelectorAll("img"));
+                        const backgroundImages = Array.from(document.querySelectorAll("*")).filter((element) => {
+                            const bg = window.getComputedStyle(element).backgroundImage;
+                            return bg && bg !== "none";
+                        });
+                        const loadImage = (src) => {
+                            return new Promise((resolve) => {
+                                const img = new Image();
+                                img.onload = resolve;
+                                img.onerror = () => {
+                                    // Replace the failed image with a placeholder
+                                    const placeholderSrc = "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png";
+                                    img.src = placeholderSrc;
+                                    img.onload = resolve;
+                                    img.onerror = resolve; // Resolve even if the placeholder fails to load
+                                };
+                                img.src = src;
+                            });
+                        };
 
-                const testE = await page.$("body > div:nth-of-type(2) > div:first-of-type > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div");
-                const res = await testE.screenshot();
-                // // 将Buffer对象转换为base64编码的字符串
-                const base64String = Buffer.from(res).toString("base64");
-                // // 创建一个包含base64编码字符串的img标签
-                const imgTag = `<img src="data:image/png;base64,${base64String}" alt="Image" />`;
-                if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.png", res);
-                if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", await page.content());
-                session.send(imgTag);
-                page.close();
+                        await Promise.all([
+                            ...images.map((img) => {
+                                if (img.complete) return Promise.resolve();
+                                else {
+                                    return new Promise((resolve) => {
+                                        img.onload = resolve;
+                                        img.onerror = () => {
+                                            const placeholderSrc = "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png";
+                                            img.src = placeholderSrc;
+                                            img.onload = resolve;
+                                            img.onerror = resolve;
+                                        };
+                                    });
+                                }
+                            }),
+                            ...backgroundImages.map((element) => {
+                                const bg = window.getComputedStyle(element).backgroundImage;
+                                const urlMatch = bg.match(/url\(["']?([^"')]+)["']?\)/);
+                                if (urlMatch && urlMatch[1]) {
+                                    const src = urlMatch[1];
+                                    return loadImage(src);
+                                } else return Promise.resolve();
+                            }),
+                        ]);
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    });
+
+                    const testE = await page.$("body > div > div > div > div > div > div > div");
+                    const res = await testE.screenshot();
+                    // // 将Buffer对象转换为base64编码的字符串
+                    const base64String = Buffer.from(res).toString("base64");
+                    // // 创建一个包含base64编码字符串的img标签
+                    const imgTag = `<img src="data:image/png;base64,${base64String}" alt="Image" />`;
+                    if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.png", res);
+                    if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", await page.content());
+                    session.send(imgTag);
+                    page.close();
+                } catch (error) {
+                    ctx.logger.error(error);
+                    session.send("查询改动失败。");
+                }
             } else session.send("https://www.dota2.com/patches/7.36");
         });
 
@@ -645,8 +699,8 @@ export async function apply(ctx: Context, config: Config) {
             // session.send();
             // await ctx.puppeteer.()
             // console.log((await ctx.database.get("dt_7_36", [0]))[0].data);
-            console.log(session)
-            ctx.broadcast(["kook:9510442027074966"],"test")
+            console.log(session);
+            ctx.broadcast(["kook:9510442027074966"], "test");
         });
 
     ctx.on("ready", async () => {
