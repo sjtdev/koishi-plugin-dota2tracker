@@ -182,7 +182,7 @@ export function getFormattedMatchData(match) {
         }
 
         // 对player.stats.matchPlayerBuffEvent（buff列表）进行处理，取stackCount（叠加层数）最高的对象并去重
-        if (match.parsedDateTime) {
+        if (player.stats.matchPlayerBuffEvent) {
             // 使用reduce方法处理数组，以abilityId或itemId作为键，并保留stackCount最大的对象
             const maxStackCountsByAbilityOrItem = player.stats.matchPlayerBuffEvent.reduce((acc, event) => {
                 // 创建一个唯一键，能力ID或物品ID，取决于哪一个不为null
