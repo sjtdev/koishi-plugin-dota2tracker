@@ -12,8 +12,7 @@ declare module "koishi" {
         dt_subscribed_players: dt_subscribed_players;
         dt_sended_match_id: dt_sended_match_id;
         dt_previous_query_results: dt_previous_query_results;
-        dt_constants_abilities_cn: dt_constants_abilities_cn;
-        dt_7_36: dt_7_36;
+        dt_hero_data_cache: dt_hero_data_cache;
     }
 }
 export interface dt_subscribed_players {
@@ -42,16 +41,10 @@ export interface dt_previous_query_results {
     queryTime: Date;
 }
 
-export interface dt_constants_abilities_cn {
+export interface dt_hero_data_cache {
     id: number;
-    data: object;
     gameVersionId: number;
-    gameVersionName: string;
-}
-
-export interface dt_7_36 {
-    id: number;
-    data: string;
+    hero: object;
 }
 
 export const CONFIGS = { STRATZ_API: { URL: "https://api.stratz.com/graphql", TOKEN: "" } };
@@ -69,6 +62,17 @@ export async function query(query_str) {
     });
 }
 
+export async function queryHeroFromValve(heroId: number) {
+    // return (await http.get("http://localhost:8099")).result.data.heroes[0];
+    return (await http.get(`https://www.dota2.com/datafeed/herodata?language=schinese&hero_id=${heroId}`)).result.data.heroes[0];
+}
+
+export enum HeroDescType {
+    Normal = "normal",
+    Facet = "facet",
+    Scepter = "scepter",
+    Shard = "shard",
+}
 export enum ImageType {
     Icons = "icons",
     IconsFacets = "icons/facets",
@@ -78,7 +82,11 @@ export enum ImageType {
     Abilities = "abilities",
     Local = "local",
 }
-export function getImageUrl(image: string, type: ImageType = ImageType.Local) {
+export enum ImageFormat {
+    png = "png",
+    svg = "svg",
+}
+export function getImageUrl(image: string, type: ImageType = ImageType.Local, format: ImageFormat = ImageFormat.png) {
     if (type === ImageType.Local) {
         try {
             const imageData = fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/template/images/${image}.png`);
@@ -88,7 +96,7 @@ export function getImageUrl(image: string, type: ImageType = ImageType.Local) {
             console.error(error);
             return "";
         }
-    } else return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/${type}/${image}.png`;
+    } else return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/${type}/${image}.${format}`;
 }
 
 // 对比赛数据进行补充以供生成模板函数使用
@@ -473,4 +481,32 @@ export async function playerisValid(steamAccountId): Promise<{ isValid: boolean;
 export function roundToDecimalPlaces(number, decimalPlaces) {
     const factor = Math.pow(10, decimalPlaces);
     return Math.round(number * factor) / factor;
+}
+
+export function formatHeroDesc(template: string, special_values, type: HeroDescType = HeroDescType.Normal): string {
+    return template.replace(/%%|%([^%]+)%/g, (match, p1) => {
+        if (match === "%%") {
+            return "%";
+        } else {
+            const specialValue = special_values.find((sv) => {
+                const match2 = /bonus_(.*)/.exec(p1);
+                return sv.name === p1 || sv.name === match2?.[1];
+            });
+            if (specialValue) {
+                let valuesToUse = "";
+                if (type == HeroDescType.Facet) {
+                    valuesToUse = specialValue.facet_bonus.name ? specialValue.facet_bonus.values.join(" / ") : specialValue.values_float.join(" / ");
+                } else if (type == HeroDescType.Scepter) {
+                    valuesToUse = specialValue.values_scepter.length ? specialValue.values_scepter.join(" / ") : specialValue.values_float.join(" / ");
+                } else if (type == HeroDescType.Shard) {
+                    valuesToUse = specialValue.values_shard.length ? specialValue.values_shard.join(" / ") : specialValue.values_float.join(" / ");
+                } else {
+                    valuesToUse = specialValue.values_float.join(" / ");
+                }
+                return `<span class="value">${valuesToUse}</span>`;
+            } else {
+                return match; // 如果未找到对应的特殊值，则保持原样
+            }
+        }
+    });
 }

@@ -84,8 +84,8 @@
         "7": "超凡入圣",
         "8": "冠绝一世"
     },
-    "roles": { "CARRY": "核心", "ESCAPE": "逃生", "NUKER": "爆发", "INITIATOR": "先手", "DURABLE": "耐久", "DISABLER": "控制", "JUNGLER": "打野", "SUPPORT": "辅助", "PUSHER": "推进" },
-    "primary_attrs": { "all": "hero_universal", "str": "hero_strength", "agi": "hero_agility", "int": "hero_intelligence" },
+    "roles": ["核心", "辅助", "爆发", "控制", "打野", "耐久", "逃生", "推进", "先手"],
+    "primary_attrs": { "3": "hero_universal", "0": "hero_strength", "1": "hero_agility", "2": "hero_intelligence" },
     "behavior": {
         "Unit Target": "单位目标",
         "Channeled": "持续施法",

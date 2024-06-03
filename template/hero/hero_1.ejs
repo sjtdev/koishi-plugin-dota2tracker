@@ -131,21 +131,42 @@
                 line-height: 1.25;
             }
 
+            .details .hype .npe {
+                color: #a5e0f3;
+                font-weight: bold;
+                line-height: 2;
+            }
+
             .talents {
-                display: flex; /* 启用Flex布局 */
-                flex-wrap: wrap; /* 允许元素换行 */
-                justify-content: center; /* 水平居中整体内容 */
+                display: grid;
+                grid-template-rows: repeat(4, 35px);
+                gap: 10px;
                 border: #444 10px solid;
-                /* background-color: ; */
-                /* padding: 10px; */
                 box-sizing: border-box;
+                position: relative; /* 添加相对定位 */
+            }
+
+            .talents::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: #444;
+                pointer-events: none; /* 使伪元素不可点击 */
+                box-sizing: border-box;
+                width: 395px;
+                transform: translate(-10px, -10px); /* 调整伪元素的位置 */
             }
 
             .talents .talent {
                 width: 375px;
-                line-height: 35px;
                 text-align: center;
                 display: flex;
+                align-items: center;
+                background: #000; /* 设置背景颜色以覆盖伪元素的背景 */
+                position: relative; /* 添加相对定位 */
             }
 
             .talents .talent .left,
@@ -154,13 +175,9 @@
                 font-size: 12px;
             }
 
-            .talents .talent:not(:last-child) {
-                border-bottom: 10px solid #444;
-            }
-
             .talents .talent .level {
-                flex: 0 0 auto; /* 第二个元素不伸缩，保持自身宽度 */
-                width: 35px; /* 给中间元素一个固定宽度 */
+                flex: 0 0 auto;
+                width: 35px;
                 height: 35px;
                 font-size: 18px;
                 line-height: 35px;
@@ -170,8 +187,6 @@
                 color: #e7d292;
                 text-shadow: 0px 0px 8px #ff531c;
                 background-color: #444;
-                /* font-family: Reaver, serif;
-                font-weight: bold; */
             }
 
             .details .list {
@@ -184,6 +199,128 @@
 
             .details .list tr:nth-child(even) {
                 background-color: #333;
+            }
+
+            .facets {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px; /* 可选：设置项目之间的间距 */
+            }
+
+            .facet {
+                flex: 1 1 calc(50% - 10px); /* 每行两个项目 */
+                box-sizing: border-box; /* 包含padding和border在宽度和高度的计算中 */
+                background-color: #181f24;
+                position: relative;
+                border: 1px solid #2b2f33;
+            }
+
+            .facet:nth-child(odd):last-child {
+                flex-basis: 100%; /* 最后一个奇数项目占据整行 */
+            }
+            .facet > .name_back {
+                position: absolute;
+                height: 50px;
+                width: 100%;
+            }
+            .facet > .name_back.type_0 {
+                background: linear-gradient(to right, #9f3c3c, #4a2026);
+            }
+            .facet > .name_line.type_0 {
+                filter: invert(22%) sepia(100%) saturate(100%) hue-rotate(316deg) brightness(98%) contrast(100%);
+            }
+            .facet > .name_back.type_1 {
+                background: linear-gradient(to right, #c8a45c, #6f3d21);
+            }
+            .facet > .name_line.type_1 {
+                filter: invert(54%) sepia(99%) saturate(100%) hue-rotate(0deg) brightness(97%) contrast(100%);
+            }
+            .facet > .name_back.type_2 {
+                background: linear-gradient(to right, #a2b23e, #2d5a18);
+            }
+            .facet > .name_line.type_2 {
+                filter: invert(57%) sepia(100%) saturate(100%) hue-rotate(32deg) brightness(93%) contrast(100%);
+            }
+            .facet > .name_back.type_3 {
+                background: linear-gradient(to right, #547ea6, #2a385e);
+            }
+            .facet > .name_line.type_3 {
+                filter: invert(39%) sepia(100%) saturate(99%) hue-rotate(167deg) brightness(99%) contrast(100%);
+            }
+            .facet > .name_back.type_4 {
+                background: linear-gradient(to right, #675cae, #261c44);
+            }
+            .facet > .name_line.type_4 {
+                filter: invert(33%) sepia(100%) saturate(100%) hue-rotate(207deg) brightness(99%) contrast(100%);
+            }
+            .facet > .name_back.type_5 {
+                background: linear-gradient(to right, #adb6be, #4e5557);
+            }
+            .facet > .name_line.type_5 {
+                filter: invert(73%) sepia(23%) saturate(99%) hue-rotate(166deg) brightness(93%) contrast(94%);
+            }
+            .facet > .name_line {
+                position: absolute;
+                background-size: cover;
+                height: 50px;
+                width: 100%;
+                background-image: url("https://cdn.akamai.steamstatic.com/apps/dota2/images/dota_react/icons/facets/ripple_texture.png");
+            }
+            .facet > .name {
+                height: 50px;
+                line-height: 50px;
+                z-index: 1;
+                position: relative;
+                display: flex;
+            }
+            .facet > .name > img {
+                width: 24px;
+                padding: 13px;
+                background-color: #0003;
+            }
+            .facet > .name > span {
+                margin-left: 16px;
+                letter-spacing: 2px;
+                text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3), 4px 4px 6px rgba(0, 0, 0, 0.2), 6px 6px 9px rgba(0, 0, 0, 0.1);
+            }
+            .facet > .content {
+                padding: 12px;
+
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .facet > .content > .ability {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .facet > .content > .ability > .name {
+                background: linear-gradient(to right, #9bcdff17 0%, #9bcdff09 30%, #d0e8ff00 100%);
+                line-height: 1;
+            }
+            .facet > .content > .ability > .name > img {
+                width: 30px;
+            }
+            .facet > .content > .ability > .name > span {
+                margin-left: 10px;
+                font-size: 14px;
+                /* font-weight: bold; */
+            }
+            .facet > .content .description {
+                color: #9ab0cd;
+            }
+            .facet > .content > .ability > .attributes {
+                font-size: 12px;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            .facet > .content > .ability > .attributes .item {
+                color: #737373;
+            }
+            .facet > .content .value {
+                color: #fff;
             }
 
             .skills {
@@ -209,7 +346,18 @@
                 background-color: #1f272b;
                 padding: 8px;
                 font-weight: 100;
+            }
+            .skill > .title > .name {
                 font-family: "KaiTi", "楷体", "楷体_GB2312", "STKaiti", serif;
+            }
+            .skill > .title > .is_innate {
+                font-size: 14px;
+                line-height: 18px;
+                width: auto;
+                display: inline;
+                padding: 2px 8px;
+                box-sizing: content-box;
+                background-color: #5b93d1;
             }
 
             .skill img.scepter,
@@ -272,6 +420,14 @@
                 margin-bottom: 32px;
             }
 
+            .skill .facet {
+                padding-left: 0;
+            }
+
+            .skill .value{
+                color: #fff;
+            }
+
             .skill .aghanim_description {
                 padding-left: 0;
                 color: #9bb1ce;
@@ -293,7 +449,7 @@
                 display: block;
             }
 
-            .skill .aghanim_description img{
+            .skill .aghanim_description img {
                 position: unset;
                 transform: none;
             }
@@ -315,6 +471,10 @@
 
             .skill .attributes .values {
                 color: #4b525d;
+            }
+
+            .skill .attributes .values > img {
+                width: 16px;
             }
 
             .skill .attributes {
@@ -365,45 +525,46 @@
         <div class="wrapper">
             <%- `
             <div class="hero" id="${hero.id}">
-                <img src="${utils.getImageUrl(hero.shortName, ImageType.Heroes)}" alt="" />
-                <img class="pri_attr" src="${utils.getImageUrl(d2a.primary_attrs[dotaconstants.heroes[hero.id].primary_attr], ImageType.Icons)}" alt="" />
+                <img src="${utils.getImageUrl(hero.shortName, ImageType.Heroes)}"/>
+                <img class="pri_attr" src="${utils.getImageUrl(d2a.primary_attrs[hero.primary_attr], ImageType.Icons)}"/>
                 <div class="info">
-                    <p class="name">${hero.language.displayName}</p>
+                    <p class="name">${hero.name_loc}</p>
                     <p class="roles">
-                        ${hero.roles.map((item) => `<span class="role level${item.level}">${d2a.roles[item.roleId]}</span>`).join("")}
+                        ${hero.role_levels.map((item, index) => item>0?`<span class="role level${item}">${d2a.roles[index]}</span>`:"").join("")}
                     </p>
                     <p class="attrs">
-                        <span class="str">${dotaconstants.heroes[hero.id].base_str} <span class="gain">+${dotaconstants.heroes[hero.id].str_gain.toFixed(1)}</span></span>
-                        <span class="agi">${dotaconstants.heroes[hero.id].base_agi} <span class="gain">+${dotaconstants.heroes[hero.id].agi_gain.toFixed(1)}</span></span>
-                        <span class="int">${dotaconstants.heroes[hero.id].base_int} <span class="gain">+${dotaconstants.heroes[hero.id].int_gain.toFixed(1)}</span></span>
+                        <span class="str">${hero.str_base} <span class="gain">+${hero.str_gain.toFixed(1)}</span></span>
+                        <span class="agi">${hero.agi_base} <span class="gain">+${hero.agi_gain.toFixed(1)}</span></span>
+                        <span class="int">${hero.int_base} <span class="gain">+${hero.int_gain.toFixed(1)}</span></span>
                     </p>
                 </div>
             </div>
             <div class="details">
                 <div class="hype_talents">
                     <div class="hype">
-                        ${hero.language.hype}
+                        <p class="npe">${hero.npe_desc_loc}</p>
+                        ${hero.hype_loc}
                     </div>
                     <div class="talents">
                         <div class="talent">
-                            <div class="left">${hero.talents[7].name_cn}</div>
+                            <div class="left">${hero.talents[7].name_loc}</div>
                             <div class="level">25</div>
-                            <div class="right">${hero.talents[6].name_cn}</div>
+                            <div class="right">${hero.talents[6].name_loc}</div>
                         </div>
                         <div class="talent">
-                            <div class="left">${hero.talents[5].name_cn}</div>
+                            <div class="left">${hero.talents[5].name_loc}</div>
                             <div class="level">20</div>
-                            <div class="right">${hero.talents[4].name_cn}</div>
+                            <div class="right">${hero.talents[4].name_loc}</div>
                         </div>
                         <div class="talent">
-                            <div class="left">${hero.talents[3].name_cn}</div>
+                            <div class="left">${hero.talents[3].name_loc}</div>
                             <div class="level">15</div>
-                            <div class="right">${hero.talents[2].name_cn}</div>
+                            <div class="right">${hero.talents[2].name_loc}</div>
                         </div>
                         <div class="talent">
-                            <div class="left">${hero.talents[1].name_cn}</div>
+                            <div class="left">${hero.talents[1].name_loc}</div>
                             <div class="level">10</div>
-                            <div class="right">${hero.talents[0].name_cn}</div>
+                            <div class="right">${hero.talents[0].name_loc}</div>
                         </div>
                     </div>
                 </div>
@@ -411,36 +572,27 @@
                     <tbody>
                         <tr>
                             <td>初始生命值</td>
-                            <td>${dotaconstants.heroes[hero.id].base_health + dotaconstants.heroes[hero.id].base_str * 22}</td>
+                            <td>${hero.max_health}</td>
                         </tr>
                         <tr>
                             <td>初始生命回复</td>
-                            <td>${dotaconstants.heroes[hero.id].base_health_regen}</td>
+                            <td>${hero.health_regen.toFixed(2)}</td>
                         </tr>
                         <tr>
                             <td>初始魔法值</td>
-                            <td>${dotaconstants.heroes[hero.id].base_mana + dotaconstants.heroes[hero.id].base_int * 12}</td>
+                            <td>${hero.max_mana}</td>
                         </tr>
                         <tr>
                             <td>初始魔法回复</td>
-                            <td>${dotaconstants.heroes[hero.id].base_mana_regen}</td>
+                            <td>${hero.mana_regen.toFixed(2)}</td>
                         </tr>
                         <tr>
                             <td>初始攻击力</td>
-                            <td>${dotaconstants.heroes[hero.id].base_mr + Math.round(dotaconstants.heroes[hero.id].primary_attr == "all" ? 
-                                (dotaconstants.heroes[hero.id].base_str + dotaconstants.heroes[hero.id].base_agi + dotaconstants.heroes[hero.id].base_int) * 0.7
-                                : dotaconstants.heroes[hero.id]["base_" + dotaconstants.heroes[hero.id].primary_attr])}
-                                （${dotaconstants.heroes[hero.id].base_attack_min + Math.round(dotaconstants.heroes[hero.id].primary_attr == "all" ?
-                                (dotaconstants.heroes[hero.id].base_str + dotaconstants.heroes[hero.id].base_agi + dotaconstants.heroes[hero.id].base_int) * 0.7
-                                : dotaconstants.heroes[hero.id]["base_" + dotaconstants.heroes[hero.id].primary_attr])}
-                                ~${dotaconstants.heroes[hero.id].base_attack_max + Math.round(dotaconstants.heroes[hero.id].primary_attr == "all" ?
-                                (dotaconstants.heroes[hero.id].base_str + dotaconstants.heroes[hero.id].base_agi + dotaconstants.heroes[hero.id].base_int) * 0.7
-                                : dotaconstants.heroes[hero.id]["base_" + dotaconstants.heroes[hero.id].primary_attr])}）
-                            </td>
+                            <td>${hero.damage_min}~${hero.damage_max}</td>
                         </tr>
                         <tr>
                             <td>基础攻击间隔</td>
-                            <td>${dotaconstants.heroes[hero.id].attack_rate.toFixed(1)}</td>
+                            <td>${hero.attack_capability.toFixed(1)}</td>
                         </tr>
                         <tr>
                             <td>基础攻击前摇</td>
@@ -448,96 +600,163 @@
                         </tr>
                         <tr>
                             <td>攻击范围</td>
-                            <td>${dotaconstants.heroes[hero.id].attack_range}</td>
+                            <td>${hero.attack_range}</td>
                         </tr>
                         <tr>
                             <td>护甲</td>
-                            <td>${(Math.round((dotaconstants.heroes[hero.id].base_armor + dotaconstants.heroes[hero.id].base_agi * 0.167) * 10) / 10).toFixed(1)}</td>
+                            <td>${hero.armor.toFixed(1)}</td>
                         </tr>
                         <tr>
                             <td>移动速度</td>
-                            <td>${dotaconstants.heroes[hero.id].move_speed}</td>
+                            <td>${hero.movement_speed}</td>
                         </tr>
                         <tr>
                             <td>视野范围</td>
-                            <td>${dotaconstants.heroes[hero.id].day_vision}（${dotaconstants.heroes[hero.id].night_vision}）</td>
+                            <td>${hero.sight_range_day}（${hero.sight_range_night}）</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="skills">
-                ${hero.abilities.filter((item) => dotaconstants.abilities[item.ability.name].behavior != "Hidden")
-                .map((item) => `
-                <div class="skill">
-                    <p class="title">
-                        <span>${item.ability.language.displayName}</span>
-                        ${item.ability.stat.isGrantedByScepter ?`<img src="${utils.getImageUrl("scepter")}" alt="" class="scepter"></p>`:""}
-                        ${item.ability.stat.isGrantedByShard ?`<img src="${utils.getImageUrl("shard")}" alt="" class="shard"></p>`:""}
+            <div class="facets">
+                ${hero.facets.map(facet=>`
+                <div class="facet">
+                    <div class="name_back type_${facet.color}"></div>
+                    <div class="name_line type_${facet.color}"></div>
+                    <p class="name">
+                        <img src="${utils.getImageUrl(facet.icon, ImageType.IconsFacets)}"/>
+                        <span>${facet.title_loc}</span>
                     </p>
-                <div class="img_stats">
-                    <img src="${utils.getImageUrl(item.ability.name, ImageType.Abilities)}" alt="" />
-                    <div class="stats">
-                        <p class="behavior">技能：${(Array.isArray(dotaconstants.abilities[item.ability.name].behavior) ? dotaconstants.abilities[item.ability.name].behavior : [dotaconstants.abilities[item.ability.name].behavior])
-                            .filter((beh) => beh !== "Hidden" || !(item.ability.stat.isGrantedByShard || item.ability.stat.isGrantedByScepter))
-                            .map((beh) => d2a.behavior[beh])
-                            .join("/")}</p>
-                        ${dotaconstants.abilities[item.ability.name].target_team
-                                ? `<p class="target_team">影响：${(Array.isArray(dotaconstants.abilities[item.ability.name].target_team)
-                                ? dotaconstants.abilities[item.ability.name].target_team
-                                : [dotaconstants.abilities[item.ability.name].target_team])
-                                .map((tt) => d2a.target_team[tt])
-                                .join("/")}</p>`
-                                : ""}
-                        ${!Array.isArray(dotaconstants.abilities[item.ability.name].dmg_type) && dotaconstants.abilities[item.ability.name].dmg_type
-                                ? `<p class="dmg_type ${dotaconstants.abilities[item.ability.name].dmg_type}">伤害类型：</p>`
-                                : ""}
-                        ${dotaconstants.abilities[item.ability.name].dispellable
-                                ? `<p class="dispellable ${dotaconstants.abilities[item.ability.name].dispellable == "Strong Dispels Only" ? "Strong" : dotaconstants.abilities[item.ability.name].dispellable}">能否驱散：</p>`
-                                : ""}
-                        ${!Array.isArray(dotaconstants.abilities[item.ability.name].bkbpierce) && dotaconstants.abilities[item.ability.name].bkbpierce
-                                ? `<p class="bkbpierce">无视减益免疫： ${dotaconstants.abilities[item.ability.name].bkbpierce == "Yes" ? "是" : "否"}</p>`
-                                : ""}
+                    <div class="content">
+                        ${facet.description_loc ?`<p class="description">${facet.description_loc}</p>`:""}
+                        ${facet.abilities?facet.abilities.map(ability=>
+                        `<div class="ability">
+                            <div class="name">
+                                <img src="${utils.getImageUrl(ability.name, ImageType.Abilities)}" onerror="this.onerror=null; this.src='${utils.getImageUrl(`innate_icon`,ImageType.Icons)}';"/>
+                                <span>${ability.name_loc}</span>
+                            </div>
+                            ${ability.description_ability_loc?`<div class="description">${ability.description_ability_loc}</div>`:""}
+                            ${ability.attributes&&ability.attributes?.length ? ability.attributes.map(attr=>
+                            `<div class="attributes">
+                                <p><span class="item">${attr.heading_loc}</span><span class="values">${attr.values.join(" / ")}</span></p>
+                            </div>`).join(""):""}
+                        </div>`).join("")
+                        :""}
                     </div>
                 </div>
-                ${item.ability.language.description.map((desc) => `<p class="description">${desc}</p>`).join("")}
-                ${item.ability.language.aghanimDescription
-                ? `<p class="aghanim_description">
-                    <span class="title"><img src="${utils.getImageUrl("scepter")}" alt="" class="scepter">阿哈利姆神杖</span>
-                    <span class="desc">${item.ability.language.aghanimDescription}</span>
-                </p>` : ""}
-                ${item.ability.language.shardDescription
-                ? `<p class="aghanim_description">
-                    <span class="title"><img src="${utils.getImageUrl("shard")}" alt="" class="shard">阿哈利姆魔晶</span>
-                    <span class="desc">${item.ability.language.shardDescription}</span>
-                </p>` : ""}
-                <div class="notes"${!item.ability.language.notes.length ? ` style="display:none;"` : ""}>
-                    ${item.ability.language.notes.map((note) => `<p>${note}</p>`).join("")}
-                </div>
-                <div class="attributes">
-                ${item.ability.language.attributes
-                    .map((attr) => {
-                        const parts = attr.split("：");
-                        return `<p><span class="item">${parts[0]}</span><span class="values">${parts[1]}</span></p>`;
-                    })
-                    .join("")}
-                </div>
-                <p>
-                    ${dotaconstants.abilities[item.ability.name].cd ?
-                    `<span class="cooldown"> ${(Array.isArray(dotaconstants.abilities[item.ability.name].cd)
-                        ? dotaconstants.abilities[item.ability.name].cd
-                        : [dotaconstants.abilities[item.ability.name].cd]).join(" / ")}
-                    </span>` : ""}
-                    ${dotaconstants.abilities[item.ability.name].mc ?
-                    `<span class="mana_cost"> ${(Array.isArray(dotaconstants.abilities[item.ability.name].mc)
-                        ? dotaconstants.abilities[item.ability.name].mc
-                        : [dotaconstants.abilities[item.ability.name].mc]).join(" / ")}
-                    </span>` : ""}
-                </p>
-                <p class="lore"${!item.ability.language.lore ? ` style="display:none;"` : ""}>${item.ability.language.lore}</p>
-            </div>`).join("")}
+                `).join("")}
+            </div>
+            <div class="skills">
+                ${hero.abilities//.filter((item) => dotaconstants.abilities[item.name].behavior != "Hidden")
+                .map((item) => `
+                <div class="skill" data-ability="${item.ability_is_innate}">
+                    <p class="title">
+                        <span class="name">${item.name_loc}</span>
+                        ${item.ability_is_innate?`<span class="is_innate">先天技能</span>`:""}
+                        ${item.ability_is_granted_by_scepter ?`<img src="${utils.getImageUrl("scepter")}" class="scepter">`:""}
+                        ${item.ability_is_granted_by_shard ?`<img src="${utils.getImageUrl("shard")}" class="shard">`:""}
+                    </p>
+                    <div class="img_stats">
+                        <img src="${utils.getImageUrl(item.name, ImageType.Abilities)}" onerror="this.onerror=null; this.src='${utils.getImageUrl(`innate_icon`,ImageType.Icons)}';"/>
+                        <div class="stats">
+                            <p class="behavior">技能：${(Array.isArray(dotaconstants.abilities[item.name].behavior) ? dotaconstants.abilities[item.name].behavior : [dotaconstants.abilities[item.name].behavior])
+                                .filter((beh) => beh !== "Hidden" || !(item.ability_is_granted_by_shard || item.ability_is_granted_by_scepter))
+                                .map((beh) => d2a.behavior[beh])
+                                .join("/")}</p>
+                            ${dotaconstants.abilities[item.name].target_team
+                                    ? `<p class="target_team">影响：${(Array.isArray(dotaconstants.abilities[item.name].target_team)
+                                    ? dotaconstants.abilities[item.name].target_team
+                                    : [dotaconstants.abilities[item.name].target_team])
+                                    .map((tt) => d2a.target_team[tt])
+                                    .join("/")}</p>`
+                                    : ""}
+                            ${!Array.isArray(dotaconstants.abilities[item.name].dmg_type) && dotaconstants.abilities[item.name].dmg_type
+                                    ? `<p class="dmg_type ${dotaconstants.abilities[item.name].dmg_type}">伤害类型：</p>`
+                                    : ""}
+                            ${dotaconstants.abilities[item.name].dispellable
+                                    ? `<p class="dispellable ${dotaconstants.abilities[item.name].dispellable == "Strong Dispels Only" ? "Strong" : dotaconstants.abilities[item.name].dispellable}">能否驱散：</p>`
+                                    : ""}
+                            ${!Array.isArray(dotaconstants.abilities[item.name].bkbpierce) && dotaconstants.abilities[item.name].bkbpierce
+                                    ? `<p class="bkbpierce">无视减益免疫： ${dotaconstants.abilities[item.name].bkbpierce == "Yes" ? "是" : "否"}</p>`
+                                    : ""}
+                        </div>
+                    </div>
+                    <p class="description">${item.desc_loc}</p>
+                    ${item.facets_loc.map((facet_loc,index)=>(facet_loc!=""?`
+                    <div class="facet">
+                        <div class="name_back type_${hero.facets[index].color}"></div>
+                        <div class="name_line type_${hero.facets[index].color}"></div>
+                        <p class="name">
+                            <img src="${utils.getImageUrl(hero.facets[index].icon, ImageType.IconsFacets)}" />
+                            <span>${hero.facets[index].title_loc}</span>
+                        </p>
+                        <div class="content">
+                            <div class="ability">
+                                <div class="description">${hero.facets[index].abilities.find(ab=>ab.id==item.id)?.description_ability_loc}</div>
+                            </div>
+                        </div>
+                    </div>
+                    `:"")).join("")}
+                    ${item.ability_has_scepter&&!item.ability_is_granted_by_scepter
+                    ? `<p class="aghanim_description">
+                        <span class="title"><img src="${utils.getImageUrl("scepter")}"class="scepter">阿哈利姆神杖</span>
+                        <span class="desc">${item.scepter_loc}</span>
+                    </p>` : ""}
+                    ${item.ability_has_shard&&!item.ability_is_granted_by_shard
+                    ? `<p class="aghanim_description">
+                        <span class="title"><img src="${utils.getImageUrl("shard")}"class="shard">阿哈利姆魔晶</span>
+                        <span class="desc">${item.shard_loc}</span>
+                    </p>` : ""}
+                    <div class="notes"${!item.notes_loc.length ? ` style="display:none;"` : ""}>
+                        ${item.notes_loc.map((note) => `<p>${note}</p>`).join("")}
+                    </div>
+                    <div class="attributes">
+                    ${item.special_values
+                        .filter(sv => sv.heading_loc)
+                        .map((sv) => `<p><span class="item">${sv.heading_loc}</span><span class="values">${sv.values_float.map(value=>value+(sv.is_percentage?"%":"")).join(" / ")}${sv.bonuses.map(bonus=>` (<img src="${utils.getImageUrl("talents","icons","svg")}"/>${(bonus.value>0?"+":"")+bonus.value+(sv.is_percentage?"%":"")})`).join(" ")}</span></p>`)
+                        .join("")}
+                    </div>
+                    <p>
+                        ${item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float.length && !(item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float.length === 1 && item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float[0] === 0) ?
+                        `<span class="cooldown"> ${item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float.join(" / ")}
+                        </span>` : ""}
+                        ${item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float.length && !(item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float.length === 1 && item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float[0] === 0) ?
+                        `<span class="mana_cost"> ${item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float.join(" / ")}
+                        </span>` : ""}
+                    </p>
+                    <p class="lore"${!item.lore_loc ? ` style="display:none;"` : ""}>${item.lore_loc}</p>
+                </div>`).join("")}
+            </div>
+            <div class="lore">
+                ${hero.bio_loc}
+            </div>` %>
         </div>
-        <div class="lore">
-            ${hero.language.lore}
-        </div>` %>
     </body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const items = document.querySelectorAll('.skills > .skill');
+            items.forEach(item => {
+                // const name = item.getAttribute('data-name');
+                const abilityIsInnate = item.getAttribute('data-ability') === 'true';
+                const img = item.querySelector('.img_stats > img');
+                const imageUrl = img.src;
+
+                // Check if image exists
+                const image = new Image();
+                image.src = imageUrl;
+                image.onload = function() {
+                    // Image exists, do nothing
+                };
+                image.onerror = function() {
+                    // Image doesn't exist
+                    if (abilityIsInnate) {
+                        item.style.order = -1;
+                        item.style.flexBasis = "100%";
+                        img.src = '<%- utils.getImageUrl("innate_icon",ImageType.Icons) %>';  // Set backup image URL
+                        // item.querySelector(".cooldown").style.display = "none";
+                        // item.querySelector(".mana_cost").style.display = "none";
+                    }
+                };
+            });
+        });
+    </script>
 </html>
