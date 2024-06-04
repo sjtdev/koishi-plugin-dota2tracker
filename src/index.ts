@@ -56,8 +56,6 @@ export const Config: Schema = Schema.intersect([
     }).description("模板设置"),
 ]);
 
-function init() {}
-
 interface PendingMatch {
     matchId: number;
     guilds: Array<{

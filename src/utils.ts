@@ -218,11 +218,33 @@ export function getFormattedMatchData(match) {
         }
 
         let items_timelist = {};
-        player.supportItemsCount = { 30: 0, 40: 0, 42: 0, 43: 0, 188: 0 };
+        const supportItemIds = [30, 40, 42, 43, 188];
+        player.supportItemsCount = supportItemIds.reduce((obj, key) => {
+            obj[key] = 0;
+            return obj;
+        }, {});
+
         if (player.playbackData) {
+            const getNextElement = function () {
+                let currentIndex = 0; // 从数组开头开始
+                return function () {
+                    if (currentIndex >= this.length) {
+                        return null; // 或者你可以返回其他值表示没有更多元素
+                    }
+                    const element = this[currentIndex];
+                    currentIndex++;
+                    return element;
+                };
+            };
+
             for (let item of player.playbackData.purchaseEvents) {
-                items_timelist[item.itemId] = item.time;
-                if (item.itemId == 42 || item.itemId == 43) items_timelist[218] = item.time;
+                if (!supportItemIds.includes(item.itemId)) {
+                    if (!items_timelist[item.itemId]) {
+                        items_timelist[item.itemId] = [];
+                        items_timelist[item.itemId].getNextElement = getNextElement.call(items_timelist[item.itemId]);
+                    }
+                    items_timelist[item.itemId].push(item.time);
+                }
                 switch (item.itemId) {
                     case 30:
                     case 40:
@@ -251,7 +273,7 @@ export function getFormattedMatchData(match) {
                 player.items.push({
                     id: itemId,
                     name: cleanName,
-                    time: items_timelist[itemId],
+                    time: items_timelist[itemId]?.getNextElement ? items_timelist[itemId].getNextElement() : undefined,
                     isRecipe: isRecipe,
                 });
             } else {
