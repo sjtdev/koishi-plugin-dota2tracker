@@ -18,3 +18,4 @@ tsconfig.tsbuildinfo
 *.sln
 
 temp.*
+backup.ts
