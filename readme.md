@@ -4,7 +4,8 @@
 
 DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑定），以及一系列查询功能。
 ### 安装
-在koishi插件市场搜索安装
+在koishi插件市场搜索安装  
+有关koishi的使用说明：（[koishi官方文档](https://koishi.chat/)）
 
 ### 使用
 需在插件配置页填入STRATZ API TOKEN，否则无法使用。(配置中提供了API的获取链接)  
