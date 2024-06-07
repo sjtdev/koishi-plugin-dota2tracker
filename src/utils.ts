@@ -12,7 +12,6 @@ declare module "koishi" {
         dt_subscribed_players: dt_subscribed_players;
         dt_sended_match_id: dt_sended_match_id;
         dt_previous_query_results: dt_previous_query_results;
-        dt_hero_data_cache: dt_hero_data_cache;
     }
 }
 export interface dt_subscribed_players {
@@ -39,12 +38,6 @@ export interface dt_previous_query_results {
     matchId: number;
     data: object;
     queryTime: Date;
-}
-
-export interface dt_hero_data_cache {
-    id: number;
-    gameVersionId: number;
-    hero: object;
 }
 
 export const CONFIGS = { STRATZ_API: { URL: "https://api.stratz.com/graphql", TOKEN: "" } };

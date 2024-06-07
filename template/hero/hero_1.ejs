@@ -189,9 +189,6 @@
                 background-color: #444;
             }
 
-            .details .list {
-            }
-
             .details .list td {
                 width: 50%;
                 text-align: center;
@@ -648,10 +645,10 @@
             <div class="skills">
                 ${hero.abilities//.filter((item) => dotaconstants.abilities[item.name].behavior != "Hidden")
                 .map((item) => `
-                <div class="skill" data-ability="${item.ability_is_innate}">
+                <div class="skill" data-innate="${item.ability_is_innate&&!item.ability_is_facet}">
                     <p class="title">
                         <span class="name">${item.name_loc}</span>
-                        ${item.ability_is_innate?`<span class="is_innate">先天技能</span>`:""}
+                        ${item.ability_is_innate&&!item.ability_is_facet?`<span class="is_innate">先天技能</span>`:""}
                         ${item.ability_is_granted_by_scepter ?`<img src="${utils.getImageUrl("scepter")}" class="scepter">`:""}
                         ${item.ability_is_granted_by_shard ?`<img src="${utils.getImageUrl("shard")}" class="shard">`:""}
                     </p>
@@ -736,7 +733,7 @@
             const items = document.querySelectorAll('.skills > .skill');
             items.forEach(item => {
                 // const name = item.getAttribute('data-name');
-                const abilityIsInnate = item.getAttribute('data-ability') === 'true';
+                const abilityIsInnate = item.getAttribute('data-innate') === 'true';
                 const img = item.querySelector('.img_stats > img');
                 const imageUrl = img.src;
 
