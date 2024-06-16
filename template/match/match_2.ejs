@@ -242,7 +242,10 @@
             .player > .titles {
                 grid-row: 4;
                 grid-column: 1 / span 3;
-                text-shadow: 1px 1px 0 #333; /* 设置阴影颜色及偏移 */
+                /* text-shadow: 1px 1px 0 #333; 设置阴影颜色及偏移 */
+            }
+            .player > .titles > span {
+                margin-right: 1.5px;
             }
 
             .player > .player_name {
@@ -398,6 +401,33 @@
     </head>
     <body>
         <% const match = data; %>
+        <% function darkenHexColor(hex, percentage) {
+            // 移除前缀 #
+            hex = hex.replace(/^#/, '');
+
+            // 处理三位 hex 颜色值
+            if (hex.length === 3) {
+                hex = hex.split('').map(char => char + char).join('');
+            }
+        
+            // 将 hex 转换为 RGB
+            let r = parseInt(hex.substring(0, 2), 16);
+            let g = parseInt(hex.substring(2, 4), 16);
+            let b = parseInt(hex.substring(4, 6), 16);
+        
+            // 将 RGB 变暗
+            r = Math.floor(r * (1 - percentage / 100));
+            g = Math.floor(g * (1 - percentage / 100));
+            b = Math.floor(b * (1 - percentage / 100));
+        
+            // 将 RGB 转换回 hex
+            const darkenedHex = `#${((1 << 24) + (r << 16) + (g << 8) + b)
+                .toString(16)
+                .slice(1)
+                .toUpperCase()}`;
+        
+            return darkenedHex;
+        } %>
         <nav>
             <div class="match_id">
                 <p>比赛 <%-match.id%></p>
@@ -456,7 +486,7 @@
                     <img src="${utils.getImageUrl('star_' + player.rank.star)}" class="stars" />
                     <p>${player.steamAccount.seasonLeaderboardRank??""}</p>
                 </div>
-                <div class="titles">${player.titles.map((item) => `<span style="color: ${item.color};">${item.name}</span>`).join('&nbsp;')}</div>
+                <div class="titles">${player.titles.map((item) => `<span style="color: ${darkenHexColor(item.color, 25)};">${item.name}</span>`).join('')}</div>
                 <div class="player_name row-1">
                     <span class="rank">${`[${d2a.rank[player.rank.medal]}${player.rank.star||""}]`}</span>
                     <span class="name">${player.steamAccount.name}</span>

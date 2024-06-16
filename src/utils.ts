@@ -399,8 +399,8 @@ export function getFormattedMatchData(match) {
     findMaxByProperty("heroHealing").titles.push({ name: "奶", color: "#00FF00" });
     match.players
         .reduce((lowest, player) => {
-            const currentContribution = (player.kills + player.assists) / match[player.team].KillsCount;
-            const lowestContribution = (lowest.kills + lowest.assists) / match[lowest.team].KillsCount;
+            const currentContribution = (player.kills + player.assists) / match[player.team].killsCount;
+            const lowestContribution = (lowest.kills + lowest.assists) / match[lowest.team].killsCount;
 
             if (currentContribution < lowestContribution) {
                 return player; // 当前玩家的贡献比最低的还低
