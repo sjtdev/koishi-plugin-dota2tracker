@@ -95,7 +95,7 @@ export async function apply(ctx: Context, config: Config) {
         if (session.guild) {
             let cancelingGuild = (await ctx.database.get("dt_subscribed_guilds", { guildId: session.event.channel.id, platform: session.event.platform }))[0];
             if (cancelingGuild) {
-                ctx.database.remove("dt_subscribed_guilds", session.event.channel.id);
+                ctx.database.remove("dt_subscribed_guilds", { guildId: session.event.channel.id, platform: session.event.platform });
                 session.send("取消订阅成功。");
                 return;
             }
@@ -104,8 +104,8 @@ export async function apply(ctx: Context, config: Config) {
 
     ctx.command("绑定 <steam_id> [nick_name]", "绑定SteamID，并起一个别名（也可以不起）")
         .usage("将你的SteamID与你的账号绑定，若本群已订阅将会实时获取你的新比赛数据发布至群中。")
-        .example("-绑定 123456789")
-        .example("-绑定 123456789 张三")
+        .example("绑定 123456789")
+        .example("绑定 123456789 张三")
         .action(async ({ session }, steam_id, nick_name) => {
             if (session.guild) {
                 // 若无输入数据或steamId不符1~11位数字则返回
@@ -160,7 +160,7 @@ export async function apply(ctx: Context, config: Config) {
     });
 
     ctx.command("改名 <nick_name>", "修改绑定时设定的别名")
-        .example("-改名 李四")
+        .example("改名 李四")
         .action(async ({ session }, nick_name) => {
             if (session.guild) {
                 let sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.channel.id, platform: session.event.platform, userId: session.event.user.id }))[0];
@@ -249,7 +249,7 @@ export async function apply(ctx: Context, config: Config) {
 
     ctx.command("查询比赛 <match_id>", "查询比赛ID")
         .usage("查询指定比赛ID的比赛数据，生成图片发布。")
-        .example("-查询比赛 1234567890")
+        .example("查询比赛 1234567890")
         .action(async ({ session }, match_id) => {
             if (!match_id) {
                 session.send("请输入比赛ID。");
@@ -270,8 +270,8 @@ export async function apply(ctx: Context, config: Config) {
 
     ctx.command("查询最近比赛 [input_data]", "查询玩家的最近比赛")
         .usage("查询指定玩家的最近一场比赛的比赛数据，生成图片发布。\n参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID")
-        .example("-查询最近比赛 123456789")
-        .example("-查询最近比赛 张三")
+        .example("查询最近比赛 123456789")
+        .example("查询最近比赛 张三")
         .action(async ({ session }, input_data) => {
             if (session.guild) {
                 let sessionPlayer;
@@ -305,9 +305,9 @@ export async function apply(ctx: Context, config: Config) {
     ctx.command("查询玩家 <input_data>", "查询玩家信息，可指定英雄")
         .usage("查询指定玩家的个人信息与最近战绩，生成图片发布。\n参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID")
         .option("hero", "-o <value:string> 查询玩家指定英雄使用情况（同其他英雄查询，可用简称与ID）")
-        .example("-查询玩家 123456789")
-        .example("-查询玩家 张三")
-        .example("-查询玩家 张三 hero 敌法师")
+        .example("查询玩家 123456789")
+        .example("查询玩家 张三")
+        .example("查询玩家 张三 hero 敌法师")
         .action(async ({ session, options }, input_data) => {
             if (session.guild) {
                 let sessionPlayer;
@@ -391,9 +391,9 @@ export async function apply(ctx: Context, config: Config) {
     ctx.command("查询英雄 <input_data>", "查询英雄技能/面板信息")
         .usage("查询英雄的技能说明与各项数据，生成图片发布。\n参数可输入英雄ID、英雄名、英雄常用别名")
         .option("random", "-r 随机选择英雄")
-        .example("-查询英雄 15")
-        .example("-查询英雄 雷泽")
-        .example("-查询英雄 电魂")
+        .example("查询英雄 15")
+        .example("查询英雄 雷泽")
+        .example("查询英雄 电魂")
         .action(async ({ session, options }, input_data) => {
             if (options.random) input_data = random.pick(Object.keys(d2a.HEROES_CHINESE));
             if (input_data) {
@@ -502,9 +502,9 @@ export async function apply(ctx: Context, config: Config) {
         .usage("根据输入英雄查询最近一周比赛数据（传奇~万古分段）中与该英雄组合胜率最高英雄和与该英雄对抗胜率最低英雄。\n参数可输入英雄ID、英雄名、英雄常用别名")
         .option("limit", "-l <value:number> 返回英雄个数（默认值 5）", { fallback: 5 })
         .option("filter", "-f <value:number> 过滤场数过低的组合（单位：%，默认值0.75）", { fallback: 0.5 })
-        .example("-查询英雄对战 敌法师\t（无额外参数默认返回5个英雄，过滤舍弃场次占比0.75%以下）")
-        .example("-查询英雄对战 敌法师 -l=10 -f=1\t（返回10个英雄，过滤舍弃场次占比1%以下）")
-        .example("-查询英雄对战 敌法师 -l 10 -f 1\t（等同于上例，参数接空格也可使用）")
+        .example("查询英雄对战 敌法师\t（无额外参数默认返回5个英雄，过滤舍弃场次占比0.75%以下）")
+        .example("查询英雄对战 敌法师 -l=10 -f=1\t（返回10个英雄，过滤舍弃场次占比1%以下）")
+        .example("查询英雄对战 敌法师 -l 10 -f 1\t（等同于上例，参数接空格也可使用）")
         .action(async ({ session, options }, input_data) => {
             if (input_data) {
                 let hero = findingHero(input_data);
