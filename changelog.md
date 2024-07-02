@@ -86,4 +86,4 @@
 
 ### 1.1.0
 **改进**：使用ejs重写模板相关代码使其模块化，使新增模板更方便  
-**新增**：为比赛信息添加了仿MAX+模板，效果可见[match_2](../wiki/match_2)，可在插件配置中切换   
+**新增**：为比赛信息添加了仿MAX+模板，效果可见[match_2](https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki/match_2)，可在插件配置中切换   
