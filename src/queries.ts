@@ -222,6 +222,7 @@ export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId,heroId?) {
         lobbyType
         gameMode
         startDateTime
+        parsedDateTime
         durationSeconds
         didRadiantWin
         topLaneOutcome

@@ -39,6 +39,7 @@
       "zh": "追踪群友的DOTA2对局"
     },
     "required": [
+      "http",
       "database",
       "puppeteer",
       "cron"

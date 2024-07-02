@@ -503,25 +503,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <%- player.matches.map((match) => `
-                    <tr class="match ${match.didRadiantWin == match.players[0].isRadiant ? "win" : "lose"}">
-                        <td>${match.id}</td>
+                    <%- player.matches.map((match) => {
+                        const innerPlayer = match.players[0];
+                        return `
+                    <tr class="match ${match.didRadiantWin == innerPlayer.isRadiant ? "win" : "lose"}">
+                        <td>${match.parsedDateTime ? match.id : `<p>${match.id}</p><p>（未解析）</p>`}</td>
                         <td>
                             <p>${d2a.lobbyTypes[match.lobbyType] || match.lobbyType}</p>
                             <p>${d2a.gameMode[match.gameMode] || match.gameMode}</p>
                         </td>
-                        <td><img alt="" src="${utils.getImageUrl(match.players[0].hero.shortName, ImageType.HeroIcons)}" /></td>
+                        <td><img alt="" src="${utils.getImageUrl(innerPlayer.hero.shortName, ImageType.HeroIcons)}" /></td>
                         <td style="line-height: 20px">
-                            <p>${((match.players[0].kills + match.players[0].assists) / Math.max(1, match.players[0].deaths)).toFixed(2)} (${(((match.players[0].kills + match.players[0].assists) /
-                            (match.players[0].isRadiant ? match.radiantKills?.reduce((acc, cva) => acc + cva, 0) : match.direKills?.reduce((acc, cva) => acc + cva, 0))) * 100)?.toFixed(0)}%)</p>
-                            <p>${match.players[0].kills}/${match.players[0].deaths}/${match.players[0].assists}</p>
+                            <p>${((innerPlayer.kills + innerPlayer.assists) / Math.max(1, innerPlayer.deaths)).toFixed(2)} (${match.parsedDateTime?((((innerPlayer.kills + innerPlayer.assists) /
+                            (match[(innerPlayer.isRadiant ? "radiant" : "dire")+"Kills"]?.reduce((acc, cva) => acc + cva, 0))) * 100)?.toFixed(0)):"?"}%)</p>
+                            <p>${innerPlayer.kills}/${innerPlayer.deaths}/${innerPlayer.assists}</p>
                         </td>
                         <td><div class="player_lane ${match.laneResult}">${laneSVG[match.laneResult]}</div></td>
                         <td style="line-height: 20px">${moment(new Date(match.startDateTime * 1000)).format("YYYY-MM-DD HH:mm:ss").slice(2)}</td>
                         <td>${utils.sec2time(match.durationSeconds)}</td>
-                        <td>${(match.players[0].imp > 0 ? "+" : "") + match.players[0].imp}</td>
+                        <td>${innerPlayer.imp ? ((innerPlayer.imp > 0 ? "+" : "") + innerPlayer.imp) : "?"}</td>
                         <td><img class="medal" src="${utils.getImageUrl("medal_" + match.rank?.toString().split("")[0])}" style="width: 100%" /></td>
-                    </tr>`).join("")%>
+                    </tr>`}).join("")%>
                 </tbody>
             </table>
             <div class="plus">
