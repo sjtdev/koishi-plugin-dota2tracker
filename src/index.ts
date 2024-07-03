@@ -571,35 +571,36 @@ export async function apply(ctx: Context, config: Config) {
     //     session.send(await utils.getJoke());
     // });
 
-    // ctx.command("test <input_data>")
-    //     .option("a", "a")
-    //     .action(async ({ session, options }, input_data) => {
-    //         // if (input_data) {
-    //         //     let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
-    //         //     let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
-    //         //         id: parseInt(key),
-    //         //         names_cn: d2a.HEROES_CHINESE[key],
-    //         //     }));
-    //         //     const mergedMap = new Map();
-    //         //     [dc_heroes, cn_heroes].forEach((array) => {
-    //         //         array.forEach((item) => {
-    //         //             const existingItem = mergedMap.get(item.id);
-    //         //             if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
-    //         //             else mergedMap.set(item.id, item);
-    //         //         });
-    //         //     });
-    //         //     let heroes = Array.from(mergedMap.values());
-    //         //     let hero = heroes.find((hero) => hero.names_cn.includes(input_data) || hero.shortName === input_data.toLowerCase() || hero.id == input_data);
-    //         //     session.send(JSON.stringify(hero));
-    //         // }
-    //         // session.send(`${random.pick(["嗯", "啊", "蛤", "啥", "咋", "咦", "哦"])}？`);
-    //         // session.send();
-    //         // await ctx.puppeteer.()
-    //         // console.log((await ctx.database.get("dt_7_36", [0]))[0].data);
-    //         console.log(session);
-    //         const data = await ctx.http.get("http://localhost:8099/");
-    //         console.log(data);
-    //     });
+    ctx.command("test <input_data>")
+        .option("a", "a")
+        .action(async ({ session, options }, input_data) => {
+            // if (input_data) {
+            //     let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
+            //     let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
+            //         id: parseInt(key),
+            //         names_cn: d2a.HEROES_CHINESE[key],
+            //     }));
+            //     const mergedMap = new Map();
+            //     [dc_heroes, cn_heroes].forEach((array) => {
+            //         array.forEach((item) => {
+            //             const existingItem = mergedMap.get(item.id);
+            //             if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
+            //             else mergedMap.set(item.id, item);
+            //         });
+            //     });
+            //     let heroes = Array.from(mergedMap.values());
+            //     let hero = heroes.find((hero) => hero.names_cn.includes(input_data) || hero.shortName === input_data.toLowerCase() || hero.id == input_data);
+            //     session.send(JSON.stringify(hero));
+            // }
+            // session.send(`${random.pick(["嗯", "啊", "蛤", "啥", "咋", "咦", "哦"])}？`);
+            // session.send();
+            // await ctx.puppeteer.()
+            // console.log((await ctx.database.get("dt_7_36", [0]))[0].data);
+            // console.log(session);
+            // const data = await ctx.http.get("http://localhost:8099/");
+            // console.log(data);
+            ctx.bots.forEach((bot) => console.log(bot.userId));
+        });
 
     ctx.on("ready", async () => {
         const tables = await ctx.database.tables;
@@ -693,22 +694,28 @@ export async function apply(ctx: Context, config: Config) {
                         });
 
                         const combinations = Array.from(combinationsMap.values());
-                        await ctx.broadcast(
-                            [`${guild.platform}:${guild.guildId}`],
-                            `昨日总结：
-                            ${currentsubscribedPlayers
-                                .map(
-                                    (player) =>
-                                        `${player.name}: ${player.winCount}胜${player.loseCount}负 胜率${Math.round((player.winCount / player.matches.length) * 100)}%，平均KDA: [${player.avgKills}/${player.avgDeaths}/${
-                                            player.avgAssists
-                                        }](${player.avgKDA})，平均表现: ${player.avgImp > 0 ? "+" : ""}${player.avgImp}`
+                        try {
+                            // await ctx.broadcast(
+                            await sendMessageToChannel(
+                                ctx, guild.guildId,
+                                // [`${guild.platform}:${guild.guildId}`],
+                                `昨日总结：
+                                ${currentsubscribedPlayers
+                                    .map(
+                                        (player) =>
+                                            `${player.name}: ${player.winCount}胜${player.loseCount}负 胜率${Math.round((player.winCount / player.matches.length) * 100)}%，平均KDA: [${player.avgKills}/${player.avgDeaths}/${
+                                                player.avgAssists
+                                            }](${player.avgKDA})，平均表现: ${player.avgImp > 0 ? "+" : ""}${player.avgImp}`
+                                    )
+                                    .join("\n")}
+                                ${combinations.map((combi) => `组合[${combi.name}]: ${combi.winCount}胜${combi.matches.length - combi.winCount}负 胜率${Math.round((combi.winCount / combi.matches.length) * 100)}%`).join("\n")}`.replace(
+                                    /\s*\n\s*/g,
+                                    "\n"
                                 )
-                                .join("\n")}
-                            ${combinations.map((combi) => `组合[${combi.name}]: ${combi.winCount}胜${combi.matches.length - combi.winCount}负 胜率${Math.round((combi.winCount / combi.matches.length) * 100)}%`).join("\n")}`.replace(
-                                /\s*\n\s*/g,
-                                "\n"
-                            )
-                        );
+                            );
+                        } catch (error) {
+                            ctx.logger.error(error);
+                        }
                     }
                 }
             });
@@ -808,7 +815,12 @@ export async function apply(ctx: Context, config: Config) {
                                 ).toFixed(2)}%`;
                                 broadMatchMessage += broadPlayerMessage + "\n";
                             }
-                            await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + img);
+                            // await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + img);
+                            // const targetChannels = await ctx.database.get("channel", { id: commingGuild.guildId, platform: commingGuild.platform });
+                            // if (targetChannels.length==1) await ctx.bots.find((bot) => bot.userId == targetChannels[0].assignee).sendMessage(commingGuild.guildId, broadMatchMessage + img);
+                            // else if (targetChannels.length>1) throw new Error("有复数个bot存在于该群组/频道，请移除多余bot。")
+                            // else throw new Error("未找到目标群组/频道。");
+                            await sendMessageToChannel(ctx, commingGuild, broadMatchMessage + img);
                             ctx.logger.info(`${match.id}${match.parsedDateTime ? "已解析，" : "已结束超过1小时仍未被解析，放弃解析直接"}生成图片并发布于${commingGuild.platform}:${commingGuild.guildId}。`);
                         }
                         if (match.parsedDateTime)
@@ -859,4 +871,25 @@ function genImageHTML(data, template, type: TemplateType) {
     });
     if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", result);
     return result;
+}
+
+async function sendMessageToChannel(ctx, commingGuild, broadMatchMessage) {
+    try {
+        const targetChannels = await ctx.database.get("channel", { id: commingGuild.guildId, platform: commingGuild.platform });
+
+        if (targetChannels.length === 1) {
+            const bot = ctx.bots.find((bot) => bot.userId === targetChannels[0].assignee);
+            if (bot) {
+                await bot.sendMessage(commingGuild.guildId, broadMatchMessage);
+            } else {
+                throw new Error("指定的bot未找到。");
+            }
+        } else if (targetChannels.length > 1) {
+            throw new Error("有复数个bot存在于该群组/频道，请移除多余bot。");
+        } else {
+            throw new Error("未找到目标群组/频道。");
+        }
+    } catch (error) {
+        throw error; // Optionally re-throw to handle it higher up in the call stack
+    }
 }
