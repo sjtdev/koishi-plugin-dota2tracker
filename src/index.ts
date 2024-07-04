@@ -599,7 +599,9 @@ export async function apply(ctx: Context, config: Config) {
     //         // console.log(session);
     //         // const data = await ctx.http.get("http://localhost:8099/");
     //         // console.log(data);
-    //         ctx.bots.forEach((bot) => console.log(bot.userId));
+    //         // ctx.bots.forEach((bot) => console.log(bot.userId));
+            
+        
     //     });
 
     ctx.on("ready", async () => {
@@ -697,7 +699,7 @@ export async function apply(ctx: Context, config: Config) {
                         try {
                             // await ctx.broadcast(
                             await sendMessageToChannel(
-                                ctx, guild.guildId,
+                                ctx, guild,
                                 // [`${guild.platform}:${guild.guildId}`],
                                 `昨日总结：
                                 ${currentsubscribedPlayers
