@@ -498,25 +498,35 @@ export function roundToDecimalPlaces(number, decimalPlaces) {
     return Math.round(number * factor) / factor;
 }
 
-export function formatHeroDesc(template: string, special_values, type: HeroDescType = HeroDescType.Normal): string {
-    return template.replace(/%%|%([^%]+)%/g, (match, p1) => {
+export function formatHeroDesc(template: string, special_values: any[], type: HeroDescType = HeroDescType.Normal): string {
+    return template.replace(/%%|%([^%]+)%|\{([^}]+)\}/g, (match, p1, p2) => {
+        const field = p1 || p2;
+
         if (match === "%%") {
             return "%";
         } else {
+            // 处理 "s:" 前缀和 "shard_" 前缀，然后转换为小写
+            const fieldName = field.replace(/^s:/, '').replace(/^shard_/, '').toLowerCase();
             const specialValue = special_values.find((sv) => {
-                const match2 = /bonus_(.*)/.exec(p1);
-                return sv.name === p1 || sv.name === match2?.[1];
+                const nameLower = sv.name.toLowerCase();
+                // 匹配字段名，忽略 "bonus_" 和 "shard_" 的有无
+                return nameLower === fieldName || nameLower === `bonus_${fieldName}` || nameLower === `shard_${fieldName}` ||
+                       `bonus_${nameLower}` === fieldName || `shard_${nameLower}` === fieldName;
             });
             if (specialValue) {
                 let valuesToUse = "";
-                if (type == HeroDescType.Facet) {
-                    valuesToUse = specialValue.facet_bonus.name ? specialValue.facet_bonus.values.join(" / ") : specialValue.values_float.join(" / ");
-                } else if (type == HeroDescType.Scepter) {
-                    valuesToUse = specialValue.values_scepter.length ? specialValue.values_scepter.join(" / ") : specialValue.values_float.join(" / ");
-                } else if (type == HeroDescType.Shard) {
-                    valuesToUse = specialValue.values_shard.length ? specialValue.values_shard.join(" / ") : specialValue.values_float.join(" / ");
-                } else {
-                    valuesToUse = specialValue.values_float.join(" / ");
+                switch (type) {
+                    case HeroDescType.Facet:
+                        valuesToUse = specialValue.facet_bonus.name ? specialValue.facet_bonus.values.join(" / ") : specialValue.values_float.join(" / ");
+                        break;
+                    case HeroDescType.Scepter:
+                        valuesToUse = specialValue.values_scepter.length ? specialValue.values_scepter.join(" / ") : specialValue.values_float.join(" / ");
+                        break;
+                    case HeroDescType.Shard:
+                        valuesToUse = specialValue.values_shard.length ? specialValue.values_shard.join(" / ") : specialValue.values_float.join(" / ");
+                        break;
+                    default:
+                        valuesToUse = specialValue.values_float.join(" / ");
                 }
                 return `<span class="value">${valuesToUse}</span>`;
             } else {

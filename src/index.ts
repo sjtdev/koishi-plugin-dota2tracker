@@ -426,7 +426,7 @@ export async function apply(ctx: Context, config: Config) {
                         ab.facets_loc.forEach((facet, i) => {
                             if (facet) {
                                 if (!(hero.facets[i] as any).abilities) (hero.facets[i] as any).abilities = [];
-                                (hero.facets[i] as any).abilities.push({ id: ab.id, name: ab.name, name_loc: ab.name_loc, description_ability_loc: utils.formatHeroDesc(facet, all_special_values, HeroDescType.Facet), attributes: [] });
+                                (hero.facets[i] as any).abilities.push({ id: ab.id, name: ab.name, name_loc: ab.name_loc, description_ability_loc: utils.formatHeroDesc(facet, ab.special_values, HeroDescType.Facet), attributes: [] });
                             }
                         });
                         hero.facets.forEach((facet) => {
@@ -436,10 +436,11 @@ export async function apply(ctx: Context, config: Config) {
                                     (facet as any).abilities.find((ability: any) => ab.id == ability.id)?.attributes.push({ heading_loc: sv.heading_loc, values: [...sv.facet_bonus.values] });
                                 }
                             });
+                            facet.description_loc = utils.formatHeroDesc(facet.description_loc, svs, HeroDescType.Facet);
                         });
                         // 处理技能本身说明
-                        ab.desc_loc = utils.formatHeroDesc(ab.desc_loc, all_special_values);
-                        ab.notes_loc = ab.notes_loc.map((note) => utils.formatHeroDesc(note, all_special_values));
+                        ab.desc_loc = utils.formatHeroDesc(ab.desc_loc, ab.special_values,(ab as any).ability_is_facet?HeroDescType.Facet:undefined);
+                        ab.notes_loc = ab.notes_loc.map((note) => utils.formatHeroDesc(note, ab.special_values));
                         // 处理神杖与魔晶说明
                         if (ab.ability_has_scepter) ab.scepter_loc = utils.formatHeroDesc(ab.scepter_loc, ab.special_values, HeroDescType.Scepter);
                         if (ab.ability_has_shard) ab.shard_loc = utils.formatHeroDesc(ab.shard_loc, ab.special_values, HeroDescType.Shard);
@@ -600,8 +601,7 @@ export async function apply(ctx: Context, config: Config) {
     //         // const data = await ctx.http.get("http://localhost:8099/");
     //         // console.log(data);
     //         // ctx.bots.forEach((bot) => console.log(bot.userId));
-            
-        
+
     //     });
 
     ctx.on("ready", async () => {
@@ -699,7 +699,8 @@ export async function apply(ctx: Context, config: Config) {
                         try {
                             // await ctx.broadcast(
                             await sendMessageToChannel(
-                                ctx, guild,
+                                ctx,
+                                guild,
                                 // [`${guild.platform}:${guild.guildId}`],
                                 `昨日总结：
                                 ${currentsubscribedPlayers
@@ -875,23 +876,19 @@ function genImageHTML(data, template, type: TemplateType) {
     return result;
 }
 
-async function sendMessageToChannel(ctx, commingGuild, broadMatchMessage) {
-    try {
-        const targetChannels = await ctx.database.get("channel", { id: commingGuild.guildId, platform: commingGuild.platform });
+async function sendMessageToChannel(ctx, guild, broadMessage) {
+    const targetChannels = await ctx.database.get("channel", { id: guild.guildId, platform: guild.platform });
 
-        if (targetChannels.length === 1) {
-            const bot = ctx.bots.find((bot) => bot.userId === targetChannels[0].assignee);
-            if (bot) {
-                await bot.sendMessage(commingGuild.guildId, broadMatchMessage);
-            } else {
-                throw new Error("指定的bot未找到。");
-            }
-        } else if (targetChannels.length > 1) {
-            throw new Error("有复数个bot存在于该群组/频道，请移除多余bot。");
+    if (targetChannels.length === 1) {
+        const bot = ctx.bots.find((bot) => bot.userId === targetChannels[0].assignee);
+        if (bot) {
+            await bot.sendMessage(guild.guildId, broadMessage);
         } else {
-            throw new Error("未找到目标群组/频道。");
+            throw new Error("指定的bot未找到。");
         }
-    } catch (error) {
-        throw error; // Optionally re-throw to handle it higher up in the call stack
+    } else if (targetChannels.length > 1) {
+        throw new Error("有复数个bot存在于该群组/频道，请移除多余bot。");
+    } else {
+        throw new Error("未找到目标群组/频道。");
     }
 }

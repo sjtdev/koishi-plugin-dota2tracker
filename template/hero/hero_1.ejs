@@ -515,6 +515,11 @@
     </head>
     <body>
         <% let hero = data; %>
+        <% if (hero.primary_attr==3) {
+            const base_damage = Math.floor((hero.str_base+hero.agi_base+hero.int_base)*0.7);
+            hero.damage_max+=base_damage;
+            hero.damage_min+=base_damage;
+        } %>
         <div class="wrapper">
             <%- `
             <div class="hero" id="${hero.id}">
@@ -620,7 +625,7 @@
                         <span>${facet.title_loc}</span>
                     </p>
                     <div class="content">
-                        ${facet.description_loc ?`<p class="description">${facet.description_loc}</p>`:""}
+                        ${facet.description_loc && !facet.abilities?.some(ability => ability.description_ability_loc === facet.description_loc) ?`<p class="description">${facet.description_loc}</p>`:""}
                         ${facet.abilities?facet.abilities.map(ability=>
                         `<div class="ability">
                             <div class="name">

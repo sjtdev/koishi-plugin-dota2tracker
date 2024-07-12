@@ -491,7 +491,7 @@
                     <span class="rank">${`[${d2a.rank[player.rank.medal]}${player.rank.star||""}]`}</span>
                     <span class="name">${player.steamAccount.name}</span>
                 </div>
-                <p class="pick">${player.isRandom?'随机':`第${player.order == null ? "-" : player.order + 1}手`} ${d2a.position[player.position?.slice(-1)]??''}</p>
+                <p class="pick">${player.isRandom?'随机':`第${player.order == null ? "?" : player.order + 1}手`} ${d2a.position[player.position?.slice(-1)]??''}</p>
                 <p class="networth">
                     <span class="gold">${utils.formatNumber(player.networth)}</span>
                     (${(player.heroDamage / player.networth)?.toFixed(2)})

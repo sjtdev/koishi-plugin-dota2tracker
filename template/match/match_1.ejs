@@ -718,7 +718,7 @@
                             <img alt="" src="${utils.getImageUrl(player.hero.shortName, ImageType.Heroes)}" />
                             <p class="party_line${player.partyId != null ? " party_" + match.party[player.partyId] : ""}"></p>
                             <p class="party_mark${player.partyId != null ? " party_" + match.party[player.partyId] : ""}"></p>
-                            <p class="position p${Math.floor(player.order / 4) + 1}">${player.isRandom ? "随机" : `第<span>${player.order == null ? "-" : player.order + 1}</span>手`}<br/>${d2a.position[player.position?.slice(-1)]??""}</p>
+                            <p class="position p${Math.floor(player.order / 4) + 1}">${player.isRandom ? "随机" : `第<span>${player.order == null ? "?" : player.order + 1}</span>手`}<br/>${d2a.position[player.position?.slice(-1)]??""}</p>
                             <p class="level">${player.level}</p>
                         </div>
                         <div class="player_info">

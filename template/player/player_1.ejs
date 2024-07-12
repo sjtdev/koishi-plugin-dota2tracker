@@ -521,7 +521,7 @@
                         <td><div class="player_lane ${match.laneResult}">${laneSVG[match.laneResult]}</div></td>
                         <td style="line-height: 20px">${moment(new Date(match.startDateTime * 1000)).format("YYYY-MM-DD HH:mm:ss").slice(2)}</td>
                         <td>${utils.sec2time(match.durationSeconds)}</td>
-                        <td>${innerPlayer.imp ? ((innerPlayer.imp > 0 ? "+" : "") + innerPlayer.imp) : "?"}</td>
+                        <td>${innerPlayer.imp != null ? ((innerPlayer.imp >= 0 ? "+" : "") + innerPlayer.imp) : "?"}</td>
                         <td><img class="medal" src="${utils.getImageUrl("medal_" + match.rank?.toString().split("")[0])}" style="width: 100%" /></td>
                     </tr>`}).join("")%>
                 </tbody>
