@@ -421,7 +421,7 @@
                 padding-left: 0;
             }
 
-            .skill .value{
+            .skill .value {
                 color: #fff;
             }
 
@@ -458,6 +458,11 @@
                 background-color: #263945;
             }
 
+            .skill .attributes {
+                line-height: 1.2em;
+                margin-bottom: 12px;
+            }
+
             .skill .attributes .item {
                 color: #546780;
             }
@@ -470,12 +475,30 @@
                 width: 16px;
             }
 
-            .skill .attributes {
-                margin-bottom: 12px;
+            .skill .attributes .facet {
+                display: inline-flex;
+                font-size: 1em;
+                align-items: center;
+                line-height: 1.2em;
+                position: unset;
+                color: #fff;
             }
 
-            .skill .mana_cost {
-                padding-left: 12px;
+            .skill .attributes .facet span {
+                height: auto;
+                width: auto;
+                position: unset;
+                padding: 0 2px;
+            }
+
+            .skill .attributes .facet img {
+                width: auto;
+                height: 1em;
+                padding-right: 0.2em;
+            }
+
+            .skill .cooldown {
+                padding-right: 12px;
             }
 
             .skill .cooldown::before,
@@ -635,7 +658,7 @@
                             ${ability.description_ability_loc?`<div class="description">${ability.description_ability_loc}</div>`:""}
                             ${ability.attributes&&ability.attributes?.length ? ability.attributes.map(attr=>
                             `<div class="attributes">
-                                <p><span class="item">${attr.heading_loc}</span><span class="values">${attr.values.join(" / ")}</span></p>
+                                <p><span class="item">${attr.heading_loc}</span><span class="values">${attr.values.map(value => value + (attr.is_percentage ? "%" : "")).join(" / ")}</span></p>
                             </div>`).join(""):""}
                         </div>`).join("")
                         :""}
@@ -710,7 +733,23 @@
                     <div class="attributes">
                     ${item.special_values
                         .filter(sv => sv.heading_loc)
-                        .map((sv) => `<p><span class="item">${sv.heading_loc}</span><span class="values">${sv.values_float.map(value=>value+(sv.is_percentage?"%":"")).join(" / ")}${sv.bonuses.map(bonus=>` (<img src="${utils.getImageUrl("talents","icons","svg")}"/>${(bonus.value>0?"+":"")+bonus.value+(sv.is_percentage?"%":"")})`).join(" ")}</span></p>`)
+                        .map((sv) => 
+                        `<p>
+                            <span class="item">${sv.heading_loc}</span>
+                            <span class="values">
+                                ${(!(((sv.values_float.length == 1 && sv.values_float[0] == 0) || sv.values_float.length == 0) && (sv.values_scepter.length || sv.values_shard.length || sv.facet_bonus.name)) 
+                                    ? (sv.values_float.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")) : "")}
+                                ${sv.values_scepter && sv.values_scepter.length
+                                    ? (sv.values_float.length == 0 || (sv.values_float.length == 1 && sv.values_float[0] == 0) ? `<img src="${utils.getImageUrl("scepter")}"/>${sv.values_scepter.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")}` : ` (<img src="${utils.getImageUrl("scepter")}"/>${sv.values_scepter.map(value => (value > 0 ? "+" : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")})`) : "" }
+                                ${sv.values_shard && sv.values_shard.length
+                                    ? (sv.values_float.length == 0 || (sv.values_float.length == 1 && sv.values_float[0] == 0) ? `<img src="${utils.getImageUrl("shard")}"/>${sv.values_shard.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")}` : ` (<img src="${utils.getImageUrl("shard")}"/>${sv.values_shard.map(value => (value > 0 ? "+" : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")})`) : "" }
+                                ${sv.facet_bonus.name
+                                    ? (sv.values_float.length == 0 || (sv.values_float.length == 1 && sv.values_float[0] == 0) ? `<span class="facet"><span class="name_back type_${hero.facets.find(facet=>facet.name==sv.facet_bonus.name).color}"><img src="${utils.getImageUrl(hero.facets.find(facet=>facet.name==sv.facet_bonus.name).icon, ImageType.IconsFacets)}" /><span>${sv.facet_bonus.values.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")}</span></span></span>` : `(<span class="facet"><span class="name_back type_${hero.facets.find(facet=>facet.name==sv.facet_bonus.name).color}"><img src="${utils.getImageUrl(hero.facets.find(facet=>facet.name==sv.facet_bonus.name).icon, ImageType.IconsFacets)}" /><span>${sv.facet_bonus.values.map(value => (value > 0 ? "+" : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}</span></span></span>)` ) : ""}
+
+                            
+                                ${sv.bonuses.map(bonus=>` (<img src="${utils.getImageUrl("talents","icons","svg")}"/>${(bonus.value>0?"+":"")+bonus.value+(sv.is_percentage?"%":"")})`).join(" ")}
+                            </span>
+                        </p>`)
                         .join("")}
                     </div>
                     <p>

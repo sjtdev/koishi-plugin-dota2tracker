@@ -433,13 +433,13 @@ export async function apply(ctx: Context, config: Config) {
                             const svs = ab.special_values.filter((sv) => sv.facet_bonus.name === facet.name);
                             svs.forEach((sv) => {
                                 if (sv.heading_loc) {
-                                    (facet as any).abilities.find((ability: any) => ab.id == ability.id)?.attributes.push({ heading_loc: sv.heading_loc, values: [...sv.facet_bonus.values] });
+                                    (facet as any).abilities.find((ability: any) => ab.id == ability.id)?.attributes.push({ heading_loc: sv.heading_loc, values: [...sv.facet_bonus.values], is_percentage: sv.is_percentage });
                                 }
                             });
                             facet.description_loc = utils.formatHeroDesc(facet.description_loc, svs, HeroDescType.Facet);
                         });
                         // 处理技能本身说明
-                        ab.desc_loc = utils.formatHeroDesc(ab.desc_loc, ab.special_values,(ab as any).ability_is_facet?HeroDescType.Facet:undefined);
+                        ab.desc_loc = utils.formatHeroDesc(ab.desc_loc, ab.special_values, (ab as any).ability_is_facet ? HeroDescType.Facet : undefined);
                         ab.notes_loc = ab.notes_loc.map((note) => utils.formatHeroDesc(note, ab.special_values));
                         // 处理神杖与魔晶说明
                         if (ab.ability_has_scepter) ab.scepter_loc = utils.formatHeroDesc(ab.scepter_loc, ab.special_values, HeroDescType.Scepter);
