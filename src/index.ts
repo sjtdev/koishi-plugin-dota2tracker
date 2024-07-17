@@ -462,9 +462,9 @@ export async function apply(ctx: Context, config: Config) {
                                 talent.name_loc = talent.name_loc.replace(match[0], target.values_float.join("/"));
                             } else {
                                 // Find the ability that contains the bonus associated with the talent
-                                const ability = hero.abilities.find((ability: any) => ability.special_values.some((specialValue: any) => specialValue.bonuses.some((bonus: any) => bonus.name === talent.name)));
+                                const abilities = hero.abilities.filter((ability: any) => ability.special_values.some((specialValue: any) => specialValue.bonuses.some((bonus: any) => bonus.name === talent.name)));
 
-                                if (ability) {
+                                for (const ability of abilities) {
                                     // Find the special value in the ability that contains the bonus
                                     const specialValues = ability.special_values.filter((specialValue: any) => specialValue.bonuses.some((bonus: any) => bonus.name === talent.name));
 

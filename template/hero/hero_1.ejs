@@ -450,6 +450,7 @@
             .skill .aghanim_description img {
                 position: unset;
                 transform: none;
+                margin-right: 8px;
             }
 
             .skill .notes {
@@ -496,6 +497,20 @@
                 width: auto;
                 height: 1em;
                 padding-right: 0.2em;
+            }
+
+            .skill .attributes .alternative .plus {
+                display: none;
+            }
+
+            .skill .attributes .primary ~ .alternative .plus {
+                display: inline;
+            }
+            .skill .attributes .primary ~ .alternative::before {
+                content: "(";
+            }
+            .skill .attributes .primary ~ .alternative::after {
+                content: ")";
             }
 
             .skill .cooldown {
@@ -738,25 +753,27 @@
                         `<p>
                             <span class="heading">${sv.heading_loc}</span>
                             <span class="values">
-                                <span class="primary">
+                                ${!(sv.values_float.every(value => value === 0) || sv.values_float.length == 0) ?
+                                `<span class="primary${(sv.values_float.every(value => value === 0) || sv.values_float.length == 0)?" empty":""}">
                                     ${(!((sv.values_float.every(value => value === 0) || sv.values_float.length == 0) && (sv.values_scepter.length || sv.values_shard.length || sv.facet_bonus.name)) 
                                         ? (sv.values_float.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")) : "")}
-                                </span>
-                                <span class="alternative scepter">
-                                    ${sv.values_scepter && sv.values_scepter.length
-                                        ? (sv.values_float.length == 0 || sv.values_float.every(value => value === 0) ? `<img src="${utils.getImageUrl("scepter")}"/>${sv.values_scepter.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")}` : ` (<img src="${utils.getImageUrl("scepter")}"/>${sv.values_scepter.map(value => (value > 0 ? "+" : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")})`) : "" }
-                                </span>
-                                <span class="alternative shard">
-                                    ${sv.values_shard && sv.values_shard.length
-                                        ? (sv.values_float.length == 0 || sv.values_float.every(value => value === 0) ? `<img src="${utils.getImageUrl("shard")}"/>${sv.values_shard.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")}` : ` (<img src="${utils.getImageUrl("shard")}"/>${sv.values_shard.map(value => (value > 0 ? "+" : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")})`) : "" }
-                                </span>
-                                <span class="alternative facet">
-                                    ${sv.facet_bonus.name
-                                        ? (sv.values_float.length == 0 || sv.values_float.every(value => value === 0) ? `<span class="facet"><span class="name_back type_${hero.facets.find(facet=>facet.name==sv.facet_bonus.name).color}"><img src="${utils.getImageUrl(hero.facets.find(facet=>facet.name==sv.facet_bonus.name).icon, ImageType.IconsFacets)}" /><span>${sv.facet_bonus.values.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")}</span></span></span>` : `(<span class="facet"><span class="name_back type_${hero.facets.find(facet=>facet.name==sv.facet_bonus.name).color}"><img src="${utils.getImageUrl(hero.facets.find(facet=>facet.name==sv.facet_bonus.name).icon, ImageType.IconsFacets)}" /><span>${sv.facet_bonus.values.map(value => (value > 0 ? "+" : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}</span></span></span>)` ) : ""}
-                                </span>
-                                <span class="alternative talent">
-                                    ${sv.bonuses.map(bonus=>` (<img src="${utils.getImageUrl("talents","icons","svg")}"/>${(bonus.value>0?"+":"")+bonus.value+(sv.is_percentage?"%":"")})`).join(" ")}
-                                </span>
+                                </span>` : "" }
+                                ${sv.values_scepter && sv.values_scepter.length ?
+                                `<span class="alternative scepter">
+                                    <img src="${utils.getImageUrl("scepter")}"/>${sv.values_scepter.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}
+                                </span>`  : "" }
+                                ${sv.values_shard && sv.values_shard.length ?
+                                `<span class="alternative shard">
+                                    <img src="${utils.getImageUrl("shard")}"/>${sv.values_shard.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}
+                                </span>`  : "" }
+                                ${sv.facet_bonus.name ?
+                                `<span class="alternative facet">
+                                    <span class="facet"><span class="name_back type_${hero.facets.find(facet=>facet.name==sv.facet_bonus.name).color}"><img src="${utils.getImageUrl(hero.facets.find(facet=>facet.name==sv.facet_bonus.name).icon, ImageType.IconsFacets)}" />${sv.facet_bonus.values.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}</span></span>
+                                </span>` : "" }
+                                ${sv.bonuses.length ? 
+                                `<span class="alternative talent">
+                                    ${sv.bonuses.map(bonus=>` <img src="${utils.getImageUrl("talents","icons","svg")}"/>${(bonus.value>0?'<span class="plus">+</span>':"")+bonus.value+(sv.is_percentage?"%":"")}`).join(" ")}
+                                </span>` : "" }
                             </span>
                         </p>`)
                         .join("")}
