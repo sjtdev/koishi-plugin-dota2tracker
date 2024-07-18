@@ -697,11 +697,8 @@ export async function apply(ctx: Context, config: Config) {
 
                         const combinations = Array.from(combinationsMap.values());
                         try {
-                            // await ctx.broadcast(
-                            await sendMessageToChannel(
-                                ctx,
-                                guild,
-                                // [`${guild.platform}:${guild.guildId}`],
+                            await ctx.broadcast(
+                                [`${guild.platform}:${guild.guildId}`],
                                 `昨日总结：
                                 ${currentsubscribedPlayers
                                     .map(
@@ -818,12 +815,7 @@ export async function apply(ctx: Context, config: Config) {
                                 ).toFixed(2)}%`;
                                 broadMatchMessage += broadPlayerMessage + "\n";
                             }
-                            // await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + img);
-                            // const targetChannels = await ctx.database.get("channel", { id: commingGuild.guildId, platform: commingGuild.platform });
-                            // if (targetChannels.length==1) await ctx.bots.find((bot) => bot.userId == targetChannels[0].assignee).sendMessage(commingGuild.guildId, broadMatchMessage + img);
-                            // else if (targetChannels.length>1) throw new Error("有复数个bot存在于该群组/频道，请移除多余bot。")
-                            // else throw new Error("未找到目标群组/频道。");
-                            await sendMessageToChannel(ctx, commingGuild, broadMatchMessage + img);
+                            await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + img);
                             ctx.logger.info(`${match.id}${match.parsedDateTime ? "已解析，" : "已结束超过1小时仍未被解析，放弃解析直接"}生成图片并发布于${commingGuild.platform}:${commingGuild.guildId}。`);
                         }
                         if (match.parsedDateTime)
@@ -874,21 +866,4 @@ function genImageHTML(data, template, type: TemplateType) {
     });
     if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", result);
     return result;
-}
-
-async function sendMessageToChannel(ctx, guild, broadMessage) {
-    const targetChannels = await ctx.database.get("channel", { id: guild.guildId, platform: guild.platform });
-
-    if (targetChannels.length === 1) {
-        const bot = ctx.bots.find((bot) => bot.userId === targetChannels[0].assignee);
-        if (bot) {
-            await bot.sendMessage(guild.guildId, broadMessage);
-        } else {
-            throw new Error("指定的bot未找到。");
-        }
-    } else if (targetChannels.length > 1) {
-        throw new Error("有复数个bot存在于该群组/频道，请移除多余bot。");
-    } else {
-        throw new Error("未找到目标群组/频道。");
-    }
 }
