@@ -24,6 +24,7 @@ export interface Config {
     dataParsingTimeoutMinutes: number;
     dailyReportSwitch: boolean;
     dailyReportHours: number;
+    urlInMessageType: Array<string>;
     template_match: string;
     template_player: string;
     template_hero: string;
@@ -43,6 +44,13 @@ export const Config: Schema = Schema.intersect([
         }),
         Schema.object({}),
     ]),
+    Schema.object({
+        urlInMessageType: Schema.array(
+            Schema.union([Schema.const("match").description("在查询比赛与战报消息中附带stratz比赛链接"), Schema.const("player").description("在查询玩家信息消息中附带stratz玩家链接"), Schema.const("hero").description("---").disabled()])
+        )
+            .role("checkbox")
+            .description("在消息中附带链接，<br/>请选择消息类型："),
+    }),
     Schema.object({
         template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)])
             .default("match_1")
@@ -74,8 +82,6 @@ export async function apply(ctx: Context, config: Config) {
     // write your plugin here
     utils.CONFIGS.STRATZ_API.TOKEN = config.STRATZ_API_TOKEN; // 读取配置API_TOKEN
     utils.setHttp(ctx.http);
-
-    // ctx.on()
 
     ctx.command("订阅本群", "订阅后还需玩家在本群绑定SteamID")
         .usage("订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。")
@@ -221,7 +227,7 @@ export async function apply(ctx: Context, config: Config) {
         }
     });
     // 查询比赛与查询最近比赛的共用代码块
-    async function queryAndDisplayMatch(session, matchId) {
+    async function queryMatchAndSend(session, matchId) {
         try {
             let match;
             let queryLocal = await ctx.database.get("dt_previous_query_results", matchId, ["data"]);
@@ -232,7 +238,7 @@ export async function apply(ctx: Context, config: Config) {
                 match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO(matchId))).data.match);
             }
             if (match && (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(moment().subtract(config.dataParsingTimeoutMinutes, "minutes")))) {
-                session.send(await ctx.puppeteer.render(genImageHTML(match, config.template_match, TemplateType.Match)));
+                session.send((ctx.config.urlInMessageType.some((type) => type == "match") ? "https://stratz.com/matches/" + matchId : "") + (await ctx.puppeteer.render(genImageHTML(match, config.template_match, TemplateType.Match))));
                 if (match.parsedDateTime)
                     // 当比赛数据已解析时才进行缓存
                     ctx.database.upsert("dt_previous_query_results", (row) => [{ matchId: match.id, data: match, queryTime: new Date() }]);
@@ -263,7 +269,7 @@ export async function apply(ctx: Context, config: Config) {
 
             session.send("正在搜索对局详情，请稍后...");
 
-            queryAndDisplayMatch(session, match_id);
+            queryMatchAndSend(session, match_id);
 
             // await ctx.puppeteer.render(await utils.getMatchImage_HTML(match_id));
         });
@@ -298,7 +304,7 @@ export async function apply(ctx: Context, config: Config) {
                     session.send("获取玩家最近比赛失败。");
                     return;
                 }
-                queryAndDisplayMatch(session, lastMatchId);
+                queryMatchAndSend(session, lastMatchId);
             }
         });
 
@@ -380,7 +386,10 @@ export async function apply(ctx: Context, config: Config) {
                         player.dotaPlus = player.dotaPlus.filter((dpHero) => dpHero.heroId == hero.id);
                     }
                     player.genHero = hero;
-                    session.send(await ctx.puppeteer.render(genImageHTML(player, config.template_player, TemplateType.Player)));
+                    session.send(
+                        (ctx.config.urlInMessageType.some((type) => type == "player") ? "https://stratz.com/players/" + player.steamAccount.id : "") +
+                            (await ctx.puppeteer.render(genImageHTML(player, config.template_player, TemplateType.Player)))
+                    );
                 } catch (error) {
                     ctx.logger.error(error);
                     session.send("获取玩家信息失败。");
@@ -488,7 +497,7 @@ export async function apply(ctx: Context, config: Config) {
                             }
                         }
                     });
-
+                    // (ctx.config.urlInMessageType.some((type) => type == "hero") ? `https://wiki.dota2.com.cn/hero/${hero.shortName}.html` : "") + 
                     await session.send(await ctx.puppeteer.render(genImageHTML(hero, config.template_hero, TemplateType.Hero)));
                 } catch (error) {
                     ctx.logger.error(error);
@@ -748,12 +757,15 @@ export async function apply(ctx: Context, config: Config) {
                     .forEach((match) => {
                         const tempGuilds: Array<{ guildId: string; platform: string; players: Array<utils.dt_subscribed_players> }> = [];
                         match.players.forEach((player) => {
-                            const subscribedPlayer = subscribedPlayersInGuild.find((subscribedPlayer) => subscribedPlayer.steamId === player.steamAccount.id);
-                            if (subscribedPlayer) {
-                                const tempGuild = tempGuilds.find((guild) => guild.guildId == subscribedPlayer.guildId && guild.platform == subscribedPlayer.platform);
-                                if (tempGuild) tempGuild.players.push(subscribedPlayer);
-                                else tempGuilds.push({ guildId: subscribedPlayer.guildId, platform: subscribedPlayer.platform, players: [subscribedPlayer] });
-                            }
+                            subscribedPlayersInGuild
+                                .filter((subscribedPlayer) => subscribedPlayer.steamId === player.steamAccount.id)
+                                .forEach((subscribedPlayer) => {
+                                    if (subscribedPlayer) {
+                                        const tempGuild = tempGuilds.find((guild) => guild.guildId == subscribedPlayer.guildId && guild.platform == subscribedPlayer.platform);
+                                        if (tempGuild) tempGuild.players.push(subscribedPlayer);
+                                        else tempGuilds.push({ guildId: subscribedPlayer.guildId, platform: subscribedPlayer.platform, players: [subscribedPlayer] });
+                                    }
+                                });
                         });
                         pendingMatches.push({ matchId: match.id, guilds: tempGuilds });
                         ctx.logger.info(
@@ -815,7 +827,7 @@ export async function apply(ctx: Context, config: Config) {
                                 ).toFixed(2)}%`;
                                 broadMatchMessage += broadPlayerMessage + "\n";
                             }
-                            await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + img);
+                            await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + (ctx.config.urlInMessageType.some((type) => type == "match") ? "https://stratz.com/matches/" + match.id : "") + img);
                             ctx.logger.info(`${match.id}${match.parsedDateTime ? "已解析，" : "已结束超过1小时仍未被解析，放弃解析直接"}生成图片并发布于${commingGuild.platform}:${commingGuild.guildId}。`);
                         }
                         if (match.parsedDateTime)

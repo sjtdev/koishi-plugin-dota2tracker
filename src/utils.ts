@@ -347,11 +347,9 @@ export function getFormattedMatchData(match) {
         Min = "min",
     }
     function findMaxByProperty(primaryProperty, secondaryProperty = null, players = match.players, primaryMode: ComparisonMode = ComparisonMode.Max, secondaryMode: ComparisonMode = ComparisonMode.Max) {
-        return players.reduce((result, player) => {
+        let maxPlayer = players.reduce((result, player) => {
             const primaryComparison = primaryMode === ComparisonMode.Max ? player[primaryProperty] > result[primaryProperty] : player[primaryProperty] < result[primaryProperty];
-
             const secondaryComparison = secondaryMode === ComparisonMode.Max ? player[secondaryProperty] > result[secondaryProperty] : player[secondaryProperty] < result[secondaryProperty];
-
             if (primaryComparison) {
                 return player; // 主属性决定返回哪个玩家
             } else if (player[primaryProperty] === result[primaryProperty] && secondaryProperty && secondaryComparison) {
@@ -360,19 +358,21 @@ export function getFormattedMatchData(match) {
             }
             return result; // 保持当前结果
         });
+
+        return maxPlayer[primaryProperty] > 0 ? maxPlayer : null; // 如果最大属性为0，则不返回玩家对象
     }
     findMaxByProperty(
         "mvpScore",
         undefined,
         match.players.filter((player) => match.didRadiantWin == player.isRadiant)
-    ).titles.push({ name: "MVP", color: "#FFA500" });
+    )?.titles.push({ name: "MVP", color: "#FFA500" });
     findMaxByProperty(
         "mvpScore",
         undefined,
         match.players.filter((player) => match.didRadiantWin != player.isRadiant)
-    ).titles.push({ name: "魂", color: "#6cf" });
-    findMaxByProperty("networth").titles.push({ name: "富", color: "#FFD700" });
-    findMaxByProperty("experiencePerMinute").titles.push({ name: "睿", color: "#8888FF" });
+    )?.titles.push({ name: "魂", color: "#6cf" });
+    findMaxByProperty("networth")?.titles.push({ name: "富", color: "#FFD700" });
+    findMaxByProperty("experiencePerMinute")?.titles.push({ name: "睿", color: "#8888FF" });
     if (match.parsedDateTime) {
         match.players
             .reduce((max, player) =>
@@ -391,12 +391,12 @@ export function getFormattedMatchData(match) {
             )
             .titles.push({ name: "耐", color: "#84A1C7" });
     }
-    findMaxByProperty("heroDamage").titles.push({ name: "爆", color: "#CC0088" });
-    findMaxByProperty("kills", "heroDamage").titles.push({ name: "破", color: "#DD0000" });
-    findMaxByProperty("deaths", "networth", undefined, undefined, ComparisonMode.Min).titles.push({ name: "鬼", color: "#CCCCCC" });
-    findMaxByProperty("assists", "heroDamage").titles.push({ name: "助", color: "#006400" });
-    findMaxByProperty("towerDamage", "heroDamage").titles.push({ name: "拆", color: "#FEDCBA" });
-    findMaxByProperty("heroHealing").titles.push({ name: "奶", color: "#00FF00" });
+    findMaxByProperty("heroDamage")?.titles.push({ name: "爆", color: "#CC0088" });
+    findMaxByProperty("kills", "heroDamage")?.titles.push({ name: "破", color: "#DD0000" });
+    findMaxByProperty("deaths", "networth", undefined, undefined, ComparisonMode.Min)?.titles.push({ name: "鬼", color: "#CCCCCC" });
+    findMaxByProperty("assists", "heroDamage")?.titles.push({ name: "助", color: "#006400" });
+    findMaxByProperty("towerDamage", "heroDamage")?.titles.push({ name: "拆", color: "#FEDCBA" });
+    findMaxByProperty("heroHealing")?.titles.push({ name: "奶", color: "#00FF00" });
     match.players
         .reduce((lowest, player) => {
             const currentContribution = (player.kills + player.assists) / match[player.team].killsCount;
@@ -506,12 +506,14 @@ export function formatHeroDesc(template: string, special_values: any[], type: He
             return "%";
         } else {
             // 处理 "s:" 前缀和 "shard_" 前缀，然后转换为小写
-            const fieldName = field.replace(/^s:/, '').replace(/^shard_/, '').toLowerCase();
+            const fieldName = field
+                .replace(/^s:/, "")
+                .replace(/^shard_/, "")
+                .toLowerCase();
             const specialValue = special_values.find((sv) => {
                 const nameLower = sv.name.toLowerCase();
                 // 匹配字段名，忽略 "bonus_" 和 "shard_" 的有无
-                return nameLower === fieldName || nameLower === `bonus_${fieldName}` || nameLower === `shard_${fieldName}` ||
-                       `bonus_${nameLower}` === fieldName || `shard_${nameLower}` === fieldName;
+                return nameLower === fieldName || nameLower === `bonus_${fieldName}` || nameLower === `shard_${fieldName}` || `bonus_${nameLower}` === fieldName || `shard_${nameLower}` === fieldName;
             });
             if (specialValue) {
                 let valuesToUse = "";
