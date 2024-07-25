@@ -497,7 +497,7 @@ export async function apply(ctx: Context, config: Config) {
                             }
                         }
                     });
-                    // (ctx.config.urlInMessageType.some((type) => type == "hero") ? `https://wiki.dota2.com.cn/hero/${hero.shortName}.html` : "") + 
+                    // (ctx.config.urlInMessageType.some((type) => type == "hero") ? `https://wiki.dota2.com.cn/hero/${hero.shortName}.html` : "") +
                     await session.send(await ctx.puppeteer.render(genImageHTML(hero, config.template_hero, TemplateType.Hero)));
                 } catch (error) {
                     ctx.logger.error(error);
@@ -655,7 +655,12 @@ export async function apply(ctx: Context, config: Config) {
                 for (let subPlayer of subscribedPlayersInGuild) {
                     let player = players.find((player) => subPlayer.steamId == player.steamAccount.id);
                     if (!player) continue;
-                    const guildMember = await ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember(subPlayer.guildId, subPlayer.userId);
+                    let guildMember;
+                    try {
+                        guildMember = await ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember(subPlayer.guildId, subPlayer.userId);
+                    } catch (error) {
+                        ctx.logger.error("获取群组信息失败。Error:" + error);
+                    }
                     subPlayer.name = subPlayer.nickName || (guildMember?.nick ?? players.find((player) => player.steamAccount.id == subPlayer.steamId)?.steamAccount.name);
 
                     player.winCount = player.matches.filter((match) => match.didRadiantWin == match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).isRadiant).length;
