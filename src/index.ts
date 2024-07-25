@@ -46,7 +46,11 @@ export const Config: Schema = Schema.intersect([
     ]),
     Schema.object({
         urlInMessageType: Schema.array(
-            Schema.union([Schema.const("match").description("在查询比赛与战报消息中附带stratz比赛链接"), Schema.const("player").description("在查询玩家信息消息中附带stratz玩家链接"), Schema.const("hero").description("---").disabled()])
+            Schema.union([
+                Schema.const("match").description("在查询比赛与战报消息中附带stratz比赛页面链接"),
+                Schema.const("player").description("在查询玩家信息消息中附带stratz玩家页面链接"),
+                Schema.const("hero").description("在查询英雄数据消息中附带刀塔百科对应英雄页面链接"),
+            ])
         )
             .role("checkbox")
             .description("在消息中附带链接，<br/>请选择消息类型："),
@@ -497,8 +501,9 @@ export async function apply(ctx: Context, config: Config) {
                             }
                         }
                     });
-                    // (ctx.config.urlInMessageType.some((type) => type == "hero") ? `https://wiki.dota2.com.cn/hero/${hero.shortName}.html` : "") +
-                    await session.send(await ctx.puppeteer.render(genImageHTML(hero, config.template_hero, TemplateType.Hero)));
+                    await session.send(
+                        (ctx.config.urlInMessageType.some((type) => type == "hero") ? `https://wiki.dota2.com.cn/hero/${hero.shortName}.html` : "") + (await ctx.puppeteer.render(genImageHTML(hero, config.template_hero, TemplateType.Hero)))
+                    );
                 } catch (error) {
                     ctx.logger.error(error);
                     session.send("获取数据失败");
