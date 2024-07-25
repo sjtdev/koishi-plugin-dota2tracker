@@ -659,7 +659,7 @@ export async function apply(ctx: Context, config: Config) {
                     try {
                         guildMember = await ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember(subPlayer.guildId, subPlayer.userId);
                     } catch (error) {
-                        ctx.logger.error("获取群组信息失败。Error:" + error);
+                        ctx.logger.error("获取群组信息失败。" + error);
                     }
                     subPlayer.name = subPlayer.nickName || (guildMember?.nick ?? players.find((player) => player.steamAccount.id == subPlayer.steamId)?.steamAccount.name);
 
@@ -687,7 +687,7 @@ export async function apply(ctx: Context, config: Config) {
                             const sortedPlayerIds = match.players
                                 .map((player) => player.steamAccount.id)
                                 .filter((id) => currentsubscribedPlayersIds.includes(id))
-                                .sort((a, b) => a.steamId - b.steamId);
+                                .sort((a, b) => a - b);
                             const key = sortedPlayerIds.join(",");
 
                             if (!combinationsMap.has(key)) {
