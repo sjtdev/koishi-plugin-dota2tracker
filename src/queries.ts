@@ -230,7 +230,10 @@ export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId,heroId?) {
         bottomLaneOutcome
         radiantKills
         direKills
-        players(steamAccountId: ${steamAccountId}) {
+        players {
+          steamAccount {
+            id
+          }
           isRadiant
           lane
           kills

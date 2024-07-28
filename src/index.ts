@@ -319,7 +319,7 @@ export async function apply(ctx: Context, config: Config) {
         .example("查询玩家 张三")
         .example("查询玩家 张三 hero 敌法师")
         .action(async ({ session, options }, input_data) => {
-            if (session.guild) {
+            if (session.guild || (!session.guild && input_data)) {
                 let sessionPlayer;
                 if (!input_data) {
                     sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.channel.id, platform: session.event.platform, userId: session.event.user.id }))[0];
@@ -398,6 +398,8 @@ export async function apply(ctx: Context, config: Config) {
                     ctx.logger.error(error);
                     session.send("获取玩家信息失败。");
                 }
+            } else {
+                session.send("<p>指令调用失败。</p><p>当前不属于群聊状态，必须提供指定玩家的SteamID。</p>");
             }
         });
 
@@ -820,6 +822,7 @@ export async function apply(ctx: Context, config: Config) {
                             let idsToFind = commingGuild.players.map((player) => player.steamId);
                             let broadPlayers = match.players.filter((item) => idsToFind.includes(item.steamAccountId));
                             for (let player of broadPlayers) {
+                                const random = new Random(() => simpleHashToSeed(match.id, player.steamAccountId));
                                 let broadPlayerMessage = `${player.steamAccount.name}的${random.pick(d2a.HEROES_CHINESE[player.hero.id])}`;
                                 if (player.isRadiant == match.didRadiantWin) {
                                     if (player.deathContribution < 0.2 || player.killContribution > 0.75 || player.heroDamage / player.networth > 1.5 || player.towerDamage > 10000 || player.imp > 0)
@@ -888,4 +891,18 @@ function genImageHTML(data, template, type: TemplateType) {
     });
     if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", result);
     return result;
+}
+
+function simpleHashToSeed(matchId, playerId) {
+    // 创建一个基于输入的字符串
+    const input = `${matchId}-${playerId}`;
+    // 将字符串转化为 Base64 编码
+    const encoded = btoa(input);
+    // 计算编码字符串的每个字符的字符代码的总和
+    let total = 0;
+    for (let i = 0; i < encoded.length; i++) {
+        total += encoded.charCodeAt(i);
+    }
+    // 通过取模操作和除法将总和转化为 [0, 1) 区间内的数
+    return (total % 1000) / 1000;
 }

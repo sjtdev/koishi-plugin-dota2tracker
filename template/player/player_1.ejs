@@ -338,7 +338,7 @@
             nearWinCount = 0,
             streak = 0;
         player.matches.forEach((match) => {
-            const innerPlayer = match.players[0];
+            const innerPlayer = match.players.find(innerPlayer=>player.steamAccount.id==innerPlayer.steamAccount.id);
             nearWinCount += match.didRadiantWin == innerPlayer.isRadiant ? 1 : 0;
             const didWin = match.didRadiantWin === innerPlayer.isRadiant;
             if (!player.streak) {
@@ -387,15 +387,15 @@
         // 瞎j8定义的各位置代表物品，以后看情况调整
         const positionIcons = ["damage","nuke","armor","speed","healing"];
         for (let index = 0; index < 5; index++) {
-            let currentPositionMatches = player.matches.filter(match=>match.players[0].position == ("POSITION_"+(index+1)))
-            let winCount = currentPositionMatches.filter(match=>match.didRadiantWin == match.players[0].isRadiant).length;
+            let currentPositionMatches = player.matches.filter(match=>match.players.find(innerPlayer=>player.steamAccount.id==innerPlayer.steamAccount.id).position == ("POSITION_"+(index+1)))
+            let winCount = currentPositionMatches.filter(match=>match.didRadiantWin == match.players.find(innerPlayer=>player.steamAccount.id==innerPlayer.steamAccount.id).isRadiant).length;
             player.positionPerformance.push({
                 position : (index + 1),
                 icon : positionIcons[index],
                 matchCount : currentPositionMatches.length,
                 winCount : winCount,
                 loseCount : currentPositionMatches.length - winCount,
-                imp : currentPositionMatches.length>0? Math.round(currentPositionMatches.reduce((acc,match)=>acc+match.players[0].imp,0)/currentPositionMatches.length):"-"
+                imp : currentPositionMatches.length>0? Math.round(currentPositionMatches.reduce((acc,match)=>acc+match.players.find(innerPlayer=>player.steamAccount.id==innerPlayer.steamAccount.id).imp,0)/currentPositionMatches.length):"-"
             })
         }
         const highestCountsPosition = {
@@ -504,7 +504,12 @@
                 </thead>
                 <tbody>
                     <%- player.matches.map((match) => {
-                        const innerPlayer = match.players[0];
+                        const innerPlayer = match.players.find(innerPlayer => player.steamAccount.id == innerPlayer.steamAccount.id);
+                        innerPlayer.teamKillsCount = match.parsedDateTime ?
+                            (match[(innerPlayer.isRadiant ? "radiant" : "dire") + "Kills"]?.reduce((acc, cva) => acc + cva, 0) ?? 0) : 
+                            match.players
+                                .filter(p => p.isRadiant === innerPlayer.isRadiant)
+                                .reduce((k, p) => k + p.kills, 0);
                         return `
                     <tr class="match ${match.didRadiantWin == innerPlayer.isRadiant ? "win" : "lose"}">
                         <td>${match.parsedDateTime ? match.id : `<p>${match.id}</p><p>（未解析）</p>`}</td>
@@ -514,8 +519,8 @@
                         </td>
                         <td><img alt="" src="${utils.getImageUrl(innerPlayer.hero.shortName, ImageType.HeroIcons)}" /></td>
                         <td style="line-height: 20px">
-                            <p>${((innerPlayer.kills + innerPlayer.assists) / Math.max(1, innerPlayer.deaths)).toFixed(2)} (${match.parsedDateTime?((((innerPlayer.kills + innerPlayer.assists) /
-                            (match[(innerPlayer.isRadiant ? "radiant" : "dire")+"Kills"]?.reduce((acc, cva) => acc + cva, 0))) * 100)?.toFixed(0)):"?"}%)</p>
+                            <p>${((innerPlayer.kills + innerPlayer.assists) / Math.max(1, innerPlayer.deaths)).toFixed(2)} (${(match.parsedDateTime?"":"≈")+((((innerPlayer.kills + innerPlayer.assists) /
+                            innerPlayer.teamKillsCount) * 100)?.toFixed(0))}%)</p>
                             <p>${innerPlayer.kills}/${innerPlayer.deaths}/${innerPlayer.assists}</p>
                         </td>
                         <td><div class="player_lane ${match.laneResult}">${laneSVG[match.laneResult]}</div></td>
