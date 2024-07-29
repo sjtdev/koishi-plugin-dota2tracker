@@ -49,6 +49,18 @@
                 color: #ffb400;
             }
 
+            nav > .rank {
+                width: 48px;
+                height: 48px;
+                position: relative;
+            }
+
+            nav > .rank > img {
+                width: 48px;
+                height: 48px;
+                position: absolute;
+            }
+
             .radiant {
                 color: #3c9028;
             }
@@ -232,7 +244,7 @@
             .player > .rank > p {
                 position: absolute;
                 width: 100%;
-                bottom: 3px;
+                bottom: 2px;
                 text-align: center;
                 font-size: 9px;
                 color: #fff;
@@ -450,7 +462,8 @@
                 <p><%-d2a.lobbyTypes[match.lobbyType] || match.lobbyType%>/<%-d2a.gameMode[match.gameMode] || match.gameMode%></p>
             </div>
             <div class="rank">
-                <img width="48" height="48" src="<%-utils.getImageUrl('medal_' + match.rank?.toString().split('')[0])%>" alt="" />
+                <img src="<%-utils.getImageUrl('medal_' + (match.rank?.toString().split('')[0] ?? '0'))%>" alt="" />
+                <img style="z-index: 1;" src="<%-utils.getImageUrl('star_' + (match.rank?.toString().split('')[1] ?? '0'))%>" alt="" />
             </div>
         </nav>
         <section class="match_result">
