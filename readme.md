@@ -12,7 +12,7 @@ DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑�
 在希望推送战报信息的群组（或频道）使用指令`订阅本群`，玩家可使用指令`绑定`来将自身账号与Steam账号绑定，bot会尝试追踪已订阅群组（或频道）中的绑定玩家的最新对局信息。  
 其他查询功能见下方指令说明。  
 **直接调用help指令可获取更详细的说明，调用【指令 -h】还会有用法示例。（例如：订阅本群 -h）**  
-**本插件使用的所有SteamID均为SteamID3类型，有关SteamID类型见 https://steamid.tatlead.com/ （由[issue](../../issues/1)提供，感谢这位用户）**  
+**本插件使用的所有SteamID均为SteamID3类型（即DOTA2游戏内个人页面显示的好友ID与stratz登录后个人页面链接中显示的ID），有关SteamID类型见 https://steamid.tatlead.com/ （由[issue](../../issues/1)提供，感谢这位用户）**  
 **更新日志见[changelog](changelog.md)**  
 
 ### 指令
