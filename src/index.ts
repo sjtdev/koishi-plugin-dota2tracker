@@ -730,7 +730,6 @@ export async function apply(ctx: Context, config: Config) {
                             for (let player of broadPlayers) {
                                 const random = new Random(() => simpleHashToSeed(`${match.id}-${player.steamAccountId}-${player.playerSlot}`));
                                 let broadPlayerMessage = `${player.steamAccount.name}的${random.pick(d2a.HEROES_CHINESE[player.hero.id])}`;
-                                console.log([player.deathContribution, player.killContribution]);
                                 if (player.isRadiant == match.didRadiantWin) {
                                     if (player.deathContribution < 0.2 || player.killContribution > 0.75 || player.heroDamage / player.networth > 1.5 || player.towerDamage > 10000 || player.imp > 0)
                                         broadPlayerMessage += random.pick(d2a.WIN_POSITIVE);
