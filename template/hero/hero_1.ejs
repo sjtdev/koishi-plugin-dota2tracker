@@ -683,7 +683,7 @@
                 `).join("")}
             </div>
             <div class="skills">
-                ${hero.abilities//.filter((item) => dotaconstants.abilities[item.name].behavior != "Hidden")
+                ${hero.abilities//.filter((item) => dotaconstants.abilities[item.name]?.behavior != "Hidden")
                 .map((item) => `
                 <div class="skill" data-innate="${item.ability_is_innate&&!item.ability_is_facet}">
                     <p class="title">
@@ -695,26 +695,20 @@
                     <div class="img_stats">
                         <img src="${utils.getImageUrl(item.name, ImageType.Abilities)}" onerror="this.onerror=null; this.src='${utils.getImageUrl(`innate_icon`,ImageType.Icons)}';"/>
                         <div class="stats">
-                            <p class="behavior">技能：${(Array.isArray(dotaconstants.abilities[item.name].behavior) ? dotaconstants.abilities[item.name].behavior : [dotaconstants.abilities[item.name].behavior])
+                            <p class="behavior">技能：${[].concat(dotaconstants.abilities[item.name]?.behavior)
                                 .filter((beh) => beh !== "Hidden" || !(item.ability_is_granted_by_shard || item.ability_is_granted_by_scepter))
-                                .map((beh) => d2a.behavior[beh])
-                                .join("/")}</p>
-                            ${dotaconstants.abilities[item.name].target_team
-                                    ? `<p class="target_team">影响：${(Array.isArray(dotaconstants.abilities[item.name].target_team)
-                                    ? dotaconstants.abilities[item.name].target_team
-                                    : [dotaconstants.abilities[item.name].target_team])
-                                    .map((tt) => d2a.target_team[tt])
-                                    .join("/")}</p>`
-                                    : ""}
-                            ${!Array.isArray(dotaconstants.abilities[item.name].dmg_type) && dotaconstants.abilities[item.name].dmg_type
-                                    ? `<p class="dmg_type ${dotaconstants.abilities[item.name].dmg_type}">伤害类型：</p>`
-                                    : ""}
-                            ${dotaconstants.abilities[item.name].dispellable
-                                    ? `<p class="dispellable ${dotaconstants.abilities[item.name].dispellable == "Strong Dispels Only" ? "Strong" : dotaconstants.abilities[item.name].dispellable}">能否驱散：</p>`
-                                    : ""}
-                            ${!Array.isArray(dotaconstants.abilities[item.name].bkbpierce) && dotaconstants.abilities[item.name].bkbpierce
-                                    ? `<p class="bkbpierce">无视减益免疫： ${dotaconstants.abilities[item.name].bkbpierce == "Yes" ? "是" : "否"}</p>`
-                                    : ""}
+                                .map((beh) => d2a.behavior[beh]).join("/")}
+                            </p>
+                            ${dotaconstants.abilities[item.name]?.target_team ?
+                            `<p class="target_team">影响：${[].concat(dotaconstants.abilities[item.name]?.target_team)
+                                .map((tt) => d2a.target_team[tt]).join("/")}
+                            </p>` : ""}
+                            ${!Array.isArray(dotaconstants.abilities[item.name]?.dmg_type) && dotaconstants.abilities[item.name]?.dmg_type ?
+                            `<p class="dmg_type ${dotaconstants.abilities[item.name]?.dmg_type}">伤害类型：</p>` : ""}
+                            ${dotaconstants.abilities[item.name]?.dispellable ?
+                            `<p class="dispellable ${dotaconstants.abilities[item.name]?.dispellable == "Strong Dispels Only" ? "Strong" : dotaconstants.abilities[item.name]?.dispellable}">能否驱散：</p>` : ""}
+                            ${!Array.isArray(dotaconstants.abilities[item.name]?.bkbpierce) && dotaconstants.abilities[item.name]?.bkbpierce ?
+                            `<p class="bkbpierce">无视减益免疫： ${dotaconstants.abilities[item.name]?.bkbpierce == "Yes" ? "是" : "否"}</p>` : ""}
                         </div>
                     </div>
                     <p class="description">${item.desc_loc}</p>
@@ -768,7 +762,7 @@
                                 </span>`  : "" }
                                 ${sv.facet_bonus.name ?
                                 `<span class="alternative facet">
-                                    <span class="facet"><span class="name_back type_${hero.facets.find(facet=>facet.name==sv.facet_bonus.name).color}"><img src="${utils.getImageUrl(hero.facets.find(facet=>facet.name==sv.facet_bonus.name).icon, ImageType.IconsFacets)}" />${sv.facet_bonus.values.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}</span></span>
+                                    <span class="facet"><span class="name_back type_${hero.facets.find(facet=>facet.name==sv.facet_bonus.name).color}"><img src="${utils.getImageUrl(hero.facets.find(facet=>facet.name==sv.facet_bonus.name).icon, ImageType.IconsFacets)}" />${sv.facet_bonus.values.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")}</span></span>
                                 </span>` : "" }
                                 ${sv.bonuses.length ? 
                                 `<span class="alternative talent">

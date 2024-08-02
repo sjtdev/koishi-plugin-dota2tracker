@@ -37,6 +37,7 @@ export function MATCH_INFO(matchId) {
           leaverStatus
           partyId
           position
+          playerSlot
           lane
           imp
           kills

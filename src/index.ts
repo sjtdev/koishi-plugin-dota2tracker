@@ -24,6 +24,10 @@ export interface Config {
     dataParsingTimeoutMinutes: number;
     dailyReportSwitch: boolean;
     dailyReportHours: number;
+    dailyReportShowCombi: boolean;
+    weeklyReportSwitch: boolean;
+    weeklyReportDayHours: Array<number>;
+    weeklyReportShowCombi: boolean;
     urlInMessageType: Array<string>;
     template_match: string;
     template_player: string;
@@ -41,6 +45,20 @@ export const Config: Schema = Schema.intersect([
         Schema.object({
             dailyReportSwitch: Schema.const(true).required(),
             dailyReportHours: Schema.number().min(0).max(23).default(6).description("日报时间小时"),
+            dailyReportShowCombi: Schema.boolean().default(true).description("日报是否显示组合"),
+        }),
+        Schema.object({}),
+    ]),
+    Schema.object({
+        weeklyReportSwitch: Schema.boolean().default(false).description("周报功能").experimental(),
+    }),
+    Schema.union([
+        Schema.object({
+            weeklyReportSwitch: Schema.const(true).required(),
+            weeklyReportDayHours: Schema.tuple([Schema.number().min(1).max(7), Schema.number().min(0).max(23)])
+                .default([1, 10])
+                .description("周报发布于周（几）的（几）点"),
+            weeklyReportShowCombi: Schema.boolean().default(true).description("周报是否显示组合"),
         }),
         Schema.object({}),
     ]),
@@ -283,7 +301,7 @@ export async function apply(ctx: Context, config: Config) {
         .example("查询最近比赛 123456789")
         .example("查询最近比赛 张三")
         .action(async ({ session }, input_data) => {
-            if (session.guild) {
+            if (session.guild || (!session.guild && input_data)) {
                 let sessionPlayer;
                 if (!input_data) {
                     sessionPlayer = (await ctx.database.get("dt_subscribed_players", { guildId: session.event.channel.id, platform: session.event.platform, userId: session.event.user.id }))[0];
@@ -309,6 +327,8 @@ export async function apply(ctx: Context, config: Config) {
                     return;
                 }
                 queryMatchAndSend(session, lastMatchId);
+            } else {
+                session.send("<p>指令调用失败。</p><p>当前不属于群聊状态，必须提供指定玩家的SteamID。</p>");
             }
         });
 
@@ -591,32 +611,6 @@ export async function apply(ctx: Context, config: Config) {
     // ctx.command("test <input_data>")
     //     .option("a", "a")
     //     .action(async ({ session, options }, input_data) => {
-    //         // if (input_data) {
-    //         //     let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({ id: hero["id"], name: hero["name"], shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1] }));
-    //         //     let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
-    //         //         id: parseInt(key),
-    //         //         names_cn: d2a.HEROES_CHINESE[key],
-    //         //     }));
-    //         //     const mergedMap = new Map();
-    //         //     [dc_heroes, cn_heroes].forEach((array) => {
-    //         //         array.forEach((item) => {
-    //         //             const existingItem = mergedMap.get(item.id);
-    //         //             if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
-    //         //             else mergedMap.set(item.id, item);
-    //         //         });
-    //         //     });
-    //         //     let heroes = Array.from(mergedMap.values());
-    //         //     let hero = heroes.find((hero) => hero.names_cn.includes(input_data) || hero.shortName === input_data.toLowerCase() || hero.id == input_data);
-    //         //     session.send(JSON.stringify(hero));
-    //         // }
-    //         // session.send(`${random.pick(["嗯", "啊", "蛤", "啥", "咋", "咦", "哦"])}？`);
-    //         // session.send();
-    //         // await ctx.puppeteer.()
-    //         // console.log((await ctx.database.get("dt_7_36", [0]))[0].data);
-    //         // console.log(session);
-    //         // const data = await ctx.http.get("http://localhost:8099/");
-    //         // console.log(data);
-    //         // ctx.bots.forEach((bot) => console.log(bot.userId));
 
     //     });
 
@@ -644,101 +638,13 @@ export async function apply(ctx: Context, config: Config) {
         if (config.dailyReportSwitch) {
             ctx.cron(`0 ${config.dailyReportHours} * * *`, async function () {
                 const oneDayAgo = moment().subtract(1, "days").unix();
-                const subscribedGuilds = await ctx.database.get("dt_subscribed_guilds", undefined);
-                const subscribedPlayersInGuild: any[] = (await ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
-
-                const players = (
-                    await utils.query(
-                        queries.MATCHES_FOR_DAILY(
-                            subscribedPlayersInGuild.map((player) => player.steamId).filter((value, index, self) => self.indexOf(value) === index),
-                            oneDayAgo
-                        )
-                    )
-                ).data.players.filter((player) => player.matches.length > 0);
-                const matches = players
-                    .map((player) => player.matches.map((match) => match))
-                    .flat()
-                    .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
-                for (let subPlayer of subscribedPlayersInGuild) {
-                    let player = players.find((player) => subPlayer.steamId == player.steamAccount.id);
-                    if (!player) continue;
-                    let guildMember;
-                    try {
-                        guildMember = await ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember(subPlayer.guildId, subPlayer.userId);
-                    } catch (error) {
-                        ctx.logger.error("获取群组信息失败。" + error);
-                    }
-                    subPlayer.name = subPlayer.nickName || (guildMember?.nick ?? players.find((player) => player.steamAccount.id == subPlayer.steamId)?.steamAccount.name);
-
-                    player.winCount = player.matches.filter((match) => match.didRadiantWin == match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).isRadiant).length;
-                    player.loseCount = player.matches.length - player.winCount;
-                    player.avgKills = utils.roundToDecimalPlaces(player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).kills, 0) / player.matches.length, 2);
-                    player.avgDeaths = utils.roundToDecimalPlaces(player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).deaths, 0) / player.matches.length, 2);
-                    player.avgAssists = utils.roundToDecimalPlaces(
-                        player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).assists, 0) / player.matches.length,
-                        2
-                    );
-                    player.avgKDA = utils.roundToDecimalPlaces((player.avgKills + player.avgAssists) / (player.avgDeaths || 1), 2);
-                    player.avgImp = utils.roundToDecimalPlaces(player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).imp, 0) / player.matches.length, 0);
-
-                    subPlayer = Object.assign(subPlayer, player);
-                }
-
-                for (let guild of subscribedGuilds) {
-                    const currentsubscribedPlayers = subscribedPlayersInGuild.filter((player) => player.platform == guild.platform && player.guildId == guild.guildId && player.matches?.length);
-                    if (currentsubscribedPlayers.length) {
-                        const currentsubscribedPlayersIds = currentsubscribedPlayers.map((player) => player.steamId);
-                        const combinationsMap = new Map();
-
-                        matches.forEach((match) => {
-                            const sortedPlayerIds = match.players
-                                .map((player) => player.steamAccount.id)
-                                .filter((id) => currentsubscribedPlayersIds.includes(id))
-                                .sort((a, b) => a - b);
-                            const key = sortedPlayerIds.join(",");
-
-                            if (!combinationsMap.has(key)) {
-                                const players = currentsubscribedPlayers.filter((subPlayer) => sortedPlayerIds.includes(subPlayer.steamId));
-                                // console.log(players);
-                                if (players.length > 0) {
-                                    const name = players.map((subPlayer) => subPlayer.name).join("/");
-                                    combinationsMap.set(key, {
-                                        players,
-                                        name,
-                                        winCount: match.didRadiantWin == match.players.find((innerPlayer) => innerPlayer.steamAccount.id == players[0].steamId).isRadiant ? 1 : 0,
-                                        matches: [match],
-                                    });
-                                }
-                            } else {
-                                const combi = combinationsMap.get(key);
-                                combi.matches.push(match);
-                                combi.winCount += match.didRadiantWin == match.players.find((innerPlayer) => innerPlayer.steamAccount.id == combi.players[0].steamId).isRadiant ? 1 : 0;
-                            }
-                        });
-
-                        const combinations = Array.from(combinationsMap.values());
-                        try {
-                            await ctx.broadcast(
-                                [`${guild.platform}:${guild.guildId}`],
-                                `昨日总结：
-                                ${currentsubscribedPlayers
-                                    .map(
-                                        (player) =>
-                                            `${player.name}: ${player.winCount}胜${player.loseCount}负 胜率${Math.round((player.winCount / player.matches.length) * 100)}%，平均KDA: [${player.avgKills}/${player.avgDeaths}/${
-                                                player.avgAssists
-                                            }](${player.avgKDA})，平均表现: ${player.avgImp > 0 ? "+" : ""}${player.avgImp}`
-                                    )
-                                    .join("\n")}
-                                ${combinations.map((combi) => `组合[${combi.name}]: ${combi.winCount}胜${combi.matches.length - combi.winCount}负 胜率${Math.round((combi.winCount / combi.matches.length) * 100)}%`).join("\n")}`.replace(
-                                    /\s*\n\s*/g,
-                                    "\n"
-                                )
-                            );
-                        } catch (error) {
-                            ctx.logger.error(error);
-                        }
-                    }
-                }
+                await report(oneDayAgo, "昨日总结", config.dailyReportShowCombi);
+            });
+        }
+        if (config.weeklyReportSwitch) {
+            ctx.cron(`0 ${config.weeklyReportDayHours[1]} * * ${config.weeklyReportDayHours[0]}`, async function () {
+                const oneWeekAgo = moment().subtract(1, "weeks").unix();
+                await report(oneWeekAgo, "上周总结", config.weeklyReportShowCombi);
             });
         }
         // 每分钟执行一次查询玩家最近比赛记录，若未发布过则进入待发布列表；检查待发布列表，若满足发布条件（比赛已被解析）则生成图片并发布。
@@ -822,14 +728,15 @@ export async function apply(ctx: Context, config: Config) {
                             let idsToFind = commingGuild.players.map((player) => player.steamId);
                             let broadPlayers = match.players.filter((item) => idsToFind.includes(item.steamAccountId));
                             for (let player of broadPlayers) {
-                                const random = new Random(() => simpleHashToSeed(match.id, player.steamAccountId));
+                                const random = new Random(() => simpleHashToSeed(`${match.id}-${player.steamAccountId}-${player.playerSlot}`));
                                 let broadPlayerMessage = `${player.steamAccount.name}的${random.pick(d2a.HEROES_CHINESE[player.hero.id])}`;
+                                console.log([player.deathContribution, player.killContribution]);
                                 if (player.isRadiant == match.didRadiantWin) {
                                     if (player.deathContribution < 0.2 || player.killContribution > 0.75 || player.heroDamage / player.networth > 1.5 || player.towerDamage > 10000 || player.imp > 0)
                                         broadPlayerMessage += random.pick(d2a.WIN_POSITIVE);
                                     else broadPlayerMessage += random.pick(d2a.WIN_NEGATIVE);
                                 } else {
-                                    if (player.deathContribution < 0.25 || player.killContribution > 0.75 || player.heroDamage / player.networth > 1.25 || player.towerDamage > 5000 || player.imp > 0)
+                                    if (player.deathContribution < 0.25 || player.killContribution > 0.75 || player.heroDamage / player.networth > 1.0 || player.towerDamage > 5000 || player.imp > 0)
                                         broadPlayerMessage += random.pick(d2a.LOSE_POSITIVE);
                                     else broadPlayerMessage += random.pick(d2a.LOSE_NEGATIVE);
                                 }
@@ -841,7 +748,7 @@ export async function apply(ctx: Context, config: Config) {
                                 broadMatchMessage += broadPlayerMessage + "\n";
                             }
                             await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + (ctx.config.urlInMessageType.some((type) => type == "match") ? "https://stratz.com/matches/" + match.id : "") + img);
-                            ctx.logger.info(`${match.id}${match.parsedDateTime ? "已解析，" : "已结束超过1小时仍未被解析，放弃解析直接"}生成图片并发布于${commingGuild.platform}:${commingGuild.guildId}。`);
+                            ctx.logger.info(`${match.id}${match.parsedDateTime ? "已解析，" : "已结束超过1小时仍未被解析，放弃等待解析直接"}生成图片并发布于${commingGuild.platform}:${commingGuild.guildId}。`);
                         }
                         if (match.parsedDateTime)
                             // 当比赛数据已解析时才进行缓存
@@ -856,6 +763,104 @@ export async function apply(ctx: Context, config: Config) {
             }
         });
     });
+
+    async function report(timeAgo, title, showCombi) {
+        const subscribedGuilds = await ctx.database.get("dt_subscribed_guilds", undefined);
+        const subscribedPlayersInGuild: any[] = (await ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
+
+        const players = (
+            await utils.query(
+                queries.MATCHES_FOR_DAILY(
+                    subscribedPlayersInGuild.map((player) => player.steamId).filter((value, index, self) => self.indexOf(value) === index),
+                    timeAgo
+                )
+            )
+        ).data.players.filter((player) => player.matches.length > 0);
+        const matches = players
+            .map((player) => player.matches.map((match) => match))
+            .flat()
+            .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+        for (let subPlayer of subscribedPlayersInGuild) {
+            let player = players.find((player) => subPlayer.steamId == player.steamAccount.id);
+            if (!player) continue;
+            let guildMember;
+            try {
+                guildMember = await ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember(subPlayer.guildId, subPlayer.userId);
+            } catch (error) {
+                ctx.logger.error("获取群组信息失败。" + error);
+            }
+            subPlayer.name = subPlayer.nickName || (guildMember?.nick ?? players.find((player) => player.steamAccount.id == subPlayer.steamId)?.steamAccount.name);
+
+            player.winCount = player.matches.filter((match) => match.didRadiantWin == match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).isRadiant).length;
+            player.loseCount = player.matches.length - player.winCount;
+            player.avgKills = utils.roundToDecimalPlaces(player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).kills, 0) / player.matches.length, 2);
+            player.avgDeaths = utils.roundToDecimalPlaces(player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).deaths, 0) / player.matches.length, 2);
+            player.avgAssists = utils.roundToDecimalPlaces(player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).assists, 0) / player.matches.length, 2);
+            player.avgKDA = utils.roundToDecimalPlaces((player.avgKills + player.avgAssists) / (player.avgDeaths || 1), 2);
+            player.avgImp = utils.roundToDecimalPlaces(player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).imp, 0) / player.matches.length, 0);
+
+            subPlayer = Object.assign(subPlayer, player);
+        }
+
+        for (let guild of subscribedGuilds) {
+            const currentsubscribedPlayers = subscribedPlayersInGuild.filter((player) => player.platform == guild.platform && player.guildId == guild.guildId && player.matches?.length);
+            if (currentsubscribedPlayers.length) {
+                const currentsubscribedPlayersIds = currentsubscribedPlayers.map((player) => player.steamId);
+                const combinationsMap = new Map();
+
+                matches.forEach((match) => {
+                    const sortedPlayerIds = match.players
+                        .map((player) => player.steamAccount.id)
+                        .filter((id) => currentsubscribedPlayersIds.includes(id))
+                        .sort((a, b) => a - b);
+                    const key = sortedPlayerIds.join(",");
+
+                    if (!combinationsMap.has(key)) {
+                        const players = currentsubscribedPlayers.filter((subPlayer) => sortedPlayerIds.includes(subPlayer.steamId));
+                        // console.log(players);
+                        if (players.length > 0) {
+                            const name = players.map((subPlayer) => subPlayer.name).join("/");
+                            combinationsMap.set(key, {
+                                players,
+                                name,
+                                winCount: match.didRadiantWin == match.players.find((innerPlayer) => innerPlayer.steamAccount.id == players[0].steamId).isRadiant ? 1 : 0,
+                                matches: [match],
+                            });
+                        }
+                    } else {
+                        const combi = combinationsMap.get(key);
+                        combi.matches.push(match);
+                        combi.winCount += match.didRadiantWin == match.players.find((innerPlayer) => innerPlayer.steamAccount.id == combi.players[0].steamId).isRadiant ? 1 : 0;
+                    }
+                });
+
+                const combinations = Array.from(combinationsMap.values());
+                try {
+                    await ctx.broadcast(
+                        [`${guild.platform}:${guild.guildId}`],
+                        `${title}：
+                                ${currentsubscribedPlayers
+                                    .map(
+                                        (player) =>
+                                            `${player.name}: ${player.winCount}胜${player.loseCount}负 胜率${Math.round((player.winCount / player.matches.length) * 100)}%，平均KDA: [${player.avgKills}/${player.avgDeaths}/${
+                                                player.avgAssists
+                                            }](${player.avgKDA})，平均表现: ${player.avgImp > 0 ? "+" : ""}${player.avgImp}`
+                                    )
+                                    .join("\n")}
+                                ${
+                                    showCombi
+                                        ? combinations.map((combi) => `组合[${combi.name}]: ${combi.winCount}胜${combi.matches.length - combi.winCount}负 胜率${Math.round((combi.winCount / combi.matches.length) * 100)}%`).join("\n")
+                                        : ""
+                                }`.replace(/\s*\n\s*/g, "\n")
+                    );
+                    ctx.logger.info(`发布日报于${guild.platform}:${guild.guildId}`);
+                } catch (error) {
+                    ctx.logger.error(error);
+                }
+            }
+        }
+    }
+
     ctx.on("dispose", async () => {
         // await save_database(ctx);
         // timer();
@@ -893,11 +898,9 @@ function genImageHTML(data, template, type: TemplateType) {
     return result;
 }
 
-function simpleHashToSeed(matchId, playerId) {
-    // 创建一个基于输入的字符串
-    const input = `${matchId}-${playerId}`;
+function simpleHashToSeed(inputString) {
     // 将字符串转化为 Base64 编码
-    const encoded = btoa(input);
+    const encoded = btoa(inputString);
     // 计算编码字符串的每个字符的字符代码的总和
     let total = 0;
     for (let i = 0; i < encoded.length; i++) {
