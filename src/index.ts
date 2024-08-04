@@ -450,6 +450,7 @@ export async function apply(ctx: Context, config: Config) {
                                     (hero.facets[i] as any).abilities.push({ id: ab.id, name: ab.name, name_loc: ab.name_loc, description_ability_loc: utils.formatHeroDesc(ab.desc_loc, ab.special_values, HeroDescType.Facet) });
                                 else (hero.facets[i] as any).description_loc = utils.formatHeroDesc((hero.facets[i] as any).description_loc, ab.special_values, HeroDescType.Facet);
                                 ab.ability_is_facet = true;
+                                ab.facet = hero.facets[i];
                                 hero.abilities.push(ab);
                             });
                         }
@@ -459,6 +460,8 @@ export async function apply(ctx: Context, config: Config) {
                     hero.abilities.forEach((ab) => {
                         // 遍历修改技能的命石，将描述与技能回填
                         ab.facets_loc.forEach((facet, i) => {
+                            i = i + (hero.facets.length - ab.facets_loc.length);
+                            if (i < 0) return;
                             if (facet) {
                                 if (!(hero.facets[i] as any).abilities) (hero.facets[i] as any).abilities = [];
                                 (hero.facets[i] as any).abilities.push({ id: ab.id, name: ab.name, name_loc: ab.name_loc, description_ability_loc: utils.formatHeroDesc(facet, ab.special_values, HeroDescType.Facet), attributes: [] });
@@ -816,7 +819,6 @@ export async function apply(ctx: Context, config: Config) {
 
                     if (!combinationsMap.has(key)) {
                         const players = currentsubscribedPlayers.filter((subPlayer) => sortedPlayerIds.includes(subPlayer.steamId));
-                        // console.log(players);
                         if (players.length > 0) {
                             const name = players.map((subPlayer) => subPlayer.name).join("/");
                             combinationsMap.set(key, {

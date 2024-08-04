@@ -204,7 +204,8 @@
                 gap: 10px; /* 可选：设置项目之间的间距 */
             }
 
-            .facet {
+            .facets > .facet ,
+            .skill > .facet {
                 flex: 1 1 calc(50% - 10px); /* 每行两个项目 */
                 box-sizing: border-box; /* 包含padding和border在宽度和高度的计算中 */
                 background-color: #181f24;
@@ -212,10 +213,11 @@
                 border: 1px solid #2b2f33;
             }
 
-            .facet:nth-child(odd):last-child {
+            .facets > .facet:nth-child(odd):last-child {
                 flex-basis: 100%; /* 最后一个奇数项目占据整行 */
             }
-            .facet > .name_back {
+            .facets > .facet > .name_back ,
+            .skill > .facet > .name_back {
                 position: absolute;
                 height: 50px;
                 width: 100%;
@@ -343,6 +345,8 @@
                 background-color: #1f272b;
                 padding: 8px;
                 font-weight: 100;
+                height: auto;
+                width: auto;
             }
             .skill > .title > .name {
                 font-family: "KaiTi", "楷体", "楷体_GB2312", "STKaiti", serif;
@@ -355,6 +359,10 @@
                 padding: 2px 8px;
                 box-sizing: content-box;
                 background-color: #5b93d1;
+            }
+
+            .skill > .title.name_back > img{
+                width: 16px;
             }
 
             .skill img.scepter,
@@ -685,8 +693,9 @@
             <div class="skills">
                 ${hero.abilities//.filter((item) => dotaconstants.abilities[item.name]?.behavior != "Hidden")
                 .map((item) => `
-                <div class="skill" data-innate="${item.ability_is_innate&&!item.ability_is_facet}">
-                    <p class="title">
+                <div class="skill${item.facet?' facet':''}" data-innate="${item.ability_is_innate&&!item.ability_is_facet}">
+                    <p class="title${item.facet?(' name_back type_' + item.facet?.color):''}">
+                        ${item.facet?`<img src="${utils.getImageUrl(item.facet?.icon, ImageType.IconsFacets)}">`:""}
                         <span class="name">${item.name_loc}</span>
                         ${item.ability_is_innate&&!item.ability_is_facet?`<span class="is_innate">先天技能</span>`:""}
                         ${item.ability_is_granted_by_scepter ?`<img src="${utils.getImageUrl("scepter")}" class="scepter">`:""}
@@ -712,7 +721,12 @@
                         </div>
                     </div>
                     <p class="description">${item.desc_loc}</p>
-                    ${item.facets_loc.map((facet_loc,index)=>(facet_loc!=""?`
+                    ${item.facets_loc
+                        .reduce((acc, facet_loc, index) => {
+                            index = index + (hero.facets.length - item.facets_loc.length);
+                            if (index >= 0) acc.push(facet_loc);
+                            return acc;},[])
+                        .map((facet_loc,index)=>(facet_loc!=""?`
                     <div class="facet">
                         <div class="name_back type_${hero.facets[index].color}"></div>
                         <div class="name_line type_${hero.facets[index].color}"></div>
@@ -727,12 +741,12 @@
                         </div>
                     </div>
                     `:"")).join("")}
-                    ${item.ability_has_scepter&&!item.ability_is_granted_by_scepter
+                    ${item.ability_has_scepter&&!item.ability_is_granted_by_scepter&&item.scepter_loc
                     ? `<p class="aghanim_description">
                         <span class="title"><img src="${utils.getImageUrl("scepter")}"class="scepter">阿哈利姆神杖</span>
                         <span class="desc">${item.scepter_loc}</span>
                     </p>` : ""}
-                    ${item.ability_has_shard&&!item.ability_is_granted_by_shard
+                    ${item.ability_has_shard&&!item.ability_is_granted_by_shard&&item.shard_loc
                     ? `<p class="aghanim_description">
                         <span class="title"><img src="${utils.getImageUrl("shard")}"class="shard">阿哈利姆魔晶</span>
                         <span class="desc">${item.shard_loc}</span>
@@ -760,7 +774,7 @@
                                 `<span class="alternative shard">
                                     <img src="${utils.getImageUrl("shard")}"/>${sv.values_shard.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}
                                 </span>`  : "" }
-                                ${sv.facet_bonus.name ?
+                                ${sv.facet_bonus.name && hero.facets.some(facet=>facet.name==sv.facet_bonus.name) ?
                                 `<span class="alternative facet">
                                     <span class="facet"><span class="name_back type_${hero.facets.find(facet=>facet.name==sv.facet_bonus.name).color}"><img src="${utils.getImageUrl(hero.facets.find(facet=>facet.name==sv.facet_bonus.name).icon, ImageType.IconsFacets)}" />${sv.facet_bonus.values.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")}</span></span>
                                 </span>` : "" }
