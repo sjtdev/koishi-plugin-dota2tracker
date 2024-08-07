@@ -205,6 +205,9 @@ export function getFormattedMatchData(match) {
             case "OFF_LANE":
                 player.laneResult = laneResult[!player.isRadiant ? "bottom" : "top"][player.team];
                 break;
+            case "JUNGLE":
+                player.laneResult = "jungle";
+                break;
             default:
                 player.laneResult = laneResult.mid[player.team];
                 break;
