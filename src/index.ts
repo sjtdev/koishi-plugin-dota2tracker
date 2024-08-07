@@ -37,32 +37,7 @@ export const Config: Schema = Schema.intersect([
     Schema.object({
         STRATZ_API_TOKEN: Schema.string().required().description("※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取。"),
         dataParsingTimeoutMinutes: Schema.number().default(60).min(0).max(1440).description("等待比赛数据解析的时间（单位：分钟）。如果数据解析时间超过等待时间，将直接生成战报而不再等待解析完成。"),
-    }).description("基础设置"),
-    Schema.object({
-        dailyReportSwitch: Schema.boolean().default(false).description("日报功能").experimental(),
-    }),
-    Schema.union([
-        Schema.object({
-            dailyReportSwitch: Schema.const(true).required(),
-            dailyReportHours: Schema.number().min(0).max(23).default(6).description("日报时间小时"),
-            dailyReportShowCombi: Schema.boolean().default(true).description("日报是否显示组合"),
-        }),
-        Schema.object({}),
-    ]),
-    Schema.object({
-        weeklyReportSwitch: Schema.boolean().default(false).description("周报功能").experimental(),
-    }),
-    Schema.union([
-        Schema.object({
-            weeklyReportSwitch: Schema.const(true).required(),
-            weeklyReportDayHours: Schema.tuple([Schema.number().min(1).max(7), Schema.number().min(0).max(23)])
-                .default([1, 10])
-                .description("周报发布于周（几）的（几）点"),
-            weeklyReportShowCombi: Schema.boolean().default(true).description("周报是否显示组合"),
-        }),
-        Schema.object({}),
-    ]),
-    Schema.object({
+
         urlInMessageType: Schema.array(
             Schema.union([
                 Schema.const("match").description("在查询比赛与战报消息中附带stratz比赛页面链接"),
@@ -72,7 +47,31 @@ export const Config: Schema = Schema.intersect([
         )
             .role("checkbox")
             .description("在消息中附带链接，<br/>请选择消息类型："),
-    }),
+    }).description("基础设置"),
+    Schema.intersect([
+        Schema.object({
+            dailyReportSwitch: Schema.boolean().default(false).description("日报功能").experimental(),
+        }).description("总结设置"),
+        Schema.union([
+            Schema.object({
+                dailyReportSwitch: Schema.const(true).required(),
+                dailyReportHours: Schema.number().min(0).max(23).default(6).description("日报时间小时"),
+                dailyReportShowCombi: Schema.boolean().default(true).description("日报是否显示组合"),
+            }),
+        ]),
+        Schema.object({
+            weeklyReportSwitch: Schema.boolean().default(false).description("周报功能").experimental(),
+        }),
+        Schema.union([
+            Schema.object({
+                weeklyReportSwitch: Schema.const(true).required(),
+                weeklyReportDayHours: Schema.tuple([Schema.number().min(1).max(7), Schema.number().min(0).max(23)])
+                    .default([1, 10])
+                    .description("周报发布于周（几）的（几）点"),
+                weeklyReportShowCombi: Schema.boolean().default(true).description("周报是否显示组合"),
+            }),
+        ]),
+    ]),
     Schema.object({
         template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)])
             .default("match_1")
