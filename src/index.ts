@@ -698,7 +698,8 @@ export async function apply(ctx: Context, config: Config) {
 
             // 获取待解析比赛列表并发布 (若待解析列表数量不止一场，每分钟只取第一位进行尝试防止同时高并发调用API)
             if (pendingMatches.length > 0) {
-                const pendingMatch = pendingMatches[0];
+                const now = moment();
+                const pendingMatch = pendingMatches[(now.hours() * 60 + now.minutes()) % pendingMatches.length];
                 try {
                     let match;
                     let queryLocal = await ctx.database.get("dt_previous_query_results", pendingMatch.matchId, ["data"]);
@@ -706,7 +707,7 @@ export async function apply(ctx: Context, config: Config) {
                         match = queryLocal[0].data;
                         ctx.database.set("dt_previous_query_results", match.id, { queryTime: new Date() });
                     } else match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO(pendingMatch.matchId))).data.match);
-                    if (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(moment().subtract(config.dataParsingTimeoutMinutes, "minutes"))) {
+                    if (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(now.subtract(config.dataParsingTimeoutMinutes, "minutes"))) {
                         pendingMatches = pendingMatches.filter((item) => item.matchId != match.id);
 
                         // let realCommingMatches = [];
