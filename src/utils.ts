@@ -82,6 +82,7 @@ export enum ImageFormat {
 export function getImageUrl(image: string, type: ImageType = ImageType.Local, format: ImageFormat = ImageFormat.png) {
     if (type === ImageType.Local) {
         try {
+            if (format === ImageFormat.svg) return fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/template/images/${image}.svg`);
             const imageData = fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/template/images/${image}.png`);
             const base64Data = imageData.toString("base64");
             return `data:image/png;base64,${base64Data}`;

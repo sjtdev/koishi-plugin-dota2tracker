@@ -133,7 +133,7 @@ export function MATCHES_FOR_DAILY(steamAccountIds,seconds){
   return `
   {
     players(steamAccountIds:${JSON.stringify(steamAccountIds)}) {
-      steamAccount{id name}
+      steamAccount{id name avatar}
       matches(request:{startDateTime:${seconds} take:50}){
         id
         didRadiantWin

@@ -50,7 +50,7 @@ export const Config: Schema = Schema.intersect([
     }).description("基础设置"),
     Schema.intersect([
         Schema.object({
-            dailyReportSwitch: Schema.boolean().default(false).description("日报功能").experimental(),
+            dailyReportSwitch: Schema.boolean().default(false).description("日报功能"),
         }).description("总结设置"),
         Schema.union([
             Schema.object({
@@ -60,7 +60,7 @@ export const Config: Schema = Schema.intersect([
             }),
         ]),
         Schema.object({
-            weeklyReportSwitch: Schema.boolean().default(false).description("周报功能").experimental(),
+            weeklyReportSwitch: Schema.boolean().default(false).description("周报功能"),
         }),
         Schema.union([
             Schema.object({
@@ -470,6 +470,7 @@ export async function apply(ctx: Context, config: Config) {
                             const svs = ab.special_values.filter((sv) => sv.facet_bonus.name === facet.name);
                             svs.forEach((sv) => {
                                 if (sv.heading_loc) {
+                                    if (!facet.abilities) facet.abilities = [];
                                     (facet as any).abilities.find((ability: any) => ab.id == ability.id)?.attributes.push({ heading_loc: sv.heading_loc, values: [...sv.facet_bonus.values], is_percentage: sv.is_percentage });
                                 }
                             });
@@ -731,7 +732,7 @@ export async function apply(ctx: Context, config: Config) {
                             let idsToFind = commingGuild.players.map((player) => player.steamId);
                             let broadPlayers = match.players.filter((item) => idsToFind.includes(item.steamAccountId));
                             for (let player of broadPlayers) {
-                                const random = new Random(() => simpleHashToSeed(`${match.id}-${player.steamAccountId}-${player.playerSlot}`));
+                                const random = new Random(() => enhancedSimpleHashToSeed(`${match.id}-${player.steamAccountId}-${player.playerSlot}`));
                                 let broadPlayerMessage = `${player.steamAccount.name}的${random.pick(d2a.HEROES_CHINESE[player.hero.id])}`;
                                 if (player.isRadiant == match.didRadiantWin) {
                                     if (player.deathContribution < 0.2 || player.killContribution > 0.75 || player.heroDamage / player.networth > 1.5 || player.towerDamage > 10000 || player.imp > 0)
@@ -766,10 +767,14 @@ export async function apply(ctx: Context, config: Config) {
         });
     });
 
+    // 定义一个异步函数 report，用于生成和发送报告
     async function report(timeAgo, title, showCombi) {
+        // 获取所有订阅的公会信息
         const subscribedGuilds = await ctx.database.get("dt_subscribed_guilds", undefined);
+        // 获取订阅的玩家，并筛选出那些属于已订阅公会的玩家
         const subscribedPlayersInGuild: any[] = (await ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
 
+        // 使用工具函数查询比赛数据，将结果中的玩家信息过滤出参与过至少一场比赛的玩家
         const players = (
             await utils.query(
                 queries.MATCHES_FOR_DAILY(
@@ -778,21 +783,27 @@ export async function apply(ctx: Context, config: Config) {
                 )
             )
         ).data.players.filter((player) => player.matches.length > 0);
+        // 对比赛信息去重处理，确保每场比赛唯一
         const matches = players
             .map((player) => player.matches.map((match) => match))
             .flat()
             .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+        // 遍历每位订阅玩家，计算相关统计信息并更新
         for (let subPlayer of subscribedPlayersInGuild) {
             let player = players.find((player) => subPlayer.steamId == player.steamAccount.id);
             if (!player) continue;
             let guildMember;
             try {
+                // 尝试获取公会成员信息
                 guildMember = await ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember(subPlayer.guildId, subPlayer.userId);
             } catch (error) {
+                // 记录错误日志
                 ctx.logger.error("获取群组信息失败。" + error);
             }
+            // 设置玩家名称，优先使用昵称，其次是公会昵称或Steam账号名称
             subPlayer.name = subPlayer.nickName || (guildMember?.nick ?? players.find((player) => player.steamAccount.id == subPlayer.steamId)?.steamAccount.name);
 
+            // 计算玩家的胜场、败场、平均击杀、死亡、助攻等统计信息
             player.winCount = player.matches.filter((match) => match.didRadiantWin == match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).isRadiant).length;
             player.loseCount = player.matches.length - player.winCount;
             player.avgKills = utils.roundToDecimalPlaces(player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).kills, 0) / player.matches.length, 2);
@@ -801,15 +812,18 @@ export async function apply(ctx: Context, config: Config) {
             player.avgKDA = utils.roundToDecimalPlaces((player.avgKills + player.avgAssists) / (player.avgDeaths || 1), 2);
             player.avgImp = utils.roundToDecimalPlaces(player.matches.reduce((acc, match) => acc + match.players.find((innerPlayer) => innerPlayer.steamAccount.id == player.steamAccount.id).imp, 0) / player.matches.length, 0);
 
+            // 更新订阅玩家对象
             subPlayer = Object.assign(subPlayer, player);
         }
 
+        // 处理每个公会的订阅玩家组合和比赛结果
         for (let guild of subscribedGuilds) {
             const currentsubscribedPlayers = subscribedPlayersInGuild.filter((player) => player.platform == guild.platform && player.guildId == guild.guildId && player.matches?.length);
             if (currentsubscribedPlayers.length) {
                 const currentsubscribedPlayersIds = currentsubscribedPlayers.map((player) => player.steamId);
                 const combinationsMap = new Map();
 
+                // 遍历每场比赛，计算参与的玩家组合及其胜负统计
                 matches.forEach((match) => {
                     const sortedPlayerIds = match.players
                         .map((player) => player.steamAccount.id)
@@ -834,28 +848,31 @@ export async function apply(ctx: Context, config: Config) {
                         combi.winCount += match.didRadiantWin == match.players.find((innerPlayer) => innerPlayer.steamAccount.id == combi.players[0].steamId).isRadiant ? 1 : 0;
                     }
                 });
-
                 const combinations = Array.from(combinationsMap.values());
                 try {
                     await ctx.broadcast(
                         [`${guild.platform}:${guild.guildId}`],
-                        `${title}：
-                                ${currentsubscribedPlayers
-                                    .map(
-                                        (player) =>
-                                            `${player.name}: ${player.winCount}胜${player.loseCount}负 胜率${Math.round((player.winCount / player.matches.length) * 100)}%，平均KDA: [${player.avgKills}/${player.avgDeaths}/${
-                                                player.avgAssists
-                                            }](${player.avgKDA})，平均表现: ${player.avgImp > 0 ? "+" : ""}${player.avgImp}`
-                                    )
-                                    .join("\n")}
-                                ${
-                                    showCombi
-                                        ? combinations.map((combi) => `组合[${combi.name}]: ${combi.winCount}胜${combi.matches.length - combi.winCount}负 胜率${Math.round((combi.winCount / combi.matches.length) * 100)}%`).join("\n")
-                                        : ""
-                                }`.replace(/\s*\n\s*/g, "\n")
+                        await ctx.puppeteer.render(
+                            genImageHTML(
+                                {
+                                    title,
+                                    players: currentsubscribedPlayers.sort((a, b) => {
+                                        if (a.matches.length > b.matches.length) return -1;
+                                        else if (a.matches.length < b.matches.length) return 1;
+                                        else return a.steamAccount.id - b.steamAccount.id;
+                                    }),
+                                    combinations,
+                                    showCombi,
+                                },
+                                "daily",
+                                TemplateType.Report
+                            )
+                        )
                     );
-                    ctx.logger.info(`发布日报于${guild.platform}:${guild.guildId}`);
+                    // 记录日志
+                    ctx.logger.info(`发布${title}于${guild.platform}:${guild.guildId}`);
                 } catch (error) {
+                    // 错误处理
                     ctx.logger.error(error);
                 }
             }
@@ -875,6 +892,7 @@ enum TemplateType {
     Player = "player",
     Hero = "hero",
     GuildMember = "guild_member",
+    Report = "report",
 }
 
 function genImageHTML(data, template, type: TemplateType) {
@@ -884,6 +902,7 @@ function genImageHTML(data, template, type: TemplateType) {
         data: data,
         utils: utils,
         ImageType: ImageType,
+        ImageFormat: utils.ImageFormat,
         d2a: d2a,
         dotaconstants: dotaconstants,
         moment: moment,
@@ -899,14 +918,25 @@ function genImageHTML(data, template, type: TemplateType) {
     return result;
 }
 
-function simpleHashToSeed(inputString) {
+function enhancedSimpleHashToSeed(inputString) {
     // 将字符串转化为 Base64 编码
     const encoded = btoa(inputString);
-    // 计算编码字符串的每个字符的字符代码的总和
+
+    // 多轮处理以增加散列性
     let total = 0;
+    let complexFactor = 1; // 引入一个复杂因子，每次循环后递增
     for (let i = 0; i < encoded.length; i++) {
-        total += encoded.charCodeAt(i);
+        // 计算字符代码，并通过复杂因子增加变化
+        total += encoded.charCodeAt(i) * complexFactor;
+        // 逐轮改变复杂因子，例如递增
+        complexFactor++;
+        // 为避免数字过大，及时应用取模
+        total %= 9973; // 使用质数增加随机性
     }
+
+    // 应用更复杂的散列方法，不必等到最后再平方
+    total = ((total % 9973) * (total % 9973)) % 9973; // 再次应用模以保持数字大小
+
     // 通过取模操作和除法将总和转化为 [0, 1) 区间内的数
     return (total % 1000) / 1000;
 }
