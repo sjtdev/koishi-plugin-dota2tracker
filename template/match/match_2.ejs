@@ -502,7 +502,7 @@
                 <div class="titles">${player.titles.map((item) => `<span style="color: ${darkenHexColor(item.color, 25)};">${item.name}</span>`).join('')}</div>
                 <div class="player_name row-1">
                     <span class="rank">${`[${d2a.rank[player.rank.medal]}${player.rank.star||""}]`}</span>
-                    <span class="name">${player.steamAccount.name}</span>
+                    <span class="name">${escapeHTML(player.steamAccount.name)}</span>
                 </div>
                 <p class="pick">${player.isRandom?'随机':`第${player.order == null ? "?" : player.order + 1}手`} ${d2a.position[player.position?.slice(-1)]??''}</p>
                 <p class="networth">

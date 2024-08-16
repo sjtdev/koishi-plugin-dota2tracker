@@ -906,6 +906,18 @@ function genImageHTML(data, template, type: TemplateType) {
         d2a: d2a,
         dotaconstants: dotaconstants,
         moment: moment,
+        escapeHTML: function escapeHTML(str) {
+            return str.replace(/[&<>"']/g, function (match) {
+                const escape = {
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;",
+                };
+                return escape[match];
+            });
+        },
     };
 
     let result = "";

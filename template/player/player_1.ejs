@@ -409,7 +409,7 @@
                 <%- `
                 <div class="avatar"><img src="${player.steamAccount?.avatar}" alt="" /></div>
                 <div class="info">
-                    <p class="name">${player.steamAccount.name}${player.guildMember ? ` <span class="guild ${guildLevel(player.guildMember.guild.currentPercentile)}">[${player.guildMember.guild.tag}]</span>${player.genHero?` >${player.genHero.names_cn[0]}<`:""}</p>` : ""}
+                    <p class="name">${escapeHTML(player.steamAccount.name)}${player.guildMember ? ` <span class="guild ${guildLevel(player.guildMember.guild.currentPercentile)}">[${escapeHTML(player.guildMember.guild.tag)}]</span>${player.genHero?` >${player.genHero.names_cn[0]}<`:""}</p>` : ""}
                     <p class="matches"><span>场次：${player.matchCount}（<span class="win">${player.winCount}</span>/<span class="lose">${player.matchCount - player.winCount}</span>）</span>胜率：<span style="color:${utils.winRateColor(player.winCount / player.matchCount)};">${((player.winCount / player.matchCount) * 100).toFixed(2)}%</span></p>
                     <p class="matches"><span>最近25场：<span class="win">${nearWinCount}</span>/<span class="lose">${nearMatchCount - nearWinCount}</span></span><span>胜率：<span style="color:${utils.winRateColor(nearWinCount / nearMatchCount)};">${(
                     (nearWinCount / nearMatchCount) * 100).toFixed(2)}%</span></span><span>评分：${(player.performance.imp > 0 ? "+" : "") + player.performance.imp}</span></span></p>

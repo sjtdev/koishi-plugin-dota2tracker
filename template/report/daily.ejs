@@ -138,18 +138,18 @@
                     <span>胜率<%= Math.round((player.winCount / player.matches.length) * 100) %>%</span>
                 </span>
                 <div class="performance">
-                    <% const imp = {sign : "", left : 0, right : 0} %>
+                    <% const imp = {sign : "", left : 0, right : 0, absValue : Math.abs(player.avgImp)} %>
                     <% if (player.avgImp > 0) imp.sign = "+"; %>
                     <% if (player.avgImp < 0) imp.sign = "-"; %>
-                    <% if (Math.abs(player.avgImp) > 25) { %>
+                    <% if (imp.absValue > 25) { %>
                         <% imp.isOver = true; %>
-                        <% if (player.avgImp > 0) imp.right = player.avgImp; %> 
-                        <% if (player.avgImp < 0) imp.left = player.avgImp; %> 
-                    <% } else imp.left = imp.right = player.avgImp; %>
-                    <div class="score_bar<%= Math.abs(player.avgImp) > 0 ? " pos" : " neg" %><%= Math.abs(player.avgImp) > 25 ? " over" : "" %>">
-                        <div class="left" style="width: <%= imp.left %>px"></div>
+                        <% if (player.avgImp > 0) imp.right = imp.absValue; %> 
+                        <% if (player.avgImp < 0) imp.left = imp.absValue; %> 
+                    <% } else imp.left = imp.right = imp.absValue; %>
+                    <div class="score_bar<%= player.avgImp > 0 ? " pos" : " neg" %><%= Math.abs(player.avgImp) > 25 ? " over" : "" %>">
+                        <div class="left" <%- `style="width: ${imp.left}px"` %>></div>
                         <div class="pipe"></div>
-                        <div class="right" style="width: <%= imp.right %>px"></div>
+                        <div class="right" <%- `style="width: ${imp.right}px"` %>></div>
                     </div>
                     <span class="score_value"><%= `${player.avgImp > 0 ? imp.sign : ""}${player.avgImp}` %></span>
                 </div>

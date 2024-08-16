@@ -728,7 +728,7 @@
                             <p class="level">${player.level}</p>
                         </div>
                         <div class="player_info">
-                            <summary class="player_name">${player.steamAccount.name}</summary>
+                            <summary class="player_name">${escapeHTML(player.steamAccount.name)}</summary>
                             <summary class="player_performance">
                                 <span class="kda">${player.kills}/${player.deaths}/${player.assists}</span>&nbsp;&nbsp;
                                 <span class="kc" style="color:${kcndcStyle.kc(player.killContribution * 100)}">${Math.floor(player.killContribution * 100)}%</span>&nbsp;&nbsp;
