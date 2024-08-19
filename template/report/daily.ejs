@@ -25,8 +25,6 @@
             span {
                 min-width: 0;
                 white-space: nowrap; /* 不换行 */
-                overflow: hidden; /* 超出部分隐藏 */
-                text-overflow: ellipsis; /* 省略号 */
             }
 
             .title {
@@ -57,8 +55,21 @@
                 display: block;
                 width: 100%;
                 text-align: center;
+                overflow: hidden; /* 超出部分隐藏 */
+                text-overflow: ellipsis; /* 省略号 */
+            }
+            .player > .count {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1.8fr;
+                width: 100%;
             }
 
+            .player > .count > span {
+                text-align: left;
+            }
+            .player > .count > span:last-child {
+                text-align: right;
+            }
             .player > .performance {
                 display: flex;
                 align-items: center;
@@ -82,7 +93,7 @@
                 justify-content: flex-end;
             }
             .player > .performance > .score_bar.neg > .left {
-                background: linear-gradient(to right, #777, #888, #999, #888, #777);
+                background: linear-gradient(to right, #777, #888, #888, #777);
             }
             .player > .performance > .score_bar.pos > .right {
                 background: linear-gradient(to right, #6cf, #7df, #6cf);
@@ -117,10 +128,10 @@
                 margin-left: 4px;
             }
             span.win {
-                color: #006400;
+                color: #007A00;
             }
             span.lose {
-                color: #8b0000;
+                color: #B30000;
             }
         </style>
     </head>
