@@ -1,7 +1,7 @@
 {
   "name": "@sjtdev/koishi-plugin-dota2tracker",
   "description": "koishi插件-追踪群友的DOTA2对局",
-  "version": "1.2.10-pre.2",
+  "version": "1.2.10",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -26,7 +26,7 @@
     "dota2"
   ],
   "dependencies": {
-    "dotaconstants": "^8.10.0",
+    "dotaconstants": "^8.11.0",
     "ejs": "^3.1.10",
     "moment": "^2.30.1"
   },
