@@ -30,8 +30,12 @@ export function MATCH_INFO(matchId) {
             id
             name
             shortName
+            facets {
+              facetId
+            }
           }
-          dotaPlus{
+          variant
+          dotaPlus {
             level
           }
           leaverStatus
@@ -88,7 +92,6 @@ export function MATCH_INFO(matchId) {
           goldPerMinute
           experiencePerMinute
           heroHealing
-          
           stats {
             campStack
             heroDamageReport {
@@ -102,7 +105,7 @@ export function MATCH_INFO(matchId) {
               }
             }
           }
-          additionalUnit{
+          additionalUnit {
             item0Id
             item1Id
             item2Id
@@ -114,7 +117,6 @@ export function MATCH_INFO(matchId) {
             backpack2Id
             neutral0Id
           }
-
           isRandom
         }
         pickBans {
@@ -124,13 +126,20 @@ export function MATCH_INFO(matchId) {
           order
         }
       }
+      constants {
+        facets {
+          id
+          color
+          icon
+        }
+      }
     }
     
 `;
 }
 
-export function MATCHES_FOR_DAILY(steamAccountIds,seconds){
-  return `
+export function MATCHES_FOR_DAILY(steamAccountIds, seconds) {
+    return `
   {
     players(steamAccountIds:${JSON.stringify(steamAccountIds)}) {
       steamAccount{id name avatar}
@@ -152,7 +161,7 @@ export function MATCHES_FOR_DAILY(steamAccountIds,seconds){
       }
     }
   }
-  `
+  `;
 }
 
 export function VERIFYING_PLAYER(steamAccountId) {
@@ -187,7 +196,7 @@ export function PLAYERS_LASTMATCH(steamAccountIds) {
     `;
 }
 
-export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId,heroId?) {
+export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId, heroId?) {
     return `
     {
 		player(steamAccountId: ${steamAccountId}) {
@@ -208,7 +217,7 @@ export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId,heroId?) {
 		  performance {
 			  imp
 		  }
-		  heroesPerformance(take: 25, request: {matchGroupOrderBy: WIN_COUNT take: 25 ${heroId?("heroIds:"+heroId):""}}) {
+		  heroesPerformance(take: 25, request: {matchGroupOrderBy: WIN_COUNT take: 25 ${heroId ? "heroIds:" + heroId : ""}}) {
         hero {
           id
           shortName
@@ -217,7 +226,7 @@ export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId,heroId?) {
         winCount
         matchCount
 		  }
-		  matches(request: {take: 25 ${heroId?("heroIds:"+heroId):""}}) {
+		  matches(request: {take: 25 ${heroId ? "heroIds:" + heroId : ""}}) {
         id
         rank
         lobbyType
@@ -256,10 +265,10 @@ export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId,heroId?) {
       `;
 }
 
-export function PLAYER_EXTRA_INFO(steamAccountId, matchCount, totalHeroCount,heroId?) {
+export function PLAYER_EXTRA_INFO(steamAccountId, matchCount, totalHeroCount, heroId?) {
     return `{
         player(steamAccountId: ${steamAccountId}) {
-          heroesPerformance(take: ${totalHeroCount}, request: {matchGroupOrderBy: MATCH_COUNT, take: ${matchCount} ${heroId?("heroIds:"+heroId):""}}) {
+          heroesPerformance(take: ${totalHeroCount}, request: {matchGroupOrderBy: MATCH_COUNT, take: ${matchCount} ${heroId ? "heroIds:" + heroId : ""}}) {
             hero {
               id
               shortName
@@ -277,8 +286,8 @@ export function PLAYER_EXTRA_INFO(steamAccountId, matchCount, totalHeroCount,her
       `;
 }
 
-export function PLAYERS_INFO_WITH_10_MATCHES_FOR_GUILD(steamAccountIds){
-  return `{
+export function PLAYERS_INFO_WITH_10_MATCHES_FOR_GUILD(steamAccountIds) {
+    return `{
     players(steamAccountIds: [${steamAccountIds.join()}]) {
       steamAccount {
         id
@@ -305,7 +314,7 @@ export function PLAYERS_INFO_WITH_10_MATCHES_FOR_GUILD(steamAccountIds){
       }
     }
   }
-  `
+  `;
 }
 
 export function CURRENT_GAMEVERSION() {

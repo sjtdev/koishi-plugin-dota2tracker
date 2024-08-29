@@ -256,7 +256,7 @@ export async function apply(ctx: Context, config: Config) {
                 match = queryLocal[0].data;
                 ctx.database.set("dt_previous_query_results", match.id, { queryTime: new Date() });
             } else {
-                match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO(matchId))).data.match);
+                match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO(matchId))).data);
             }
             if (match && (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(moment().subtract(config.dataParsingTimeoutMinutes, "minutes")))) {
                 session.send((ctx.config.urlInMessageType.some((type) => type == "match") ? "https://stratz.com/matches/" + matchId : "") + (await ctx.puppeteer.render(genImageHTML(match, config.template_match, TemplateType.Match))));
@@ -607,6 +607,7 @@ export async function apply(ctx: Context, config: Config) {
         let heroes = Array.from(mergedMap.values());
         return heroes.find((hero) => hero.names_cn.some((cn) => cn.toLowerCase() == input.toLowerCase()) || hero.shortName === input.toLowerCase() || hero.id == input);
     }
+
     // ctx.command("来个笑话").action(async ({ session }) => {
     //     session.send(await utils.getJoke());
     // });
@@ -707,7 +708,7 @@ export async function apply(ctx: Context, config: Config) {
                     if (queryLocal.length > 0) {
                         match = queryLocal[0].data;
                         ctx.database.set("dt_previous_query_results", match.id, { queryTime: new Date() });
-                    } else match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO(pendingMatch.matchId))).data.match);
+                    } else match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO(pendingMatch.matchId))).data);
                     if (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(now.subtract(config.dataParsingTimeoutMinutes, "minutes"))) {
                         pendingMatches = pendingMatches.filter((item) => item.matchId != match.id);
 

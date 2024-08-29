@@ -94,7 +94,8 @@ export function getImageUrl(image: string, type: ImageType = ImageType.Local, fo
 }
 
 // 对比赛数据进行补充以供生成模板函数使用
-export function getFormattedMatchData(match) {
+export function getFormattedMatchData(data) {
+    const { match, constants } = data;
     // if (!match.parsedDateTime)
     //     return match;
     // ↓ 累加团队击杀数，并初始化团队[总对英雄造成伤害]与[总受到伤害]
@@ -344,6 +345,10 @@ export function getFormattedMatchData(match) {
                     player.unitBackpacks.push(null); // 如果没有对应的dotaconstants条目
                 }
             }
+        }
+        // 命石处理
+        if (player.variant != null) {
+            player.facet = constants.facets.find((facet) => facet.id == player.hero.facets[player.variant - 1].facetId);
         }
     });
     enum ComparisonMode {
