@@ -246,8 +246,9 @@
 
             .hero .player_avatar .position {
                 /* width: auto; */
+                line-height: 1.2;
                 text-align: right;
-                bottom: 1px;
+                top: 3px;
                 right: 0;
                 color: #cccccc;
                 text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.5), 1px -1px 0 rgba(0, 0, 0, 0.5), -1px 1px 0 rgba(0, 0, 0, 0.5), 1px 1px 0 rgba(0, 0, 0, 0.5); /* 描边效果 */
@@ -273,6 +274,40 @@
                 color: rgba(255, 255, 255, 1);
                 /* color: #cccccc; */
                 text-shadow: 0 0 4px black;
+            }
+
+            .hero .player_avatar .facet {
+                width: 24px;
+                height: 24px;
+                position: absolute;
+                right: 0;
+                bottom: 0;
+                border-radius: 4px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .hero .player_avatar .facet img{
+                width: 18px;
+                height: 18px;
+            }
+            .hero > .player_avatar > .facet.Red {
+                background: linear-gradient(to right, #9f3c3c, #4a2026);
+            }
+            .hero > .player_avatar > .facet.Yellow {
+                background: linear-gradient(to right, #c8a45c, #6f3d21);
+            }
+            .hero > .player_avatar > .facet.Green {
+                background: linear-gradient(to right, #a2b23e, #2d5a18);
+            }
+            .hero > .player_avatar > .facet.Blue {
+                background: linear-gradient(to right, #547ea6, #2a385e);
+            }
+            .hero > .player_avatar > .facet.Purple {
+                background: linear-gradient(to right, #675cae, #261c44);
+            }
+            .hero > .player_avatar > .facet.Gray {
+                background: linear-gradient(to right, #adb6be, #4e5557);
             }
 
             .hero .player_info {
@@ -726,6 +761,10 @@
                             <p class="party_mark${player.partyId != null ? " party_" + match.party[player.partyId] : ""}"></p>
                             <p class="position p${Math.floor(player.order / 4) + 1}">${player.isRandom ? "随机" : `第<span>${player.order == null ? "?" : player.order + 1}</span>手`}<br/>${d2a.position[player.position?.slice(-1)]??""}</p>
                             <p class="level">${player.level}</p>
+                            ${player.facet ? `
+                            <div class="facet ${player.facet.color}">
+                                <img src="${utils.getImageUrl(player.facet.icon, ImageType.IconsFacets)}">
+                            </div>` : ""}
                         </div>
                         <div class="player_info">
                             <summary class="player_name">${escapeHTML(player.steamAccount.name)}</summary>
