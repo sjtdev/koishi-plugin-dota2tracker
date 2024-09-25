@@ -146,7 +146,6 @@
                 height: 63px;
                 position: relative;
                 border-radius: 4px;
-                overflow: hidden;
                 flex-grow: 0;
             }
 
@@ -267,9 +266,8 @@
             }
 
             .hero .player_avatar .level {
-                left: 2px;
+                right: 2px;
                 bottom: 1px;
-                right: auto;
                 font-size: 12px;
                 color: rgba(255, 255, 255, 1);
                 /* color: #cccccc; */
@@ -277,19 +275,38 @@
             }
 
             .hero .player_avatar .facet {
-                width: 24px;
+                width: 112px;
                 height: 24px;
                 position: absolute;
-                right: 0;
-                bottom: 0;
-                border-radius: 4px;
-                display: flex;
-                justify-content: center;
+                left: 0;
+                bottom: -24px;
+                display: grid;
+                grid-template-columns: 24px auto;
                 align-items: center;
             }
             .hero .player_avatar .facet img{
+                padding: 3px;
                 width: 18px;
                 height: 18px;
+                background-color: #4444;
+            }
+            .hero .player_avatar .facet span{
+                display: grid;
+                place-items: center;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                width: 88px;
+                position: relative;
+            }
+            .hero .player_avatar .facet span > * {
+                box-sizing: border-box;
+                padding: 0 4px;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                font-size: 14px;
             }
             .hero > .player_avatar > .facet.Red {
                 background: linear-gradient(to right, #9f3c3c, #4a2026);
@@ -454,6 +471,7 @@
                 margin-bottom: 4px;
                 padding-left: 4px;
                 height: 24px;
+                margin-left: 120px;
                 /* text-shadow: -1px -1px 2px #aaa, 1px -1px 2px #aaa, -1px 1px 2px #aaa, 1px 1px 2px #aaa; */ /*描边效果 */
             }
 
@@ -764,6 +782,7 @@
                             ${player.facet ? `
                             <div class="facet ${player.facet.color}">
                                 <img src="${utils.getImageUrl(player.facet.icon, ImageType.IconsFacets)}">
+                                <span><p style="font-size: ${player.facet.name.length > 7 ? 10 : player.facet.name.length > 5 ? 12 : 14}px;">${player.facet.name}</p></span>
                             </div>` : ""}
                         </div>
                         <div class="player_info">

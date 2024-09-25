@@ -127,10 +127,14 @@ export function MATCH_INFO(matchId) {
         }
       }
       constants {
-        facets {
+        facets (language: S_CHINESE) {
+          name
           id
           color
           icon
+          language {
+            displayName
+          }
         }
       }
     }

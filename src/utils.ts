@@ -349,6 +349,7 @@ export function getFormattedMatchData(data) {
         // 命石处理
         if (player.variant != null) {
             player.facet = constants.facets.find((facet) => facet.id == player.hero.facets[player.variant - 1].facetId);
+            player.facet.name = player.facet.language.displayName ?? player.facet.name;
         }
     });
     enum ComparisonMode {

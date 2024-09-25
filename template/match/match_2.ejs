@@ -231,38 +231,55 @@
                 content: "IV";
             }
 
-            .player > .hero_avatar > .facet {
-                position: absolute;
-                left: 4px;
-                left: 0;
-                bottom: 0;
-                width: 16px;
+            .player > .facet {
+                color: #fff;
+                width: 100%;
                 height: 16px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                grid-row: 4;
+                grid-column: 1;
+                display: grid;
+                grid-template-columns: 16px auto;
                 z-index: 1;
+                position: relative;
+                top: -5px;
             }
-            .player > .hero_avatar > .facet > img {
+            .player > .facet > img {
+                padding: 2px;
                 width: 12px;
                 height: 12px;
+                background-color: #4444;
             }
-            .player > .hero_avatar > .facet.Red {
+            .player > .facet > span {
+                padding: 0 2px;
+                line-height: 1;
+                display: grid;
+                place-items: center;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+            }
+            .player > .facet > span > * {
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .player > .facet.Red {
                 background: linear-gradient(to right, #9f3c3c, #4a2026);
             }
-            .player > .hero_avatar > .facet.Yellow {
+            .player > .facet.Yellow {
                 background: linear-gradient(to right, #c8a45c, #6f3d21);
             }
-            .player > .hero_avatar > .facet.Green {
+            .player > .facet.Green {
                 background: linear-gradient(to right, #a2b23e, #2d5a18);
             }
-            .player > .hero_avatar > .facet.Blue {
+            .player > .facet.Blue {
                 background: linear-gradient(to right, #547ea6, #2a385e);
             }
-            .player > .hero_avatar > .facet.Purple {
+            .player > .facet.Purple {
                 background: linear-gradient(to right, #675cae, #261c44);
             }
-            .player > .hero_avatar > .facet.Gray {
+            .player > .facet.Gray {
                 background: linear-gradient(to right, #adb6be, #4e5557);
             }
 
@@ -288,7 +305,7 @@
 
             .player > .titles {
                 grid-row: 4;
-                grid-column: 1 / span 3;
+                grid-column: 3;
                 /* text-shadow: 1px 1px 0 #333; 设置阴影颜色及偏移 */
             }
             .player > .titles > span {
@@ -522,14 +539,15 @@
             <div class="player ${player.team}${player.hero.id==80?" bear":""}" style="order: ${player.team==="radiant"?1:100};">
                 <div class="hero_avatar row-1${player.partyId != null ? " party_" + match.party[player.partyId] : ""}">
                     <img src="${utils.getImageUrl(player.hero.shortName, ImageType.Heroes)}" />
-                    ${player.facet ? `
-                    <div class="facet ${player.facet.color}">
-                        <img src="${utils.getImageUrl(player.facet.icon, ImageType.IconsFacets)}">
-                    </div>` : ""}
                     <p class="level">${player.level}</p>
                     <p class="party_line"></p>
                     <p class="party_mark"></p>
                 </div>
+                ${player.facet ? `
+                <div class="facet ${player.facet.color}">
+                    <img src="${utils.getImageUrl(player.facet.icon, ImageType.IconsFacets)}">
+                    <span style="font-size: ${player.facet.name?.length>4?8:11}px;"><p>${player.facet.name??""}</p></span>
+                </div>` : ""}
                 <div class="rank">
                     <img
                         src="${utils.getImageUrl('medal_' +(player.inTop100??player.rank.medal))}"
