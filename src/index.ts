@@ -58,6 +58,7 @@ export const Config: Schema = Schema.intersect([
                 dailyReportHours: Schema.number().min(0).max(23).default(6).description("日报时间小时"),
                 dailyReportShowCombi: Schema.boolean().default(true).description("日报是否显示组合"),
             }),
+            Schema.object({}),
         ]),
         Schema.object({
             weeklyReportSwitch: Schema.boolean().default(false).description("周报功能"),
@@ -70,6 +71,7 @@ export const Config: Schema = Schema.intersect([
                     .description("周报发布于周（几）的（几）点"),
                 weeklyReportShowCombi: Schema.boolean().default(true).description("周报是否显示组合"),
             }),
+            Schema.object({}),
         ]),
     ]),
     Schema.object({
