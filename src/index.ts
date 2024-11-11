@@ -322,7 +322,7 @@ export async function apply(ctx: Context, config: Config) {
                 let lastMatchId = 0;
                 try {
                     session.send("正在搜索对局详情，请稍后...");
-                    lastMatchId = (await utils.query(queries.PLAYERS_LASTMATCH([parseInt(flagBindedPlayer ? flagBindedPlayer.steamId : input_data)]))).data.players[0].matches[0].id;
+                    lastMatchId = (await utils.query(queries.PLAYER_LASTMATCH(parseInt(flagBindedPlayer?.steamId ?? input_data)))).data.player.matches[0].id;
                 } catch {
                     session.send("获取玩家最近比赛失败。");
                     return;
@@ -668,7 +668,11 @@ export async function apply(ctx: Context, config: Config) {
                         return self.indexOf(value) === index;
                     });
                 // 获取所有查询到的玩家最新比赛并根据match.id去重
-                const lastMatches = (await utils.query(queries.PLAYERS_LASTMATCH(subscribedPlayersSteamIds))).data.players
+                const players = [];
+                for (let id of subscribedPlayersSteamIds) {
+                    players.push((await utils.query(queries.PLAYER_LASTMATCH(id))).data.player);
+                }
+                const lastMatches = players
                     .map((player) => player.matches[0])
                     .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id)) // 根据match.id去重
                     .filter((match) => moment.unix(match.startDateTime).isAfter(moment().subtract(1, "days"))) // 排除1天以前的比赛，防止弃坑数年群友绑定时突然翻出上古战报

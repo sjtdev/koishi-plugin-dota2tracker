@@ -49,6 +49,7 @@ export async function query(query_str) {
     return await http.post(CONFIGS.STRATZ_API.URL, query_str, {
         responseType: "json",
         headers: {
+            "User-Agent": "STRATZ_API",
             "Content-Type": "application/graphql",
             Authorization: `Bearer ${CONFIGS.STRATZ_API.TOKEN}`,
         },
@@ -222,7 +223,7 @@ export function getFormattedMatchData(data) {
             return obj;
         }, {});
 
-        if (player.playbackData) {
+        if (player.stats?.itemPurchases) {
             const getNextElement = function () {
                 let currentIndex = 0; // 从数组开头开始
                 return function () {
@@ -235,7 +236,7 @@ export function getFormattedMatchData(data) {
                 };
             };
 
-            for (let item of player.playbackData.purchaseEvents) {
+            for (let item of player.stats.itemPurchases) {
                 if (!supportItemIds.includes(item.itemId)) {
                     if (!items_timelist[item.itemId]) {
                         items_timelist[item.itemId] = [];

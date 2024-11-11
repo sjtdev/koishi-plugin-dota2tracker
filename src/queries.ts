@@ -70,12 +70,6 @@ export function MATCH_INFO(matchId) {
               stackCount
             }
           }
-          playbackData {
-            purchaseEvents {
-              itemId
-              time
-            }
-          }
           heroDamage
           towerDamage
           stats {
@@ -93,6 +87,10 @@ export function MATCH_INFO(matchId) {
           experiencePerMinute
           heroHealing
           stats {
+            itemPurchases{
+              itemId
+              time
+            }
             campStack
             heroDamageReport {
               dealtTotal {
@@ -179,7 +177,7 @@ export function VERIFYING_PLAYER(steamAccountId) {
     `;
 }
 
-export function PLAYERS_LASTMATCH(steamAccountIds) {
+function PLAYERS_LASTMATCH(steamAccountIds) {
     return `
     {
         players(steamAccountIds:${JSON.stringify(steamAccountIds)}) {
@@ -198,6 +196,29 @@ export function PLAYERS_LASTMATCH(steamAccountIds) {
       }
       
     `;
+}
+
+export function PLAYER_LASTMATCH(steamAccountId) {
+    return `
+  {
+    player(steamAccountId: ${steamAccountId}) {
+      steamAccount {
+        id
+      }
+      matches(request: {take: 1}) {
+        id
+        parsedDateTime
+        startDateTime
+        players {
+          steamAccount {
+            id
+          }
+        }
+      }
+    }
+  }
+    
+  `;
 }
 
 export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId, heroId?) {
