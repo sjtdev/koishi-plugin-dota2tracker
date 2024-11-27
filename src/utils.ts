@@ -21,6 +21,7 @@ export interface dt_subscribed_players {
     platform: string;
     steamId: number;
     nickName: string;
+    rank: { rank: number; leader: number };
 }
 
 export interface dt_subscribed_guilds {
@@ -84,7 +85,7 @@ export function getImageUrl(image: string, type: ImageType = ImageType.Local, fo
     if (type === ImageType.Local) {
         try {
             if (format === ImageFormat.svg) return fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/template/images/${image}.svg`);
-            const imageData = fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/template/images/${image}.png`);
+            const imageData = fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/template/images/${image}.${format}`);
             const base64Data = imageData.toString("base64");
             return `data:image/png;base64,${base64Data}`;
         } catch (error) {

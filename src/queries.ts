@@ -177,11 +177,17 @@ export function VERIFYING_PLAYER(steamAccountId) {
     `;
 }
 
-function PLAYERS_LASTMATCH(steamAccountIds) {
+export function PLAYERS_LASTMATCH_RANKINFO(steamAccountIds) {
     return `
     {
         players(steamAccountIds:${JSON.stringify(steamAccountIds)}) {
-          steamAccount{id}
+          steamAccount{
+            id
+            name
+            avatar
+            seasonRank
+            seasonLeaderboardRank
+          }
           matches(request:{take:1}){
             id
             parsedDateTime
@@ -196,29 +202,6 @@ function PLAYERS_LASTMATCH(steamAccountIds) {
       }
       
     `;
-}
-
-export function PLAYER_LASTMATCH(steamAccountId) {
-    return `
-  {
-    player(steamAccountId: ${steamAccountId}) {
-      steamAccount {
-        id
-      }
-      matches(request: {take: 1}) {
-        id
-        parsedDateTime
-        startDateTime
-        players {
-          steamAccount {
-            id
-          }
-        }
-      }
-    }
-  }
-    
-  `;
 }
 
 export function PLAYER_INFO_WITH_25_MATCHES(steamAccountId, heroId?) {
@@ -456,4 +439,8 @@ export function HERO_MATCHUP_WINRATE(heroId) {
       }
       
     `;
+}
+
+export function REQUEST_MATCH_DATA_ANALYSIS(matchId){
+  return `stratz{matchRetry(id:${matchId})}`
 }

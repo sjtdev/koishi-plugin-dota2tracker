@@ -29,6 +29,10 @@ export interface Config {
     weeklyReportDayHours: Array<number>;
     weeklyReportShowCombi: boolean;
     urlInMessageType: Array<string>;
+    rankBroadSwitch: boolean;
+    rankBroadStar: boolean;
+    rankBroadLeader: boolean;
+    rankBroadFun: boolean;
     template_match: string;
     template_player: string;
     template_hero: string;
@@ -48,6 +52,20 @@ export const Config: Schema = Schema.intersect([
             .role("checkbox")
             .description("在消息中附带链接，<br/>请选择消息类型："),
     }).description("基础设置"),
+    Schema.intersect([
+        Schema.object({
+            rankBroadSwitch: Schema.boolean().default(false).description("段位变动播报"),
+        }),
+        Schema.union([
+            Schema.object({
+                rankBroadSwitch: Schema.const(true).required(),
+                rankBroadStar: Schema.boolean().default(true).description("星级变动播报"),
+                rankBroadLeader: Schema.boolean().default(true).description("冠绝名次变动播报"),
+                rankBroadFun: Schema.boolean().default(false).description("整活播报模板"),
+            }),
+            Schema.object({}),
+        ]),
+    ]),
     Schema.intersect([
         Schema.object({
             dailyReportSwitch: Schema.boolean().default(false).description("日报功能"),
@@ -322,7 +340,7 @@ export async function apply(ctx: Context, config: Config) {
                 let lastMatchId = 0;
                 try {
                     session.send("正在搜索对局详情，请稍后...");
-                    lastMatchId = (await utils.query(queries.PLAYER_LASTMATCH(parseInt(flagBindedPlayer?.steamId ?? input_data)))).data.player.matches[0].id;
+                    lastMatchId = (await utils.query(queries.PLAYERS_LASTMATCH_RANKINFO(parseInt(flagBindedPlayer?.steamId ?? input_data)))).data.player.matches[0].id;
                 } catch {
                     session.send("获取玩家最近比赛失败。");
                     return;
@@ -621,19 +639,12 @@ export async function apply(ctx: Context, config: Config) {
     //     });
 
     ctx.on("ready", async () => {
-        const tables = await ctx.database.tables;
-        if (!("dt_subscribed_guilds" in tables)) {
-            ctx.model.extend("dt_subscribed_guilds", { id: "unsigned", guildId: "string", platform: "string" }, { autoInc: true });
-        }
-        if (!("dt_subscribed_players" in tables)) {
-            ctx.model.extend("dt_subscribed_players", { id: "unsigned", userId: "string", guildId: "string", platform: "string", steamId: "integer", nickName: "string" }, { autoInc: true });
-        }
-        if (!("dt_sended_match_id" in tables)) {
-            ctx.model.extend("dt_sended_match_id", { matchId: "unsigned", sendTime: "timestamp" }, { primary: "matchId" });
-        }
-        if (!("dt_previous_query_results" in tables)) {
-            ctx.model.extend("dt_previous_query_results", { matchId: "unsigned", data: "json", queryTime: "timestamp" }, { primary: "matchId" });
-        }
+        // 注册数据库-表
+        ctx.model.extend("dt_subscribed_guilds", { id: "unsigned", guildId: "string", platform: "string" }, { autoInc: true });
+        ctx.model.extend("dt_subscribed_players", { id: "unsigned", userId: "string", guildId: "string", platform: "string", steamId: "integer", nickName: "string", rank: "json" }, { autoInc: true });
+        ctx.model.extend("dt_sended_match_id", { matchId: "unsigned", sendTime: "timestamp" }, { primary: "matchId" });
+        ctx.model.extend("dt_previous_query_results", { matchId: "unsigned", data: "json", queryTime: "timestamp" }, { primary: "matchId" });
+
         // 每隔6小时尝试清除一个月前的发送记录和查询缓存
         ctx.cron("0 */6 * * *", () => {
             const oneMonthAgo = moment().subtract(1, "months").toDate();
@@ -668,10 +679,7 @@ export async function apply(ctx: Context, config: Config) {
                         return self.indexOf(value) === index;
                     });
                 // 获取所有查询到的玩家最新比赛并根据match.id去重
-                const players = [];
-                for (let id of subscribedPlayersSteamIds) {
-                    players.push((await utils.query(queries.PLAYER_LASTMATCH(id))).data.player);
-                }
+                const players = (await utils.query(queries.PLAYERS_LASTMATCH_RANKINFO(subscribedPlayersSteamIds))).data.players;
                 const lastMatches = players
                     .map((player) => player.matches[0])
                     .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id)) // 根据match.id去重
@@ -696,12 +704,75 @@ export async function apply(ctx: Context, config: Config) {
                                 });
                         });
                         pendingMatches.push({ matchId: match.id, guilds: tempGuilds });
+                        utils.query(queries.REQUEST_MATCH_DATA_ANALYSIS(match.id));
                         ctx.logger.info(
                             tempGuilds
                                 .map((guild) => `追踪到来自群组${guild.platform}:${guild.guildId}的用户${guild.players.map((player) => `[${player.nickName ?? ""}(${player.steamId})]`).join("、")}的尚未播报过的最新比赛 ${match.id}。`)
                                 .join("")
                         );
                     });
+
+                // 段位变动播报
+                // 创建 steamId 到 rank 的哈希表
+                const rankMap = players.reduce((map, player) => {
+                    map[player.steamAccount.id] = { rank: player.steamAccount.seasonRank, leader: player.steamAccount.seasonLeaderboardRank };
+                    return map;
+                }, {});
+
+                // 遍历已绑定玩家列表，判断段位是否变动
+                for (let subPlayer of subscribedPlayersInGuild) {
+                    if (subPlayer.rank.rank !== rankMap[subPlayer.steamId].rank || subPlayer.rank.leader !== rankMap[subPlayer.steamId].board) {
+                        // 此条判断语句为旧版本dotatracker准备，旧版升到新版后subPlayer.rank为空对象，此时为第一次绑定段位信息，所以不进行播报
+                        if (Object.keys(subPlayer.rank).length != 0) {
+                            if (config.rankBroadSwitch) {
+                                const ranks = ["prevRank", "currRank"].reduce((acc, key) => {
+                                    const source = key === "prevRank" ? subPlayer.rank : rankMap[subPlayer.steamId];
+                                    acc[key] = {
+                                        medal: parseInt(source.rank?.toString().split("")[0] ?? "0"),
+                                        star: parseInt(source.rank?.toString().split("")[1] ?? "0"),
+                                        leader: source.leader,
+                                        inTop100: source.leader ? (source.leader <= 10 ? "8c" : source.leader <= 100 ? "8b" : undefined) : undefined,
+                                    };
+                                    return acc;
+                                }, {});
+                                const prevRank = ranks["prevRank"];
+                                const currRank = ranks["currRank"];
+                                if (prevRank.medal !== currRank.medal || (prevRank.star !== currRank.star && config.rankBroadStar) || (prevRank.leader !== currRank.leader && config.rankBroadLeader)) {
+                                    const guildMember = await ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember?.(subPlayer.guildId, subPlayer.userId);
+                                    const name = subPlayer.nickName ?? guildMember?.nick ?? players.find((player) => player.steamAccount.id == subPlayer.steamId)?.steamAccount.name ?? subPlayer.steamId;
+                                    const message = `群友 ${name} 段位变动：${d2a.rank[prevRank.medal]}${prevRank.star} → ${d2a.rank[currRank.medal]}${currRank.star} `;
+                                    if (config.rankBroadFun === true) {
+                                        // 整活播报
+                                        const img = await ctx.puppeteer.render(
+                                            genImageHTML(
+                                                {
+                                                    name,
+                                                    avatar: guildMember?.avatar ?? players.find((player) => subPlayer.steamId == player.steamAccount.id).steamAccount.avatar,
+                                                    isRising:
+                                                        rankMap[subPlayer.steamId].rank > subPlayer.rank.rank ||
+                                                        (rankMap[subPlayer.steamId].rank == subPlayer.rank.rank && rankMap[subPlayer.steamId].leader < subPlayer.rank.leader) ||
+                                                        (rankMap[subPlayer.steamId].leader > 0 && subPlayer.rank.leader == null),
+                                                    prevRank,
+                                                    currRank,
+                                                },
+                                                "rank" + (config.rankBroadFun ? "_fun" : ""),
+                                                TemplateType.Rank
+                                            )
+                                        );
+                                        await ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], img);
+                                    } else {
+                                        // 常规播报
+                                        const img = await ctx.puppeteer.render(genImageHTML(currRank, "rank" + (config.rankBroadFun ? "2" : ""), TemplateType.Rank));
+                                        await ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], message + img);
+                                    }
+                                    ctx.logger.info(`向${subPlayer.platform}:${subPlayer.guildId}发布段位变动播报信息。`);
+                                }
+                            }
+                        }
+                        // 更新玩家的数据记录
+                        ctx.database.set("dt_subscribed_players", subPlayer.id, { rank: rankMap[subPlayer.steamId] });
+                    }
+                }
             }
 
             // 获取待解析比赛列表并发布 (若待解析列表数量不止一场，每分钟只取第一位进行尝试防止同时高并发调用API)
@@ -801,7 +872,7 @@ export async function apply(ctx: Context, config: Config) {
             if (!player) continue;
             let guildMember;
             try {
-                // 尝试获取公会成员信息
+                // 尝试获取群组成员信息
                 guildMember = await ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember(subPlayer.guildId, subPlayer.userId);
             } catch (error) {
                 // 记录错误日志
@@ -900,6 +971,7 @@ enum TemplateType {
     Hero = "hero",
     GuildMember = "guild_member",
     Report = "report",
+    Rank = "rank",
 }
 
 function genImageHTML(data, template, type: TemplateType) {

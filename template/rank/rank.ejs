@@ -1,0 +1,35 @@
+<% const rank = data; %>
+<head>
+    <style>
+        html,
+        body {
+            width: 128px;
+            height: 128px;
+            margin: 0;
+            padding: 0;
+            background-color: #0000;
+        }
+        div {
+            width: 128px;
+            height: 128px;
+            position: relative;
+        }
+        div > * {
+            position: absolute;
+            width: 100%;
+        }
+        p {
+            margin: 0;
+            text-align: center;
+            color: #fff;
+            bottom: 8px;
+            font-size: 20px;
+            text-shadow: -2px -2px 0 rgba(0, 0, 0, 0.5), 2px -2px 0 rgba(0, 0, 0, 0.5), -2px 2px 0 rgba(0, 0, 0, 0.5), 2px 2px 0 rgba(0, 0, 0, 0.5); /* 描边效果 */
+        }
+    </style>
+</head>
+<div>
+    <img src="<%= utils.getImageUrl('medal_' + (rank.inTop100 ?? rank.medal)) %>" /> 
+    <img src="<%= utils.getImageUrl("star_" + rank.star) %>" />
+    <p><%= rank.leader %></p>
+</div>
