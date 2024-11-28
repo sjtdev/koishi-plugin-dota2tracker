@@ -740,7 +740,6 @@ export async function apply(ctx: Context, config: Config) {
                                 if (prevRank.medal !== currRank.medal || (prevRank.star !== currRank.star && config.rankBroadStar) || (prevRank.leader !== currRank.leader && config.rankBroadLeader)) {
                                     const guildMember = await ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember?.(subPlayer.guildId, subPlayer.userId);
                                     const name = subPlayer.nickName ?? guildMember?.nick ?? players.find((player) => player.steamAccount.id == subPlayer.steamId)?.steamAccount.name ?? subPlayer.steamId;
-                                    const message = `群友 ${name} 段位变动：${d2a.rank[prevRank.medal]}${prevRank.star} → ${d2a.rank[currRank.medal]}${currRank.star} `;
                                     if (config.rankBroadFun === true) {
                                         // 整活播报
                                         const img = await ctx.puppeteer.render(
@@ -762,6 +761,7 @@ export async function apply(ctx: Context, config: Config) {
                                         await ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], img);
                                     } else {
                                         // 常规播报
+                                        const message = `群友 ${name} 段位变动：${d2a.rank[prevRank.medal]}${prevRank.star} → ${d2a.rank[currRank.medal]}${currRank.star} `;
                                         const img = await ctx.puppeteer.render(genImageHTML(currRank, "rank" + (config.rankBroadFun ? "2" : ""), TemplateType.Rank));
                                         await ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], message + img);
                                     }
