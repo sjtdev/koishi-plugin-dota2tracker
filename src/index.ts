@@ -765,7 +765,7 @@ export async function apply(ctx: Context, config: Config) {
                                         const img = await ctx.puppeteer.render(genImageHTML(currRank, "rank" + (config.rankBroadFun ? "2" : ""), TemplateType.Rank));
                                         await ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], message + img);
                                     }
-                                    ctx.logger.info(`向${subPlayer.platform}:${subPlayer.guildId}发布段位变动播报信息。`);
+                                    ctx.logger.info(`向 ${subPlayer.platform}:${subPlayer.guildId} 发布段位变动播报信息。`);
                                 }
                             }
                         }
