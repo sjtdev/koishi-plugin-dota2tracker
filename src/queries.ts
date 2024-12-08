@@ -140,10 +140,10 @@ export function MATCH_INFO(matchId) {
 `;
 }
 
-export function MATCHES_FOR_DAILY(steamAccountIds, seconds) {
+export function PLAYERS_MATCHES_FOR_DAILY(steamAccountIds, seconds) {
     return `
   {
-    players(steamAccountIds:${JSON.stringify(steamAccountIds)}) {
+    players(steamAccountIds:[${steamAccountIds.join(",")}]) {
       steamAccount{id name avatar}
       matches(request:{startDateTime:${seconds} take:50}){
         id
@@ -180,7 +180,7 @@ export function VERIFYING_PLAYER(steamAccountId) {
 export function PLAYERS_LASTMATCH_RANKINFO(steamAccountIds) {
     return `
     {
-        players(steamAccountIds:${JSON.stringify(steamAccountIds)}) {
+        players(steamAccountIds:[${steamAccountIds.join(",")}]) {
           steamAccount{
             id
             name

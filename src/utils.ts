@@ -43,10 +43,11 @@ export interface dt_previous_query_results {
 
 export const CONFIGS = { STRATZ_API: { URL: "https://api.stratz.com/graphql", TOKEN: "" } };
 let http: HTTP = null;
-export function setHttp(newHttp: HTTP) {
+export function init(newHttp: HTTP, setTimeout) {
     http = newHttp;
+    setTimeout = setTimeout;
 }
-export async function query(query_str) {
+async function fetchData(query_str) {
     return await http.post(CONFIGS.STRATZ_API.URL, query_str, {
         responseType: "json",
         headers: {
@@ -55,6 +56,38 @@ export async function query(query_str) {
             Authorization: `Bearer ${CONFIGS.STRATZ_API.TOKEN}`,
         },
     });
+}
+export async function query(query_func, ...args) {
+    // 判断是否是需要分批的查询
+    if (query_func.name.startsWith("PLAYERS") && args[0].length > 5) {
+        const playerIds = args[0];
+        const chunkSize = 5;
+        let allPlayers = [];
+
+        // 将玩家ID数组分割成多个5个一组的子数组
+        for (let i = 0; i < playerIds.length; i += chunkSize) {
+            const chunk = playerIds.slice(i, i + chunkSize);
+
+            // 对每个分批的查询调用query_func, 并确保传入多个参数
+            const query_str = query_func(chunk, ...args.slice(1)); // 如果有额外的参数，保持传递下去
+
+            // 等待请求之间加入延迟
+            const result: any = await new Promise((resolve) => setTimeout(() => resolve(fetchData(query_str)), 100));
+
+            // 确保每次请求返回的是{ data: { players: [...] } }格式
+            if (result.data && result.data.players) {
+                allPlayers = allPlayers.concat(result.data.players);
+            }
+        }
+
+        // 将所有players合并到data字段下
+        return { data: { players: allPlayers } };
+    } else {
+        // 如果不需要分批，直接进行查询
+        const query_str = query_func(...args);
+        const result = await fetchData(query_str);
+        return result || {}; 
+    }
 }
 
 export async function queryHeroFromValve(heroId: number) {

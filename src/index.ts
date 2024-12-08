@@ -122,7 +122,7 @@ const random = new Random(() => Math.random());
 export async function apply(ctx: Context, config: Config) {
     // write your plugin here
     utils.CONFIGS.STRATZ_API.TOKEN = config.STRATZ_API_TOKEN; // 读取配置API_TOKEN
-    utils.setHttp(ctx.http);
+    utils.init(ctx.http, ctx.setTimeout);
 
     ctx.command("订阅本群", "订阅后还需玩家在本群绑定SteamID")
         .usage("订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。")
@@ -238,17 +238,20 @@ export async function apply(ctx: Context, config: Config) {
             }
             if (subscribedPlayers.length <= 20) {
                 try {
-                    const memberList = await session.bot.getGuildMemberList(session.event.channel.id);
+                    let memberList;
+                    try {
+                        memberList = await session.bot?.getGuildMemberList(session.event.channel.id);
+                    } catch (error) {}
                     async function getUsers(subscribedPlayers: any[], utils: any, queries: any, memberList: any) {
                         const playerSteamIds = subscribedPlayers.map((player) => player.steamId);
-                        const queryResult = await utils.query(queries.PLAYERS_INFO_WITH_10_MATCHES_FOR_GUILD(playerSteamIds));
+                        const queryResult = await utils.query(queries.PLAYERS_INFO_WITH_10_MATCHES_FOR_GUILD, playerSteamIds);
                         const playersInfo = queryResult.data.players;
 
                         const users = [];
 
                         for (const subscribedPlayer of subscribedPlayers) {
                             const queryPlayer = playersInfo.find((player) => player.steamAccount.id == subscribedPlayer.steamId);
-                            const queryMember = memberList.data.find((member) => member.user?.id == subscribedPlayer.userId);
+                            const queryMember = memberList?.data.find((member) => member.user?.id == subscribedPlayer.userId);
                             users.push({ ...subscribedPlayer, ...queryPlayer, ...queryMember });
                         }
 
@@ -257,7 +260,6 @@ export async function apply(ctx: Context, config: Config) {
 
                     // Usage
                     const users = await getUsers(subscribedPlayers, utils, queries, memberList);
-
                     session.send(await ctx.puppeteer.render(genImageHTML(users, TemplateType.GuildMember, TemplateType.GuildMember)));
                 } catch (error) {
                     ctx.logger.error(error);
@@ -276,7 +278,7 @@ export async function apply(ctx: Context, config: Config) {
                 match = queryLocal[0].data;
                 ctx.database.set("dt_previous_query_results", match.id, { queryTime: new Date() });
             } else {
-                match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO(matchId))).data);
+                match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO, matchId)).data);
             }
             if (match && (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(moment().subtract(config.dataParsingTimeoutMinutes, "minutes")))) {
                 session.send((ctx.config.urlInMessageType.some((type) => type == "match") ? "https://stratz.com/matches/" + matchId : "") + (await ctx.puppeteer.render(genImageHTML(match, config.template_match, TemplateType.Match))));
@@ -302,7 +304,6 @@ export async function apply(ctx: Context, config: Config) {
                 session.send("请输入比赛ID。");
                 return;
             }
-            JSON.stringify;
             if (!/^\d{10}$/.test(match_id)) {
                 session.send("比赛ID无效。");
                 return;
@@ -340,9 +341,10 @@ export async function apply(ctx: Context, config: Config) {
                 let lastMatchId = 0;
                 try {
                     session.send("正在搜索对局详情，请稍后...");
-                    lastMatchId = (await utils.query(queries.PLAYERS_LASTMATCH_RANKINFO(parseInt(flagBindedPlayer?.steamId ?? input_data)))).data.player.matches[0].id;
-                } catch {
+                    lastMatchId = (await utils.query(queries.PLAYERS_LASTMATCH_RANKINFO, [parseInt(flagBindedPlayer?.steamId ?? input_data)])).data.players[0].matches[0].id;
+                } catch (error) {
                     session.send("获取玩家最近比赛失败。");
+                    ctx.logger.error(error);
                     return;
                 }
                 queryMatchAndSend(session, lastMatchId);
@@ -380,8 +382,8 @@ export async function apply(ctx: Context, config: Config) {
                 let steamId = flagBindedPlayer?.steamId ?? input_data;
                 let player;
                 try {
-                    player = (await utils.query(queries.PLAYER_INFO_WITH_25_MATCHES(steamId, hero?.id))).data.player;
-                    let playerExtra = (await utils.query(queries.PLAYER_EXTRA_INFO(steamId, player.matchCount, Object.keys(dotaconstants.heroes).length, hero?.id))).data.player;
+                    player = (await utils.query(queries.PLAYER_INFO_WITH_25_MATCHES, steamId, hero?.id)).data.player;
+                    let playerExtra = (await utils.query(queries.PLAYER_EXTRA_INFO, steamId, player.matchCount, Object.keys(dotaconstants.heroes).length, hero?.id)).data.player;
                     // 过滤和保留最高 level 的记录
                     let filteredDotaPlus = {};
                     playerExtra.dotaPlus.forEach((item) => {
@@ -573,7 +575,7 @@ export async function apply(ctx: Context, config: Config) {
                     return;
                 }
                 try {
-                    let heroStats = (await utils.query(queries.HERO_MATCHUP_WINRATE(hero.id))).data.heroStats;
+                    let heroStats = (await utils.query(queries.HERO_MATCHUP_WINRATE, hero.id)).data.heroStats;
                     let withTopFive = heroStats.matchUp[0].with
                         .filter((item) => item.matchCount / heroStats.matchUp[0].matchCountWith > Math.max(0, Math.min(5, options.filter)) / 100)
                         .map((item) => {
@@ -679,7 +681,7 @@ export async function apply(ctx: Context, config: Config) {
                         return self.indexOf(value) === index;
                     });
                 // 获取所有查询到的玩家最新比赛并根据match.id去重
-                const players = (await utils.query(queries.PLAYERS_LASTMATCH_RANKINFO(subscribedPlayersSteamIds))).data.players;
+                const players = (await utils.query(queries.PLAYERS_LASTMATCH_RANKINFO, subscribedPlayersSteamIds)).data.players;
                 const lastMatches = players
                     .map((player) => player.matches[0])
                     .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id)) // 根据match.id去重
@@ -704,7 +706,7 @@ export async function apply(ctx: Context, config: Config) {
                                 });
                         });
                         pendingMatches.push({ matchId: match.id, guilds: tempGuilds });
-                        utils.query(queries.REQUEST_MATCH_DATA_ANALYSIS(match.id));
+                        utils.query(queries.REQUEST_MATCH_DATA_ANALYSIS, match.id);
                         ctx.logger.info(
                             tempGuilds
                                 .map((guild) => `追踪到来自群组${guild.platform}:${guild.guildId}的用户${guild.players.map((player) => `[${player.nickName ?? ""}(${player.steamId})]`).join("、")}的尚未播报过的最新比赛 ${match.id}。`)
@@ -785,7 +787,7 @@ export async function apply(ctx: Context, config: Config) {
                     if (queryLocal.length > 0) {
                         match = queryLocal[0].data;
                         ctx.database.set("dt_previous_query_results", match.id, { queryTime: new Date() });
-                    } else match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO(pendingMatch.matchId))).data);
+                    } else match = utils.getFormattedMatchData((await utils.query(queries.MATCH_INFO, pendingMatch.matchId)).data);
                     if (match.parsedDateTime || moment.unix(match.endDateTime).isBefore(now.subtract(config.dataParsingTimeoutMinutes, "minutes"))) {
                         pendingMatches = pendingMatches.filter((item) => item.matchId != match.id);
 
@@ -855,10 +857,9 @@ export async function apply(ctx: Context, config: Config) {
         // 使用工具函数查询比赛数据，将结果中的玩家信息过滤出参与过至少一场比赛的玩家
         const players = (
             await utils.query(
-                queries.MATCHES_FOR_DAILY(
-                    subscribedPlayersInGuild.map((player) => player.steamId).filter((value, index, self) => self.indexOf(value) === index),
-                    timeAgo
-                )
+                queries.PLAYERS_MATCHES_FOR_DAILY,
+                subscribedPlayersInGuild.map((player) => player.steamId).filter((value, index, self) => self.indexOf(value) === index),
+                timeAgo
             )
         ).data.players.filter((player) => player.matches.length > 0);
         // 对比赛信息去重处理，确保每场比赛唯一
@@ -986,6 +987,7 @@ function genImageHTML(data, template, type: TemplateType) {
         dotaconstants: dotaconstants,
         moment: moment,
         escapeHTML: function escapeHTML(str) {
+            if (str == null) return "";
             return str.replace(/[&<>"']/g, function (match) {
                 const escape = {
                     "&": "&amp;",
