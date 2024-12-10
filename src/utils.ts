@@ -43,11 +43,12 @@ export interface dt_previous_query_results {
 
 export const CONFIGS = { STRATZ_API: { URL: "https://api.stratz.com/graphql", TOKEN: "" } };
 let http: HTTP = null;
-export function init(newHttp: HTTP, setTimeout) {
+let setTimeout: Function;
+export function init(newHttp: HTTP, newSetTimeout: Function) {
     http = newHttp;
-    setTimeout = setTimeout;
+    setTimeout = newSetTimeout;
 }
-async function fetchData(query_str) {
+async function fetchData(query_str: string): Promise<{ data: any; errors?: {} }> {
     return await http.post(CONFIGS.STRATZ_API.URL, query_str, {
         responseType: "json",
         headers: {
@@ -57,7 +58,7 @@ async function fetchData(query_str) {
         },
     });
 }
-export async function query(query_func, ...args) {
+export async function query(query_func: Function, ...args: any[]): Promise<any> {
     // 判断是否是需要分批的查询
     if (query_func.name.startsWith("PLAYERS") && args[0].length > 5) {
         const playerIds = args[0];
@@ -72,7 +73,9 @@ export async function query(query_func, ...args) {
             const query_str = query_func(chunk, ...args.slice(1)); // 如果有额外的参数，保持传递下去
 
             // 等待请求之间加入延迟
-            const result: any = await new Promise((resolve) => setTimeout(() => resolve(fetchData(query_str)), 100));
+            const result: any = await new Promise((resolve) => setTimeout(async () => resolve(await fetchData(query_str)), 100));
+
+            if (result.errors) throw { errors: result.errors };
 
             // 确保每次请求返回的是{ data: { players: [...] } }格式
             if (result.data && result.data.players) {
@@ -86,7 +89,8 @@ export async function query(query_func, ...args) {
         // 如果不需要分批，直接进行查询
         const query_str = query_func(...args);
         const result = await fetchData(query_str);
-        return result || {}; 
+        if (result.errors) throw { errors: result.errors };
+        return result || {};
     }
 }
 
@@ -523,7 +527,7 @@ export function winRateColor(value) {
 /** 使用stratzAPI查询，根据传入的SteamID验证此Steam账号是否为有效的DOTA2玩家账号，返回对象{isValid:boolean,reason:"如果失败此处为失败原因"}。 */
 export async function playerisValid(steamAccountId): Promise<{ isValid: boolean; reason?: string }> {
     try {
-        let queryRes = await query(queries.VERIFYING_PLAYER(steamAccountId));
+        let queryRes: any = await query(queries.VERIFYING_PLAYER, steamAccountId);
         if (queryRes.data.player.matchCount != null) return { isValid: true };
         else return { isValid: false, reason: "SteamID无效或无任何场次。" };
     } catch (error) {
