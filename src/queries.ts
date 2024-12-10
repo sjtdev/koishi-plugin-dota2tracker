@@ -442,5 +442,5 @@ export function HERO_MATCHUP_WINRATE(heroId) {
 }
 
 export function REQUEST_MATCH_DATA_ANALYSIS(matchId){
-  return `stratz{matchRetry(id:${matchId})}`
+  return `{stratz{matchRetry(id:${matchId})}}`
 }
