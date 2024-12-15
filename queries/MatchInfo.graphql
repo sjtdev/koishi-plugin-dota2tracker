@@ -1,0 +1,135 @@
+query MatchInfo($matchId: Long!) {
+  match(id: $matchId) {
+    id
+    didRadiantWin
+    lobbyType
+    gameMode
+    regionId
+    parsedDateTime
+    startDateTime
+    endDateTime
+    actualRank
+    rank
+    averageRank
+    durationSeconds
+    topLaneOutcome
+    midLaneOutcome
+    bottomLaneOutcome
+    radiantKills
+    direKills
+    players {
+      steamAccountId
+      steamAccount {
+        name
+      }
+      level
+      hero {
+        id
+        name
+        shortName
+        facets {
+          facetId
+        }
+      }
+      variant
+      dotaPlus {
+        level
+      }
+      leaverStatus
+      partyId
+      position
+      playerSlot
+      lane
+      imp
+      kills
+      deaths
+      assists
+      isRadiant
+      networth
+      steamAccount {
+        seasonRank
+        seasonLeaderboardRank
+      }
+      item0Id
+      item1Id
+      item2Id
+      item3Id
+      item4Id
+      item5Id
+      backpack0Id
+      backpack1Id
+      backpack2Id
+      neutral0Id
+      stats {
+        matchPlayerBuffEvent {
+          abilityId
+          itemId
+          stackCount
+        }
+      }
+      heroDamage
+      towerDamage
+      stats {
+        heroDamageReport {
+          receivedTotal {
+            physicalDamage
+            magicalDamage
+            pureDamage
+          }
+        }
+      }
+      numLastHits
+      numDenies
+      goldPerMinute
+      experiencePerMinute
+      heroHealing
+      stats {
+        itemPurchases {
+          itemId
+          time
+        }
+        campStack
+        heroDamageReport {
+          dealtTotal {
+            stunDuration
+            stunCount
+            slowDuration
+            slowCount
+            disableDuration
+            disableCount
+          }
+        }
+      }
+      additionalUnit {
+        item0Id
+        item1Id
+        item2Id
+        item3Id
+        item4Id
+        item5Id
+        backpack0Id
+        backpack1Id
+        backpack2Id
+        neutral0Id
+      }
+      isRandom
+    }
+    pickBans {
+      isPick
+      bannedHeroId
+      heroId
+      order
+    }
+  }
+  constants {
+    facets(language: S_CHINESE) {
+      name
+      id
+      color
+      icon
+      language {
+        displayName
+      }
+    }
+  }
+}

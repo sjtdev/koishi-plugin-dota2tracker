@@ -1,0 +1,17 @@
+query PlayerExtraInfo($steamAccountId: Long!, $totalHeroCount: Int!, $matchCount: Int!, $heroIds: [Short]) {
+  player(steamAccountId: $steamAccountId) {
+    heroesPerformance(take: $totalHeroCount, request: { matchGroupOrderBy: MATCH_COUNT, take: $matchCount, heroIds: $heroIds }) {
+      hero {
+        id
+        shortName
+      }
+      winCount
+      matchCount
+      imp
+    }
+    dotaPlus {
+      heroId
+      level
+    }
+  }
+}

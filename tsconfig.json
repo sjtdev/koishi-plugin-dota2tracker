@@ -16,7 +16,7 @@
         "jsxImportSource": "@satorijs/element",
         "types": ["node",  "yml-register/types"],
 
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
     },
-    "include": ["src", "src/*.json"]
+    "include": ["src", "src/*.json", "queries"]
 }

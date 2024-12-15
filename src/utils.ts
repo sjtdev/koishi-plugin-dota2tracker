@@ -4,7 +4,7 @@ import fs from "fs";
 import * as dotaconstants from "dotaconstants";
 import os from "os";
 import path from "path";
-import * as queries from "./queries.ts";
+import * as graphql from "./graphql-generated";
 
 declare module "koishi" {
     interface Tables {
@@ -41,6 +41,15 @@ export interface dt_previous_query_results {
     queryTime: Date;
 }
 
+interface QueryFormat {
+    query: string;
+    variables?: {};
+}
+interface QueryResult {
+    data: any;
+    errors?: [{ message: string }];
+}
+
 export const CONFIGS = { STRATZ_API: { URL: "https://api.stratz.com/graphql", TOKEN: "" } };
 let http: HTTP = null;
 let setTimeout: Function;
@@ -48,34 +57,37 @@ export function init(newHttp: HTTP, newSetTimeout: Function) {
     http = newHttp;
     setTimeout = newSetTimeout;
 }
-async function fetchData(query_str: string): Promise<{ data: any; errors?: {} }> {
-    return await http.post(CONFIGS.STRATZ_API.URL, query_str, {
+async function fetchData(query: QueryFormat): Promise<QueryResult> {
+    return await http.post(CONFIGS.STRATZ_API.URL, JSON.stringify(query), {
         responseType: "json",
         headers: {
             "User-Agent": "STRATZ_API",
-            "Content-Type": "application/graphql",
+            "Content-Type": "application/json",
             Authorization: `Bearer ${CONFIGS.STRATZ_API.TOKEN}`,
         },
     });
 }
-export async function query(query_func: Function, ...args: any[]): Promise<any> {
+export async function query<TVariables, TData>(
+    queryName: string, // 定义 query_func 为字符串
+    variables?: TVariables // 查询变量
+): Promise<TData> {
     // 判断是否是需要分批的查询
-    if (query_func.name.startsWith("PLAYERS") && args[0].length > 5) {
-        const playerIds = args[0];
+    if (queryName.startsWith("Players") && (variables as { steamAccountIds?: any[] })?.steamAccountIds.length > 5) {
+        const playerIds = (variables as { steamAccountIds?: any[] })?.steamAccountIds ?? [];
         const chunkSize = 5;
         let allPlayers = [];
 
         // 将玩家ID数组分割成多个5个一组的子数组
         for (let i = 0; i < playerIds.length; i += chunkSize) {
             const chunk = playerIds.slice(i, i + chunkSize);
+            (variables as { steamAccountIds?: any[] }).steamAccountIds = chunk;
 
             // 对每个分批的查询调用query_func, 并确保传入多个参数
-            const query_str = query_func(chunk, ...args.slice(1)); // 如果有额外的参数，保持传递下去
+            const query_str = loadGraphqlFile(queryName); // 如果有额外的参数，保持传递下去
 
             // 等待请求之间加入延迟
-            const result: any = await new Promise((resolve) => setTimeout(async () => resolve(await fetchData(query_str)), 100));
-
-            if (result.errors) throw { errors: result.errors };
+            const result: QueryResult = await new Promise((resolve) => setTimeout(async () => resolve(await fetchData({ query: query_str, variables })), 200));
+            if (result?.errors) throw { errors: result.errors };
 
             // 确保每次请求返回的是{ data: { players: [...] } }格式
             if (result.data && result.data.players) {
@@ -84,14 +96,19 @@ export async function query(query_func: Function, ...args: any[]): Promise<any> 
         }
 
         // 将所有players合并到data字段下
-        return { data: { players: allPlayers } };
+        return { players: allPlayers } as TData;
     } else {
         // 如果不需要分批，直接进行查询
-        const query_str = query_func(...args);
-        const result = await fetchData(query_str);
+        const query_str = loadGraphqlFile(queryName);
+        const result = await fetchData({ query: query_str, variables });
         if (result.errors) throw { errors: result.errors };
-        return result || {};
+        return result.data as TData;
     }
+}
+
+function loadGraphqlFile(queryName: string): string {
+    const filepath = `./node_modules/@sjtdev/koishi-plugin-dota2tracker/queries/${queryName}.graphql`;
+    return fs.readFileSync(filepath, { encoding: "utf-8" }).replace(/[\r\n]+/g, " ");
 }
 
 export async function queryHeroFromValve(heroId: number) {
@@ -132,9 +149,57 @@ export function getImageUrl(image: string, type: ImageType = ImageType.Local, fo
     } else return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/${type}/${image}.${format}`;
 }
 
+export interface MatchInfoEx extends NonNullable<graphql.MatchInfoQuery["match"]> {
+    radiant: MatchInfoExTeam;
+    dire: MatchInfoExTeam;
+    party: { [key: string]: string }; // party 是一个对象，key 是 partyId，value 是 party_mark 中的字符串
+    players:PlayerTypeEx[]
+}
+interface MatchInfoExTeam {
+    killsCount: number;
+    damageReceived: number;
+    heroDamage: number;
+    networth: number;
+    experience: number;
+}
+type PlayerType = NonNullable<graphql.MatchInfoQuery["match"]["players"]>[number];
+interface PlayerTypeEx extends PlayerType {
+    team: "radiant" | "dire";
+    rank: RankInfo;
+    killContribution: number;
+    deathContribution: number;
+    damageReceived: number;
+    titles: { name: string; color: string }[];
+    mvpScore: number;
+    order: number;
+    buffs: {
+        key: string;
+        stackCount?: number | null;
+    }[];
+    laneResult: "stomp" | "stomped" | "tie" | "victory" | "fail" | "jungle";
+    supportItemsCount: { [key: number]: number };
+    items: ItemInfo[];
+    backpacks?: ItemInfo[];
+    unitItems?: ItemInfo[];
+    unitBackpacks?: ItemInfo[];
+    facet: NonNullable<graphql.MatchInfoQuery["constants"]["facets"]>[number];
+}
+interface RankInfo {
+    medal: number;
+    star: number;
+    leaderboard: number;
+    inTop100: "8" | "8b" | "8c";
+}
+interface ItemInfo {
+    id: string;
+    name: string;
+    time: any;
+    isRecipe: boolean;
+}
 // 对比赛数据进行补充以供生成模板函数使用
-export function getFormattedMatchData(data) {
-    const { match, constants } = data;
+export function getFormattedMatchData(data: graphql.MatchInfoQuery) {
+    const match = data.match as MatchInfoEx;
+    const constants = data.constants;
     // if (!match.parsedDateTime)
     //     return match;
     // ↓ 累加团队击杀数，并初始化团队[总对英雄造成伤害]与[总受到伤害]
@@ -185,7 +250,7 @@ export function getFormattedMatchData(data) {
     laneResult.bottom = processLaneOutcome(match.bottomLaneOutcome);
 
     // 遍历所有玩家，为需要的数据进行处理
-    match.players.forEach((player) => {
+    match.players.forEach((player: PlayerTypeEx) => {
         // 储存玩家所属队伍（字符串类型非队伍对象）
         player.team = player.isRadiant ? "radiant" : "dire";
         // 储存玩家分段
@@ -225,18 +290,22 @@ export function getFormattedMatchData(data) {
 
         // 对player.stats.matchPlayerBuffEvent（buff列表）进行处理，取stackCount（叠加层数）最高的对象并去重
         if (player.stats.matchPlayerBuffEvent) {
-            // 使用reduce方法处理数组，以abilityId或itemId作为键，并保留stackCount最大的对象
+            // 使用 reduce 方法处理，筛选出 stackCount 最大的 buff
             const maxStackCountsByAbilityOrItem = player.stats.matchPlayerBuffEvent.reduce((acc, event) => {
-                // 创建一个唯一键，能力ID或物品ID，取决于哪一个不为null
+                // 确定唯一键
                 const key = event.abilityId !== null ? `ability-${event.abilityId}` : `item-${event.itemId}`;
-                // 如果当前key还未存在于accumulator中，或当前event的stackCount更大，则更新记录
+                // 更新逻辑
                 if (!acc[key] || event.stackCount > acc[key].stackCount) {
                     acc[key] = event;
                 }
                 return acc;
             }, {});
-            // 将结果对象转换为数组，并重新赋值给原数组
-            player.stats.matchPlayerBuffEvent.splice(0, player.stats.matchPlayerBuffEvent.length, ...Object.values(maxStackCountsByAbilityOrItem));
+
+            // 将结果存入 player.buffs，转换为数组格式
+            player.buffs = Object.entries(maxStackCountsByAbilityOrItem).map(([key, event]) => ({
+                key,
+                event,
+            }));
         }
 
         switch (player.lane) {
@@ -400,15 +469,15 @@ export function getFormattedMatchData(data) {
             const primaryComparison = primaryMode === ComparisonMode.Max ? player[primaryProperty] > result[primaryProperty] : player[primaryProperty] < result[primaryProperty];
             const secondaryComparison = secondaryMode === ComparisonMode.Max ? player[secondaryProperty] > result[secondaryProperty] : player[secondaryProperty] < result[secondaryProperty];
             if (primaryComparison) {
-                return player; // 主属性决定返回哪个玩家
+                return player as PlayerTypeEx; // 主属性决定返回哪个玩家
             } else if (player[primaryProperty] === result[primaryProperty] && secondaryProperty && secondaryComparison) {
                 // 主属性相同，检查次属性
-                return player;
+                return player as PlayerTypeEx;
             }
-            return result; // 保持当前结果
+            return result as PlayerTypeEx; // 保持当前结果
         });
 
-        return maxPlayer[primaryProperty] > 0 ? maxPlayer : null; // 如果最大属性为0，则不返回玩家对象
+        return (maxPlayer[primaryProperty] > 0 ? maxPlayer : null) as PlayerTypeEx; // 如果最大属性为0，则不返回玩家对象
     }
     findMaxByProperty(
         "mvpScore",
@@ -423,22 +492,22 @@ export function getFormattedMatchData(data) {
     findMaxByProperty("networth")?.titles.push({ name: "富", color: "#FFD700" });
     findMaxByProperty("experiencePerMinute")?.titles.push({ name: "睿", color: "#8888FF" });
     if (match.parsedDateTime) {
-        match.players
-            .reduce((max, player) =>
+        (
+            match.players.reduce((max, player) =>
                 player.stats.heroDamageReport.dealtTotal.stunDuration + player.stats.heroDamageReport.dealtTotal.disableDuration / 2 + player.stats.heroDamageReport.dealtTotal.slowDuration / 4 >
                 max.stats.heroDamageReport.dealtTotal.stunDuration + max.stats.heroDamageReport.dealtTotal.disableDuration / 2 + max.stats.heroDamageReport.dealtTotal.slowDuration / 4
                     ? player
                     : max
-            )
-            .titles.push({ name: "控", color: "#FF00FF" });
-        match.players
-            .reduce((max, player) =>
+            ) as PlayerTypeEx
+        ).titles.push({ name: "控", color: "#FF00FF" });
+        (
+            match.players.reduce((max, player) =>
                 player.stats.heroDamageReport.receivedTotal.physicalDamage + player.stats.heroDamageReport.receivedTotal.magicalDamage + player.stats.heroDamageReport.receivedTotal.pureDamage >
                 max.stats.heroDamageReport.receivedTotal.physicalDamage + max.stats.heroDamageReport.receivedTotal.magicalDamage + max.stats.heroDamageReport.receivedTotal.pureDamage
                     ? player
                     : max
-            )
-            .titles.push({ name: "耐", color: "#84A1C7" });
+            ) as PlayerTypeEx
+        ).titles.push({ name: "耐", color: "#84A1C7" });
     }
     findMaxByProperty("heroDamage")?.titles.push({ name: "爆", color: "#CC0088" });
     findMaxByProperty("kills", "heroDamage")?.titles.push({ name: "破", color: "#DD0000" });
@@ -446,8 +515,8 @@ export function getFormattedMatchData(data) {
     findMaxByProperty("assists", "heroDamage")?.titles.push({ name: "助", color: "#006400" });
     findMaxByProperty("towerDamage", "heroDamage")?.titles.push({ name: "拆", color: "#FEDCBA" });
     findMaxByProperty("heroHealing")?.titles.push({ name: "奶", color: "#00FF00" });
-    match.players
-        .reduce((lowest, player) => {
+    (
+        match.players.reduce((lowest: PlayerTypeEx, player: PlayerTypeEx) => {
             const currentContribution = (player.kills + player.assists) / match[player.team].killsCount;
             const lowestContribution = (lowest.kills + lowest.assists) / match[lowest.team].killsCount;
 
@@ -466,8 +535,8 @@ export function getFormattedMatchData(data) {
                 }
             }
             return lowest; // 保持当前最低的玩家
-        })
-        .titles.push({ name: "摸", color: "#DDDDDD" });
+        }) as PlayerTypeEx
+    ).titles.push({ name: "摸", color: "#DDDDDD" });
     return match;
 }
 
@@ -527,7 +596,7 @@ export function winRateColor(value) {
 /** 使用stratzAPI查询，根据传入的SteamID验证此Steam账号是否为有效的DOTA2玩家账号，返回对象{isValid:boolean,reason:"如果失败此处为失败原因"}。 */
 export async function playerisValid(steamAccountId): Promise<{ isValid: boolean; reason?: string }> {
     try {
-        let queryRes: any = await query(queries.VERIFYING_PLAYER, steamAccountId);
+        let queryRes: any = await query<graphql.VerifyingPlayerQueryVariables, graphql.VerifyingPlayerQuery>("VerifyingPlayer", { steamAccountId });
         if (queryRes.data.player.matchCount != null) return { isValid: true };
         else return { isValid: false, reason: "SteamID无效或无任何场次。" };
     } catch (error) {
