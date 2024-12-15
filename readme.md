@@ -53,11 +53,6 @@ DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑�
 展示见[wiki](https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki)  
 生成图片已使用ejs模板实现，所有模板都在[template]文件夹下，若是有大佬想自己设计模板欢迎联系我完善数据接口。（当前有很多在模板中后处理的数据，不是很友好）  
 
-### 其他问题
-已知问题：当本插件更新版本后，查询已经查询过的比赛数据可能查询失败。  
-* 原因：插件的缓存功能，查询过的比赛数据会缓存至本地以节省API调用次数与服务器流量，再次查询时优先调用本地数据也会提高处理速度。当插件更新后若新增数据的处理或API查询字段，会导致旧的缓存内缺失部分数据引发生成时报错。（播报比赛战报应该不会有这个问题）  
-* 解决：目前在生成失败时会清除缓存，再查询一次就好了。  
-
 ## 灵感来源&鸣谢
 * 感谢[SonodaHanami](https://github.com/SonodaHanami)大佬的[Steam_watcher](https://github.com/SonodaHanami/Steam_watcher)项目，是本插件最重要的灵感来源，并授权提供了战报称号系统、英雄代称与播报信息的代码数据。
 * 也受到了[koishi-plugin-dota2track(npm)](https://www.npmjs.com/package/koishi-plugin-dota2track)的启发，为我的代码提供了一些思路。

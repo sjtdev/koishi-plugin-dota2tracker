@@ -1,0 +1,25 @@
+query HeroMatchupWinrate($heroId: Short!, $take: Int!) {
+  heroStats {
+    matchUp(heroId: $heroId, take: $take, bracketBasicIds: LEGEND_ANCIENT) {
+      heroId
+      matchCountWith
+      matchCountVs
+      with {
+        heroId1
+        winRateHeroId1
+        heroId2
+        winRateHeroId2
+        winCount
+        matchCount
+      }
+      vs {
+        heroId1
+        winRateHeroId1
+        heroId2
+        winRateHeroId2
+        winCount
+        matchCount
+      }
+    }
+  }
+}

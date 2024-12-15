@@ -1,0 +1,62 @@
+query PlayerInfoWith25Matches($steamAccountId: Long!, $heroIds: [Short]) {
+  player(steamAccountId: $steamAccountId) {
+    steamAccount {
+      avatar
+      name
+      seasonRank
+      seasonLeaderboardRank
+      id
+    }
+    guildMember {
+      guild {
+        tag
+      }
+    }
+    matchCount
+    winCount
+    performance {
+      imp
+    }
+    heroesPerformance(take: 25, request: { matchGroupOrderBy: WIN_COUNT, take: 25, heroIds: $heroIds }) {
+      hero {
+        id
+        shortName
+      }
+      imp
+      winCount
+      matchCount
+    }
+    matches(request: { take: 25, heroIds: $heroIds }) {
+      id
+      rank
+      lobbyType
+      gameMode
+      startDateTime
+      parsedDateTime
+      durationSeconds
+      didRadiantWin
+      topLaneOutcome
+      midLaneOutcome
+      bottomLaneOutcome
+      radiantKills
+      direKills
+      players {
+        steamAccount {
+          id
+        }
+        isRadiant
+        lane
+        kills
+        deaths
+        assists
+        position
+        award
+        imp
+        hero {
+          id
+          shortName
+        }
+      }
+    }
+  }
+}

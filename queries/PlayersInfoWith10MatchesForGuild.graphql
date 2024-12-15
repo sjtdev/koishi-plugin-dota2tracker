@@ -1,0 +1,27 @@
+query PlayersInfoWith10MatchesForGuild($steamAccountIds: [Long]!) {
+  players(steamAccountIds: $steamAccountIds) {
+    steamAccount {
+      id
+      avatar
+      name
+      seasonRank
+    }
+    matches(request: { take: 10 }) {
+      didRadiantWin
+      startDateTime
+      players {
+        isRadiant
+        kills
+        deaths
+        assists
+        steamAccount {
+          id
+        }
+        hero {
+          shortName
+        }
+        imp
+      }
+    }
+  }
+}

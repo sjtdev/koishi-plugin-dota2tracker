@@ -1,0 +1,53 @@
+query HeroInfo($heroId: Short!) {
+  constants {
+    hero(id: $heroId, language: S_CHINESE) {
+      id
+      name
+      shortName
+      aliases
+      roles {
+        roleId
+        level
+      }
+      language {
+        displayName
+        lore
+        hype
+      }
+      abilities {
+        ability(language: S_CHINESE) {
+          name
+          language {
+            displayName
+            description
+            attributes
+            lore
+            aghanimDescription
+            shardDescription
+            notes
+          }
+          stat {
+            type
+            behavior
+            unitTargetType
+            unitTargetTeam
+            unitTargetFlags
+            unitDamageType
+            cooldown
+            manaCost
+            spellImmunity
+            isOnCastbar
+            isGrantedByShard
+            isGrantedByScepter
+            hasShardUpgrade
+            hasScepterUpgrade
+          }
+        }
+      }
+      talents {
+        abilityId
+        slot
+      }
+    }
+  }
+}

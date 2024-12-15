@@ -1,0 +1,14 @@
+query AllAbilitiesChineseName {
+  constants {
+    abilities(language: S_CHINESE) {
+      id
+      language {
+        displayName
+      }
+    }
+    gameVersions {
+      name
+      id
+    }
+  }
+}

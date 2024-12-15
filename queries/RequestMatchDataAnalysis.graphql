@@ -1,0 +1,5 @@
+query RequestMatchDataAnalysis($matchId: Long!) {
+  stratz {
+    matchRetry(id: $matchId)
+  }
+}
