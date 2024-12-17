@@ -18,5 +18,5 @@
 
         "resolveJsonModule": true,
     },
-    "include": ["src", "src/*.json", "queries"]
+    "include": ["src", "src/data/*.json", "queries"]
 }

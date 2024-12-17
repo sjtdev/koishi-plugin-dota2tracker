@@ -111,9 +111,12 @@ function loadGraphqlFile(queryName: string): string {
     return fs.readFileSync(filepath, { encoding: "utf-8" }).replace(/[\r\n]+/g, " ");
 }
 
-export async function queryHeroFromValve(heroId: number) {
-    // return (await http.get("http://localhost:8099")).result.data.heroes[0];
-    return (await http.get(`https://www.dota2.com/datafeed/herodata?language=schinese&hero_id=${heroId}`)).result.data.heroes[0];
+export async function queryHeroFromValve(heroId: number, languageTag = "zh-CN") {
+    enum language {
+        "zh-CN" = "schinese",
+        "en-US" = "english",
+    }
+    return (await http.get(`https://www.dota2.com/datafeed/herodata?language=${language[languageTag]}&hero_id=${heroId}`)).result.data.heroes[0];
 }
 
 export enum HeroDescType {
@@ -153,7 +156,7 @@ export interface MatchInfoEx extends NonNullable<graphql.MatchInfoQuery["match"]
     radiant: MatchInfoExTeam;
     dire: MatchInfoExTeam;
     party: { [key: string]: string }; // party 是一个对象，key 是 partyId，value 是 party_mark 中的字符串
-    players:PlayerTypeEx[]
+    players: PlayerTypeEx[];
 }
 interface MatchInfoExTeam {
     killsCount: number;

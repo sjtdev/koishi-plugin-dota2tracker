@@ -570,7 +570,7 @@
         <div class="wrapper">
             <%- `
             <div class="hero" id="${hero.id}">
-                <img src="${utils.getImageUrl(hero.shortName, ImageType.Heroes)}"/>
+                <img src="${utils.getImageUrl(hero["name"].match(/^npc_dota_hero_(.+)$/)[1], ImageType.Heroes)}"/>
                 <img class="pri_attr" src="${utils.getImageUrl(d2a.primary_attrs[hero.primary_attr], ImageType.Icons)}"/>
                 <div class="info">
                     <p class="name">${hero.name_loc}</p>

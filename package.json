@@ -1,7 +1,7 @@
 {
   "name": "@sjtdev/koishi-plugin-dota2tracker",
   "description": "koishi插件-追踪群友的DOTA2对局",
-  "version": "1.2.20-pre.2",
+  "version": "1.2.20-pre.3",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -46,7 +46,8 @@
       "cron"
     ],
     "locales": [
-      "zh"
+      "zh-CN",
+      "en-US"
     ]
   }
 }

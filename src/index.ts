@@ -1,21 +1,23 @@
-import { Context, Schema, h } from "koishi";
+import { Channel, Context, Schema, Session, h } from "koishi";
 import * as utils from "./utils.ts";
 import { ImageType, HeroDescType } from "./utils.ts";
-import * as puppeteer from "koishi-plugin-puppeteer";
+import {} from "koishi-plugin-puppeteer";
 import fs from "fs";
 import path from "path";
 import moment from "moment";
 import * as dotaconstants from "dotaconstants";
-import * as d2a from "./dotaconstants_add.json";
+import * as d2a from "./data/dotaconstants_add.json";
 import { Random } from "koishi";
 import * as cron from "koishi-plugin-cron";
 import * as ejs from "ejs";
 import * as graphql from "./graphql-generated";
 import { query } from "./utils.ts";
+import {} from "@koishijs/plugin-locales";
 
 export const name = "dota2tracker";
 export const usage = `
 DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑定），以及一系列查询功能。  
+[本地化/dota2tracker](../../locales/dota2tracker)可以自定义英雄别名和位置代称  
 **更多信息请进入[插件主页](https://github.com/sjtdev/koishi-plugin-dota2tracker)与[更新日志](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md)查看。**`;
 export const inject = ["http", "database", "cron", "puppeteer"]; // 声明依赖
 
@@ -124,6 +126,14 @@ export async function apply(ctx: Context, config: Config) {
     // write your plugin here
     utils.CONFIGS.STRATZ_API.TOKEN = config.STRATZ_API_TOKEN; // 读取配置API_TOKEN
     utils.init(ctx.http, ctx.setTimeout);
+    ctx.i18n.define("zh-CN", require("./locales/zh-CN"));
+    ctx.i18n.define("en-US", require("./locales/en-US"));
+    const koishiLanguageTag = ctx.i18n.fallback(undefined).at(2);
+    const getLanguageTag = async function (session?: Session, channel?: Channel): Promise<string> {
+        if (!session && !channel) return koishiLanguageTag;
+        const resolvedChannel = channel ?? (await session?.getChannel(session.event.channel.id));
+        return resolvedChannel?.locales?.at(0) ?? koishiLanguageTag;
+    };
 
     ctx.command("订阅本群", "订阅后还需玩家在本群绑定SteamID")
         .usage("订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。")
@@ -245,11 +255,9 @@ export async function apply(ctx: Context, config: Config) {
                     } catch (error) {}
                     async function getUsers(subscribedPlayers: any[], memberList: any) {
                         const playerSteamIds: graphql.PlayersInfoWith10MatchesForGuildQueryVariables = { steamAccountIds: subscribedPlayers.map((player) => player.steamId) };
-                        const queryResult = await query<graphql.PlayersInfoWith10MatchesForGuildQueryVariables, graphql.PlayersInfoWith10MatchesForGuildQuery>("PlayersInfoWith10MatchesForGuild", { steamAccountIds: playerSteamIds });
+                        const queryResult = await query<graphql.PlayersInfoWith10MatchesForGuildQueryVariables, graphql.PlayersInfoWith10MatchesForGuildQuery>("PlayersInfoWith10MatchesForGuild",  playerSteamIds );
                         const playersInfo = queryResult.players;
-
                         const users = [];
-
                         for (const subscribedPlayer of subscribedPlayers) {
                             const queryPlayer = playersInfo.find((player) => player.steamAccount.id == subscribedPlayer.steamId);
                             const queryMember = memberList?.data.find((member) => member.user?.id == subscribedPlayer.userId);
@@ -379,17 +387,17 @@ export async function apply(ctx: Context, config: Config) {
                 }
                 session.send("正在获取玩家数据，请稍后...");
                 // let steamId = flagBindedPlayer ? flagBindedPlayer.steamId : input_data;
-                let hero = findingHero(options.hero);
+                let heroId = findingHero(options.hero);
                 let steamId = flagBindedPlayer?.steamId ?? input_data;
                 let player;
                 try {
-                    player = (await query<graphql.PlayerInfoWith25MatchesQueryVariables, graphql.PlayerInfoWith25MatchesQuery>("PlayerInfoWith25Matches", { steamAccountId: steamId, heroIds: hero?.id })).player;
+                    player = (await query<graphql.PlayerInfoWith25MatchesQueryVariables, graphql.PlayerInfoWith25MatchesQuery>("PlayerInfoWith25Matches", { steamAccountId: steamId, heroIds: heroId })).player;
                     let playerExtra = (
                         await utils.query<graphql.PlayerExtraInfoQueryVariables, graphql.PlayerExtraInfoQuery>("PlayerExtraInfo", {
                             steamAccountId: steamId,
                             matchCount: player.matchCount,
                             totalHeroCount: Object.keys(dotaconstants.heroes).length,
-                            heroIds: hero?.id,
+                            heroIds: heroId,
                         })
                     ).player;
                     // 过滤和保留最高 level 的记录
@@ -431,14 +439,14 @@ export async function apply(ctx: Context, config: Config) {
                     // 取场次前十的英雄表现数据附加到原player对象中
                     player.heroesPerformanceTop10 = playerExtra.heroesPerformance.slice(0, 10);
 
-                    if (hero) {
+                    if (heroId) {
                         const { matchCount, winCount, imp } = player.heroesPerformanceTop10[0];
                         player.matchCount = matchCount;
                         player.winCount = winCount;
                         player.performance.imp = imp;
-                        player.dotaPlus = player.dotaPlus.filter((dpHero) => dpHero.heroId == hero.id);
+                        player.dotaPlus = player.dotaPlus.filter((dpHero) => dpHero.heroId == heroId);
                     }
-                    player.genHero = hero;
+                    player.genHero = { name: d2a.HEROES_NAMES[(await session.getChannel(session.event.channel.id)).locales?.at(0) ?? "zh-CN"][heroId] };
                     session.send(
                         (ctx.config.urlInMessageType.some((type) => type == "player") ? "https://stratz.com/players/" + player.steamAccount.id : "") +
                             (await ctx.puppeteer.render(genImageHTML(player, config.template_player, TemplateType.Player)))
@@ -459,17 +467,17 @@ export async function apply(ctx: Context, config: Config) {
         .example("查询英雄 雷泽")
         .example("查询英雄 电魂")
         .action(async ({ session, options }, input_data) => {
-            if (options.random) input_data = random.pick(Object.keys(d2a.HEROES_CHINESE));
+            const languageTag = await getLanguageTag(session);
+            if (options.random) input_data = random.pick(Object.keys(d2a.HEROES_NAMES[languageTag]));
             if (input_data) {
-                let hero: any = findingHero(input_data);
-                if (!hero) {
+                let heroId = findingHero(input_data);
+                if (!heroId) {
                     session.send("未找到输入的英雄，请确认后重新输入。");
                     return;
                 }
                 await session.send("正在获取英雄数据，请稍后...");
                 try {
-                    const queryHero = await utils.queryHeroFromValve(hero.id);
-                    Object.assign(hero, queryHero);
+                    let hero = await utils.queryHeroFromValve(heroId, languageTag);
                     // 处理命石新增的技能
                     hero.facet_abilities.forEach((fa, i) => {
                         if (fa.abilities.length) {
@@ -577,13 +585,14 @@ export async function apply(ctx: Context, config: Config) {
         .example("查询英雄对战 敌法师 -l 10 -f 1\t（等同于上例，参数接空格也可使用）")
         .action(async ({ session, options }, input_data) => {
             if (input_data) {
-                let hero = findingHero(input_data);
-                if (!hero) {
+                const languageTag = await getLanguageTag(session);
+                let heroId = findingHero(input_data);
+                if (!heroId) {
                     session.send("未找到输入的英雄，请确认后重新输入。");
                     return;
                 }
                 try {
-                    let heroStats = (await query<graphql.HeroMatchupWinrateQueryVariables, graphql.HeroMatchupWinrateQuery>("HeroMatchupWinrate", { heroId: hero.id, take: Object.keys(dotaconstants.heroes).length - 1 })).heroStats;
+                    let heroStats = (await query<graphql.HeroMatchupWinrateQueryVariables, graphql.HeroMatchupWinrateQuery>("HeroMatchupWinrate", { heroId: heroId, take: Object.keys(dotaconstants.heroes).length - 1 })).heroStats;
                     let withTopFive = heroStats.matchUp[0].with
                         .filter((item) => item.matchCount / heroStats.matchUp[0].matchCountWith > Math.max(0, Math.min(5, options.filter)) / 100)
                         .map((item) => {
@@ -601,10 +610,10 @@ export async function apply(ctx: Context, config: Config) {
                         .sort((a, b) => a.winRate - b.winRate)
                         .slice(0, Math.max(1, Math.min(Object.keys(dotaconstants.heroes).length - 1, options.limit)));
                     session.send(
-                        `你查询的英雄是${d2a.HEROES_CHINESE[heroStats.matchUp[0].heroId][0]}（ID：${heroStats.matchUp[0].heroId}），\n以下是7天内传奇-万古分段比赛数据总结而来的搭档与克制关系\n最佳搭档（组合胜率前${
+                        `你查询的英雄是${d2a.HEROES_NAMES[heroStats.matchUp[0].heroId][0]}（ID：${heroStats.matchUp[0].heroId}），\n以下是7天内传奇-万古分段比赛数据总结而来的搭档与克制关系\n最佳搭档（组合胜率前${
                             options.limit
-                        }）：${withTopFive.map((item) => `${d2a.HEROES_CHINESE[item.heroId2][0]}(胜率${(item.winRate * 100).toFixed(1)}%)`).join("、")}\n最佳克星（对抗胜率倒${options.limit}）：${vsBottomFive
-                            .map((item) => `${d2a.HEROES_CHINESE[item.heroId2][0]}(胜率${(item.winRate * 100).toFixed(1)}%)`)
+                        }）：${withTopFive.map((item) => `${d2a.HEROES_NAMES[languageTag][item.heroId2][0]}(胜率${(item.winRate * 100).toFixed(1)}%)`).join("、")}\n最佳克星（对抗胜率倒${options.limit}）：${vsBottomFive
+                            .map((item) => `${d2a.HEROES_NAMES[languageTag][item.heroId2][0]}(胜率${(item.winRate * 100).toFixed(1)}%)`)
                             .join("、")}`
                     );
                 } catch (error) {
@@ -615,27 +624,61 @@ export async function apply(ctx: Context, config: Config) {
             }
         });
 
-    function findingHero(input): { id: number; name: string; shortName: string; names_cn: Array<string>; localized_name: string } {
-        if (!input) return;
-        let dc_heroes = Object.values(dotaconstants.heroes).map((hero) => ({
-            id: hero["id"],
-            name: hero["name"],
-            shortName: hero["name"].match(/^npc_dota_hero_(.+)$/)[1],
-        }));
-        let cn_heroes = Object.keys(d2a.HEROES_CHINESE).map((key) => ({
-            id: parseInt(key),
-            names_cn: d2a.HEROES_CHINESE[key],
-        }));
-        const mergedMap = new Map();
-        [dc_heroes, cn_heroes].forEach((array) => {
-            array.forEach((item) => {
-                const existingItem = mergedMap.get(item.id);
-                if (existingItem) mergedMap.set(item.id, { ...existingItem, ...item });
-                else mergedMap.set(item.id, item);
-            });
-        });
-        let heroes = Array.from(mergedMap.values());
-        return heroes.find((hero) => hero.names_cn.some((cn) => cn.toLowerCase() == input.toLowerCase()) || hero.shortName === input.toLowerCase() || hero.id == input);
+    function findingHero(input: string | number): number | undefined {
+        const heroIds = Object.keys(dotaconstants.heroes).map((id) => parseInt(id));
+        let tid;
+        for (const loc of Object.keys(d2a.HEROES_NAMES)) {
+            for (const id_nicknames of getHeroNicknames(heroIds, loc) as { [key: number]: string[] }[]) {
+                for (const [id, nicknames] of Object.entries(id_nicknames)) {
+                    try {
+                        for (const nickname of nicknames) {
+                            if (input == nickname) return Number(id);
+                        }
+                    } catch {
+                        continue;
+                    }
+                }
+            }
+        }
+        for (const names of Object.values(d2a.HEROES_NAMES)) {
+            for (const [id, name] of Object.entries(names)) {
+                if (input == name) return Number(id);
+                if (input == id) tid = input;
+            }
+        }
+        return tid;
+    }
+
+    /**
+     * 获取英雄的别名。
+     * @param heroIds 英雄ID或英雄ID数组
+     * @param languageTag 语言标签，默认使用koishi当前优先级最高的语言（全局配置-i18n.locales）
+     * @returns 输入单个ID时直接返回英雄别名列表（string[]）；输入ID数组时返回英雄ID：英雄别名列表（{number:string[]}[]）。
+     */
+    function getHeroNicknames(heroIds?: number | number[], languageTag: string = koishiLanguageTag): string[] | { [key: number]: string[] }[] {
+        if (heroIds === undefined) return []; // 边界情况：heroIds 为空时返回空数组
+        const heroIdArray = Array.isArray(heroIds) ? heroIds : [heroIds];
+        const result = [];
+
+        for (const heroId of heroIdArray) {
+            let content: string[] = [];
+
+            try {
+                // 获取 render 返回的内容，并尝试用 JSON.parse 解析
+                const rawContent = ctx.i18n.render([languageTag], [`dota2tracker.heroes.${heroId}`], {}).at(0)?.attrs?.content ?? "";
+
+                content = JSON.parse(`[${rawContent}]`);
+            } catch (error) {
+                // 如果解析失败，记录错误信息，并回退为空数组
+                ctx.logger.error(`Failed to parse heroId ${heroId} content: ${error.message}`);
+                content = [];
+            }
+
+            result.push({ [heroId]: content });
+        }
+
+        // 如果输入是单个 heroId，返回字符串数组而非对象
+        return Array.isArray(heroIds) ? result : result[0][heroIds as number];
     }
 
     // ctx.command("来个笑话").action(async ({ session }) => {
@@ -714,7 +757,9 @@ export async function apply(ctx: Context, config: Config) {
                                 });
                         });
                         pendingMatches.push({ matchId: match.id, guilds: tempGuilds });
-                        query<graphql.RequestMatchDataAnalysisQueryVariables, graphql.RequestMatchDataAnalysisQuery>("RequestMatchDataAnalysis", { matchId: match.id });
+                        query<graphql.RequestMatchDataAnalysisQueryVariables, graphql.RequestMatchDataAnalysisQuery>("RequestMatchDataAnalysis", { matchId: match.id }).then((response) =>
+                            ctx.logger.info(response.stratz.matchRetry ? "解析请求已成功发送至服务器。" : "解析请求发送失败。")
+                        );
                         ctx.logger.info(
                             tempGuilds
                                 .map((guild) => `追踪到来自群组${guild.platform}:${guild.guildId}的用户${guild.players.map((player) => `[${player.nickName ?? ""}(${player.steamId})]`).join("、")}的尚未播报过的最新比赛 ${match.id}。`)
@@ -790,6 +835,7 @@ export async function apply(ctx: Context, config: Config) {
                 const now = moment();
                 const pendingMatch = pendingMatches[(now.hours() * 60 + now.minutes()) % pendingMatches.length];
                 try {
+                    const languageTag = await getLanguageTag();
                     let matchQuery: graphql.MatchInfoQuery;
                     let queryLocal = await ctx.database.get("dt_previous_query_results", pendingMatch.matchId, ["data"]);
                     if (queryLocal.length > 0) {
@@ -810,7 +856,7 @@ export async function apply(ctx: Context, config: Config) {
                             let broadPlayers = match.players.filter((item) => idsToFind.includes(item.steamAccountId));
                             for (let player of broadPlayers) {
                                 const random = new Random(() => enhancedSimpleHashToSeed(`${match.id}-${player.steamAccountId}-${player.playerSlot}`));
-                                let broadPlayerMessage = `${player.steamAccount.name}的${random.pick(d2a.HEROES_CHINESE[player.hero.id])}`;
+                                let broadPlayerMessage = `${player.steamAccount.name}的${random.pick(getHeroNicknames(player.hero.id, languageTag) as string[])}`;
                                 if (player.isRadiant == match.didRadiantWin) {
                                     if (player.deathContribution < 0.2 || player.killContribution > 0.75 || player.heroDamage / player.networth > 1.5 || player.towerDamage > 10000 || player.imp > 0)
                                         broadPlayerMessage += random.pick(d2a.WIN_POSITIVE);
@@ -834,7 +880,6 @@ export async function apply(ctx: Context, config: Config) {
                     } else ctx.logger.info("比赛 %d 尚未解析完成，继续等待。", matchQuery.match.id);
                 } catch (error) {
                     ctx.logger.error(error);
-                    // session.send("获取比赛信息失败。");
                     ctx.database.remove("dt_previous_query_results", { matchId: pendingMatch.matchId });
                 }
             }
