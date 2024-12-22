@@ -14,9 +14,9 @@
         "moduleResolution": "Bundler",
         "jsx": "react-jsx",
         "jsxImportSource": "@satorijs/element",
-        "types": ["node",  "yml-register/types"],
+        "types": ["node", "yml-register/types"],
 
-        "resolveJsonModule": true,
+        "resolveJsonModule": true
     },
     "include": ["src", "src/data/*.json", "queries"]
 }
