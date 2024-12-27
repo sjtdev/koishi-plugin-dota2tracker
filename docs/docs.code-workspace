@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"name": "koishi-app",
+			"path": "../../.."
+		}
+	],
+	"settings": {
+		"git.repositoryScanIgnoredFolders": [
+			"node_modules",
+			".yarn"
+		],
+		"git.repositoryScanMaxDepth": 10,
+		"git.autoRepositoryDetection": "subFolders",
+		"i18n-ally.localesPaths": [
+			"external/dota2tracker/src/locales",
+			"locales",
+			"data/locales"
+		],
+		"i18n-ally.keystyle": "nested",
+		"i18n-ally.extract.autoDetect": false
+	}
+}

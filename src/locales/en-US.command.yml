@@ -1,0 +1,18 @@
+commands:
+  subscribe:
+    description: After subscribing, players need to bind their Steam ID to this group.
+    usage: >-
+      After subscribing, players need to bind their Steam ID to this group. BOT
+      will subscribe to the new game data of bound players in this group. After
+      the STRATZ game analysis is completed, the game data will be generated
+      into a picture battle report and published to this group.
+    messages:
+      subscribe_success: Subscription successful.
+      subscribed: This Channel has been subscribed, no need to subscribe again.
+  unsubscribe:
+    description: Unsubscribe from this group.
+    messages:
+      unsubscribe_success: Unsubscription successful.
+      not_subscribed: >-
+        This Channel has not been subscribed yet, so there is no need to
+        unsubscribe.

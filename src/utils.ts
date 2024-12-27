@@ -4,14 +4,13 @@ import fs from "fs";
 import * as dotaconstants from "dotaconstants";
 import os from "os";
 import path from "path";
-import * as graphql from "./graphql-generated";
+import * as graphql from "./@types/graphql-generated";
+import {} from "@koishijs/cache";
 
 declare module "koishi" {
     interface Tables {
         dt_subscribed_guilds: dt_subscribed_guilds;
         dt_subscribed_players: dt_subscribed_players;
-        dt_sended_match_id: dt_sended_match_id;
-        dt_previous_query_results: dt_previous_query_results;
     }
 }
 export interface dt_subscribed_players {
@@ -30,15 +29,23 @@ export interface dt_subscribed_guilds {
     platform: string;
 }
 
-export interface dt_sended_match_id {
-    matchId: number;
-    sendTime: Date;
-}
+// export interface dt_sended_match_id {
+//     matchId: number;
+//     sendTime: Date;
+// }
 
-export interface dt_previous_query_results {
-    matchId: number;
-    data: object;
-    queryTime: Date;
+// export interface dt_previous_query_results {
+//     matchId: number;
+//     data: object;
+//     queryTime: Date;
+// }
+
+declare module "@koishijs/cache" {
+    interface Tables {
+        dt_facets_constants: graphql.ConstantsQuery; // 游戏数据
+        dt_previous_query_results: graphql.MatchInfoQuery;
+        dt_sended_match_id: undefined;
+    }
 }
 
 interface QueryFormat {
@@ -53,9 +60,10 @@ interface QueryResult {
 export const CONFIGS = { STRATZ_API: { URL: "https://api.stratz.com/graphql", TOKEN: "" } };
 let http: HTTP = null;
 let setTimeout: Function;
-export function init(newHttp: HTTP, newSetTimeout: Function) {
+export function init(newHttp: HTTP, newSetTimeout: Function, APIKEY: string) {
     http = newHttp;
     setTimeout = newSetTimeout;
+    CONFIGS.STRATZ_API.TOKEN = APIKEY;
 }
 async function fetchData(query: QueryFormat): Promise<QueryResult> {
     return await http.post(CONFIGS.STRATZ_API.URL, JSON.stringify(query), {
@@ -130,6 +138,7 @@ export enum ImageType {
     IconsFacets = "icons/facets",
     Heroes = "heroes",
     HeroIcons = "heroes/icons",
+    HeroStats = "heroes/stats",
     Items = "items",
     Abilities = "abilities",
     Local = "local",
@@ -179,13 +188,13 @@ interface PlayerTypeEx extends PlayerType {
         key: string;
         stackCount?: number | null;
     }[];
-    laneResult: "stomp" | "stomped" | "tie" | "victory" | "fail" | "jungle";
+    laneResult: "stomp" | "stomped" | "tie" | "advantage" | "disadvantage" | "jungle";
     supportItemsCount: { [key: number]: number };
     items: ItemInfo[];
     backpacks?: ItemInfo[];
     unitItems?: ItemInfo[];
     unitBackpacks?: ItemInfo[];
-    facet: NonNullable<graphql.MatchInfoQuery["constants"]["facets"]>[number];
+    facet: NonNullable<graphql.ConstantsQuery["constants"]["facets"]>[number];
 }
 interface RankInfo {
     medal: number;
@@ -200,15 +209,15 @@ interface ItemInfo {
     isRecipe: boolean;
 }
 // 对比赛数据进行补充以供生成模板函数使用
-export function getFormattedMatchData(data: graphql.MatchInfoQuery) {
-    const match = data.match as MatchInfoEx;
-    const constants = data.constants;
+export function getFormattedMatchData(matchQuery: graphql.MatchInfoQuery, constantsQuery: graphql.ConstantsQuery) {
+    const match = matchQuery.match as MatchInfoEx;
+    const constants = constantsQuery.constants;
     // if (!match.parsedDateTime)
     //     return match;
     // ↓ 累加团队击杀数，并初始化团队[总对英雄造成伤害]与[总受到伤害]
     // 获取到的团队击杀数是每分钟击杀数的数组，需要累加计算，由radiantKills/direKills累加计算存为match.radiant.KillsCount/match.dire.KillsCount
     ["radiant", "dire"].forEach((team) => {
-        match[team] = { killsCount: match[team + "Kills"]?.reduce((acc: number, cva: number) => acc + cva, 0) ?? 0, damageReceived: 0, heroDamage: 0, networth: 0, experience: 0 };
+        match[team] = { killsCount: match?.[team + "Kills"]?.reduce((acc: number, cva: number) => acc + cva, 0) ?? 0, damageReceived: 0, heroDamage: 0, networth: 0, experience: 0 };
     });
     // 未解析比赛时radiantKills/direKills为null，需要遍历玩家数组
     if (!match.parsedDateTime) {
@@ -235,11 +244,11 @@ export function getFormattedMatchData(data: graphql.MatchInfoQuery) {
     let processLaneOutcome = function (outcome) {
         switch (outcome) {
             case "RADIANT_VICTORY":
-                return { radiant: "victory", dire: "fail" };
+                return { radiant: "advantage", dire: "disadvantage" };
             case "RADIANT_STOMP":
                 return { radiant: "stomp", dire: "stomped" };
             case "DIRE_VICTORY":
-                return { radiant: "fail", dire: "victory" };
+                return { radiant: "disadvantage", dire: "advantage" };
             case "DIRE_STOMP":
                 return { radiant: "stomped", dire: "stomp" };
             default:
@@ -265,7 +274,7 @@ export function getFormattedMatchData(data: graphql.MatchInfoQuery) {
         };
         // 参战率与参葬率
         player.killContribution = (player.kills + player.assists) / match[player.team].killsCount;
-        player.deathContribution = player.deaths / match[player.team === "radiant" ? "dire" : player.team].killsCount;
+        player.deathContribution = player.deaths / match[player.team === "radiant" ? "dire" : "radiant"].killsCount;
         // 受到伤害计算
         player.damageReceived = (player.stats?.heroDamageReport?.receivedTotal?.physicalDamage ?? 0) + (player.stats?.heroDamageReport?.receivedTotal?.magicalDamage ?? 0) + (player.stats?.heroDamageReport?.receivedTotal?.pureDamage ?? 0);
         // 团队造成英雄伤害与受到伤害累加

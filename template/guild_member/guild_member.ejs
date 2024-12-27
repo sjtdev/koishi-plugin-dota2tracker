@@ -139,9 +139,9 @@
             <div class="info">
                 <img class="avatar user" src="${user?.user?.avatar}" alt="" />
                 <div class="name">
-                    <span class="nick_name">${escapeHTML(user.nickName)}</span>
-                    <span class="user name">${escapeHTML(user.nick || user.user?.name)}</span>
-                    <span class="steam name">${escapeHTML(user.steamAccount.name)}</span>
+                    <span class="nick_name">${eh(user.nickName)}</span>
+                    <span class="user name">${eh(user.nick || user.user?.name)}</span>
+                    <span class="steam name">${eh(user.steamAccount.name)}</span>
                     <span class="user id">${user.userId}</span>
                     <span class="steam id">${user.steamId}</span>
                 </div>

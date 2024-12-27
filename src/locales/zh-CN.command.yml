@@ -1,0 +1,12 @@
+commands:
+  subscribe:
+    description: 订阅后还需玩家在本群绑定SteamID
+    usage: 订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。
+    messages:
+      subscribed: 本群已订阅，无需重复订阅。
+      subscribe_success: 订阅成功。
+  unsubscribe:
+    description: 取消订阅本群。
+    messages:
+      unsubscribe_success: 取消订阅成功。
+      not_subscribed: 本群尚未订阅，无需取消订阅。

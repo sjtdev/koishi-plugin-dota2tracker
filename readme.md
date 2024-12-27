@@ -46,8 +46,9 @@ DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑�
   `查询英雄`指令已适配7.36改动，所以此指令已废弃
 
 ### 英雄ID|英雄名|英雄常用别名 列表
-[dotaconstants_add.json](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/src/dotaconstants_add.json#L102-L226)  
-补充或纠错请提issue
+<del>[dotaconstants_add.json](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/src/dotaconstants_add.json#L102-L226)  
+补充或纠错请提issue</del>  
+已可在本地化中定义
 
 ### 图片模板列表
 展示见[wiki](https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki)  

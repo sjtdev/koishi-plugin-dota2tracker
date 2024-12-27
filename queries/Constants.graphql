@@ -1,0 +1,16 @@
+query Constants($language: LanguageEnum = ENGLISH) {
+  constants {
+    gameVersions {
+      id
+    }
+    facets(language: $language) {
+      name
+      id
+      color
+      icon
+      language {
+        displayName
+      }
+    }
+  }
+}

@@ -122,14 +122,8 @@ query MatchInfo($matchId: Long!) {
     }
   }
   constants {
-    facets(language: S_CHINESE) {
-      name
+    gameVersions {
       id
-      color
-      icon
-      language {
-        displayName
-      }
     }
   }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= languageTag %>">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -128,6 +128,7 @@
                 margin: 5px;
                 /* display: flex; */
                 flex-grow: 1;
+                height: 320px;
             }
 
             .player > div {
@@ -372,37 +373,13 @@
                 /* fill: red; */
             }
 
-            .hero .player_lane::after {
+            .hero .player_lane span {
                 width: 100%;
                 font-size: 10px;
                 line-height: 1;
             }
 
-            .hero .player_lane.victory::after {
-                content: "对线优势";
-            }
-
-            .hero .player_lane.stomp::after {
-                content: "对线碾压";
-            }
-
-            .hero .player_lane.tie::after {
-                content: "对线平手";
-            }
-
-            .hero .player_lane.fail::after {
-                content: "对线劣势";
-            }
-
-            .hero .player_lane.stomped::after {
-                content: "对线被碾";
-            }
-
-            .hero .player_lane.jungle::after {
-                content: "野区霸主";
-            }
-
-            .hero .player_lane.victory svg path {
+            .hero .player_lane.advantage svg path {
                 fill: lightgreen;
             }
 
@@ -736,8 +713,8 @@
         // 对线结果的图标（来自免费SVG素材网）
         const laneSVG = {
             stomp: utils.getImageUrl("lane_stomp", undefined, ImageFormat.svg),
-            victory: utils.getImageUrl("lane_victory", undefined, ImageFormat.svg),
-            fail: utils.getImageUrl("lane_fail", undefined, ImageFormat.svg),
+            advantage: utils.getImageUrl("lane_victory", undefined, ImageFormat.svg),
+            disadvantage: utils.getImageUrl("lane_fail", undefined, ImageFormat.svg),
             stomped: utils.getImageUrl("lane_stomped", undefined, ImageFormat.svg),
             tie: utils.getImageUrl("lane_tie", undefined, ImageFormat.svg),
             jungle: utils.getImageUrl("lane_jungle", undefined, ImageFormat.svg),
@@ -748,17 +725,17 @@
             <div class="match_info">
                 <img src="${utils.getImageUrl("flag_radiant")}" alt="" class="flag radiant${match.didRadiantWin ? " won" : ""}" style="order: 1" />
                 <img src="${utils.getImageUrl("flag_dire")}" alt="" class="flag dire${match.didRadiantWin ? "" : " won"}" style="order: 3" />
-                <p class="won${match.didRadiantWin ? " radiant" : ""}">获胜</p>
+                <p class="won${match.didRadiantWin ? " radiant" : ""}">${$t("dota2tracker.template.won")}</p>
                 <div class="details" style="order: 2">
-                    <p>比赛编号：<span class="match_id">${match.id}</span></p>
-                    <p>模式：<span class="mode">${d2a.lobbyTypes[match.lobbyType] || match.lobbyType}/${d2a.gameMode[match.gameMode] || match.gameMode}</span></p>
-                    <p>服务器：<span class="server">${d2a.region[match.regionId]}</span></p>
-                    <p>起始时间：<span class="start_time">${moment(new Date(match.startDateTime * 1000))
+                    <p>${$t("dota2tracker.template.match_id_")}<span class="match_id">${match.id}</span></p>
+                    <p>${$t("dota2tracker.template.game_mode_")}<span class="mode">${$t("dota2tracker.template.lobby_types."+match.lobbyType) || match.lobbyType}/${$t("dota2tracker.template.game_modes."+match.gameMode) || match.gameMode}</span></p>
+                    <p>${$t("dota2tracker.template.region_")}<span class="server">${$t("dota2tracker.template.regions." + match.regionId)}</span></p>
+                    <p>${$t("dota2tracker.template.start_time_")}<span class="start_time">${moment(new Date(match.startDateTime * 1000))
                         .format("YYYY-MM-DD HH:mm:ss")
                         .slice(2)}</span></p>
                     <img src="${utils.getImageUrl("star_" + match.rank?.toString().split("")[1])}" alt="" class="star">
                     <img src="${utils.getImageUrl("medal_" + match.rank?.toString().split("")[0])}" alt="" class="rank">
-                    <p>结束时间：<span class="end_time">${moment(new Date(match.endDateTime * 1000))
+                    <p>${$t("dota2tracker.template.end_time_")}<span class="end_time">${moment(new Date(match.endDateTime * 1000))
                         .format("YYYY-MM-DD HH:mm:ss")
                         .slice(2)}</span></p>
                     <div class="score">
@@ -777,7 +754,7 @@
                             <img alt="" src="${utils.getImageUrl(player.hero.shortName, ImageType.Heroes)}" />
                             <p class="party_line${player.partyId != null ? " party_" + match.party[player.partyId] : ""}"></p>
                             <p class="party_mark${player.partyId != null ? " party_" + match.party[player.partyId] : ""}"></p>
-                            <p class="position p${Math.floor(player.order / 4) + 1}">${player.isRandom ? "随机" : `第<span>${player.order == null ? "?" : player.order + 1}</span>手`}<br/>${d2a.position[player.position?.slice(-1)]??""}</p>
+                            <p class="position p${Math.floor(player.order / 4) + 1}">${player.isRandom ? $t("dota2tracker.template.random") : $t("dota2tracker.template.pick_order",[`<span>${player.order == null ? "?" : player.order + 1}</span>`])}<br/>${$t("dota2tracker.template.position_"+player.position?.slice(-1))??''}</p>
                             <p class="level">${player.level}</p>
                             ${player.facet ? `
                             <div class="facet ${player.facet.color}">
@@ -786,7 +763,7 @@
                             </div>` : ""}
                         </div>
                         <div class="player_info">
-                            <summary class="player_name">${escapeHTML(player.steamAccount.name)}</summary>
+                            <summary class="player_name">${eh(player.steamAccount.name)}</summary>
                             <summary class="player_performance">
                                 <span class="kda">${player.kills}/${player.deaths}/${player.assists}</span>&nbsp;&nbsp;
                                 <span class="kc" style="color:${kcndcStyle.kc(player.killContribution * 100)}">${Math.floor(player.killContribution * 100)}%</span>&nbsp;&nbsp;
@@ -794,6 +771,7 @@
                             <summary class="player_net"><span class="networth">${player.networth}</span>&emsp;<span class="score">${(player.heroDamage / player.networth)?.toFixed(2)}</span></summary>
                         </div>
                         <div class="player_lane ${player.laneResult}">
+                            <span>${$t("dota2tracker.template.lane_" + player.laneResult)}</span>
                             ${laneSVG[player.laneResult]}
                         </div>
                         <div class="player_rank">
@@ -809,7 +787,7 @@
                                             : player.steamAccount.seasonRank?.toString().split("")[0]) ?? "0")
                                 )}" alt="" />
                                 <img class="star" src="${utils.getImageUrl("star_" + (player.steamAccount.seasonRank?.toString().split("")[1] ?? "0"))}" alt="" />
-                                <p>${player.steamAccount.seasonLeaderboardRank ?? ""}</p>    
+                                <p>${player.steamAccount.seasonLeaderboardRank ?? ""}</p>
                             </div>
                             <div class="dotaPlusLevel"${!player.dotaPlus ? ` style="display:none"` : ""}>
                                 <img src="${utils.getImageUrl("hero_badge_" + (player.dotaPlus ? Math.ceil((player.dotaPlus?.level + 1) / 6) : 1))}" alt="" class="badge">
@@ -1007,15 +985,15 @@
                         </div>
                     </div>`}
                     <div class="details">
-                        <section>英雄伤害：<span class="hero_damage">${player.heroDamage}</span></section>
-                        <section>建筑伤害：<span class="building_damage">${player.towerDamage}</span></section>
-                        <section>受到伤害(减免后)：<span class="tak">${
+                        <section>${$t("dota2tracker.template.hero_damage_")}<span class="hero_damage">${player.heroDamage}</span></section>
+                        <section>${$t("dota2tracker.template.building_damage_")}<span class="building_damage">${player.towerDamage}</span></section>
+                        <section>${$t("dota2tracker.template.damage_received_")}<span class="tak">${
                             (player.stats?.heroDamageReport?.receivedTotal.physicalDamage??0) + (player.stats?.heroDamageReport?.receivedTotal.magicalDamage??0) + (player.stats?.heroDamageReport?.receivedTotal.pureDamage??0)
                         }</span></section>
-                        <section>补刀：<span class="lh">${player.numLastHits}</span>/<span class="dn">${player.numDenies}</span></section>
-                        <section>GPM/XPM：<span class="gpm">${player.goldPerMinute}</span>/<span class="xpm">${player.experiencePerMinute}</span></section>
-                        <section>治疗量：<span class="heal">${player.heroHealing}</span></section>
-                        <section>控制时间：<span class="building_damage">${((player.stats?.heroDamageReport?.dealtTotal.stunDuration ?? 0) / 100).toFixed(2)}/${((player.stats?.heroDamageReport?.dealtTotal.slowDuration ?? 0) / 100).toFixed(2)}/${(
+                        <section>${$t("dota2tracker.template.lasthit_")}<span class="lh">${player.numLastHits}</span>/<span class="dn">${player.numDenies}</span></section>
+                        <section>${$t("dota2tracker.template.GPM/XPM_")}<span class="gpm">${player.goldPerMinute}</span>/<span class="xpm">${player.experiencePerMinute}</span></section>
+                        <section>${$t("dota2tracker.template.heal_")}<span class="heal">${player.heroHealing}</span></section>
+                        <section>${$t("dota2tracker.template.crowd_control_duration_")}<span class="building_damage">${((player.stats?.heroDamageReport?.dealtTotal.stunDuration ?? 0) / 100).toFixed(2)}/${((player.stats?.heroDamageReport?.dealtTotal.slowDuration ?? 0) / 100).toFixed(2)}/${(
                         (player.stats?.heroDamageReport?.dealtTotal.disableDuration ?? 0) / 100
                     ).toFixed(2)}</span>s</section>
                     </div>
@@ -1057,5 +1035,5 @@
         originalContainer.innerHTML = '';
         originalContainer.appendChild(radiantContainer);
         originalContainer.appendChild(direContainer);
-        
+
 </script>

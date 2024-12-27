@@ -13,7 +13,9 @@
                 width: 1024px;
                 height: 768px;
             }
-            <%= ["xi","bei"].map(kind=>`body.${kind} {background: url(${utils.getImageUrl(kind, undefined, "jpg")}) no-repeat center center / cover;}`).join("\n") %>
+            body {
+                background: no-repeat center center / cover;
+            }
             .wrapper {
                 padding: 80px;
                 padding-top: 180px;
@@ -81,7 +83,8 @@
         </style>
     </head>
     <% const {name, avatar, isRising, prevRank, currRank} = data; %>
-    <body class="<%= isRising ? "xi" : "bei" %>">
+    <% const kind = isRising ? "xi" : "bei"; %>
+    <body class="<%= kind %>" <%= `style="background-image: url( ${utils.getImageUrl(kind, undefined, "jpg")} )"`%>>
         <div class="wrapper">
             <p class="xi">热烈祝贺群友 <img src="<%= avatar %>" /><%= name %> 在天梯中再获进步，</p>
             <p class="xi">由
