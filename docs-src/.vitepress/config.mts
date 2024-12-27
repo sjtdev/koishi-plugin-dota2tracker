@@ -2,6 +2,7 @@ import { defineConfig } from "vitepress";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base:"/external/dota2tracker/docs/",
   lang: "zh-CN",
   title: "@sjtdev/dota2tracker",
   description: "koishi插件-追踪群友的DOTA2对局",
@@ -9,7 +10,7 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: "介绍", link: "/" },
-      { text: "详细功能", link: "/markdown-examples" },
+      { text: "详细功能", link: "/starter" },
       { text: "更新日志", link: "/changelog" },
       { text: "tests", link: "/tests" },
     ],
