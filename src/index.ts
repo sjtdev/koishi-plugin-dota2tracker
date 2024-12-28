@@ -359,7 +359,8 @@ export async function apply(ctx: Context, config: Config) {
                 // Step 2: 从 GraphQL 查询比赛数据
                 matchQuery = await query<graphql.MatchInfoQueryVariables, graphql.MatchInfoQuery>("MatchInfo", { matchId });
                 // 如果比赛已解析，写入缓存
-                if (matchQuery.match?.parsedDateTime) ctx.cache.set("dt_previous_query_results", String(matchQuery.match.id), matchQuery, days_30);
+                if (matchQuery.match?.parsedDateTime && matchQuery.match.players.filter((player) => player?.stats?.heroDamageReport?.dealtTotal).length > 0)
+                    ctx.cache.set("dt_previous_query_results", String(matchQuery.match.id), matchQuery, days_30);
             }
             return matchQuery;
         } catch (error) {
@@ -1110,7 +1111,10 @@ export async function apply(ctx: Context, config: Config) {
                 const pendingMatch: PendingMatch = pendingMatches[(now.hours() * 60 + now.minutes()) % pendingMatches.length];
                 try {
                     let matchQuery: graphql.MatchInfoQuery = await queryMatchData(pendingMatch.matchId);
-                    if (matchQuery.match.parsedDateTime || moment.unix(matchQuery.match.endDateTime).isBefore(now.subtract(config.dataParsingTimeoutMinutes, "minutes"))) {
+                    if (
+                        (matchQuery.match.parsedDateTime && matchQuery.match.players.filter((player) => player?.stats?.heroDamageReport?.dealtTotal).length > 0) ||
+                        moment.unix(matchQuery.match.endDateTime).isBefore(now.subtract(config.dataParsingTimeoutMinutes, "minutes"))
+                    ) {
                         for (const languageTag of Object.keys(pendingMatch.guilds)) {
                             let match: utils.MatchInfoEx = await formatMatchData(matchQuery, languageTag);
                             const img: string = await generateMatchImage(match, languageTag);

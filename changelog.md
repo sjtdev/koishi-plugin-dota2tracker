@@ -1,3 +1,7 @@
+# 更新日志
+
+# 1.3.0-pre.2
+**修复**：尝试修复[比赛数据解析不完整引发的报错](https://github.com/sjtdev/koishi-plugin-dota2tracker/issues/4)。
 
 # 1.3.0-pre.1
 (英雄别名的键名修改导致在`1.2.20-pre.3`版本自定义的本地化内容丢失，如有需要请到`koishi/data/locales/{locale}.yml`或者于`locales`插件的自定义目录中查找恢复)
@@ -27,7 +31,7 @@
 > 这个版本代码变动量真的很大！
 
 ### 文档方向：
-全新的文档也在编写中，敬请期待。
+[全新的文档](https://sjtdev.github.io/koishi-plugin-dota2tracker/)也在编写中，敬请期待。
 
 # 1.2.20-pre.3
 **新增&改进**：重构了部分数据文件并转移至新建的`i18n`文档中，现在可以自定义 [英雄别名] 与 [位置名称] ，在 **koishi侧边栏-本地化** 中配置。

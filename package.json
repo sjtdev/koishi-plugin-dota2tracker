@@ -1,7 +1,7 @@
 {
   "name": "@sjtdev/koishi-plugin-dota2tracker",
   "description": "koishi插件-追踪群友的DOTA2对局",
-  "version": "1.3.0-pre.1",
+  "version": "1.3.0-pre.2",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -14,7 +14,7 @@
   "contributors": [
     "sjtdev <sh1j1n9ta0@foxmail.com>"
   ],
-  "homepage": "https://github.com/sjtdev/koishi-plugin-dota2tracker",
+  "homepage": "https://sjtdev.github.io/koishi-plugin-dota2tracker/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sjtdev/koishi-plugin-dota2tracker.git"

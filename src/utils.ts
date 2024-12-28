@@ -503,7 +503,7 @@ export function getFormattedMatchData(matchQuery: graphql.MatchInfoQuery, consta
     )?.titles.push({ name: "魂", color: "#6cf" });
     findMaxByProperty("networth")?.titles.push({ name: "富", color: "#FFD700" });
     findMaxByProperty("experiencePerMinute")?.titles.push({ name: "睿", color: "#8888FF" });
-    if (match.parsedDateTime) {
+    if (match.parsedDateTime && match.players.every((player) => player?.stats?.heroDamageReport?.dealtTotal)) {
         (
             match.players.reduce((max, player) =>
                 player.stats.heroDamageReport.dealtTotal.stunDuration + player.stats.heroDamageReport.dealtTotal.disableDuration / 2 + player.stats.heroDamageReport.dealtTotal.slowDuration / 4 >
