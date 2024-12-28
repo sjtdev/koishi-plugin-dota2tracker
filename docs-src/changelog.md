@@ -1,7 +1,7 @@
 # 更新日志
 
 # 1.3.0-pre.2
-**修复**：尝试修复[比赛数据解析不完整引发的报错](https://github.com/sjtdev/koishi-plugin-dota2tracker/issues/4)。
+**修复**：尝试修复[比赛数据解析不完整引发的报错](https://github.com/sjtdev/koishi-plugin-dota2tracker/issues/4)。  
 
 # 1.3.0-pre.1
 (英雄别名的键名修改导致在`1.2.20-pre.3`版本自定义的本地化内容丢失，如有需要请到`koishi/data/locales/{locale}.yml`或者于`locales`插件的自定义目录中查找恢复)
