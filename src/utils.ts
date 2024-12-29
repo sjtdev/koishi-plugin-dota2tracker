@@ -196,7 +196,7 @@ interface PlayerTypeEx extends PlayerType {
     unitBackpacks?: ItemInfo[];
     facet: NonNullable<graphql.ConstantsQuery["constants"]["facets"]>[number];
 }
-interface RankInfo {
+export interface RankInfo {
     medal: number;
     star: number;
     leaderboard: number;

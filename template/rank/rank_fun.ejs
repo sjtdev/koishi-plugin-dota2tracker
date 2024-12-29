@@ -82,14 +82,14 @@
             }
         </style>
     </head>
-    <% const {name, avatar, isRising, prevRank, currRank} = data; %>
+    <% const {name, avatar, isRising, prevRank, currRank, date} = data; %>
     <% const kind = isRising ? "xi" : "bei"; %>
-    <body class="<%= kind %>" <%= `style="background-image: url( ${utils.getImageUrl(kind, undefined, "jpg")} )"`%>>
+    <body class="<%= kind %>" <%- `style="background-image: url( ${utils.getImageUrl(kind, undefined, "jpg")} )"`%>>
         <div class="wrapper">
             <p class="xi">热烈祝贺群友 <img src="<%= avatar %>" /><%= name %> 在天梯中再获进步，</p>
             <p class="xi">由
-                <span class="rank prev"><%= d2a.rank[prevRank.medal] %><%= prevRank.leader ?? prevRank.star %></span>升为
-                <span class="rank curr"><%= d2a.rank[currRank.medal] %><%= currRank.leader ?? currRank.star %></span>，再接再厉，再创辉煌！
+                <span class="rank prev"><%= $t("dota2tracker.template.ranks."+prevRank.medal) %><%= prevRank.leader ?? prevRank.star %></span>升为
+                <span class="rank curr"><%= $t("dota2tracker.template.ranks."+currRank.medal) %><%= currRank.leader ?? currRank.star %></span>，再接再厉，再创辉煌！
             </p>
             <p class="bei"><img src="<%= avatar %>" /></p>
             <p class="bei">寄</p>
@@ -105,7 +105,7 @@
                     <p><%= currRank.leader ?? "" %></p>
                 </div>
             </div>
-            <p style="text-align: right; margin-top: 40px;">—— <%= moment().format('YYYY/MM/DD HH点mm分') %></p>
+            <p style="text-align: right; margin-top: 40px;">—— <%= date.format('YYYY/MM/DD HH点mm分') %></p>
         </div>
     </body>
 </html>

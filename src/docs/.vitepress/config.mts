@@ -9,10 +9,10 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: "介绍", link: "/" },
-      { text: "详细功能", link: "/starter" },
+      { text: "主页", link: "/" },
+      { text: "指南", link: "/starter" },
       { text: "更新日志", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
-      { text: "tests", link: "/tests" },
+      // { text: "tests", link: "/tests" },
     ],
 
     sidebar: [
@@ -24,8 +24,11 @@ export default defineConfig({
         ],
       },
       {
-        text: "更新日志",
-        link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md",
+        text:"其他",
+        items:[
+          {text:"展示区",link:"/previews"},
+          {text:"更新日志",link:"https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md"}
+        ]
       },
     ],
 

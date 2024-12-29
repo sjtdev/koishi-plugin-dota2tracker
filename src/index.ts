@@ -18,7 +18,7 @@ export const name = "dota2tracker";
 export const usage = `
 DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑定），以及一系列查询功能。  
 [本地化/dota2tracker](../../locales/dota2tracker)可以自定义英雄别名和位置代称等文本内容  
-**更多信息请进入[插件主页](https://github.com/sjtdev/koishi-plugin-dota2tracker)与[更新日志](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md)查看。**`;
+**更多信息请进入[插件主页](https://sjtdev.github.io/koishi-plugin-dota2tracker/)与[更新日志](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md)查看。**`;
 export const inject = ["http", "database", "cron", "puppeteer", "cache"]; // 声明依赖
 
 // 配置项
@@ -1058,6 +1058,7 @@ export async function apply(ctx: Context, config: Config) {
                                                         (rankMap[subPlayer.steamId].leader > 0 && subPlayer.rank.leader == null),
                                                     prevRank,
                                                     currRank,
+                                                    date: moment(),
                                                 },
                                                 "rank" + (config.rankBroadFun ? "_fun" : ""),
                                                 TemplateType.Rank,

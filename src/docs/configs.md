@@ -31,4 +31,9 @@
 - 此项启用后将追踪冠绝玩家的名次变动。
 
 ##### rankBroadFun `boolean`
-- 整活播报模板，
+- 整活播报模板，效果图见[展示区](./previews#段位变动整活模板预览)。
+
+### 总结设置
+#### 日报/周报
+##### dailyReportSwitch / weeklyReportSwitch `boolean`
+- 日报/周报开启开关。目前日报与周报使用同一模板
