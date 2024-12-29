@@ -192,15 +192,13 @@ export async function apply(ctx: Context, config: Config) {
             } else session.send(session.text(".not_subscribed"));
         });
 
-    ctx.command("绑定 <steam_id> [nick_name]", "绑定SteamID，并起一个别名（也可以不起）")
-        .usage("将你的SteamID与你的账号绑定，若本群已订阅将会实时获取你的新比赛数据发布至群中。")
-        .example("绑定 123456789")
-        .example("绑定 123456789 张三")
+    ctx.command("bind <steam_id> [nick_name]") //.command("绑定 <steam_id> [nick_name]", "绑定SteamID，并起一个别名（也可以不起）")
+        .alias("绑定")
         .action(async ({ session }, steam_id, nick_name) => {
             if (session.guild) {
                 // 若无输入数据或steamId不符1~11位数字则返回
                 if (!steam_id || !/^\d{1,11}$/.test(steam_id)) {
-                    session.send("SteamID无效。");
+                    session.send(session.text(".steam_id_invalid"));
                     return;
                 }
                 // 若在已绑定玩家中找到调用指令用户则返回
@@ -213,40 +211,27 @@ export async function apply(ctx: Context, config: Config) {
                     })
                 )[0];
                 if (sessionPlayer) {
-                    session.send(
-                        `
-                        你已绑定，无需重复绑定。
-                        以下是你的个人信息：
-                        ID：${sessionPlayer.userId}
-                        别名：${sessionPlayer.nickName || ""}
-                        SteamID：${sessionPlayer.steamId}`.replace(/\n\s+/g, " ")
-                    );
+                    session.send(session.text(".already_binded", sessionPlayer));
                     return;
                 }
                 // 此处执行玩家验证函数，调用API查询玩家比赛数据，若SteamID无效或无场次都将返回
                 let verifyRes = await utils.playerisValid(steam_id);
                 if (!verifyRes.isValid) {
-                    session.send(`绑定失败，${verifyRes.reason}`);
+                    session.send(session.text(`.bind_failed`, verifyRes));
                     return;
                 }
                 if (!/^(?:.{1,20})?$/.test(nick_name ?? "")) {
-                    session.send("别名过长，请限制在20个字符以内。（也可以留空）");
+                    session.send(session.text(".nick_name_too_long"));
                     return;
                 }
                 // 以上判定都通过则绑定成功
-                session.send(
-                    `
-                    绑定成功，
-                    ID：${session.event.user.id}
-                    别名：${nick_name || ""}
-                    SteamID：${steam_id}`.replace(/\n\s+/g, " ")
-                );
+                session.send(session.text(".bind_success", { userId: session.event.user.id, nickName: nick_name || "", steamId: steam_id }));
                 ctx.database.create("dt_subscribed_players", {
                     userId: session.event.user.id,
                     guildId: session.event.channel.id,
                     platform: session.event.platform,
                     steamId: parseInt(steam_id),
-                    nickName: nick_name || null,
+                    nickName: nick_name || "",
                 });
             }
         });

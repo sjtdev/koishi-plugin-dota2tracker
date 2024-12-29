@@ -606,10 +606,11 @@ export function winRateColor(value) {
 }
 
 /** 使用stratzAPI查询，根据传入的SteamID验证此Steam账号是否为有效的DOTA2玩家账号，返回对象{isValid:boolean,reason:"如果失败此处为失败原因"}。 */
-export async function playerisValid(steamAccountId): Promise<{ isValid: boolean; reason?: string }> {
+export async function playerisValid(input): Promise<{ isValid: boolean; reason?: string }> {
     try {
-        let queryRes: any = await query<graphql.VerifyingPlayerQueryVariables, graphql.VerifyingPlayerQuery>("VerifyingPlayer", { steamAccountId });
-        if (queryRes.data.player.matchCount != null) return { isValid: true };
+        const steamAccountId = parseInt(input);
+        let queryRes = await query<graphql.VerifyingPlayerQueryVariables, graphql.VerifyingPlayerQuery>("VerifyingPlayer", { steamAccountId: steamAccountId });
+        if (queryRes.player.matchCount != null) return { isValid: true };
         else return { isValid: false, reason: "SteamID无效或无任何场次。" };
     } catch (error) {
         console.error(error);

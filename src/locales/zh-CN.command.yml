@@ -10,3 +10,25 @@ commands:
     messages:
       unsubscribe_success: 取消订阅成功。
       not_subscribed: 本群尚未订阅，无需取消订阅。
+  bind:
+    description: 绑定SteamID，并起一个别名（也可以不起）
+    usage: 将你的SteamID与你的账号绑定，若本群已订阅将会实时获取你的新比赛数据发布至群中。
+    examples: |-
+      绑定 123456789
+      绑定 123456789 张三
+    messages:
+      steam_id_invalid: SteamID无效。
+      bind_success: |-
+        绑定成功，
+        ID：{userId}
+        别名：{nickName}
+        SteamID：{steamId}
+      bind_failed: 绑定失败，{reason}
+      already_binded: |-
+        你已绑定，无需重复绑定。
+        以下是你的个人信息：
+        ID：{userId}
+        别名：{nickName}
+        SteamID：{steamId}
+      nick_name_too_long: 别名过长，请限制在20个字符以内。（也可以留空）
+

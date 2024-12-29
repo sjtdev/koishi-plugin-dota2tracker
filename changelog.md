@@ -1,6 +1,10 @@
 # 更新日志
 
 ***
+# 1.3.0-pre.3
+**修复**：修复1.2.20-pre.2重构查询代码导致使用`绑定`指令时可能无法验证SteamID的问题。
+
+***
 # 1.3.0-pre.2
 **修复**：尝试修复[比赛数据解析不完整引发的报错](https://github.com/sjtdev/koishi-plugin-dota2tracker/issues/4)。  
 

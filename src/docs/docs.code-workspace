@@ -2,7 +2,7 @@
 	"folders": [
 		{
 			"name": "koishi-app",
-			"path": "../../.."
+			"path": "../../../.."
 		}
 	],
 	"settings": {
