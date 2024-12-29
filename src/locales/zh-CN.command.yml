@@ -1,34 +1,124 @@
 commands:
-  subscribe:
-    description: 订阅后还需玩家在本群绑定SteamID
-    usage: 订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。
-    messages:
-      subscribed: 本群已订阅，无需重复订阅。
-      subscribe_success: 订阅成功。
-  unsubscribe:
-    description: 取消订阅本群。
-    messages:
-      unsubscribe_success: 取消订阅成功。
-      not_subscribed: 本群尚未订阅，无需取消订阅。
-  bind:
-    description: 绑定SteamID，并起一个别名（也可以不起）
-    usage: 将你的SteamID与你的账号绑定，若本群已订阅将会实时获取你的新比赛数据发布至群中。
-    examples: |-
-      绑定 123456789
-      绑定 123456789 张三
-    messages:
-      steam_id_invalid: SteamID无效。
-      bind_success: |-
-        绑定成功，
-        ID：{userId}
-        别名：{nickName}
-        SteamID：{steamId}
-      bind_failed: 绑定失败，{reason}
-      already_binded: |-
-        你已绑定，无需重复绑定。
-        以下是你的个人信息：
-        ID：{userId}
-        别名：{nickName}
-        SteamID：{steamId}
-      nick_name_too_long: 别名过长，请限制在20个字符以内。（也可以留空）
-
+  dota2tracker:
+    subscribe:
+      description: 订阅后还需玩家在本群绑定SteamID
+      usage: 订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。
+      messages:
+        subscribed: 本群已订阅，无需重复订阅。
+        subscribe_success: 订阅成功。
+    unsubscribe:
+      description: 取消订阅本群。
+      messages:
+        unsubscribe_success: 取消订阅成功。
+        not_subscribed: 本群尚未订阅，无需取消订阅。
+    bind:
+      description: 绑定SteamID，并起一个别名（也可以不起）
+      usage: 将你的SteamID与你的账号绑定，若本群已订阅将会实时获取你的新比赛数据发布至群中。
+      examples: |-
+        绑定 123456789
+        绑定 123456789 张三
+        绑定 123456789 "张 三"
+      messages:
+        steam_id_invalid: SteamID无效。
+        bind_success: |-
+          绑定成功，
+          ID：{userId}
+          别名：{nickName}
+          SteamID：{steamId}
+        bind_failed: 绑定失败，{0}
+        reason_without_match: SteamID无效或无任何场次。
+        reason_fetch_failed: 网络状况不佳或其他原因无法验证SteamID，请稍后重试。
+        already_binded: |-
+          你已绑定，无需重复绑定。
+          以下是你的个人信息：
+          ID：{userId}
+          别名：{nickName}
+          SteamID：{steamId}
+        nick_name_too_long: 别名过长，请限制在20个字符以内。（也可以留空）
+    unbind:
+      description: 取消绑定你的个人信息
+      messages:
+        unbind_success: 取消绑定成功。
+        not_binded: 尚未绑定，无需取消绑定。
+    rename:
+      description: 修改绑定时设定的别名
+      examples: |-
+        改名 李四
+        改名 "李 四"
+      messages:
+        rename_success: 改名成功，现在你叫{nick_name}了。
+        empty_input: 请输入你的别名。
+        not_binded: 请先绑定，绑定时即可设定别名。
+        nick_name_too_long: 别名过长，请限制在20个字符以内。
+    query-members:
+      description: 查询本群已绑定的玩家
+      messages:
+        no_members: 本群尚无绑定玩家。
+        query_failed: 查询群友失败。
+    query-match:
+      description: 查询指定比赛ID的比赛数据，生成图片发布
+      examples: |-
+        查询比赛 1234567890
+      messages:
+        empty_input: 请输入比赛ID。
+        match_id_invalid: 比赛ID无效。
+        querying_match: 正在搜索对局详情，请稍后……
+        query_failed: 获取比赛数据失败。
+    query-recent-match:
+      description: 查询最近的比赛数据，生成图片发布
+      usage: |-
+        查询指定玩家的最近一场比赛的比赛数据，生成图片发布。
+        参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID
+      examples: |-
+        查询最近比赛
+        查询最近比赛 123456789
+        查询最近比赛 张三
+      messages:
+        not_binded: |-
+          无参数时默认从已绑定SteamID玩家中寻找你的信息，但你似乎并没有绑定。
+          请在本群绑定SteamID。（可输入【-绑定 -h】获取帮助）
+          或在指令后跟上希望查询的SteamID或已绑定玩家的别名。
+        steam_id_invalid: SteamID无效并且未在本群找到此玩家。
+        querying_match: 正在搜索对局详情，请稍后……
+        query_failed: 获取玩家最近比赛失败。
+        not_in_group: |-
+          指令调用失败。
+          当前不属于群聊状态，必须提供指定玩家的SteamID。
+    query-player:
+      description: 查询玩家的个人信息，可指定英雄
+      options:
+        hero: 查询玩家指定英雄使用情况（同查询英雄，可用别名或ID）
+      usage: |-
+        查询指定玩家的个人信息，生成图片发布，可指定英雄。
+        参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID
+      examples: |-
+        查询玩家 123456789
+        查询玩家 张三
+        查询玩家 张三 hero 敌法师
+      messages:
+        not_binded: |-
+          无参数时默认从已绑定SteamID玩家中寻找你的信息，但你似乎并没有绑定。
+          请在本群绑定SteamID。（可输入【-绑定 -h】获取帮助）
+          或在指令后跟上希望查询的SteamID或已绑定玩家的别名。
+        steam_id_invalid: SteamID无效并且未在本群找到此玩家。
+        querying_player: 正在获取玩家数据，请稍后……
+        query_failed: 获取玩家信息失败。
+        not_in_group: |-
+          指令调用失败。
+          当前不属于群聊状态，必须提供指定玩家的SteamID。
+    query-hero:
+      description: 查询英雄技能/面板信息
+      options:
+        random: 随机选择英雄
+      usage: |-
+        查询英雄的技能说明与各项数据，生成图片发布。
+        参数可输入英雄ID、英雄名、英雄常用别名。
+      examples: |-
+        查询英雄 15
+        查询英雄 雷泽
+        查询英雄 电魂
+      messages:
+        not_found: 未找到输入的英雄，请确认后重新输入。
+        querying_hero: 正在获取英雄数据，请稍后……
+        query_failed: 获取英雄数据失败。
+        empty_input: 请输入参数。

@@ -473,7 +473,7 @@
                     <span class="lose" style="${hero.matchCount - hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${(hero.matchCount - hero.winCount) * pixelOfPerMatchInTotal}px">${hero.matchCount - hero.winCount}</span>`).join("") %>
                     <%- !player.genHero ?
                     `<p class="tip row near">${$t("dota2tracker.template.recently_heroes")}</p>`:
-                    `<p class="tip row total">${$t("dota2tracker.template.last25match_")}</p>`
+                    `<p class="tip row total">${$t("dota2tracker.template.last25matches_")}</p>`
                     %>
                     <%- player.heroesPerformance
                     .filter((hero) => hero.matchCount > 1)

@@ -11,23 +11,26 @@ export default defineConfig({
     nav: [
       { text: "介绍", link: "/" },
       { text: "详细功能", link: "/starter" },
-      { text: "更新日志", link: "/changelog" },
+      { text: "更新日志", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
       { text: "tests", link: "/tests" },
     ],
 
     sidebar: [
       {
-        text: "启动",
+        text: "安装与使用",
         items: [
           { text: "安装插件", link: "/starter" },
-          { text: "配置详细说明", link: "/configs" },
+          { text: "插件配置说明", link: "/configs" },
         ],
       },
       {
         text: "更新日志",
-        link: "/changelog",
+        link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md",
       },
     ],
+
+    outline:"deep",
+    outlineTitle: "页面导航",
 
     socialLinks: [{ icon: "github", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/" }],
   },

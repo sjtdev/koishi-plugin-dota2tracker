@@ -611,10 +611,10 @@ export async function playerisValid(input): Promise<{ isValid: boolean; reason?:
         const steamAccountId = parseInt(input);
         let queryRes = await query<graphql.VerifyingPlayerQueryVariables, graphql.VerifyingPlayerQuery>("VerifyingPlayer", { steamAccountId: steamAccountId });
         if (queryRes.player.matchCount != null) return { isValid: true };
-        else return { isValid: false, reason: "SteamID无效或无任何场次。" };
+        else return { isValid: false, reason: ".reason_without_match" };
     } catch (error) {
         console.error(error);
-        return { isValid: false, reason: "网络状况不佳SteamID验证失败，请稍后重试。" };
+        return { isValid: false, reason: ".reason_fetch_failed" };
         // session.send("获取比赛信息失败。");
     }
 }

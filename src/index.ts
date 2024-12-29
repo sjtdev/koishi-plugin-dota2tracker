@@ -149,7 +149,7 @@ export async function apply(ctx: Context, config: Config) {
         return ctx.i18n.fallback((resolvedChannel?.locales ?? []).concat(Object.values(ctx.i18n.locales).map((locale) => Object.keys(locale).at(0)))).find((locale) => Object.keys(GraphqlLanguageEnum).some((language) => locale == language));
     };
 
-    ctx.command("subscribe")
+    ctx.command("dota2tracker.subscribe")
         .alias("订阅本群")
         .action(async ({ session }) => {
             if (session.guild) {
@@ -171,7 +171,7 @@ export async function apply(ctx: Context, config: Config) {
             }
         });
 
-    ctx.command("unsubscribe")
+    ctx.command("dota2tracker.unsubscribe")
         .alias("取消订阅")
         .action(async ({ session }) => {
             if (session.guild) {
@@ -192,8 +192,8 @@ export async function apply(ctx: Context, config: Config) {
             } else session.send(session.text(".not_subscribed"));
         });
 
-    ctx.command("bind <steam_id> [nick_name]") //.command("绑定 <steam_id> [nick_name]", "绑定SteamID，并起一个别名（也可以不起）")
-        .alias("绑定")
+    ctx.command("dota2tracker.bind <steam_id> [nick_name]")
+        .alias("绑定") //.command("绑定 <steam_id> [nick_name]", "绑定SteamID，并起一个别名（也可以不起）")
         .action(async ({ session }, steam_id, nick_name) => {
             if (session.guild) {
                 // 若无输入数据或steamId不符1~11位数字则返回
@@ -217,7 +217,7 @@ export async function apply(ctx: Context, config: Config) {
                 // 此处执行玩家验证函数，调用API查询玩家比赛数据，若SteamID无效或无场次都将返回
                 let verifyRes = await utils.playerisValid(steam_id);
                 if (!verifyRes.isValid) {
-                    session.send(session.text(`.bind_failed`, verifyRes));
+                    session.send(session.text(`.bind_failed`, [session.text(verifyRes.reason)]));
                     return;
                 }
                 if (!/^(?:.{1,20})?$/.test(nick_name ?? "")) {
@@ -235,25 +235,27 @@ export async function apply(ctx: Context, config: Config) {
                 });
             }
         });
-    ctx.command("取消绑定", "取消绑定你的个人信息").action(async ({ session }) => {
-        if (session.guild) {
-            // 在已绑定玩家中查找当前玩家
-            let sessionPlayer = (
-                await ctx.database.get("dt_subscribed_players", {
-                    guildId: session.event.channel.id,
-                    platform: session.event.platform,
-                    userId: session.event.user.id,
-                })
-            )[0];
-            if (sessionPlayer) {
-                await ctx.database.remove("dt_subscribed_players", sessionPlayer.id); // 从数据库中删除
-                session.send("取消绑定成功。");
-            } else session.send("尚未绑定，无需取消绑定。");
-        }
-    });
+    ctx.command("dota2tracker.unbind")
+        .alias("取消绑定")
+        .action(async ({ session }) => {
+            if (session.guild) {
+                // 在已绑定玩家中查找当前玩家
+                let sessionPlayer = (
+                    await ctx.database.get("dt_subscribed_players", {
+                        guildId: session.event.channel.id,
+                        platform: session.event.platform,
+                        userId: session.event.user.id,
+                    })
+                )[0];
+                if (sessionPlayer) {
+                    await ctx.database.remove("dt_subscribed_players", sessionPlayer.id); // 从数据库中删除
+                    session.send(session.text(".unbind_success"));
+                } else session.send(session.text(".not_binded"));
+            }
+        });
 
-    ctx.command("改名 <nick_name>", "修改绑定时设定的别名")
-        .example("改名 李四")
+    ctx.command("dota2tracker.rename <nick_name>")
+        .alias("改名")
         .action(async ({ session }, nick_name) => {
             if (session.guild) {
                 let sessionPlayer = (
@@ -265,70 +267,72 @@ export async function apply(ctx: Context, config: Config) {
                 )[0];
                 if (sessionPlayer) {
                     if (!nick_name) {
-                        session.send("请输入你的别名。");
+                        session.send(session.text(".emtpy_input"));
                         return;
                     }
                     if (!/^.{1,20}$/.test(nick_name ?? "")) {
-                        session.send("别名过长，请限制在20个字符以内。");
+                        session.send(session.text(".nick_name_too_long"));
                         return;
                     }
                     sessionPlayer.nickName = nick_name;
                     await ctx.database.set("dt_subscribed_players", sessionPlayer.id, { nickName: sessionPlayer.nickName });
-                    session.send(`改名成功，现在你叫${nick_name}了。`);
+                    session.send(session.text(".rename_success", { nick_name }));
                 } else {
-                    session.send("请先绑定，绑定时即可设定别名。");
+                    session.send(session.text(".not_binded"));
                 }
             }
         });
 
-    ctx.command("查询群友", "查询本群已绑定的玩家").action(async ({ session }) => {
-        if (session.guild) {
-            const languageTag = await getLanguageTag(session);
-            const subscribedPlayers = await ctx.database.get("dt_subscribed_players", {
-                guildId: session.event.channel.id,
-                platform: session.platform,
-            });
-            if (!subscribedPlayers.length) {
-                session.send("本群尚无绑定玩家。");
-                return;
-            }
-            if (subscribedPlayers.length <= 20) {
-                try {
-                    let memberList;
+    ctx.command("dota2tracker.query-members")
+        .alias("查询群友")
+        .action(async ({ session }) => {
+            if (session.guild) {
+                const languageTag = await getLanguageTag(session);
+                const subscribedPlayers = await ctx.database.get("dt_subscribed_players", {
+                    guildId: session.event.channel.id,
+                    platform: session.platform,
+                });
+                if (!subscribedPlayers.length) {
+                    session.send(session.text(".no_members"));
+                    return;
+                }
+                if (subscribedPlayers.length <= 20) {
                     try {
-                        memberList = await session.bot?.getGuildMemberList(session.event.channel.id);
-                    } catch (error) {}
-                    async function getUsers(subscribedPlayers: any[], memberList: any) {
-                        const playerSteamIds: graphql.PlayersInfoWith10MatchesForGuildQueryVariables = {
-                            steamAccountIds: subscribedPlayers.map((player) => player.steamId),
-                        };
-                        const queryResult = await query<graphql.PlayersInfoWith10MatchesForGuildQueryVariables, graphql.PlayersInfoWith10MatchesForGuildQuery>("PlayersInfoWith10MatchesForGuild", playerSteamIds);
-                        const playersInfo = queryResult.players;
-                        const users = [];
-                        for (const subscribedPlayer of subscribedPlayers) {
-                            const queryPlayer = playersInfo.find((player) => player.steamAccount.id == subscribedPlayer.steamId);
-                            const queryMember = memberList?.data.find((member) => member.user?.id == subscribedPlayer.userId);
-                            users.push({
-                                ...subscribedPlayer,
-                                ...queryPlayer,
-                                ...queryMember,
-                            });
+                        let memberList;
+                        try {
+                            memberList = await session.bot?.getGuildMemberList(session.event.channel.id);
+                        } catch (error) {}
+                        async function getUsers(subscribedPlayers: any[], memberList: any) {
+                            const playerSteamIds: graphql.PlayersInfoWith10MatchesForGuildQueryVariables = {
+                                steamAccountIds: subscribedPlayers.map((player) => player.steamId),
+                            };
+                            const queryResult = await query<graphql.PlayersInfoWith10MatchesForGuildQueryVariables, graphql.PlayersInfoWith10MatchesForGuildQuery>("PlayersInfoWith10MatchesForGuild", playerSteamIds);
+                            const playersInfo = queryResult.players;
+                            const users = [];
+                            for (const subscribedPlayer of subscribedPlayers) {
+                                const queryPlayer = playersInfo.find((player) => player.steamAccount.id == subscribedPlayer.steamId);
+                                const queryMember = memberList?.data.find((member) => member.user?.id == subscribedPlayer.userId);
+                                users.push({
+                                    ...subscribedPlayer,
+                                    ...queryPlayer,
+                                    ...queryMember,
+                                });
+                            }
+
+                            return users;
                         }
 
-                        return users;
+                        // Usage
+                        const users = await getUsers(subscribedPlayers, memberList);
+                        session.send(await ctx.puppeteer.render(await genImageHTML(users, TemplateType.GuildMember, TemplateType.GuildMember, ctx, languageTag)));
+                    } catch (error) {
+                        ctx.logger.error(error);
+                        session.send(session.text(".query_failed"));
                     }
-
-                    // Usage
-                    const users = await getUsers(subscribedPlayers, memberList);
-                    session.send(await ctx.puppeteer.render(await genImageHTML(users, TemplateType.GuildMember, TemplateType.GuildMember, ctx, languageTag)));
-                } catch (error) {
-                    ctx.logger.error(error);
-                    session.send("查询群友失败。");
                 }
+                // session.send("开发中，未来此功能会重写。\n" + queryRes.map((item) => `${item.nickName ?? ""}，ID：${item.userId}，SteamID：${item.steamId}`).join("\n"));
             }
-            // session.send("开发中，未来此功能会重写。\n" + queryRes.map((item) => `${item.nickName ?? ""}，ID：${item.userId}，SteamID：${item.steamId}`).join("\n"));
-        }
-    });
+        });
 
     // 查询比赛与查询最近比赛的共用代码块
     async function queryMatchData(matchId: number): Promise<graphql.MatchInfoQuery | null> {
@@ -413,21 +417,19 @@ export async function apply(ctx: Context, config: Config) {
         return await ctx.puppeteer.render(imageHTML);
     }
 
-    ctx.command("查询比赛 <match_id>", "查询比赛ID")
-        .alias("querymatch")
-        .usage("查询指定比赛ID的比赛数据，生成图片发布。")
-        .example("查询比赛 1234567890")
+    ctx.command("dota2tracker.query-match <match_id>")
+        .alias("查询比赛")
         .action(async ({ session }, match_id) => {
             if (!match_id) {
-                session.send("请输入比赛ID。");
+                session.send(session.text(".empty_input"));
                 return;
             }
             if (!/^\d{1,11}$/.test(match_id)) {
-                session.send("比赛ID无效。");
+                session.send(session.text(".match_id_invalid"));
                 return;
             }
 
-            await session.send("正在搜索对局详情，请稍后...");
+            await session.send(session.text(".querying_match"));
 
             try {
                 const languageTag = await getLanguageTag(session);
@@ -436,15 +438,13 @@ export async function apply(ctx: Context, config: Config) {
                 const image = await generateMatchImage(match, languageTag);
                 session.send((ctx.config.urlInMessageType.some((type) => type == "match") ? "https://stratz.com/matches/" + match.id : "") + image);
             } catch (error) {
-                session.send("获取比赛信息失败。");
+                session.send(session.text(".query_failed"));
                 ctx.logger.error(error);
             }
         });
 
-    ctx.command("查询最近比赛 [input_data]", "查询玩家的最近比赛")
-        .usage("查询指定玩家的最近一场比赛的比赛数据，生成图片发布。\n参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID")
-        .example("查询最近比赛 123456789")
-        .example("查询最近比赛 张三")
+    ctx.command("dota2tracker.query-recent-match [input_data]")
+        .alias("查询最近比赛")
         .action(async ({ session }, input_data) => {
             if (session.guild || (!session.guild && input_data)) {
                 let sessionPlayer;
@@ -457,7 +457,7 @@ export async function apply(ctx: Context, config: Config) {
                         })
                     )[0];
                     if (!sessionPlayer) {
-                        session.send("无参数时默认从已绑定SteamID玩家中寻找你的信息，但你似乎并没有绑定。\n请在本群绑定SteamID。（可输入【-绑定 -h】获取帮助）\n或在指令后跟上希望查询的SteamID或已绑定玩家的别名。");
+                        session.send(session.text(".not_binded"));
                         return;
                     }
                 }
@@ -473,20 +473,20 @@ export async function apply(ctx: Context, config: Config) {
                     )[0];
 
                 if (!(flagBindedPlayer || /^\d{1,11}$/.test(input_data))) {
-                    session.send("SteamID不合法并且未在本群找到此玩家。");
+                    session.send(session.text(".steam_id_invalid"));
                     return;
                 }
 
                 let lastMatchId = 0;
                 try {
-                    session.send("正在搜索对局详情，请稍后...");
+                    session.send(session.text(".querying_match"));
                     lastMatchId = (
                         await query<graphql.PlayersLastmatchRankinfoQueryVariables, graphql.PlayersLastmatchRankinfoQuery>("PlayersLastmatchRankinfo", {
                             steamAccountIds: [parseInt(flagBindedPlayer?.steamId ?? input_data)],
                         })
                     ).players[0].matches[0].id;
                 } catch (error) {
-                    session.send("获取玩家最近比赛失败。");
+                    session.send(session.text(".query_failed"));
                     ctx.logger.error(error);
                     return;
                 }
@@ -496,16 +496,13 @@ export async function apply(ctx: Context, config: Config) {
                 const image = await generateMatchImage(match, languageTag);
                 session.send((ctx.config.urlInMessageType.some((type) => type == "match") ? "https://stratz.com/matches/" + match.id : "") + image);
             } else {
-                session.send("<p>指令调用失败。</p><p>当前不属于群聊状态，必须提供指定玩家的SteamID。</p>");
+                session.send(session.text(".not_in_group"));
             }
         });
 
-    ctx.command("查询玩家 <input_data>", "查询玩家信息，可指定英雄")
-        .usage("查询指定玩家的个人信息与最近战绩，生成图片发布。\n参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID")
-        .option("hero", "-o <value:string> 查询玩家指定英雄使用情况（同其他英雄查询，可用简称与ID）")
-        .example("查询玩家 123456789")
-        .example("查询玩家 张三")
-        .example("查询玩家 张三 hero 敌法师")
+    ctx.command("dota2tracker.query-player <input_data>")
+        .option("hero", "-o <value:string>")
+        .alias("查询玩家")
         .action(async ({ session, options }, input_data) => {
             if (session.guild || (!session.guild && input_data)) {
                 let sessionPlayer;
@@ -519,7 +516,7 @@ export async function apply(ctx: Context, config: Config) {
                         })
                     )[0];
                     if (!sessionPlayer) {
-                        session.send("无参数时默认从已绑定SteamID玩家中寻找你的信息，但你似乎并没有绑定。\n请在本群绑定SteamID。（可输入【-绑定 -h】获取帮助）\n或在指令后跟上希望查询的SteamID或已绑定玩家的别名。");
+                        session.send(session.text(".not_binded"));
                         return;
                     }
                 }
@@ -535,10 +532,10 @@ export async function apply(ctx: Context, config: Config) {
                     )[0];
 
                 if (!(flagBindedPlayer || /^\d{1,11}$/.test(input_data))) {
-                    session.send("SteamID不合法并且未在本群找到此玩家。");
+                    session.send(session.text(".steam_id_invalid"));
                     return;
                 }
-                session.send("正在获取玩家数据，请稍后...");
+                session.send(session.text(".querying_player"));
                 // let steamId = flagBindedPlayer ? flagBindedPlayer.steamId : input_data;
                 let heroId = findingHero(options.hero);
                 let steamId = flagBindedPlayer?.steamId ?? input_data;
@@ -613,29 +610,26 @@ export async function apply(ctx: Context, config: Config) {
                     );
                 } catch (error) {
                     ctx.logger.error(error);
-                    session.send("获取玩家信息失败。");
+                    session.send(session.text(".query_failed"));
                 }
             } else {
-                session.send("<p>指令调用失败。</p><p>当前不属于群聊状态，必须提供指定玩家的SteamID。</p>");
+                session.send(session.text(".not_in_group"));
             }
         });
 
-    ctx.command("查询英雄 <input_data>", "查询英雄技能/面板信息")
-        .usage("查询英雄的技能说明与各项数据，生成图片发布。\n参数可输入英雄ID、英雄名、英雄常用别名")
-        .option("random", "-r 随机选择英雄")
-        .example("查询英雄 15")
-        .example("查询英雄 雷泽")
-        .example("查询英雄 电魂")
+    ctx.command("dota2tracker.query-hero <input_data>")
+        .option("random", "-r")
+        .alias("查询英雄")
         .action(async ({ session, options }, input_data) => {
             const languageTag = await getLanguageTag(session);
             if (options.random) input_data = random.pick(Object.keys(dotaconstants.heroes));
             if (input_data) {
                 let heroId = findingHero(input_data);
                 if (!heroId) {
-                    session.send("未找到输入的英雄，请确认后重新输入。");
+                    session.send(session.text(".hero_not_found"));
                     return;
                 }
-                await session.send("正在获取英雄数据，请稍后...");
+                await session.send(session.text(".querying_hero"));
                 try {
                     let hero = await utils.queryHeroFromValve(heroId, languageTag);
                     // 处理命石新增的技能
@@ -753,10 +747,10 @@ export async function apply(ctx: Context, config: Config) {
                     );
                 } catch (error) {
                     ctx.logger.error(error);
-                    session.send("获取数据失败");
+                    session.send(session.text(".query_failed"));
                 }
             } else {
-                session.send("请输入参数。");
+                session.send(session.text(".empty_input"));
             }
         });
 

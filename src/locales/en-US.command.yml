@@ -1,18 +1,131 @@
 commands:
-  subscribe:
-    description: After subscribing, players need to bind their Steam ID to this group.
-    usage: >-
-      After subscribing, players need to bind their Steam ID to this group. BOT
-      will subscribe to the new game data of bound players in this group. After
-      the STRATZ game analysis is completed, the game data will be generated
-      into a picture battle report and published to this group.
-    messages:
-      subscribe_success: Subscription successful.
-      subscribed: This Channel has been subscribed, no need to subscribe again.
-  unsubscribe:
-    description: Unsubscribe from this group.
-    messages:
-      unsubscribe_success: Unsubscription successful.
-      not_subscribed: >-
-        This Channel has not been subscribed yet, so there is no need to
-        unsubscribe.
+  dota2tracker:
+    subscribe:
+      description: After subscribing, players need to bind their Steam ID to this group.
+      usage: >-
+        After subscribing, players need to bind their Steam ID to this group. BOT
+        will subscribe to the new game data of bound players in this group. After
+        the STRATZ game analysis is completed, the game data will be generated
+        into a picture battle report and published to this group.
+      messages:
+        subscribe_success: Subscription successful.
+        subscribed: This Channel has been subscribed, no need to subscribe again.
+    unsubscribe:
+      description: Unsubscribe from this group.
+      messages:
+        unsubscribe_success: Unsubscription successful.
+        not_subscribed: >-
+          This Channel has not been subscribed yet, so there is no need to
+          unsubscribe.
+    bind:
+      description: Bind your SteamID and optionally set a nickname.
+      usage: Bind your SteamID to your account. If the group is subscribed, your new match data will be posted in the group in real-time.
+      examples: |-
+        bind 123456789
+        bind 123456789 John
+        bind 123456789 "John Doe"
+      messages:
+        steam_id_invalid: Invalid SteamID.
+        bind_success: |-
+          Binding successful,
+          ID: {userId}
+          Nickname: {nickName}
+          SteamID: {steamId}
+        bind_failed: Binding failed, {0}
+        reason_without_match: Invalid SteamID or no matches found.
+        reason_fetch_failed: Poor network conditions or other reasons prevented the verification of the SteamID. Please try again later.
+        already_binded: |-
+          You are already bound, no need to bind again.
+          Here is your personal information:
+          ID: {userId}
+          Nickname: {nickName}
+          SteamID: {steamId}
+        nick_name_too_long: Nickname is too long, please limit it to 20 characters or less. (It can also be left blank)
+    unbind:
+      description: Unbind your personal information.
+      messages:
+        unbind_success: Unbinding successful.
+        not_binded: Not bound, no need to unbind.
+    rename:
+      description: Change the nickname set during binding.
+      examples: |-
+        rename John
+        rename "John Doe"
+      messages:
+        rename_success: Rename successful, now you are called {nick_name}.
+        empty_input: Please enter your nickname.
+        not_binded: Please bind first, you can set a nickname during binding.
+        nick_name_too_long: Nickname is too long, please limit it to 20 characters.
+    query-members:
+      description: Query the players bound in this group.
+      messages:
+        no_members: No players bound in this group.
+        query_failed: Failed to query group members.
+    query-match:
+      description: Query the match data of the specified match ID and generate a picture.
+      examples: |-
+        query-match 1234567890
+      messages:
+        empty_input: Please enter the match ID.
+        match_id_invalid: Invalid match ID.
+        querying_match: Searching for match details, please wait...
+        query_failed: Failed to get match data.
+    query-recent-match:
+      description: Query the most recent match data and generate a picture.
+      usage: |-
+        Query the most recent match data of the specified player and generate a picture.
+        The parameter can be the player's SteamID or the nickname of a player bound in this group. If no parameter is provided, it will try to query the SteamID of the command caller.
+      examples: |-
+        query-recent-match
+        query-recent-match 123456789
+        query-recent-match John
+      messages:
+        not_binded: |-
+          By default, it tries to find your information from the bound SteamID players, but it seems you are not bound.
+          Please bind your SteamID in this group. (You can enter [-bind -h] for help)
+          Or follow the command with the SteamID or nickname of the player you want to query.
+        steam_id_invalid: Invalid SteamID and the player was not found in this group.
+        querying_match: Searching for match details, please wait...
+        query_failed: Failed to get the player's recent match.
+        not_in_group: |-
+          Command failed.
+          Currently not in a group chat, you must provide the specified player's SteamID.
+    query-player:
+      description: Query the player's personal information, optionally specify a hero.
+      options:
+        hero: Query the player's usage of the specified hero (same as querying a hero, can use nickname or ID)
+      usage: |-
+        Query the personal information of the specified player and generate a picture, optionally specify a hero.
+        The parameter can be the player's SteamID or the nickname of a player bound in this group. If no parameter is provided, it will try to query the SteamID of the command caller.
+      examples: |-
+        query-player 123456789
+        query-player John
+        query-player John --hero Anti-Mage
+        query-player John -o Anti-Mage
+      messages:
+        not_binded: |-
+          By default, it tries to find your information from the bound SteamID players, but it seems you are not bound.
+          Please bind your SteamID in this group. (You can enter [-bind -h] for help)
+          Or follow the command with the SteamID or nickname of the player you want to query.
+        steam_id_invalid: Invalid SteamID and the player was not found in this group.
+        querying_player: Retrieving player data, please wait...
+        query_failed: Failed to get player information.
+        not_in_group: |-
+          Command failed.
+          Currently not in a group chat, you must provide the specified player's SteamID.
+    query-hero:
+      description: Query hero skills/stats information.
+      options:
+        random: Randomly select a hero.
+      usage: |-
+        Query the hero's skill descriptions and various stats, generate a picture.
+        The parameter can be the hero's ID, name, or common nickname.
+      examples: |-
+        query-hero 15
+        query-hero Razor
+        query-hero -r
+      messages:
+        not_found: Hero not found, please confirm and re-enter.
+        querying_hero: Retrieving hero data, please wait...
+        query_failed: Failed to get hero data.
+        empty_input: Please enter a parameter.
