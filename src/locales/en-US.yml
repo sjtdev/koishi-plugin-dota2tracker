@@ -153,3 +153,14 @@ dota2tracker:
     message: |-
       {name}'s {hero_name} {comment}.
       KDA: {kda}, GPM/XPM: {gpm_xpm}, Last Hits/Denies: {lh_dn}, Damage/Tower Damage: {damage}, Kill/Death Contribution Rate: {kc_dc}
+  logger:
+    fetch_guilds_failed: Failed to fetch guild information.
+    match_tracked: Tracked the latest unreported match {match.id} from group {#each messageToLogger as item}{item.platform}:{item.guildId} for users [{#each item.players as player}{player.nickName}({player.steamId}){#if player === item.players[item.players.length - 1]}{/if}{#if player !== item.players[item.players.length - 1]} and {/if}{/each}]{#if item !== messageToLogger[messageToLogger.length - 1]}, {/if}{/each}.
+    parse_request_sent: The parsing request for match {matchId} has been successfully sent to the STRATZ server.
+    parse_request_failed: The parsing request for match {matchId} failed to send.
+    match_parsed: Match {matchId} has been parsed, an image was generated and published to {#each guilds as guild}{guild.platform}:{guild.guildId}{#if guild !== guilds[guilds.length - 1]}, {/if}{/each}.
+    match_unparsed: Match {matchId} exceeded the waiting time [{timeout}] and remains unparsed, an image was generated and published to {#each guilds as guild}{guild.platform}:{guild.guildId}{#if guild !== guilds[guilds.length - 1]}, {/if}{/each}.
+    waiting_for_parse: Match {matchId} is still being parsed, continue waiting.
+    report_sent: Posted {title} on {platform}:{guildId}.
+    rank_sent: Posted rank change information of {player.nickName} ({player.steamId}) on {platform}:{guildId}.
+    ejs_error: "Error rendering EJS template: {error}"

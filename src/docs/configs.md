@@ -31,9 +31,23 @@
 - 此项启用后将追踪冠绝玩家的名次变动。
 
 ##### rankBroadFun `boolean`
-- 整活播报模板，效果图见[展示区](./previews#段位变动整活模板预览)。
+- 是否启用整活播报模板，效果图见[模板展示](./previews#段位变动整活模板预览)。
 
 ### 总结设置
-#### 日报/周报
+#### 日报/周报 [模板展示](./previews)
 ##### dailyReportSwitch / weeklyReportSwitch `boolean`
-- 日报/周报开启开关。目前日报与周报使用同一模板
+- 日报/周报开启开关。目前日报与周报使用同一模板。
+
+##### dailyReportHours / weeklyReportHours
+- 日报/周报发布于几点。
+
+##### dailyReportShowCombi / weeklyReportShowCombi
+- 日报/周报显示玩家组合开关<del>（友尽开关）</del>。
+
+### 模板设置
+#### template_match [模板展示](previews)
+比赛模板选择`["match_1", "match_2"]`
+#### template_player
+玩家模板选择`目前仅有一张模板`
+#### template_hero
+英雄模板选择`目前仅有一张模板`

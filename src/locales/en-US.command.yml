@@ -63,15 +63,22 @@ commands:
         query_failed: Failed to query group members.
     query-match:
       description: Query the match data of the specified match ID and generate a picture.
+      options:
+        parse: Whether to wait for match data parsing
       examples: |-
         query-match 1234567890
+        query-match 1234567890 -p
+        query-match 1234567890 --parse
       messages:
         empty_input: Please enter the match ID.
         match_id_invalid: Invalid match ID.
         querying_match: Searching for match details, please wait...
         query_failed: Failed to get match data.
+        waiting_for_parse: Match data has not been parsed yet, a parse request has been sent to the server. The battle report will be sent once parsing is complete or times out.
     query-recent-match:
       description: Query the most recent match data and generate a picture.
+      options:
+        parse: Whether to wait for match data parsing
       usage: |-
         Query the most recent match data of the specified player and generate a picture.
         The parameter can be the player's SteamID or the nickname of a player bound in this group. If no parameter is provided, it will try to query the SteamID of the command caller.
@@ -79,6 +86,8 @@ commands:
         query-recent-match
         query-recent-match 123456789
         query-recent-match John
+        query-recent-match 123456789 -p
+        query-recent-match John --parse
       messages:
         not_binded: |-
           By default, it tries to find your information from the bound SteamID players, but it seems you are not bound.
@@ -98,6 +107,7 @@ commands:
         Query the personal information of the specified player and generate a picture, optionally specify a hero.
         The parameter can be the player's SteamID or the nickname of a player bound in this group. If no parameter is provided, it will try to query the SteamID of the command caller.
       examples: |-
+        query-player
         query-player 123456789
         query-player John
         query-player John --hero Anti-Mage
@@ -105,7 +115,7 @@ commands:
       messages:
         not_binded: |-
           By default, it tries to find your information from the bound SteamID players, but it seems you are not bound.
-          Please bind your SteamID in this group. (You can enter [-bind -h] for help)
+          Please bind your SteamID in this group. (You can enter [bind -h] for help)
           Or follow the command with the SteamID or nickname of the player you want to query.
         steam_id_invalid: Invalid SteamID and the player was not found in this group.
         querying_player: Retrieving player data, please wait...

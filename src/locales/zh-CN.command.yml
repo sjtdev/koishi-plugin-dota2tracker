@@ -57,15 +57,22 @@ commands:
         query_failed: 查询群友失败。
     query-match:
       description: 查询指定比赛ID的比赛数据，生成图片发布
+      options:
+        parse: 是否等待解析比赛数据
       examples: |-
         查询比赛 1234567890
+        查询比赛 1234567890 -p
+        查询比赛 1234567890 --parse
       messages:
         empty_input: 请输入比赛ID。
         match_id_invalid: 比赛ID无效。
         querying_match: 正在搜索对局详情，请稍后……
         query_failed: 获取比赛数据失败。
+        waiting_for_parse: 比赛数据尚未解析，已发送解析请求到服务器，战报将在解析完成或超时后发送。
     query-recent-match:
       description: 查询最近的比赛数据，生成图片发布
+      options:
+        parse: 是否等待解析比赛数据
       usage: |-
         查询指定玩家的最近一场比赛的比赛数据，生成图片发布。
         参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID
@@ -73,10 +80,12 @@ commands:
         查询最近比赛
         查询最近比赛 123456789
         查询最近比赛 张三
+        查询最近比赛 123456789 -p
+        查询最近比赛 张三 --parse
       messages:
         not_binded: |-
           无参数时默认从已绑定SteamID玩家中寻找你的信息，但你似乎并没有绑定。
-          请在本群绑定SteamID。（可输入【-绑定 -h】获取帮助）
+          请在本群绑定SteamID。（可输入【绑定 -h】获取帮助）
           或在指令后跟上希望查询的SteamID或已绑定玩家的别名。
         steam_id_invalid: SteamID无效并且未在本群找到此玩家。
         querying_match: 正在搜索对局详情，请稍后……
@@ -92,13 +101,15 @@ commands:
         查询指定玩家的个人信息，生成图片发布，可指定英雄。
         参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID
       examples: |-
+        查询玩家
         查询玩家 123456789
         查询玩家 张三
-        查询玩家 张三 hero 敌法师
+        查询玩家 张三 --hero 敌法师
+        查询玩家 张三 -o 15
       messages:
         not_binded: |-
           无参数时默认从已绑定SteamID玩家中寻找你的信息，但你似乎并没有绑定。
-          请在本群绑定SteamID。（可输入【-绑定 -h】获取帮助）
+          请在本群绑定SteamID。（可输入【绑定 -h】获取帮助）
           或在指令后跟上希望查询的SteamID或已绑定玩家的别名。
         steam_id_invalid: SteamID无效并且未在本群找到此玩家。
         querying_player: 正在获取玩家数据，请稍后……
