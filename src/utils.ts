@@ -552,6 +552,179 @@ export function getFormattedMatchData(matchQuery: graphql.MatchInfoQuery, consta
     return match;
 }
 
+export interface PlayerInfoEx extends NonNullable<graphql.PlayerInfoWith25MatchesQuery["player"]>, NonNullable<graphql.PlayerExtraInfoQuery["player"]> {
+    heroesPerformanceTop10: any[];
+    genHero: { name: string };
+    rank: RankInfo;
+}
+
+export function getFormattedPlayerData(playerQuery: graphql.PlayerInfoWith25MatchesQuery, playerExtraQuery: graphql.PlayerExtraInfoQuery, genHero?: { heroId: number; name: string }) {
+    const player = playerQuery.player as PlayerInfoEx;
+    const playerExtra = playerExtraQuery.player;
+    // 过滤和保留最高 level 的记录
+    let filteredDotaPlus = {};
+    playerExtra.dotaPlus.forEach((item) => {
+        if (!filteredDotaPlus[item.heroId] || filteredDotaPlus[item.heroId].level < item.level) {
+            filteredDotaPlus[item.heroId] = {
+                heroId: item.heroId,
+                level: item.level,
+            };
+        }
+    });
+
+    // 合并 heroesPerformance 数据
+    playerExtra.heroesPerformance.forEach((hero) => {
+        if (filteredDotaPlus[hero.hero.id]) {
+            filteredDotaPlus[hero.hero.id].shortName = hero.hero.shortName;
+            filteredDotaPlus[hero.hero.id].winCount = hero.winCount;
+            filteredDotaPlus[hero.hero.id].matchCount = hero.matchCount;
+        }
+    });
+    // 储存玩家分段
+    player.rank = {
+        medal: parseInt(player.steamAccount.seasonRank?.toString().split("")[0] ?? 0),
+        star: parseInt(player.steamAccount.seasonRank?.toString().split("")[1] ?? 0),
+        leaderboard: player.steamAccount.seasonLeaderboardRank,
+        inTop100: player.steamAccount.seasonLeaderboardRank ? (player.steamAccount.seasonLeaderboardRank <= 10 ? "8c" : player.steamAccount.seasonLeaderboardRank <= 100 ? "8b" : undefined) : undefined,
+    };
+
+    // 转换为数组
+    player.dotaPlus = Object.values(filteredDotaPlus); // 排序 dotaPlus 数组
+    player.dotaPlus.sort((a, b) => {
+        if (b.level !== a.level) {
+            return b.level - a.level;
+        }
+        return a.heroId - b.heroId;
+    });
+
+    // 取场次前十的英雄表现数据附加到原player对象中
+    player.heroesPerformanceTop10 = playerExtra.heroesPerformance.slice(0, 10);
+
+    if (genHero) {
+        const { matchCount, winCount, imp } = player.heroesPerformanceTop10[0];
+        player.matchCount = matchCount;
+        player.winCount = winCount;
+        player.performance.imp = imp;
+        player.dotaPlus = player.dotaPlus.filter((dpHero) => dpHero.heroId == genHero.heroId);
+        player.genHero = genHero;
+    }
+    return player;
+}
+
+// 英雄数据处理
+export function getFormattedHeroData(rawHero: any) {
+    let hero = Object.assign({}, rawHero);
+    hero.facet_abilities.forEach((fa, i) => {
+        if (fa.abilities.length) {
+            fa.abilities.forEach((ab) => {
+                if (!(hero.facets[i] as any).abilities) (hero.facets[i] as any).abilities = [];
+                if ((hero.facets[i] as any).description_loc !== ab.desc_loc)
+                    (hero.facets[i] as any).abilities.push({
+                        id: ab.id,
+                        name: ab.name,
+                        name_loc: ab.name_loc,
+                        description_ability_loc: formatHeroDesc(ab.desc_loc, ab.special_values, HeroDescType.Facet),
+                    });
+                else (hero.facets[i] as any).description_loc = formatHeroDesc((hero.facets[i] as any).description_loc, ab.special_values, HeroDescType.Facet);
+                ab.ability_is_facet = true;
+                ab.facet = hero.facets[i];
+                hero.abilities.push(ab);
+            });
+        }
+    });
+    // 遍历技能处理命石（facet）
+    const all_special_values = [...hero.abilities.flatMap((ab) => ab.special_values), ...hero.facet_abilities.flatMap((fas) => fas.abilities.flatMap((fa) => fa.special_values))];
+    hero.abilities.forEach((ab) => {
+        // 遍历修改技能的命石，将描述与技能回填
+        ab.facets_loc.forEach((facet, i) => {
+            i = i + (hero.facets.length - ab.facets_loc.length);
+            if (i < 0) return;
+            if (facet) {
+                if (!(hero.facets[i] as any).abilities) (hero.facets[i] as any).abilities = [];
+                (hero.facets[i] as any).abilities.push({
+                    id: ab.id,
+                    name: ab.name,
+                    name_loc: ab.name_loc,
+                    description_ability_loc: formatHeroDesc(facet, ab.special_values, HeroDescType.Facet),
+                    attributes: [],
+                });
+            }
+        });
+        hero.facets.forEach((facet) => {
+            const svs = ab.special_values.filter((sv) => sv.facet_bonus.name === facet.name);
+            svs.forEach((sv) => {
+                if (sv.heading_loc) {
+                    if (!facet.abilities) facet.abilities = [];
+                    (facet as any).abilities
+                        .find((ability: any) => ab.id == ability.id)
+                        ?.attributes.push({
+                            heading_loc: sv.heading_loc,
+                            values: [...sv.facet_bonus.values],
+                            is_percentage: sv.is_percentage,
+                        });
+                }
+            });
+            facet.description_loc = formatHeroDesc(facet.description_loc, svs, HeroDescType.Facet);
+        });
+        // 处理技能本身说明
+        ab.desc_loc = formatHeroDesc(ab.desc_loc, ab.special_values, (ab as any).ability_is_facet ? HeroDescType.Facet : undefined);
+        ab.notes_loc = ab.notes_loc.map((note) => formatHeroDesc(note, ab.special_values));
+        // 处理神杖与魔晶说明
+        if (ab.ability_has_scepter) ab.scepter_loc = formatHeroDesc(ab.scepter_loc, ab.special_values, HeroDescType.Scepter);
+        if (ab.ability_has_shard) ab.shard_loc = formatHeroDesc(ab.shard_loc, ab.special_values, HeroDescType.Shard);
+    });
+
+    // 处理天赋
+    hero.talents.forEach((talent: any) => {
+        // Regular expression to match {s:some_value}
+        const regex = /\{s:(.*?)\}/g;
+        let match;
+
+        // Loop through all matches
+        while ((match = regex.exec(talent.name_loc)) !== null) {
+            const specialValueName = match[1];
+
+            // Find the target special value in the talent's special values
+            const target = talent.special_values?.find((sv: any) => sv.name === specialValueName);
+            if (target) {
+                talent.name_loc = talent.name_loc.replace(match[0], target.values_float.join("/"));
+            } else {
+                // Find the ability that contains the bonus associated with the talent
+                const abilities = hero.abilities.filter((ability: any) => ability.special_values.some((specialValue: any) => specialValue.bonuses.some((bonus: any) => bonus.name === talent.name)));
+
+                for (const ability of abilities) {
+                    // Find the special value in the ability that contains the bonus
+                    const specialValues = ability.special_values.filter((specialValue: any) => specialValue.bonuses.some((bonus: any) => bonus.name === talent.name));
+
+                    const regex = /{s:bonus_(.*?)}/g;
+                    let match: RegExpExecArray | null;
+                    const replacements: {
+                        original: string;
+                        replacement: any;
+                    }[] = [];
+
+                    while ((match = regex.exec(talent.name_loc)) !== null) {
+                        const specialValue = specialValues.find((sv) => sv.name === String((match as any)[1]));
+                        const replacement = specialValue?.bonuses.find((bonus) => bonus.name === talent.name)?.value;
+                        if (replacement !== undefined) {
+                            replacements.push({
+                                original: match[0],
+                                replacement,
+                            });
+                        }
+                    }
+
+                    // 进行所有替换
+                    replacements.forEach(({ original, replacement }) => {
+                        talent.name_loc = talent.name_loc.replace(original, replacement);
+                    });
+                }
+            }
+        }
+    });
+    return hero;
+}
+
 /** 秒数格式化，返回"分钟:秒数"，运算失败返回"--:--"。 */
 export function sec2time(sec: number) {
     return sec ? (sec < 0 ? "-" : "") + Math.floor(Math.abs(sec) / 60) + ":" + ("00" + (Math.abs(sec) % 60)).slice(-2) : "--:--";

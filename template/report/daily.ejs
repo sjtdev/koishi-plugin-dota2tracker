@@ -144,9 +144,9 @@
                 <img src="<%= player.steamAccount.avatar %>" class="avatar" />
                 <span class="name"><%= player.name %></span>
                 <span class="count">
-                    <span class="win">胜<%= player.winCount %></span>
-                    <span class="lose">负<%= player.loseCount %></span>
-                    <span>胜率<%= Math.round((player.winCount / player.matches.length) * 100) %>%</span>
+                    <span class="win"><%- $t("dota2tracker.template.report_won") %><%= player.winCount %></span>
+                    <span class="lose"><%- $t("dota2tracker.template.report_lost") %><%= player.loseCount %></span>
+                    <span><%- $t("dota2tracker.template.report_winrate") %> <%= Math.round((player.winCount / player.matches.length) * 100) %>%</span>
                 </span>
                 <div class="performance">
                     <% const imp = {sign : "", left : 0, right : 0, absValue : Math.abs(player.avgImp)} %>
@@ -169,16 +169,16 @@
             <% } %>
         </div>
         <div class="combinations"<%= !showCombi ? ` style="display:none;"` : "" %>>
-            <span style="grid-column: 1/-1">组合胜负情况：</span>
+            <span style="grid-column: 1/-1"><%- $t("dota2tracker.template.combined_win_loss_summary") %></span>
             <% combinations.forEach((combi) => {%>
                 <div class="players">
                 <% combi.players.forEach(player => {%>
                     <img src="<%= player.steamAccount.avatar %>" class="avatar" />
                 <% }); %>
                 </div>
-            <span class="win">胜<%= combi.winCount %></span>
-            <span class="lose">负<%= combi.matches.length - combi.winCount %></span>
-            <span>胜率<%= Math.round((combi.winCount / combi.matches.length) * 100) %>%</span>
+            <span class="win"><%- $t("dota2tracker.template.report_won") %><%= combi.winCount %></span>
+            <span class="lose"><%- $t("dota2tracker.template.report_lost") %><%= combi.matches.length - combi.winCount %></span>
+            <span><%- $t("dota2tracker.template.report_winrate") %> <%= Math.round((combi.winCount / combi.matches.length) * 100) %>%</span>
             <% }); %>
         </div>
     </body>

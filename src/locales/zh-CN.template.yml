@@ -72,3 +72,9 @@ dota2tracker:
     duration: 时长
     rank: 段位
     un_parsed: （未解析）
+    combined_win_loss_summary: 组合胜负情况：
+    yesterdays_summary: 昨日总结
+    last_weeks_summary: 上周总结
+    report_won: 胜
+    report_lost: 负
+    report_winrate: 胜率

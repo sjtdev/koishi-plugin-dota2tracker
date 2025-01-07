@@ -72,3 +72,9 @@ dota2tracker:
     duration: Duration
     rank: Rank
     un_parsed: (Unparsed)
+    combined_win_loss_summary: "Combined Win/Loss Summary: "
+    yesterdays_summary: Yesterday's Summary
+    last_weeks_summary: Last Week's Summary
+    report_won: W
+    report_lost: L
+    report_winrate: WR

@@ -1,5 +1,6 @@
 {
   "dota2tracker": {
+    "usage": "DOTA2Bot plugin - provides the functionality to automatically track the latest matches of group members (requires group members to bind), as well as a series of query functions. \n[Localization/dota2tracker](../../locales/dota2tracker) allows customization of hero aliases and position nicknames, etc. \n**For more information, please visit the [plugin homepage](https://sjtdev.github.io/koishi-plugin-dota2tracker/) and [changelog](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md).**",
     "template": {
       "game_modes": {
         "NONE": "None",
@@ -45,6 +46,7 @@
         "NEW_PLAYER_POOL": "New Player Pool"
       },
       "regions": {
+        "0": "Unknown",
         "1": "US West",
         "2": "US East",
         "3": "Europe West",

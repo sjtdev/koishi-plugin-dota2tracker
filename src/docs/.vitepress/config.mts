@@ -26,6 +26,7 @@ export default defineConfig({
       {
         text:"其他",
         items:[
+          {text:"模板展示",link:"/templates"},
           {text:"展示区",link:"/previews"},
           {text:"更新日志",link:"https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md"}
         ]

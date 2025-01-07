@@ -1,0 +1,30 @@
+_config:
+  base:
+    $desc: 基础设置
+    STRATZ_API_TOKEN: ※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取。
+    dataParsingTimeoutMinutes: 等待比赛数据解析的时间（单位：分钟）。如果数据解析时间超过等待时间，将直接生成战报而不再等待解析完成。
+    urlInMessageType:
+      $desc: 在消息中附带链接，<br/>请选择消息类型：
+      $inner:
+        - 在查询比赛与战报消息中附带stratz比赛页面链接
+        - 在查询玩家信息消息中附带stratz玩家页面链接
+        - 在查询英雄数据消息中附带刀塔百科对应英雄页面链接
+  rank:
+    rankBroadSwitch: 段位变动播报
+    rankBroadStar: 星级变动播报
+    rankBroadLeader: 冠绝名次变动播报
+    rankBroadFun: 整活播报模板
+  report:
+    $desc: 总结设置
+    dailyReportSwitch: "日报功能"
+    dailyReportHours: 日报时间小时
+    dailyReportShowCombi: 日报是否显示组合
+    weeklyReportSwitch: 周报功能
+    weeklyReportDayHours: 周报发布于周（几）的（几）点
+    weeklyReportShowCombi: 周报是否显示组合
+  template:
+    $desc: 模板设置
+    template_match: 生成比赛信息图片使用的模板，见 https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki 有模板展示。
+    template_player: 生成玩家信息图片使用的模板。（目前仅有一张模板）
+    template_hero: 生成英雄信息图片使用的模板。（目前仅有一张模板）
+

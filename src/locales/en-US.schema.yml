@@ -1,0 +1,29 @@
+_config:
+  base:
+    $desc: Basic Settings
+    STRATZ_API_TOKEN: Required. API TOKEN from stratz.com, available at https://stratz.com/api.
+    dataParsingTimeoutMinutes: Time to wait for match data parsing (in minutes). If the data parsing time exceeds the waiting time, the report will be generated directly without waiting for the parsing to complete.
+    urlInMessageType:
+      $desc: "Include links in messages, <br/>please select the message type:"
+      $inner:
+        - Include stratz match page link in match query and report messages
+        - Include stratz player page link in player information query messages
+        - Include Dota Encyclopedia hero page link in hero data query messages
+  rank:
+    rankBroadSwitch: Rank change broadcast
+    rankBroadStar: Star change broadcast
+    rankBroadLeader: Leaderboard rank change broadcast
+    rankBroadFun: Fun broadcast template
+  report:
+    $desc: Summary Settings
+    dailyReportSwitch: "Daily Report Function"
+    dailyReportHours: Daily report time in hours
+    dailyReportShowCombi: Show combinations in daily report
+    weeklyReportSwitch: Weekly Report Function
+    weeklyReportDayHours: Weekly report published on (day) at (hour)
+    weeklyReportShowCombi: Show combinations in weekly report
+  template:
+    $desc: Template Settings
+    template_match: Template used to generate match information images, see https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki for template display.
+    template_player: Template used to generate player information images. (Currently only one template available)
+    template_hero: Template used to generate hero information images. (Currently only one template available)

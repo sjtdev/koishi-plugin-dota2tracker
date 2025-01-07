@@ -15,10 +15,7 @@ import {} from "@koishijs/plugin-locales";
 import {} from "@koishijs/cache";
 
 export const name = "dota2tracker";
-export const usage = `
-DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑定），以及一系列查询功能。  
-[本地化/dota2tracker](../../locales/dota2tracker)可以自定义英雄别名和位置代称等文本内容  
-**更多信息请进入[插件主页](https://sjtdev.github.io/koishi-plugin-dota2tracker/)与[更新日志](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md)查看。**`;
+export let usage = "";
 export const inject = ["http", "database", "cron", "puppeteer", "cache"]; // 声明依赖
 
 // 配置项
@@ -42,70 +39,53 @@ export interface Config {
 }
 export const Config: Schema = Schema.intersect([
     Schema.object({
-        STRATZ_API_TOKEN: Schema.string().required().role("secret").description("※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取。"),
-        dataParsingTimeoutMinutes: Schema.number().default(60).min(0).max(1440).description("等待比赛数据解析的时间（单位：分钟）。如果数据解析时间超过等待时间，将直接生成战报而不再等待解析完成。"),
-
-        urlInMessageType: Schema.array(
-            Schema.union([
-                Schema.const("match").description("在查询比赛与战报消息中附带stratz比赛页面链接"),
-                Schema.const("player").description("在查询玩家信息消息中附带stratz玩家页面链接"),
-                Schema.const("hero").description("在查询英雄数据消息中附带刀塔百科对应英雄页面链接"),
-            ])
-        )
-            .role("checkbox")
-            .description("在消息中附带链接，<br/>请选择消息类型："),
-    }).description("基础设置"),
+        STRATZ_API_TOKEN: Schema.string().required().role("secret"),
+        dataParsingTimeoutMinutes: Schema.number().default(60).min(0).max(1440),
+        urlInMessageType: Schema.array(Schema.union([Schema.const("match"), Schema.const("player"), Schema.const("hero")])).role("checkbox"),
+    }).i18n(["zh-CN", "en-US"].reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.base), acc), {})),
     Schema.intersect([
         Schema.object({
-            rankBroadSwitch: Schema.boolean().default(false).description("段位变动播报"),
+            rankBroadSwitch: Schema.boolean().default(false),
         }),
         Schema.union([
             Schema.object({
                 rankBroadSwitch: Schema.const(true).required(),
-                rankBroadStar: Schema.boolean().default(true).description("星级变动播报"),
-                rankBroadLeader: Schema.boolean().default(true).description("冠绝名次变动播报"),
-                rankBroadFun: Schema.boolean().default(false).description("整活播报模板"),
+                rankBroadStar: Schema.boolean().default(true),
+                rankBroadLeader: Schema.boolean().default(true),
+                rankBroadFun: Schema.boolean().default(false),
             }),
             Schema.object({}),
         ]),
-    ]),
+    ]).i18n(["zh-CN", "en-US"].reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.rank), acc), {})),
     Schema.intersect([
         Schema.object({
-            dailyReportSwitch: Schema.boolean().default(false).description("日报功能"),
-        }).description("总结设置"),
+            dailyReportSwitch: Schema.boolean().default(false),
+        }),
         Schema.union([
             Schema.object({
                 dailyReportSwitch: Schema.const(true).required(),
-                dailyReportHours: Schema.number().min(0).max(23).default(6).description("日报时间小时"),
-                dailyReportShowCombi: Schema.boolean().default(true).description("日报是否显示组合"),
+                dailyReportHours: Schema.number().min(0).max(23).default(6),
+                dailyReportShowCombi: Schema.boolean().default(true),
             }),
             Schema.object({}),
         ]),
         Schema.object({
-            weeklyReportSwitch: Schema.boolean().default(false).description("周报功能"),
+            weeklyReportSwitch: Schema.boolean().default(false),
         }),
         Schema.union([
             Schema.object({
                 weeklyReportSwitch: Schema.const(true).required(),
-                weeklyReportDayHours: Schema.tuple([Schema.number().min(1).max(7), Schema.number().min(0).max(23)])
-                    .default([1, 10])
-                    .description("周报发布于周（几）的（几）点"),
-                weeklyReportShowCombi: Schema.boolean().default(true).description("周报是否显示组合"),
+                weeklyReportDayHours: Schema.tuple([Schema.number().min(1).max(7), Schema.number().min(0).max(23)]).default([1, 10]),
+                weeklyReportShowCombi: Schema.boolean().default(true),
             }),
             Schema.object({}),
         ]),
-    ]),
+    ]).i18n(["zh-CN", "en-US"].reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {})),
     Schema.object({
-        template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)])
-            .default("match_1")
-            .description("生成比赛信息图片使用的模板，见 https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki 有模板展示。"),
-        template_player: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/player`)])
-            .default("player_1")
-            .description("生成玩家信息图片使用的模板。（目前仅有一张模板）"),
-        template_hero: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/hero`)])
-            .default("hero_1")
-            .description("生成英雄信息图片使用的模板。（目前仅有一张模板）"),
-    }).description("模板设置"),
+        template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)]).default("match_1"),
+        template_player: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/player`)]).default("player_1"),
+        template_hero: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/hero`)]).default("hero_1"),
+    }).i18n(["zh-CN", "en-US"].reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.template), acc), {})),
 ]);
 
 interface PendingMatch {
@@ -128,7 +108,7 @@ const days_30: number = 2592000000; // 30天
 
 // At the same time, SupportLanguageTags can also be obtained from the Keys of GraphqlLanguageEnum.
 // const SupportLanguageTags = Object.keys(GraphqlLanguageEnum);
-enum GraphqlLanguageEnum {
+export enum GraphqlLanguageEnum {
     "en-US" = "ENGLISH",
     "zh-CN" = "S_CHINESE",
 }
@@ -151,6 +131,7 @@ export async function apply(ctx: Context, config: Config) {
         return ctx.i18n.fallback((resolvedChannel?.locales ?? []).concat(Object.values(ctx.i18n.locales).map((locale) => Object.keys(locale).at(0)))).find((locale) => Object.keys(GraphqlLanguageEnum).some((language) => locale == language));
     };
     const GlobalLanguageTag = await getLanguageTag();
+    usage = $t(GlobalLanguageTag, "dota2tracker.usage");
 
     ctx.command("dota2tracker.subscribe")
         .alias("订阅本群")
@@ -196,7 +177,7 @@ export async function apply(ctx: Context, config: Config) {
         });
 
     ctx.command("dota2tracker.bind <steam_id> [nick_name]")
-        .alias("绑定") //.command("绑定 <steam_id> [nick_name]", "绑定SteamID，并起一个别名（也可以不起）")
+        .alias("绑定")
         .action(async ({ session }, steam_id, nick_name) => {
             if (session.guild) {
                 // 若无输入数据或steamId不符1~11位数字则返回
@@ -554,71 +535,19 @@ export async function apply(ctx: Context, config: Config) {
                 // let steamId = flagBindedPlayer ? flagBindedPlayer.steamId : input_data;
                 let heroId = findingHero(options.hero);
                 let steamId = flagBindedPlayer?.steamId ?? input_data;
-                let player;
+                // let player;
                 try {
-                    player = (
-                        await query<graphql.PlayerInfoWith25MatchesQueryVariables, graphql.PlayerInfoWith25MatchesQuery>("PlayerInfoWith25Matches", {
-                            steamAccountId: steamId,
-                            heroIds: heroId,
-                        })
-                    ).player;
-                    let playerExtra = (
-                        await utils.query<graphql.PlayerExtraInfoQueryVariables, graphql.PlayerExtraInfoQuery>("PlayerExtraInfo", {
-                            steamAccountId: steamId,
-                            matchCount: player.matchCount,
-                            totalHeroCount: Object.keys(dotaconstants.heroes).length,
-                            heroIds: heroId,
-                        })
-                    ).player;
-                    // 过滤和保留最高 level 的记录
-                    let filteredDotaPlus = {};
-                    playerExtra.dotaPlus.forEach((item) => {
-                        if (!filteredDotaPlus[item.heroId] || filteredDotaPlus[item.heroId].level < item.level) {
-                            filteredDotaPlus[item.heroId] = {
-                                heroId: item.heroId,
-                                level: item.level,
-                            };
-                        }
+                    const playerQuery = await query<graphql.PlayerInfoWith25MatchesQueryVariables, graphql.PlayerInfoWith25MatchesQuery>("PlayerInfoWith25Matches", {
+                        steamAccountId: steamId,
+                        heroIds: heroId,
                     });
-
-                    // 合并 heroesPerformance 数据
-                    playerExtra.heroesPerformance.forEach((hero) => {
-                        if (filteredDotaPlus[hero.hero.id]) {
-                            filteredDotaPlus[hero.hero.id].shortName = hero.hero.shortName;
-                            filteredDotaPlus[hero.hero.id].winCount = hero.winCount;
-                            filteredDotaPlus[hero.hero.id].matchCount = hero.matchCount;
-                        }
+                    const playerExtraQuery = await utils.query<graphql.PlayerExtraInfoQueryVariables, graphql.PlayerExtraInfoQuery>("PlayerExtraInfo", {
+                        steamAccountId: steamId,
+                        matchCount: playerQuery.player.matchCount,
+                        totalHeroCount: Object.keys(dotaconstants.heroes).length,
+                        heroIds: heroId,
                     });
-                    // 储存玩家分段
-                    player.rank = {
-                        medal: parseInt(player.steamAccount.seasonRank?.toString().split("")[0] ?? 0),
-                        star: parseInt(player.steamAccount.seasonRank?.toString().split("")[1] ?? 0),
-                        leaderboard: player.steamAccount.seasonLeaderboardRank,
-                        inTop100: player.steamAccount.seasonLeaderboardRank ? (player.steamAccount.seasonLeaderboardRank <= 10 ? "8c" : player.steamAccount.seasonLeaderboardRank <= 100 ? "8b" : undefined) : undefined,
-                    };
-
-                    // 转换为数组
-                    player.dotaPlus = Object.values(filteredDotaPlus); // 排序 dotaPlus 数组
-                    player.dotaPlus.sort((a, b) => {
-                        if (b.level !== a.level) {
-                            return b.level - a.level;
-                        }
-                        return a.heroId - b.heroId;
-                    });
-
-                    // 取场次前十的英雄表现数据附加到原player对象中
-                    player.heroesPerformanceTop10 = playerExtra.heroesPerformance.slice(0, 10);
-
-                    if (heroId) {
-                        const { matchCount, winCount, imp } = player.heroesPerformanceTop10[0];
-                        player.matchCount = matchCount;
-                        player.winCount = winCount;
-                        player.performance.imp = imp;
-                        player.dotaPlus = player.dotaPlus.filter((dpHero) => dpHero.heroId == heroId);
-                        player.genHero = {
-                            name: constantLocales[languageTag].dota2tracker.template.hero_names[heroId],
-                        };
-                    }
+                    const player = utils.getFormattedPlayerData(playerQuery, playerExtraQuery, heroId ? { heroId, name: constantLocales[languageTag].dota2tracker.template.hero_names[heroId] } : null);
                     session.send(
                         (ctx.config.urlInMessageType.some((type) => type == "player") ? "https://stratz.com/players/" + player.steamAccount.id : "") +
                             (await ctx.puppeteer.render(await genImageHTML(player, config.template_player, TemplateType.Player, ctx, languageTag)))
@@ -648,114 +577,7 @@ export async function apply(ctx: Context, config: Config) {
                 try {
                     let hero = await utils.queryHeroFromValve(heroId, languageTag);
                     // 处理命石新增的技能
-                    hero.facet_abilities.forEach((fa, i) => {
-                        if (fa.abilities.length) {
-                            fa.abilities.forEach((ab) => {
-                                if (!(hero.facets[i] as any).abilities) (hero.facets[i] as any).abilities = [];
-                                if ((hero.facets[i] as any).description_loc !== ab.desc_loc)
-                                    (hero.facets[i] as any).abilities.push({
-                                        id: ab.id,
-                                        name: ab.name,
-                                        name_loc: ab.name_loc,
-                                        description_ability_loc: utils.formatHeroDesc(ab.desc_loc, ab.special_values, HeroDescType.Facet),
-                                    });
-                                else (hero.facets[i] as any).description_loc = utils.formatHeroDesc((hero.facets[i] as any).description_loc, ab.special_values, HeroDescType.Facet);
-                                ab.ability_is_facet = true;
-                                ab.facet = hero.facets[i];
-                                hero.abilities.push(ab);
-                            });
-                        }
-                    });
-                    // 遍历技能处理命石（facet）
-                    const all_special_values = [...hero.abilities.flatMap((ab) => ab.special_values), ...hero.facet_abilities.flatMap((fas) => fas.abilities.flatMap((fa) => fa.special_values))];
-                    hero.abilities.forEach((ab) => {
-                        // 遍历修改技能的命石，将描述与技能回填
-                        ab.facets_loc.forEach((facet, i) => {
-                            i = i + (hero.facets.length - ab.facets_loc.length);
-                            if (i < 0) return;
-                            if (facet) {
-                                if (!(hero.facets[i] as any).abilities) (hero.facets[i] as any).abilities = [];
-                                (hero.facets[i] as any).abilities.push({
-                                    id: ab.id,
-                                    name: ab.name,
-                                    name_loc: ab.name_loc,
-                                    description_ability_loc: utils.formatHeroDesc(facet, ab.special_values, HeroDescType.Facet),
-                                    attributes: [],
-                                });
-                            }
-                        });
-                        hero.facets.forEach((facet) => {
-                            const svs = ab.special_values.filter((sv) => sv.facet_bonus.name === facet.name);
-                            svs.forEach((sv) => {
-                                if (sv.heading_loc) {
-                                    if (!facet.abilities) facet.abilities = [];
-                                    (facet as any).abilities
-                                        .find((ability: any) => ab.id == ability.id)
-                                        ?.attributes.push({
-                                            heading_loc: sv.heading_loc,
-                                            values: [...sv.facet_bonus.values],
-                                            is_percentage: sv.is_percentage,
-                                        });
-                                }
-                            });
-                            facet.description_loc = utils.formatHeroDesc(facet.description_loc, svs, HeroDescType.Facet);
-                        });
-                        // 处理技能本身说明
-                        ab.desc_loc = utils.formatHeroDesc(ab.desc_loc, ab.special_values, (ab as any).ability_is_facet ? HeroDescType.Facet : undefined);
-                        ab.notes_loc = ab.notes_loc.map((note) => utils.formatHeroDesc(note, ab.special_values));
-                        // 处理神杖与魔晶说明
-                        if (ab.ability_has_scepter) ab.scepter_loc = utils.formatHeroDesc(ab.scepter_loc, ab.special_values, HeroDescType.Scepter);
-                        if (ab.ability_has_shard) ab.shard_loc = utils.formatHeroDesc(ab.shard_loc, ab.special_values, HeroDescType.Shard);
-                    });
-
-                    // 处理天赋
-                    hero.talents.forEach((talent: any) => {
-                        // Regular expression to match {s:some_value}
-                        const regex = /\{s:(.*?)\}/g;
-                        let match;
-
-                        // Loop through all matches
-                        while ((match = regex.exec(talent.name_loc)) !== null) {
-                            const specialValueName = match[1];
-
-                            // Find the target special value in the talent's special values
-                            const target = talent.special_values?.find((sv: any) => sv.name === specialValueName);
-                            if (target) {
-                                talent.name_loc = talent.name_loc.replace(match[0], target.values_float.join("/"));
-                            } else {
-                                // Find the ability that contains the bonus associated with the talent
-                                const abilities = hero.abilities.filter((ability: any) => ability.special_values.some((specialValue: any) => specialValue.bonuses.some((bonus: any) => bonus.name === talent.name)));
-
-                                for (const ability of abilities) {
-                                    // Find the special value in the ability that contains the bonus
-                                    const specialValues = ability.special_values.filter((specialValue: any) => specialValue.bonuses.some((bonus: any) => bonus.name === talent.name));
-
-                                    const regex = /{s:bonus_(.*?)}/g;
-                                    let match: RegExpExecArray | null;
-                                    const replacements: {
-                                        original: string;
-                                        replacement: any;
-                                    }[] = [];
-
-                                    while ((match = regex.exec(talent.name_loc)) !== null) {
-                                        const specialValue = specialValues.find((sv) => sv.name === String((match as any)[1]));
-                                        const replacement = specialValue?.bonuses.find((bonus) => bonus.name === talent.name)?.value;
-                                        if (replacement !== undefined) {
-                                            replacements.push({
-                                                original: match[0],
-                                                replacement,
-                                            });
-                                        }
-                                    }
-
-                                    // 进行所有替换
-                                    replacements.forEach(({ original, replacement }) => {
-                                        talent.name_loc = talent.name_loc.replace(original, replacement);
-                                    });
-                                }
-                            }
-                        }
-                    });
+                    hero = utils.getFormattedHeroData(hero);
                     await session.send(
                         (ctx.config.urlInMessageType.some((type) => type == "hero") ? `https://wiki.dota2.com.cn/hero/${hero["name"].match(/^npc_dota_hero_(.+)$/)[1]}.html` : "") +
                             (await ctx.puppeteer.render(await genImageHTML(hero, config.template_hero, TemplateType.Hero, ctx, languageTag)))
@@ -917,13 +739,13 @@ export async function apply(ctx: Context, config: Config) {
         if (config.dailyReportSwitch) {
             ctx.cron(`0 ${config.dailyReportHours} * * *`, async function () {
                 const oneDayAgo = moment().subtract(1, "days").unix();
-                await report(oneDayAgo, "昨日总结", config.dailyReportShowCombi);
+                await report(oneDayAgo, "dota2tracker.template.yesterdays_summary", config.dailyReportShowCombi);
             });
         }
         if (config.weeklyReportSwitch) {
             ctx.cron(`0 ${config.weeklyReportDayHours[1]} * * ${config.weeklyReportDayHours[0]}`, async function () {
                 const oneWeekAgo = moment().subtract(1, "weeks").unix();
-                await report(oneWeekAgo, "上周总结", config.weeklyReportShowCombi);
+                await report(oneWeekAgo, "dota2tracker.template.last_weeks_summary", config.weeklyReportShowCombi);
             });
         }
         // 每分钟执行一次查询玩家最近比赛记录，若未发布过则进入待发布列表；检查待发布列表，若满足发布条件（比赛已被解析）则生成图片并发布。
@@ -1150,7 +972,7 @@ export async function apply(ctx: Context, config: Config) {
     });
 
     // 定义一个异步函数 report，用于生成和发送报告
-    async function report(timeAgo, title, showCombi) {
+    async function report(timeAgo, titleKey, showCombi) {
         // 获取所有订阅的公会信息
         const subscribedGuilds = await ctx.database.get("dt_subscribed_guilds", undefined);
         // 获取订阅的玩家，并筛选出那些属于已订阅公会的玩家
@@ -1238,12 +1060,13 @@ export async function apply(ctx: Context, config: Config) {
                 });
                 const combinations = Array.from(combinationsMap.values());
                 try {
+                    const languageTag = await getLanguageTag({ channelId: guild.guildId });
                     await ctx.broadcast(
                         [`${guild.platform}:${guild.guildId}`],
                         await ctx.puppeteer.render(
                             await genImageHTML(
                                 {
-                                    title,
+                                    title: $t(languageTag, titleKey),
                                     players: currentsubscribedPlayers.sort((a, b) => {
                                         if (a.matches.length > b.matches.length) return -1;
                                         else if (a.matches.length < b.matches.length) return 1;
@@ -1260,7 +1083,7 @@ export async function apply(ctx: Context, config: Config) {
                         )
                     );
                     // 记录日志
-                    ctx.logger.info($t(GlobalLanguageTag, "dota2tracker.logger.report_sent", { title, guildId: guild.guildId, platform: guild.platform }));
+                    ctx.logger.info($t(GlobalLanguageTag, "dota2tracker.logger.report_sent", { title: $t(languageTag, titleKey), guildId: guild.guildId, platform: guild.platform }));
                 } catch (error) {
                     // 错误处理
                     ctx.logger.error(error);
