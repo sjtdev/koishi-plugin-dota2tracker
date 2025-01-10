@@ -27,4 +27,5 @@ _config:
     template_match: 生成比赛信息图片使用的模板，见 https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki 有模板展示。
     template_player: 生成玩家信息图片使用的模板。（目前仅有一张模板）
     template_hero: 生成英雄信息图片使用的模板。（目前仅有一张模板）
+    playerRankEstimate: 在player模板中对没有段位的玩家进行段位估算 <br>估算的段位将以灰色图片显示
 

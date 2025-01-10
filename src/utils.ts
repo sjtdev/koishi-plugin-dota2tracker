@@ -6,6 +6,7 @@ import os from "os";
 import path from "path";
 import * as graphql from "./@types/graphql-generated";
 import {} from "@koishijs/cache";
+import { Random } from "koishi";
 
 declare module "koishi" {
   interface Tables {
@@ -57,6 +58,7 @@ interface QueryResult {
   errors?: [{ message: string }];
 }
 
+const pluginDir = path.join(__dirname, "..");
 export const CONFIGS = { STRATZ_API: { URL: "https://api.stratz.com/graphql", TOKEN: "" } };
 let http: HTTP = null;
 let setTimeout: Function;
@@ -115,8 +117,7 @@ export async function query<TVariables, TData>(
 }
 
 function loadGraphqlFile(queryName: string): string {
-  const filepath = `./node_modules/@sjtdev/koishi-plugin-dota2tracker/queries/${queryName}.graphql`;
-  return fs.readFileSync(filepath, { encoding: "utf-8" }).replace(/[\r\n]+/g, " ");
+  return fs.readFileSync(path.join(pluginDir, "queries", `${queryName}.graphql`), { encoding: "utf-8" }).replace(/[\r\n]+/g, " ");
 }
 
 export async function queryHeroFromValve(heroId: number, languageTag = "zh-CN") {
@@ -150,8 +151,8 @@ export enum ImageFormat {
 export function getImageUrl(image: string, type: ImageType = ImageType.Local, format: ImageFormat = ImageFormat.png) {
   if (type === ImageType.Local) {
     try {
-      if (format === ImageFormat.svg) return fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/template/images/${image}.svg`);
-      const imageData = fs.readFileSync(`./node_modules/@sjtdev/koishi-plugin-dota2tracker/template/images/${image}.${format}`);
+      if (format === ImageFormat.svg) return fs.readFileSync(path.join(pluginDir, "template", "images", `${image}.svg`));
+      const imageData = fs.readFileSync(path.join(pluginDir, "template", "images", `${image}.${format}`));
       const base64Data = imageData.toString("base64");
       return `data:image/png;base64,${base64Data}`;
     } catch (error) {
@@ -556,11 +557,38 @@ export interface PlayerInfoEx extends NonNullable<graphql.PlayerInfoWith25Matche
   heroesPerformanceTop10: any[];
   genHero: { name: string };
   rank: RankInfo;
+  isEstimatedRank?: boolean;
 }
 
-export function getFormattedPlayerData(playerQuery: graphql.PlayerInfoWith25MatchesQuery, playerExtraQuery?: graphql.PlayerExtraInfoQuery, genHero?: { heroId: number; name: string }) {
+export function getFormattedPlayerData(param: { playerQuery: graphql.PlayerInfoWith25MatchesQuery; playerExtraQuery?: graphql.PlayerExtraInfoQuery; genHero?: { heroId: number; name: string }; estimateRank?: boolean }) {
+  const { playerQuery, playerExtraQuery, genHero, estimateRank } = param;
   const player = playerQuery.player as PlayerInfoEx;
   const playerExtra = playerExtraQuery?.player;
+  if (player.steamAccount.isAnonymous) {
+    for (let index = 0; index < 25; index++) {
+      const random = new Random(() => enhancedSimpleHashToSeed(`${player.steamAccount.id}-${index}`));
+      player.matches.push({
+        id: 1000000000 + index,
+        gameMode: "UNKNOWN" as any,
+        lobbyType: "UNRANKED" as any,
+        didRadiantWin: random.bool(0.5),
+        rank: random.int(0, 8) * 10,
+        radiantKills: [random.int(0, 30)],
+        direKills: [random.int(0, 30)],
+        parsedDateTime: 1,
+        players: [
+          {
+            steamAccount: { id: player.steamAccount.id },
+            isRadiant: true,
+            kills: random.int(0, 20),
+            deaths: random.int(0, 20),
+            assists: random.int(0, 20),
+            hero: { id: random.pick(Object.keys(dotaconstants.heroes)), shortName: dotaconstants.heroes[random.pick(Object.keys(dotaconstants.heroes))].name.match(/^npc_dota_hero_(.+)$/)[1] },
+          },
+        ],
+      });
+    }
+  }
   // 过滤和保留最高 level 的记录
   let filteredDotaPlus = {};
   playerExtra?.dotaPlus?.forEach((item) => {
@@ -580,6 +608,48 @@ export function getFormattedPlayerData(playerQuery: graphql.PlayerInfoWith25Matc
       filteredDotaPlus[hero.hero.id].matchCount = hero.matchCount;
     }
   });
+
+  // 如果玩家没有段位，为玩家估算段位；必要条件：玩家没有段位信息 且 配置允许推算 且 玩家并未隐藏数据。（若隐藏数据则没有推算用的比赛段位数据）
+  if (!player.steamAccount.seasonRank && estimateRank && !player.steamAccount.isAnonymous) {
+    function estimateWeightedRank(player: PlayerInfoEx): number | string {
+      const ranks = player.matches.map((match) => match.rank);
+
+      const validRanks = ranks.filter(validateRank);
+
+      if (validRanks.length === 0) {
+        return "Unknown";
+      }
+
+      const totalWeight = validRanks.reduce((sum, _, index) => sum + calculateWeight(index, validRanks.length), 0);
+
+      const weightedAverage =
+        validRanks.reduce((sum, rank, index) => {
+          const value = rankToValue(rank);
+          const weight = calculateWeight(index, validRanks.length);
+          return sum + value * weight;
+        }, 0) / totalWeight;
+      const tier = Math.floor(weightedAverage / 6);
+      const stars = Math.round(weightedAverage % 6);
+      return tier * 10 + stars;
+      function rankToValue(rank: number): number {
+        const tier = Math.floor(rank / 10);
+        const stars = rank % 10;
+        return tier * 6 + stars;
+      }
+      function calculateWeight(index: number, total: number): number {
+        return 1.0 - (0.5 / (total - 1)) * index;
+      }
+      function validateRank(rank: number): boolean {
+        if (rank === 80) return true;
+        const tier = Math.floor(rank / 10);
+        const stars = rank % 10;
+        return tier >= 1 && tier <= 8 && stars >= 0 && stars <= 5;
+      }
+    }
+    player.isEstimatedRank = true;
+    player.steamAccount.seasonRank = estimateWeightedRank(player);
+  }
+
   // 储存玩家分段
   player.rank = {
     medal: parseInt(player.steamAccount.seasonRank?.toString().split("")[0] ?? 0),
@@ -607,10 +677,6 @@ export function getFormattedPlayerData(playerQuery: graphql.PlayerInfoWith25Matc
     player.performance.imp = imp;
     player.dotaPlus = player.dotaPlus.filter((dpHero) => dpHero.heroId == genHero.heroId);
     player.genHero = genHero;
-  }
-
-  if (player.steamAccount.isAnonymous){
-    
   }
 
   return player;
@@ -740,14 +806,16 @@ export function formatNumber(num: number): string {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-/** 读取目录下所有文件名去除后缀名后返回文件名数组。 */
-export function readDirectoryFilesSync(directoryPath) {
+/** 读取目录下所有 .ejs 文件名并去除后缀名后返回文件名数组。 */
+export function readDirectoryFilesSync(directoryPath: string): string[] {
   try {
     // 同步读取目录下的所有文件名
     const files = fs.readdirSync(directoryPath);
 
-    // 使用 map 函数去除每个文件名的扩展名
-    const fileNames = files.map((file) => path.basename(file, path.extname(file)));
+    // 过滤出 .ejs 文件并去除扩展名
+    const fileNames = files
+      .filter(file => path.extname(file).toLowerCase() === '.ejs')
+      .map(file => path.basename(file, '.ejs'));
 
     return fileNames;
   } catch (error) {
@@ -845,4 +913,27 @@ export function formatHeroDesc(template: string, special_values: any[], type: He
       }
     }
   });
+}
+
+export function enhancedSimpleHashToSeed(inputString) {
+  // 将字符串转化为 Base64 编码
+  const encoded = btoa(inputString);
+
+  // 多轮处理以增加散列性
+  let total = 0;
+  let complexFactor = 1; // 引入一个复杂因子，每次循环后递增
+  for (let i = 0; i < encoded.length; i++) {
+    // 计算字符代码，并通过复杂因子增加变化
+    total += encoded.charCodeAt(i) * complexFactor;
+    // 逐轮改变复杂因子，例如递增
+    complexFactor++;
+    // 为避免数字过大，及时应用取模
+    total %= 9973; // 使用质数增加随机性
+  }
+
+  // 应用更复杂的散列方法，不必等到最后再平方
+  total = ((total % 9973) * (total % 9973)) % 9973; // 再次应用模以保持数字大小
+
+  // 通过取模操作和除法将总和转化为 [0, 1) 区间内的数
+  return (total % 1000) / 1000;
 }

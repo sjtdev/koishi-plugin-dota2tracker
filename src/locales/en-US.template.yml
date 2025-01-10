@@ -78,3 +78,5 @@ dota2tracker:
     report_won: W
     report_lost: L
     report_winrate: WR
+    anonymous_player_1: This profile is private.
+    anonymous_player_2: Background is for display purposes only. It is not {player}’s data.

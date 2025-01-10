@@ -17,6 +17,7 @@ import {} from "@koishijs/cache";
 export const name = "dota2tracker";
 export let usage = "";
 export const inject = ["http", "database", "cron", "puppeteer", "cache"]; // 声明依赖
+const pluginDir = path.resolve(__dirname, "..");
 
 // 配置项
 export interface Config {
@@ -36,6 +37,7 @@ export interface Config {
   template_match: string;
   template_player: string;
   template_hero: string;
+  playerRankEstimate: boolean;
 }
 export const Config: Schema = Schema.intersect([
   Schema.object({
@@ -82,9 +84,10 @@ export const Config: Schema = Schema.intersect([
     ]),
   ]).i18n(["zh-CN", "en-US"].reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {})),
   Schema.object({
-    template_match: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/match`)]).default("match_1"),
-    template_player: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/player`)]).default("player_1"),
-    template_hero: Schema.union([...utils.readDirectoryFilesSync(`./node_modules/@sjtdev/koishi-plugin-${name}/template/hero`)]).default("hero_1"),
+    template_match: Schema.union([...utils.readDirectoryFilesSync(path.join(pluginDir, "template", "match"))]).default("match_1"),
+    template_player: Schema.union([...utils.readDirectoryFilesSync(path.join(pluginDir, "template", "player"))]).default("player_1"),
+    template_hero: Schema.union([...utils.readDirectoryFilesSync(path.join(pluginDir, "template", "hero"))]).default("hero_1"),
+    playerRankEstimate: Schema.boolean().default(true),
   }).i18n(["zh-CN", "en-US"].reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.template), acc), {})),
 ]);
 
@@ -377,7 +380,7 @@ export async function apply(ctx: Context, config: Config) {
     let idsToFind = guild.players.map((player) => player.steamId);
     let broadPlayers = match.players.filter((item) => idsToFind.includes(item.steamAccountId));
     for (let player of broadPlayers) {
-      const random = new Random(() => enhancedSimpleHashToSeed(`${match.id}-${player.steamAccountId}-${player.playerSlot}`));
+      const random = new Random(() => utils.enhancedSimpleHashToSeed(`${match.id}-${player.steamAccountId}-${player.playerSlot}`));
       let comment: string;
       if (player.isRadiant == match.didRadiantWin) {
         if (player.deathContribution < 0.2 || player.killContribution > 0.75 || player.heroDamage / player.networth > 1.5 || player.towerDamage > 10000 || player.imp > 0)
@@ -546,9 +549,9 @@ export async function apply(ctx: Context, config: Config) {
         session.send(session.text(".querying_player"));
         // let steamId = flagBindedPlayer ? flagBindedPlayer.steamId : input_data;
         let heroId = findingHero(options.hero);
-        let steamId = flagBindedPlayer?.steamId ?? input_data;
         // let player;
         try {
+          let steamId = Number(flagBindedPlayer?.steamId ?? input_data);
           const playerQuery = await query<graphql.PlayerInfoWith25MatchesQueryVariables, graphql.PlayerInfoWith25MatchesQuery>("PlayerInfoWith25Matches", {
             steamAccountId: steamId,
             heroIds: heroId,
@@ -567,7 +570,12 @@ export async function apply(ctx: Context, config: Config) {
                   dotaPlus: null,
                 },
               };
-          const player = utils.getFormattedPlayerData(playerQuery, playerExtraQuery, heroId ? { heroId, name: constantLocales[languageTag].dota2tracker.template.hero_names[heroId] } : null);
+          const player = utils.getFormattedPlayerData({
+            playerQuery,
+            playerExtraQuery,
+            genHero: heroId ? { heroId, name: constantLocales[languageTag].dota2tracker.template.hero_names[heroId] } : null,
+            estimateRank: config.playerRankEstimate,
+          });
           session.send(
             (ctx.config.urlInMessageType.some((type) => type == "player") ? "https://stratz.com/players/" + player.steamAccount.id : "") +
               (await ctx.puppeteer.render(await genImageHTML(player, config.template_player, TemplateType.Player, ctx, languageTag)))
@@ -1147,7 +1155,7 @@ export async function apply(ctx: Context, config: Config) {
     return result;
   }
   async function genImageHTML(data, template, type: TemplateType, ctx: Context, languageTag) {
-    const templatePath = path.join(`./node_modules/@sjtdev/koishi-plugin-${name}/template/${type}`, template + ".ejs");
+    const templatePath = path.join(pluginDir, "template", type, `${template}.ejs`);
     const templateData = {
       data: data,
       utils: utils,
@@ -1158,6 +1166,7 @@ export async function apply(ctx: Context, config: Config) {
       eh: escapeHTML,
       $t: templateI18nHelper,
       languageTag: languageTag,
+      Random,
     };
 
     function templateI18nHelper(key: string[] | string, param?: string[] | string | object): string {
@@ -1168,7 +1177,7 @@ export async function apply(ctx: Context, config: Config) {
       const html = await ejs.renderFile(templatePath, templateData, {
         strict: false,
       });
-      if (process.env.NODE_ENV === "development") fs.writeFileSync("./node_modules/@sjtdev/koishi-plugin-dota2tracker/temp.html", html);
+      if (process.env.NODE_ENV === "development") fs.writeFileSync(path.join(pluginDir, "temp.html"), html);
       return html;
     } catch (error) {
       ctx.logger.error(error);
@@ -1184,29 +1193,6 @@ enum TemplateType {
   GuildMember = "guild_member",
   Report = "report",
   Rank = "rank",
-}
-
-function enhancedSimpleHashToSeed(inputString) {
-  // 将字符串转化为 Base64 编码
-  const encoded = btoa(inputString);
-
-  // 多轮处理以增加散列性
-  let total = 0;
-  let complexFactor = 1; // 引入一个复杂因子，每次循环后递增
-  for (let i = 0; i < encoded.length; i++) {
-    // 计算字符代码，并通过复杂因子增加变化
-    total += encoded.charCodeAt(i) * complexFactor;
-    // 逐轮改变复杂因子，例如递增
-    complexFactor++;
-    // 为避免数字过大，及时应用取模
-    total %= 9973; // 使用质数增加随机性
-  }
-
-  // 应用更复杂的散列方法，不必等到最后再平方
-  total = ((total % 9973) * (total % 9973)) % 9973; // 再次应用模以保持数字大小
-
-  // 通过取模操作和除法将总和转化为 [0, 1) 区间内的数
-  return (total % 1000) / 1000;
 }
 
 function escapeHTML(str) {

@@ -28,7 +28,7 @@
         "ALL_PICK_RANKED": "全英雄选择",
         "TURBO": "加速模式",
         "MUTATION": "",
-        "UNKNOWN": ""
+        "UNKNOWN": "未知"
       },
       "lobby_types": {
         "INVALID": "",

@@ -6,303 +6,344 @@
         <title>Document</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
         <style>
-            html,
-            body {
-                background-color: black;
-                color: white;
-                width: 800px;
-            }
+          html,
+          body {
+            background-color: black;
+            color: white;
+            width: 800px;
+          }
 
-            .wrapper > * {
-                margin: 5px;
-                box-shadow: 0 0 5px #fff;
-                width: 790px;
-                border-radius: 5px;
-                overflow: hidden;
-            }
+          .wrapper > * {
+            margin: 5px;
+            box-shadow: 0 0 5px #fff;
+            width: 790px;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+          }
 
-            img {
-                width: auto;
-                vertical-align: middle;
-            }
+          img {
+            width: auto;
+            vertical-align: middle;
+          }
 
-            p {
-                margin: 0;
-            }
+          p {
+            margin: 0;
+          }
 
-            .player {
-                display: flex;
-                position: relative;
-                height: 128px;
-            }
+          .player {
+            display: flex;
+            position: relative;
+            height: 128px;
+          }
 
-            .player .avatar {
-                width: 128px;
-                height: 128px;
-                position: absolute;
-            }
+          .player .avatar {
+            width: 128px;
+            height: 128px;
+            position: absolute;
+          }
 
-            .player .avatar img {
-                width: 100%;
-                border-radius: 5px;
-            }
+          .player .avatar img {
+            width: 100%;
+            border-radius: 5px;
+          }
 
-            .player .name {
-                font-size: 24px;
-            }
-            .player .name .guild::before {
-                content: "[";
-                color: #fff;
-            }
-            .player .name .guild::after {
-                content: "]";
-                color: #fff;
-            }
-            .player .name .hero_name::before {
-                content: ">";
-                color: #fff;
-            }
-            .player .name .hero_name::after {
-                content: "<";
-                color: #fff;
-            }
+          .player .name {
+            font-size: 24px;
+          }
+          .player .name .guild::before {
+            content: "[";
+            color: #fff;
+          }
+          .player .name .guild::after {
+            content: "]";
+            color: #fff;
+          }
+          .player .name .hero_name::before {
+            content: ">";
+            color: #fff;
+          }
+          .player .name .hero_name::after {
+            content: "<";
+            color: #fff;
+          }
 
-            .player .info {
-                width: 100%;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                /* line-height: 2; */
-                justify-content: space-around;
-            }
+          .player .info {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* line-height: 2; */
+            justify-content: space-around;
+          }
 
-            .player .info .guild.Copper {
-                color: #b4775f;
-            }
-            .player .info .guild.Silver {
-                color: #9a9593;
-            }
-            .player .info .guild.Gold {
-                color: #bda97f;
-            }
-            .player .info .guild.Diamond {
-                color: #a5cbcf;
-            }
+          .player .info .guild.Copper {
+            color: #b4775f;
+          }
+          .player .info .guild.Silver {
+            color: #9a9593;
+          }
+          .player .info .guild.Gold {
+            color: #bda97f;
+          }
+          .player .info .guild.Diamond {
+            color: #a5cbcf;
+          }
 
-            .player .info .matches span.win {
-                color: #007A00;
-            }
-            .player .info .matches span.lose {
-                color: #B30000;
-            }
+          .player .info .matches span.win {
+            color: #007a00;
+          }
+          .player .info .matches span.lose {
+            color: #b30000;
+          }
 
-            .player .info .matches span.victory {
-                color: lightgreen;
-            }
-            .player .info .matches span.stomp {
-                color: green;
-                /* font-size: 8px; */
-            }
-            .player .info .matches span.fail {
-                color: #ff6961;
-            }
-            .player .info .matches span.stomped {
-                color: red;
-                /* font-size: 8px; */
-            }
+          .player .info .matches span.victory {
+            color: lightgreen;
+          }
+          .player .info .matches span.stomp {
+            color: green;
+            /* font-size: 8px; */
+          }
+          .player .info .matches span.fail {
+            color: #ff6961;
+          }
+          .player .info .matches span.stomped {
+            color: red;
+            /* font-size: 8px; */
+          }
+          .player .info .matches.blur {
+            filter: blur(10px);
+          }
 
-            .player .rank {
-                width: 64px;
-                height: 64px;
-                flex-grow: 1;
-                position: absolute;
-                top: 0;
-                right: 0;
-            }
+          .player .rank {
+            width: 64px;
+            height: 64px;
+            flex-grow: 1;
+            position: absolute;
+            top: 0;
+            right: 0;
+          }
 
-            .player .rank .medal {
-                z-index: 1;
-            }
+          .player .rank.estimated {
+            filter: grayscale(100%);
+          }
 
-            .player .rank .star {
-                z-index: 2;
-            }
+          .player .rank .medal {
+            z-index: 1;
+          }
 
-            .player .rank p {
-                z-index: 4;
-            }
+          .player .rank .star {
+            z-index: 2;
+          }
 
-            .player .rank div {
-                height: 100%;
-                width: 100%;
-                top: 0;
-                right: 0;
-                position: absolute;
-            }
+          .player .rank p {
+            z-index: 4;
+          }
 
-            .player .rank img {
-                top: 0;
-                right: 0;
-                position: absolute;
-                height: 64px;
-            }
+          .player .rank div {
+            height: 100%;
+            width: 100%;
+            top: 0;
+            right: 0;
+            position: absolute;
+          }
 
-            .player .rank p {
-                font-size: 12px;
-                line-height: 1;
-                position: absolute;
-                text-align: center;
-                width: 64px;
-                bottom: 4px;
-                right: 0;
-                /* background-color: #222; */
-                /* border: black 1px solid; */
-                box-sizing: border-box;
-                text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; /* 描边效果 */
-            }
+          .player .rank img {
+            top: 0;
+            right: 0;
+            position: absolute;
+            height: 64px;
+          }
 
-            .hero_winrate > *:not(:last-child) {
-                /* margin-bottom: 10px; */
-            }
+          .player .rank p {
+            font-size: 12px;
+            line-height: 1;
+            position: absolute;
+            text-align: center;
+            width: 64px;
+            bottom: 4px;
+            right: 0;
+            /* background-color: #222; */
+            /* border: black 1px solid; */
+            box-sizing: border-box;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; /* 描边效果 */
+          }
 
-            .hero_winrate .heroes {
-                display: grid;
-                /* line-height: 2; */
-                grid-template-columns: 32px auto auto auto auto auto;
-                /* grid-template-rows: repeat(auto-fill, 1fr); */
-                justify-content: start;
-                align-items: center;
-            }
+          .hero_winrate > *:not(:last-child) {
+            /* margin-bottom: 10px; */
+          }
 
-            .hero_winrate .heroes .hero {
-                width: 100%;
-                display: flex;
-                align-items: center;
-            }
+          .hero_winrate {
+          }
 
-            .hero_winrate .heroes img {
-                width: 100%;
-                /* height: 32px; */
-                border-radius: 6px;
-                overflow: hidden;
-            }
+          .hero_winrate .heroes {
+            display: grid;
+            /* line-height: 2; */
+            grid-template-columns: 32px auto auto auto auto auto;
+            /* grid-template-rows: repeat(auto-fill, 1fr); */
+            justify-content: start;
+            align-items: center;
+          }
 
-            .hero_winrate .heroes span.imp {
-                margin: 0 4px;
-            }
+          .hero_winrate .heroes .hero {
+            width: 100%;
+            display: flex;
+            align-items: center;
+          }
 
-            .hero_winrate .heroes span {
-                text-align: center;
-            }
+          .hero_winrate .heroes img {
+            width: 100%;
+            /* height: 32px; */
+            border-radius: 6px;
+            overflow: hidden;
+          }
 
-            .hero_winrate .heroes .tip.row {
-                grid-column: 1/-1;
-            }
+          .hero_winrate .heroes span.imp {
+            margin: 0 4px;
+          }
 
-            .hero_winrate .heroes .win {
-                /* color: #000; */
-                text-align: right;
-                padding-right: 8px;
-                background-color: #006400;
-                border-radius: 16px 0 0 16px;
-                height: 16px;
-                justify-self: end;
-            }
-            .hero_winrate .heroes .lose {
-                /* color: #000; */
-                text-align: left;
-                padding-left: 8px;
-                background-color: #8b0000;
-                border-radius: 0 16px 16px 0;
-                height: 16px;
-                justify-self: start;
-            }
+          .hero_winrate .heroes span {
+            text-align: center;
+          }
 
-            .matches {
-                table-layout: fixed;
-            }
+          .hero_winrate .heroes .tip.row {
+            grid-column: 1/-1;
+          }
 
-            .matches .match.win {
-                background-color: #006400;
-            }
-            .matches .match.lose {
-                background-color: #8b0000;
-            }
+          .hero_winrate .heroes .win {
+            /* color: #000; */
+            text-align: right;
+            padding-right: 8px;
+            background-color: #006400;
+            border-radius: 16px 0 0 16px;
+            height: 16px;
+            justify-self: end;
+          }
+          .hero_winrate .heroes .lose {
+            /* color: #000; */
+            text-align: left;
+            padding-left: 8px;
+            background-color: #8b0000;
+            border-radius: 0 16px 16px 0;
+            height: 16px;
+            justify-self: start;
+          }
 
-            .matches .match td {
-                text-align: center;
-                /* line-height: 40px; */
-                height: 40px;
-                overflow: hidden;
-            }
+          table.matches {
+            table-layout: fixed;
+            width: 100%;
+          }
 
-            .matches .match .player_lane {
-                width: 100%;
-                height: 100%;
-                justify-content: center; /* 水平居中 */
-                align-items: center; /* 垂直居中 */
-                display: flex;
-            }
+          .matches .match.win {
+            background-color: #006400;
+          }
+          .matches .match.lose {
+            background-color: #8b0000;
+          }
 
-            .matches .match .player_lane:not(.tie) {
-                /* background-color: #000; */
-            }
+          .matches .match td {
+            text-align: center;
+            /* line-height: 40px; */
+            height: 40px;
+            overflow: hidden;
+          }
 
-            .matches .match .player_lane svg {
-                width: 36px;
-                height: 36px;
-            }
-            .player_lane.victory svg path {
-                fill: lightgreen;
-            }
+          .matches .match .player_lane {
+            width: 100%;
+            height: 100%;
+            justify-content: center; /* 水平居中 */
+            align-items: center; /* 垂直居中 */
+            display: flex;
+          }
 
-            .player_lane.stomp svg path {
-                fill: green;
-            }
+          .matches .match .player_lane:not(.tie) {
+            /* background-color: #000; */
+          }
 
-            .player_lane.stomped svg path {
-                fill: red;
-            }
+          .matches .match .player_lane svg {
+            width: 36px;
+            height: 36px;
+          }
+          .player_lane.victory svg path {
+            fill: lightgreen;
+          }
 
-            .plus {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 10px;
-            }
+          .player_lane.stomp svg path {
+            fill: green;
+          }
 
-            .plus .hero {
-                width: 190px;
-                height: 190px;
-                border-radius: 5px;
-                position: relative;
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                grid-template-rows: 118.75px auto;
-                justify-items: center;
-                align-items: center;
-            }
-            .plus .hero img {
-                width: 100%;
-                grid-column: 1/-1;
-            }
+          .player_lane.stomped svg path {
+            fill: red;
+          }
 
-            .plus .level {
-                position: absolute;
-                width: 50px;
-                height: 50px;
-                left: calc(50% - 25px);
-                top: calc(118.75px - 25px);
-            }
+          .plus {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+          }
 
-            .plus .level span {
-                position: absolute;
-                width: 100%;
-                text-align: center;
-                left: 0;
-                bottom: 18px;
-                font-size: 14px;
-                text-shadow: -1px -1px 1px #000, 1px -1px 1px #000, -1px 1px 1px #000, 1px 1px 1px #000;
-            }
+          .plus .hero {
+            width: 190px;
+            height: 190px;
+            border-radius: 5px;
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: 118.75px auto;
+            justify-items: center;
+            align-items: center;
+          }
+          .plus .hero img {
+            width: 100%;
+            grid-column: 1/-1;
+          }
+
+          .plus .level {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            left: calc(50% - 25px);
+            top: calc(118.75px - 25px);
+          }
+
+          .plus .level span {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            left: 0;
+            bottom: 18px;
+            font-size: 14px;
+            text-shadow: -1px -1px 1px #000, 1px -1px 1px #000, -1px 1px 1px #000, 1px 1px 1px #000;
+          }
+
+          .blur-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #00000050;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+          }
+
+          .lock-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+          }
+
+          .lock-text {
+            font-size: 18px;
+            font-weight: bold;
+          }
+          .lock-sub {
+            line-height: 3;
+            font-size: 14px;
+            color: #aaa;
+          }
         </style>
     </head>
     <body>
@@ -426,9 +467,9 @@
                     </p>
                     <p class="matches">
                         <%=$t("dota2tracker.template.match_count_")%><%=player.matchCount%> (<span class="win"><%=player.winCount%></span>/<span class="lose"><%=player.matchCount - player.winCount%></span>) &nbsp;&nbsp;
-                        <%=$t("dota2tracker.template.winrate_")%><span <%=`style="color:${utils.winRateColor(player.winCount / player.matchCount)};"`%>><%=((player.winCount / player.matchCount) * 100).toFixed(2)%>%</span>
+                        <%=$t("dota2tracker.template.winrate_")%><span <%-`style="color:${utils.winRateColor(player.winCount / player.matchCount)};"`%>><%=((player.winCount / player.matchCount) * 100).toFixed(2)%>%</span>
                     </p>
-                    <p class="matches">
+                    <p class="matches<%- player.steamAccount.isAnonymous ? " blur" : "" %>">
                         <span><%-$t("dota2tracker.template.last25matches_")%>
                             <span class="win"><%-nearWinCount%></span>/
                             <span class="lose"><%-nearMatchCount - nearWinCount%></span>
@@ -436,19 +477,19 @@
                         <span><%-$t("dota2tracker.template.winrate_")%>
                             <span <%-`style="color:${utils.winRateColor(nearWinCount / nearMatchCount)};"`%>><%-((nearWinCount / nearMatchCount) * 100).toFixed(2)%>%</span>
                         </span>&nbsp;
-                        <span><%-$t("dota2tracker.template.imp_")%><%-(player.performance?.imp > 0 ? "+" : "") + player.performance?.imp%></span>
+                        <span><%-$t("dota2tracker.template.imp_")%><%-player.steamAccount.isAnonymous?"?":((player.performance?.imp > 0 ? "+" : "") + player.performance?.imp)%></span>
                     </p>
-                    <p class="matches">
+                    <p class="matches<%- player.steamAccount.isAnonymous ? " blur" : "" %>">
                         <span><%-$t("dota2tracker.template.lane")%>
                             <span class="victory"><%-outcomeCounts.victory + outcomeCounts.stomp%>(<span class="stomp"><%-outcomeCounts.stomp%></span>)</span>-<span class="tie"><%-outcomeCounts.tie%></span>-<span class="fail"><%-outcomeCounts.fail + outcomeCounts.stomped%>(<span class="stomped"><%-outcomeCounts.stomped%></span>)</span>
                         </span>&nbsp;&nbsp;
                         <span><%-$t("dota2tracker.template.lane_advantage_rate_")%>
-                            <span <%-`style="color:${utils.winRateColor((outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.tie / 2) / (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.tie + outcomeCounts.fail + outcomeCounts.stomped))};"`%>><%-(((outcomeCounts.victory + outcomeCounts.stomp) / (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.fail + outcomeCounts.stomped)) * 100).toFixed(2)%>%</span>
+                            <span <%-`style="color:${utils.winRateColor((outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.tie / 2) / (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.tie + outcomeCounts.fail + outcomeCounts.stomped))};"`%>><%-player.steamAccount.isAnonymous?"?":(((outcomeCounts.victory + outcomeCounts.stomp) / (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.fail + outcomeCounts.stomped)) * 100).toFixed(2)%>%</span>
                         </span>
                     </p>
                 </div>
-                <div class="rank">
-                    <img class="medal" src="<%-utils.getImageUrl('medal_' +(player.inTop100??player.rank.medal))%>" alt="" />
+                <div class="rank<%= player.isEstimatedRank ? " estimated" : "" %>">
+                    <img class="medal" src="<%-utils.getImageUrl('medal_' +(player.rank.inTop100??player.rank.medal))%>" alt="" />
                     <img class="star" src="<%-utils.getImageUrl('star_' + player.rank.star)%>" alt="" />
                     <p><%-player.steamAccount.seasonLeaderboardRank ?? ""%></p>
                 </div>
@@ -499,63 +540,71 @@
                     <span class="win" style="${position.winCount == 0 ? "visibility:hidden;" : ""}width: ${position.winCount * pixelOfPerMatchInPosition}px">${position.winCount}</span>
                     <span class="lose" style="${position.matchCount - position.winCount == 0 ? "visibility:hidden;" : ""}width: ${(position.matchCount - position.winCount) * pixelOfPerMatchInPosition}px">${position.matchCount - position.winCount}</span>`).join("") %>
                 </div>
+                <% if (player.steamAccount.isAnonymous) { %>
+                  <%- include("player_1/private", {$t, player}) %>
+                <% } %>
             </div>
-            <%- Math.abs(player.streak) > 1 ?
+            <%- Math.abs(player.streak) > 1 && !player.steamAccount.isAnonymous ?
             `<div class="streak" style="box-shadow:none;color:${utils.winRateColor((player.streak + 10) / 20)};">${Math.abs(player.streak) + (player.streak > 0 ? $t("dota2tracker.template.winning_streak") : $t("dota2tracker.template.losing_streak"))}</div>`:"" %>
-            <table class="matches">
-                <colgroup>
-                    <col style="width: auto" />
-                    <col style="width: auto" />
-                    <col style="width: 40px" />
-                    <col style="width: auto" />
-                    <col style="width: 40px" />
-                    <col style="width: auto" />
-                    <col style="width: auto" />
-                    <col style="width: auto" />
-                    <col style="width: 40px" />
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th><%= $t("dota2tracker.template.id") %></th>
-                        <th><%= $t("dota2tracker.template.mode") %></th>
-                        <th><%= $t("dota2tracker.template.hero") %></th>
-                        <th><%= $t("dota2tracker.template.kda_kc") %></th>
-                        <th><%= $t("dota2tracker.template.lane") %></th>
-                        <th><%= $t("dota2tracker.template.time") %></th>
-                        <th><%= $t("dota2tracker.template.duration") %></th>
-                        <th><%= $t("dota2tracker.template.imp") %></th>
-                        <th><%= $t("dota2tracker.template.rank") %></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%- player.matches.map((match) => {
-                        const innerPlayer = match.players.find(innerPlayer => player.steamAccount.id == innerPlayer.steamAccount.id);
-                        innerPlayer.teamKillsCount = match.parsedDateTime ?
-                            (match[(innerPlayer.isRadiant ? "radiant" : "dire") + "Kills"]?.reduce((acc, cva) => acc + cva, 0) ?? 0) :
-                            match.players
-                                .filter(p => p.isRadiant === innerPlayer.isRadiant)
-                                .reduce((k, p) => k + p.kills, 0);
-                        return `
-                    <tr class="match ${match.didRadiantWin == innerPlayer.isRadiant ? "win" : "lose"}">
-                        <td>${match.parsedDateTime ? match.id : `<p>${match.id}</p><p>${$t("dota2tracker.template.un_parsed")}</p>`}</td>
-                        <td>
-                            <p>${$t("dota2tracker.template.lobby_types."+match.lobbyType) || match.lobbyType}</p>
-                            <p>${$t("dota2tracker.template.game_modes."+match.gameMode) || match.gameMode}</p>
-                        </td>
-                        <td><img alt="" src="${utils.getImageUrl(innerPlayer.hero.shortName, ImageType.HeroIcons)}" /></td>
-                        <td style="line-height: 20px">
-                            <p>${((innerPlayer.kills + innerPlayer.assists) / Math.max(1, innerPlayer.deaths)).toFixed(2)} (${(match.parsedDateTime?"":"≈")+((((innerPlayer.kills + innerPlayer.assists) /
-                            innerPlayer.teamKillsCount) * 100)?.toFixed(0))}%)</p>
-                            <p>${innerPlayer.kills}/${innerPlayer.deaths}/${innerPlayer.assists}</p>
-                        </td>
-                        <td><div class="player_lane ${match.laneResult}">${laneSVG[match.laneResult]}</div></td>
-                        <td style="line-height: 20px">${moment(new Date(match.startDateTime * 1000)).format("YYYY-MM-DD HH:mm:ss").slice(2)}</td>
-                        <td>${utils.sec2time(match.durationSeconds)}</td>
-                        <td>${innerPlayer.imp != null ? ((innerPlayer.imp >= 0 ? "+" : "") + innerPlayer.imp) : "?"}</td>
-                        <td><img class="medal" src="${utils.getImageUrl("medal_" + match.rank?.toString().split("")[0])}" style="width: 100%" /></td>
-                    </tr>`}).join("")%>
-                </tbody>
-            </table>
+            <div>
+                <table class="matches">
+                    <colgroup>
+                        <col style="width: auto" />
+                        <col style="width: auto" />
+                        <col style="width: 40px" />
+                        <col style="width: auto" />
+                        <col style="width: 40px" />
+                        <col style="width: auto" />
+                        <col style="width: auto" />
+                        <col style="width: auto" />
+                        <col style="width: 40px" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th><%= $t("dota2tracker.template.id") %></th>
+                            <th><%= $t("dota2tracker.template.mode") %></th>
+                            <th><%= $t("dota2tracker.template.hero") %></th>
+                            <th><%= $t("dota2tracker.template.kda_kc") %></th>
+                            <th><%= $t("dota2tracker.template.lane") %></th>
+                            <th><%= $t("dota2tracker.template.time") %></th>
+                            <th><%= $t("dota2tracker.template.duration") %></th>
+                            <th><%= $t("dota2tracker.template.imp") %></th>
+                            <th><%= $t("dota2tracker.template.rank") %></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%- player.matches.map((match) => {
+                            const innerPlayer = match.players.find(innerPlayer => player.steamAccount.id == innerPlayer.steamAccount.id);
+                            innerPlayer.teamKillsCount = match.parsedDateTime ?
+                                (match[(innerPlayer.isRadiant ? "radiant" : "dire") + "Kills"]?.reduce((acc, cva) => acc + cva, 0) ?? 0) :
+                                match.players
+                                    .filter(p => p.isRadiant === innerPlayer.isRadiant)
+                                    .reduce((k, p) => k + p.kills, 0);
+                            return `
+                        <tr class="match ${match.didRadiantWin == innerPlayer.isRadiant ? "win" : "lose"}">
+                            <td>${match.parsedDateTime ? match.id : `<p>${match.id}</p><p>${$t("dota2tracker.template.un_parsed")}</p>`}</td>
+                            <td>
+                                <p>${$t("dota2tracker.template.lobby_types."+match.lobbyType) || match.lobbyType}</p>
+                                <p>${$t("dota2tracker.template.game_modes."+match.gameMode) || match.gameMode}</p>
+                            </td>
+                            <td><img alt="" src="${utils.getImageUrl(innerPlayer.hero.shortName, ImageType.HeroIcons)}" /></td>
+                            <td style="line-height: 20px">
+                                <p>${((innerPlayer.kills + innerPlayer.assists) / Math.max(1, innerPlayer.deaths)).toFixed(2)} (${(match.parsedDateTime?"":"≈")+((((innerPlayer.kills + innerPlayer.assists) /
+                                innerPlayer.teamKillsCount) * 100)?.toFixed(0))}%)</p>
+                                <p>${innerPlayer.kills}/${innerPlayer.deaths}/${innerPlayer.assists}</p>
+                            </td>
+                            <td><div class="player_lane ${match.laneResult}">${laneSVG[match.laneResult]}</div></td>
+                            <td style="line-height: 20px">${moment(new Date(match.startDateTime * 1000)).format("YYYY-MM-DD HH:mm:ss").slice(2)}</td>
+                            <td>${utils.sec2time(match.durationSeconds)}</td>
+                            <td>${innerPlayer.imp != null ? ((innerPlayer.imp >= 0 ? "+" : "") + innerPlayer.imp) : "?"}</td>
+                            <td><img class="medal" src="${utils.getImageUrl("medal_" + match.rank?.toString().split("")[0])}" style="width: 100%" /></td>
+                        </tr>`}).join("")%>
+                    </tbody>
+                </table>
+                <% if (player.steamAccount.isAnonymous) { %>
+                  <%- include("player_1/private", {$t, player}) %>
+                <% } %>
+            </div>
             <div class="plus">
                 <%- player.dotaPlus.map((hero) => `
                 <div class="hero">
@@ -564,6 +613,9 @@
                     <span>${((hero.winCount / hero.matchCount) * 100).toFixed(2)}%</span>
                     <span>${hero.matchCount}</span>
                 </div>`).join("") %>
+                <% if (player.steamAccount.isAnonymous) { %>
+                  <%- include("player_1/private", {$t, player}) %>
+                <% } %>
             </div>
         </div>
     </body>

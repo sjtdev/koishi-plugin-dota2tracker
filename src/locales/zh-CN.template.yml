@@ -40,7 +40,7 @@ dota2tracker:
     position_3: 烈士路
     position_4: 采灵芝
     position_5: 工具人
-    position_undefined: '?'
+    position_undefined: "?"
     total_damage: 总伤害
     total_gold: 总经济
     total_experience: 总经验
@@ -78,3 +78,5 @@ dota2tracker:
     report_won: 胜
     report_lost: 负
     report_winrate: 胜率
+    anonymous_player_1: 数据未公开
+    anonymous_player_2: 背景仅供展示目的，不属于{player}的数据。
