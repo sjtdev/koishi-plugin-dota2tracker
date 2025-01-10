@@ -212,7 +212,7 @@ export async function apply(ctx: Context, config: Config) {
           return;
         }
         // 以上判定都通过则绑定成功
-        session.send(session.text(".bind_success", { userId: session.event.user.id, nickName: nick_name || "", steamId: steam_id }));
+        session.send(session.text(".bind_success", { userId: session.event.user.id, nickName: nick_name || "", steamId: steam_id }) + (verifyRes.isAnonymous ? "\n" + session.text(".is_anonymous") : ""));
         ctx.database.create("dt_subscribed_players", {
           userId: session.event.user.id,
           guildId: session.event.channel.id,
@@ -487,11 +487,14 @@ export async function apply(ctx: Context, config: Config) {
         let lastMatchId = 0;
         try {
           await session.send(session.text(".querying_match"));
-          lastMatchId = (
-            await query<graphql.PlayersLastmatchRankinfoQueryVariables, graphql.PlayersLastmatchRankinfoQuery>("PlayersLastmatchRankinfo", {
-              steamAccountIds: [parseInt(flagBindedPlayer?.steamId ?? input_data)],
-            })
-          ).players[0].matches[0].id;
+          const lastMatchQuery = await query<graphql.PlayersLastmatchRankinfoQueryVariables, graphql.PlayersLastmatchRankinfoQuery>("PlayersLastmatchRankinfo", {
+            steamAccountIds: [parseInt(flagBindedPlayer?.steamId ?? input_data)],
+          });
+          if (lastMatchQuery.players[0].steamAccount.isAnonymous) {
+            await session.send(session.text(".is_anonymous"));
+            return;
+          }
+          lastMatchId = lastMatchQuery.players[0].matches[0]?.id;
         } catch (error) {
           session.send(session.text(".query_failed"));
           ctx.logger.error(error);
@@ -550,12 +553,20 @@ export async function apply(ctx: Context, config: Config) {
             steamAccountId: steamId,
             heroIds: heroId,
           });
-          const playerExtraQuery = await utils.query<graphql.PlayerExtraInfoQueryVariables, graphql.PlayerExtraInfoQuery>("PlayerExtraInfo", {
-            steamAccountId: steamId,
-            matchCount: playerQuery.player.matchCount,
-            totalHeroCount: Object.keys(dotaconstants.heroes).length,
-            heroIds: heroId,
-          });
+
+          const playerExtraQuery = !playerQuery.player.steamAccount.isAnonymous
+            ? await utils.query<graphql.PlayerExtraInfoQueryVariables, graphql.PlayerExtraInfoQuery>("PlayerExtraInfo", {
+                steamAccountId: steamId,
+                matchCount: playerQuery.player.matchCount,
+                totalHeroCount: Object.keys(dotaconstants.heroes).length,
+                heroIds: heroId,
+              })
+            : {
+                player: {
+                  heroesPerformance: [],
+                  dotaPlus: null,
+                },
+              };
           const player = utils.getFormattedPlayerData(playerQuery, playerExtraQuery, heroId ? { heroId, name: constantLocales[languageTag].dota2tracker.template.hero_names[heroId] } : null);
           session.send(
             (ctx.config.urlInMessageType.some((type) => type == "player") ? "https://stratz.com/players/" + player.steamAccount.id : "") +
@@ -780,6 +791,7 @@ export async function apply(ctx: Context, config: Config) {
         ).players;
         const lastMatches = players
           .map((player) => player.matches[0])
+          .filter((match) => match && match.id)
           .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id)) // 根据match.id去重
           .filter((match) => moment.unix(match.startDateTime).isAfter(moment().subtract(1, "days"))) // 排除1天以前的比赛，防止弃坑数年群友绑定时突然翻出上古战报
           .filter((match) => !pendingMatches.some((pendingMatch) => pendingMatch.matchId == match.id)); // 判断是否已加入待发布列表

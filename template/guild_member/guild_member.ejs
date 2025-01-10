@@ -127,7 +127,7 @@
     </head>
     <body>
         <% const users = data;
-            users.forEach(player=>{ 
+            users.forEach(player=>{
                 player.rank = {
                     medal: parseInt(player.steamAccount.seasonRank?.toString().split("")[0] ?? 0),
                     star: parseInt(player.steamAccount.seasonRank?.toString().split("")[1] ?? 0),
@@ -163,7 +163,7 @@
                     <span>${(playerInMatch.imp > 0 ? "+" : "") + playerInMatch.imp}</span>
                 </div>`}).join("")}
             </div>`:0}
-            <div class="last_match_date">最近游戏: ${moment(new Date(user.matches[0].startDateTime * 1000)).format("YYYY-MM-DD HH:mm:ss")}</div>
+            <div class="last_match_date">最近游戏: ${moment(new Date((user.matches[0]?.startDateTime ?? 0) * 1000)).format("YYYY-MM-DD HH:mm:ss")}</div>
         </div>`).join("")
         %>
     </body>

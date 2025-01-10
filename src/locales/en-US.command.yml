@@ -41,6 +41,9 @@ commands:
           Nickname: {nickName}
           SteamID: {steamId}
         nick_name_too_long: Nickname is too long, please limit it to 20 characters or less. (It can also be left blank)
+        is_anonymous: |- 
+          Please note: Your Steam player data is not public, and you will not be able to use the main functions of the BOT, such as "battle report tracking," "query-recent-match commands," etc.
+          If you need to make data public, please set it to public in the DOTA2 game settings.
     unbind:
       description: Unbind your personal information.
       messages:
@@ -99,6 +102,9 @@ commands:
         not_in_group: |-
           Command failed.
           Currently not in a group chat, you must provide the specified player's SteamID.
+        is_anonymous: |-
+          Your player data is not public, and recent match data cannot be obtained.
+          If you need to make data public, please set it to public in the DOTA2 game settings.
     query-player:
       description: Query the player's personal information, optionally specify a hero.
       options:

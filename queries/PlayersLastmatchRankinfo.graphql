@@ -6,6 +6,7 @@ query PlayersLastmatchRankinfo($steamAccountIds: [Long]!) {
       avatar
       seasonRank
       seasonLeaderboardRank
+      isAnonymous
     }
     matches(request: { take: 1 }) {
       id

@@ -558,12 +558,12 @@ export interface PlayerInfoEx extends NonNullable<graphql.PlayerInfoWith25Matche
   rank: RankInfo;
 }
 
-export function getFormattedPlayerData(playerQuery: graphql.PlayerInfoWith25MatchesQuery, playerExtraQuery: graphql.PlayerExtraInfoQuery, genHero?: { heroId: number; name: string }) {
+export function getFormattedPlayerData(playerQuery: graphql.PlayerInfoWith25MatchesQuery, playerExtraQuery?: graphql.PlayerExtraInfoQuery, genHero?: { heroId: number; name: string }) {
   const player = playerQuery.player as PlayerInfoEx;
-  const playerExtra = playerExtraQuery.player;
+  const playerExtra = playerExtraQuery?.player;
   // 过滤和保留最高 level 的记录
   let filteredDotaPlus = {};
-  playerExtra.dotaPlus.forEach((item) => {
+  playerExtra?.dotaPlus?.forEach((item) => {
     if (!filteredDotaPlus[item.heroId] || filteredDotaPlus[item.heroId].level < item.level) {
       filteredDotaPlus[item.heroId] = {
         heroId: item.heroId,
@@ -573,7 +573,7 @@ export function getFormattedPlayerData(playerQuery: graphql.PlayerInfoWith25Matc
   });
 
   // 合并 heroesPerformance 数据
-  playerExtra.heroesPerformance.forEach((hero) => {
+  playerExtra?.heroesPerformance?.forEach((hero) => {
     if (filteredDotaPlus[hero.hero.id]) {
       filteredDotaPlus[hero.hero.id].shortName = hero.hero.shortName;
       filteredDotaPlus[hero.hero.id].winCount = hero.winCount;
@@ -590,7 +590,7 @@ export function getFormattedPlayerData(playerQuery: graphql.PlayerInfoWith25Matc
 
   // 转换为数组
   player.dotaPlus = Object.values(filteredDotaPlus); // 排序 dotaPlus 数组
-  player.dotaPlus.sort((a, b) => {
+  player.dotaPlus?.sort((a, b) => {
     if (b.level !== a.level) {
       return b.level - a.level;
     }
@@ -598,7 +598,7 @@ export function getFormattedPlayerData(playerQuery: graphql.PlayerInfoWith25Matc
   });
 
   // 取场次前十的英雄表现数据附加到原player对象中
-  player.heroesPerformanceTop10 = playerExtra.heroesPerformance.slice(0, 10);
+  player.heroesPerformanceTop10 = playerExtra?.heroesPerformance.slice(0, 10);
 
   if (genHero) {
     const { matchCount, winCount, imp } = player.heroesPerformanceTop10[0];
@@ -608,6 +608,11 @@ export function getFormattedPlayerData(playerQuery: graphql.PlayerInfoWith25Matc
     player.dotaPlus = player.dotaPlus.filter((dpHero) => dpHero.heroId == genHero.heroId);
     player.genHero = genHero;
   }
+
+  if (player.steamAccount.isAnonymous){
+    
+  }
+
   return player;
 }
 
@@ -779,11 +784,11 @@ export function winRateColor(value) {
 }
 
 /** 使用stratzAPI查询，根据传入的SteamID验证此Steam账号是否为有效的DOTA2玩家账号，返回对象{isValid:boolean,reason:"如果失败此处为失败原因"}。 */
-export async function playerisValid(input): Promise<{ isValid: boolean; reason?: string }> {
+export async function playerisValid(input): Promise<{ isValid: boolean; isAnonymous?: boolean; reason?: string }> {
   try {
     const steamAccountId = parseInt(input);
     let queryRes = await query<graphql.VerifyingPlayerQueryVariables, graphql.VerifyingPlayerQuery>("VerifyingPlayer", { steamAccountId: steamAccountId });
-    if (queryRes.player.matchCount != null) return { isValid: true };
+    if (queryRes.player.matchCount != null) return { isValid: true, isAnonymous: queryRes.player.steamAccount.isAnonymous };
     else return { isValid: false, reason: ".reason_without_match" };
   } catch (error) {
     console.error(error);

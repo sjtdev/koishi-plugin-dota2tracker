@@ -8,10 +8,8 @@ charset = utf-8
 trim_trailing_whitespace = true
 max_line_length = 240
 
-[*.{ts,ejs,html}]
-indent_size = tab
-tab_width = 2
+[*.md]
 trim_trailing_whitespace = false
 
-[*.md]
+[*.yml]
 trim_trailing_whitespace = false

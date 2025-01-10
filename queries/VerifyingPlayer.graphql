@@ -1,5 +1,8 @@
 query VerifyingPlayer($steamAccountId: Long!) {
   player(steamAccountId: $steamAccountId) {
     matchCount
+    steamAccount {
+      isAnonymous
+    }
   }
 }

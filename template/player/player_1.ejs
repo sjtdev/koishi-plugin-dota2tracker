@@ -377,7 +377,7 @@
             if (match.laneResult in outcomeCounts) {
                 outcomeCounts[match.laneResult]++;
             }
-        }); 
+        });
         // 无法动态获取tip元素个数
         // const heroesCountPixels = 800 - ($(".tip:not(.row):not(.win_count):not(.lose_count)").length + 1) * 40;
         const heroesCountPixels = 800 - (4+1) * 40;
@@ -393,9 +393,8 @@
         const nearAdjustmentFactor = Math.min(highestCountsTotal.winCount / (highestCountsTotal.winCount + highestCountsTotal.loseCount), highestCountsTotal.loseCount / (highestCountsTotal.winCount + highestCountsTotal.loseCount));
 
         const pixelOfPerMatchInNear = (heroesCountPixels / (highestCountsNear?.winCount + highestCountsNear?.loseCount ?? 1)) * nearAdjustmentFactor;
-        
+
         player.positionPerformance=[];
-        // 瞎j8定义的各位置代表物品，以后看情况调整
         const positionIcons = ["damage","nuke","armor","speed","healing"];
         for (let index = 0; index < 5; index++) {
             let currentPositionMatches = player.matches.filter(match=>match.players.find(innerPlayer=>player.steamAccount.id==innerPlayer.steamAccount.id).position == ("POSITION_"+(index+1)))
@@ -437,7 +436,7 @@
                         <span><%-$t("dota2tracker.template.winrate_")%>
                             <span <%-`style="color:${utils.winRateColor(nearWinCount / nearMatchCount)};"`%>><%-((nearWinCount / nearMatchCount) * 100).toFixed(2)%>%</span>
                         </span>&nbsp;
-                        <span><%-$t("dota2tracker.template.imp_")%><%-(player.performance.imp > 0 ? "+" : "") + player.performance.imp%></span>
+                        <span><%-$t("dota2tracker.template.imp_")%><%-(player.performance?.imp > 0 ? "+" : "") + player.performance?.imp%></span>
                     </p>
                     <p class="matches">
                         <span><%-$t("dota2tracker.template.lane")%>
@@ -451,7 +450,7 @@
                 <div class="rank">
                     <img class="medal" src="<%-utils.getImageUrl('medal_' +(player.inTop100??player.rank.medal))%>" alt="" />
                     <img class="star" src="<%-utils.getImageUrl('star_' + player.rank.star)%>" alt="" />
-                    <p><%-player.steamAccount.seasonLeaderboardRank ?? ""%></p>    
+                    <p><%-player.steamAccount.seasonLeaderboardRank ?? ""%></p>
                 </div>
             </div>
             <div class="hero_winrate">
@@ -532,7 +531,7 @@
                     <%- player.matches.map((match) => {
                         const innerPlayer = match.players.find(innerPlayer => player.steamAccount.id == innerPlayer.steamAccount.id);
                         innerPlayer.teamKillsCount = match.parsedDateTime ?
-                            (match[(innerPlayer.isRadiant ? "radiant" : "dire") + "Kills"]?.reduce((acc, cva) => acc + cva, 0) ?? 0) : 
+                            (match[(innerPlayer.isRadiant ? "radiant" : "dire") + "Kills"]?.reduce((acc, cva) => acc + cva, 0) ?? 0) :
                             match.players
                                 .filter(p => p.isRadiant === innerPlayer.isRadiant)
                                 .reduce((k, p) => k + p.kills, 0);

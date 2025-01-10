@@ -35,6 +35,9 @@ commands:
           别名：{nickName}
           SteamID：{steamId}
         nick_name_too_long: 别名过长，请限制在20个字符以内。（也可以留空）
+        is_anonymous: |- 
+          请注意：你的Steam玩家数据并未公开，将无法使用BOT的主要功能，如“战报追踪”、“查询最近指令”等。
+          如需公开数据，请在DOTA2游戏内设置中公开。
     unbind:
       description: 取消绑定你的个人信息
       messages:
@@ -93,6 +96,9 @@ commands:
         not_in_group: |-
           指令调用失败。
           当前不属于群聊状态，必须提供指定玩家的SteamID。
+        is_anonymous: |-
+          你的比赛数据未公开，无法获取最近比赛数据。
+          如需公开数据，请在DOTA2游戏内设置中公开。
     query-player:
       description: 查询玩家的个人信息，可指定英雄
       options:
