@@ -24,16 +24,24 @@ export default defineConfig({
         ],
       },
       {
-        text:"其他",
-        items:[
-          {text:"模板展示",link:"/templates"},
-          {text:"展示区",link:"/previews"},
-          {text:"更新日志",link:"https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md"}
-        ]
+        text: "其他",
+        items: [
+          {
+            text: "模板展示",
+            link:"/template",
+            items: [
+              { text: "对局信息模板", link: "/template-match" },
+              { text: "玩家信息模板", link: "/template-player" },
+              { text: "英雄信息模板", link: "/template-hero" },
+            ],
+          },
+          { text: "展示区", link: "/previews" },
+          { text: "更新日志", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
+        ],
       },
     ],
 
-    outline:"deep",
+    outline: "deep",
     outlineTitle: "页面导航",
 
     socialLinks: [{ icon: "github", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/" }],

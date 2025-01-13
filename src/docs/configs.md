@@ -42,7 +42,7 @@
 - 日报/周报发布于几点。
 
 ##### dailyReportShowCombi / weeklyReportShowCombi
-- 日报/周报显示玩家组合开关<del>（友尽开关）</del>。
+- 日报/周报显示玩家组合开关。<del>（友尽开关）</del>
 
 ### 模板设置
 #### template_match [模板展示](previews)
@@ -51,3 +51,5 @@
 玩家模板选择`目前仅有一张模板`
 #### template_hero
 英雄模板选择`目前仅有一张模板`
+#### playerRankEstimate `boolean`
+启用后使用`查询玩家`指令查询无段位玩家时，将根据玩家近期场次段位推算玩家段位，推算的段位标志显示为灰色图片。

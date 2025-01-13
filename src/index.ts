@@ -19,6 +19,12 @@ export let usage = "";
 export const inject = ["http", "database", "cron", "puppeteer", "cache"]; // 声明依赖
 const pluginDir = path.resolve(__dirname, "..");
 
+// At the same time, SupportLanguageTags can also be obtained from the Keys of GraphqlLanguageEnum.
+// const SupportLanguageTags = Object.keys(GraphqlLanguageEnum);
+export enum GraphqlLanguageEnum {
+  "en-US" = "ENGLISH",
+  "zh-CN" = "S_CHINESE",
+}
 // 配置项
 export interface Config {
   STRATZ_API_TOKEN: string;
@@ -44,7 +50,7 @@ export const Config: Schema = Schema.intersect([
     STRATZ_API_TOKEN: Schema.string().required().role("secret"),
     dataParsingTimeoutMinutes: Schema.number().default(60).min(0).max(1440),
     urlInMessageType: Schema.array(Schema.union([Schema.const("match"), Schema.const("player"), Schema.const("hero")])).role("checkbox"),
-  }).i18n(["zh-CN", "en-US"].reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.base), acc), {})),
+  }).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.base), acc), {})),
   Schema.intersect([
     Schema.object({
       rankBroadSwitch: Schema.boolean().default(false),
@@ -58,7 +64,7 @@ export const Config: Schema = Schema.intersect([
       }),
       Schema.object({}),
     ]),
-  ]).i18n(["zh-CN", "en-US"].reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.rank), acc), {})),
+  ]).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.rank), acc), {})),
   Schema.intersect([
     Schema.object({
       dailyReportSwitch: Schema.boolean().default(false),
@@ -82,13 +88,13 @@ export const Config: Schema = Schema.intersect([
       }),
       Schema.object({}),
     ]),
-  ]).i18n(["zh-CN", "en-US"].reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {})),
+  ]).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {})),
   Schema.object({
     template_match: Schema.union([...utils.readDirectoryFilesSync(path.join(pluginDir, "template", "match"))]).default("match_1"),
     template_player: Schema.union([...utils.readDirectoryFilesSync(path.join(pluginDir, "template", "player"))]).default("player_1"),
     template_hero: Schema.union([...utils.readDirectoryFilesSync(path.join(pluginDir, "template", "hero"))]).default("hero_1"),
     playerRankEstimate: Schema.boolean().default(true),
-  }).i18n(["zh-CN", "en-US"].reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.template), acc), {})),
+  }).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.template), acc), {})),
 ]);
 
 interface PendingMatch {
@@ -109,12 +115,6 @@ let pendingMatches: PendingMatch[] = []; // 待发布的比赛，当获取到的
 const random = new Random(() => Math.random());
 const days_30: number = 2592000000; // 30天
 
-// At the same time, SupportLanguageTags can also be obtained from the Keys of GraphqlLanguageEnum.
-// const SupportLanguageTags = Object.keys(GraphqlLanguageEnum);
-export enum GraphqlLanguageEnum {
-  "en-US" = "ENGLISH",
-  "zh-CN" = "S_CHINESE",
-}
 // 不可修改词典
 const constantLocales = {};
 export async function apply(ctx: Context, config: Config) {

@@ -19,3 +19,4 @@ tsconfig.tsbuildinfo
 
 temp.*
 backup.ts
+docs.code-workspace
