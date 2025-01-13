@@ -85,9 +85,30 @@ jobs:
         run: |
           npx tsx scripts/generation.ts
       
+      - name: Check Environment
+        run: |
+          pwd
+          ls -la
+          node --version
+          npm --version
+          echo "Content of src/docs directory:"
+          ls -la src/docs
+
+      - name: Verify Config Files
+        run: |
+          if [ -f "src/docs/.vitepress/config.ts" ]; then
+            echo "VitePress config found"
+            cat src/docs/.vitepress/config.ts
+          else
+            echo "VitePress config not found!"
+            exit 1
+          fi
+
       - name: Build Docs
-        run: npx vitepress build src/docs
-      
+        run: |
+          export NODE_OPTIONS="--max-old-space-size=4096"
+          npx vitepress build src/docs --debug 2>&1 || { echo "Build failed with error $?"; exit 1; }
+    
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
