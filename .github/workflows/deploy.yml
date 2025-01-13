@@ -98,7 +98,7 @@ jobs:
         run: |
           if [ -f "src/docs/.vitepress/config.ts" ]; then
             echo "VitePress config found"
-            cat src/docs/.vitepress/config.ts
+            cat src/docs/.vitepress/config.mts
           else
             echo "VitePress config not found!"
             exit 1
