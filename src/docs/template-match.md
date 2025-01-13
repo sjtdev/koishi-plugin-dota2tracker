@@ -8,4 +8,4 @@
 
 ##### match_1
 
-![](/images/match_1.ejs-result.png)
+![](/images/generated/match_1.ejs-result.png)
