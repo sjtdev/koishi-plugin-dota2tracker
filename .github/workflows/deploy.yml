@@ -83,7 +83,7 @@ jobs:
       
       - name: Generate Preview Images
         run: |
-          npx tsx src/docs/scripts/generation.ts
+          npx tsx scripts/generation.ts
       
       - name: Build Docs
         run: npx vitepress build src/docs
