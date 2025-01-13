@@ -50,7 +50,10 @@ jobs:
       
       - name: Build Docs
         run: npx vitepress build src/docs
-      
+        
+      - name: Create .nojekyll file
+        run: touch src/docs/.vitepress/dist/.nojekyll
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
