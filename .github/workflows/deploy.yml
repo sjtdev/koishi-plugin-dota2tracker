@@ -96,7 +96,7 @@ jobs:
 
       - name: Verify Config Files
         run: |
-          if [ -f "src/docs/.vitepress/config.ts" ]; then
+          if [ -f "src/docs/.vitepress/config.mts" ]; then
             echo "VitePress config found"
             cat src/docs/.vitepress/config.mts
           else
