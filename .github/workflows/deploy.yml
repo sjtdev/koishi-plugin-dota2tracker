@@ -79,6 +79,7 @@ jobs:
           npm install -D typescript @types/node @types/puppeteer @types/ejs @types/js-yaml @types/i18next
           npm install -D tsx puppeteer ejs vitepress@1.5.0
           npm install dotaconstants moment i18next js-yaml
+          npm install @cordisjs/vitepress
           npm install
       
       - name: Generate Preview Images
