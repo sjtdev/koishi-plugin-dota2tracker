@@ -4,7 +4,7 @@
 **修复**：修复`match_2`模板中英雄选取顺序显示错误的问题。  
 **调整**：
 - 将`match_2`模板中称号的显示位置左移，防止称号过多时显示不全。
-- 提升依赖版本，适配koishi修复的[Bug: 由插件开发者定义的指令别名被禁用后仍然生效](https://github.com/koishijs/koishi/issues/1483)问题。（赞美koishi！）
+- 提升依赖版本，适配koishi修复的[Bug: 由插件开发者定义的指令别名被禁用后仍然生效 #1483](https://github.com/koishijs/koishi/issues/1483)问题。（赞美koishi！）
 > 即`1.3.0`版本提到的问题
 - 其他的一些微调以适配编写中的新文档。
 

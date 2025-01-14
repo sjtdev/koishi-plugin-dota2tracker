@@ -56,7 +56,7 @@ enum GraphqlLanguageEnum {
     for (const languageTag of Object.keys(GraphqlLanguageEnum)) {
       for (const templateType of fs.readdirSync(templatesPath)) {
         for (const template of fs.readdirSync(path.join(templatesPath, templateType))) {
-          if (template.endsWith(".ejs") && ["player"].some((targets) => template.startsWith(targets))) {
+          if (template.endsWith(".ejs") && ["match", "player"].some((targets) => template.startsWith(targets))) {
             // const templateFile = fs.readFileSync(path.join(templatesPath, templateType, template), "utf-8");
             const templateFile = path.join(templatesPath, templateType, template);
             if (templateType === "match") {
