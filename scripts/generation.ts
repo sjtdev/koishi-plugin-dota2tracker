@@ -79,13 +79,13 @@ enum GraphqlLanguageEnum {
               anonymousPlayerQuery.player.performance = null;
               anonymousPlayerQuery.player.heroesPerformance = [];
               const anonymousData = utils.getFormattedPlayerData({ playerQuery: anonymousPlayerQuery });
-              await renderImage({ data: anonymousData, languageTag, templateFile, template, browser, imageFileName: "player_1-anonymous" });
+              await renderImage({ data: anonymousData, languageTag, templateFile, template, browser, fileName: "player_1-anonymous" });
             }
             if (templateType === "hero") {
               const heroIds = getRandomThree(Object.keys(dotaconstants.heroes));
               for (let i = 0; i < heroIds.length; i++) {
                 const data = await utils.getFormattedHeroData(await queryHeroFromValve(Number(heroIds[i]), languageTag));
-                await renderImage({ data, languageTag, templateFile, template, browser, imageFileName: `${template.split(".")[0]}-${i}` });
+                await renderImage({ data, languageTag, templateFile, template, browser, fileName: `${template.split(".")[0]}-${i}` });
               }
             }
           }
@@ -99,8 +99,9 @@ enum GraphqlLanguageEnum {
   }
 })();
 
-async function renderImage(params: { data: object; languageTag: string; templateFile: string; template: string; browser: Browser; imageFileName?: string }) {
-  const { data, languageTag, templateFile, template, browser, imageFileName } = params;
+async function renderImage(params: { data: object; languageTag: string; templateFile: string; template: string; browser: Browser; fileName?: string }) {
+  const { data, languageTag, templateFile, template, browser, fileName } = params;
+  const imageFileName = fileName ?? template.split(".")[0];
 
   const templateData = {
     data,
@@ -162,8 +163,8 @@ async function renderImage(params: { data: object; languageTag: string; template
 
   const buffer = await page.screenshot({ type: "png", fullPage: true });
   // fs.writeFileSync(path.join(__dirname, "..", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "images", `${template}-result.html`), html);
-  fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName ?? template.split(".")[0]}.png`), buffer);
-  console.log(template, dimensions);
+  fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.png`), buffer);
+  console.log(languageTag, imageFileName);
   await page.close();
 }
 async function queryHeroFromValve(heroId: number, languageTag = "zh-CN") {
