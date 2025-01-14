@@ -76,23 +76,36 @@ jobs:
 
       - name: Install Maple Mono fonts
         run: |
-          # 安装基础英文字体
+          # 安装基础英文字体（OTF）
           wget -q https://github.com/subframe7536/maple-font/releases/download/v7.0-beta34/MapleMono-OTF.zip
           unzip -q MapleMono-OTF.zip
+          
           sudo mkdir -p /usr/share/fonts/opentype/maple-mono
+          
+          # 移动所有 OTF 文件
           sudo mv MapleMono-OTF/*.otf /usr/share/fonts/opentype/maple-mono/
-
-          # 安装中文支持
+          
+          # 安装中文支持（使用 OTF）
           wget -q https://github.com/subframe7536/maple-font/releases/download/v7.0-beta34/MapleMono-CN.zip
           unzip -q MapleMono-CN.zip
-          sudo mv MapleMono-CN/*.otf /usr/share/fonts/opentype/maple-mono/
-
+          
+          # 仅移动 OTF 文件（如果存在）
+          if [ -f MapleMono-CN/*.otf ]; then
+            sudo mv MapleMono-CN/*.otf /usr/share/fonts/opentype/maple-mono/
+          else
+            echo "Warning: No OTF files found in MapleMono-CN. Using TTF files instead."
+            sudo mv MapleMono-CN/*.ttf /usr/share/fonts/opentype/maple-mono/
+          fi
+          
           # 更新字体缓存
           sudo fc-cache -f -v
-
+          
           # 检查安装的字体
           echo "Installed fonts:"
           fc-list | grep -i "maple"
+        shell: /usr/bin/bash -e {0}
+        env:
+          GITHUB_PAGES: true
 
       - name: Install dependencies
         run: |
