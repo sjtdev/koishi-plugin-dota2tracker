@@ -76,30 +76,33 @@ jobs:
 
       - name: Install Maple Mono fonts
         run: |
-          # 创建字体目录
-          sudo mkdir -p /usr/share/fonts/opentype/maple-mono
+          # 创建临时目录和字体目录
+          mkdir -p temp_fonts /usr/share/fonts/opentype/maple-mono
+          cd temp_fonts
           
           # 安装基础英文字体（OTF）
           wget -q https://github.com/subframe7536/maple-font/releases/download/v7.0-beta34/MapleMono-OTF.zip
-          unzip -q MapleMono-OTF.zip
+          unzip -q MapleMono-OTF.zip -d MapleMono-OTF
           
-          # 显示解压后的目录结构
           echo "Directory structure after unzipping MapleMono-OTF:"
-          ls -R
+          ls -R MapleMono-OTF
           
-          # 查找并移动所有 OTF 文件
-          find . -name "*.otf" -exec sudo mv {} /usr/share/fonts/opentype/maple-mono/ \;
+          # 移动所有 OTF 文件
+          sudo find MapleMono-OTF -name "*.otf" -exec mv {} /usr/share/fonts/opentype/maple-mono/ \;
           
           # 安装中文支持
           wget -q https://github.com/subframe7536/maple-font/releases/download/v7.0-beta34/MapleMono-CN.zip
-          unzip -q MapleMono-CN.zip
+          unzip -q MapleMono-CN.zip -d MapleMono-CN
           
-          # 显示解压后的目录结构
           echo "Directory structure after unzipping MapleMono-CN:"
-          ls -R
+          ls -R MapleMono-CN
           
-          # 查找并移动所有 TTF 文件（因为中文版是 TTF 格式）
-          find . -name "*.ttf" -exec sudo mv {} /usr/share/fonts/opentype/maple-mono/ \;
+          # 移动所有 TTF 文件
+          sudo find MapleMono-CN -name "*.ttf" -exec mv {} /usr/share/fonts/opentype/maple-mono/ \;
+          
+          # 返回原目录并删除临时目录
+          cd ..
+          rm -rf temp_fonts
           
           # 更新字体缓存
           sudo fc-cache -f -v
