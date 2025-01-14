@@ -74,31 +74,21 @@ jobs:
             xdg-utils \
             wget
 
-      - name: Install Maple Mono fonts
+      - name: Install MiSans fonts
         run: |
           # 创建临时目录和字体目录
-          mkdir -p temp_fonts /usr/share/fonts/opentype/maple-mono
+          mkdir -p temp_fonts /usr/share/fonts/opentype/misans
           cd temp_fonts
           
-          # 安装基础英文字体（OTF）
-          wget -q https://github.com/subframe7536/maple-font/releases/download/v7.0-beta34/MapleMono-OTF.zip
-          unzip -q MapleMono-OTF.zip -d MapleMono-OTF
+          # 下载并解压 MiSans
+          wget -q https://hyperos.mi.com/font-download/MiSans.zip
+          unzip -q MiSans.zip
           
-          echo "Directory structure after unzipping MapleMono-OTF:"
-          ls -R MapleMono-OTF
+          echo "Directory structure after unzipping MiSans:"
+          ls -R MiSans/otf
           
           # 移动所有 OTF 文件
-          sudo find MapleMono-OTF -name "*.otf" -exec mv {} /usr/share/fonts/opentype/maple-mono/ \;
-          
-          # 安装中文支持
-          wget -q https://github.com/subframe7536/maple-font/releases/download/v7.0-beta34/MapleMono-CN.zip
-          unzip -q MapleMono-CN.zip -d MapleMono-CN
-          
-          echo "Directory structure after unzipping MapleMono-CN:"
-          ls -R MapleMono-CN
-          
-          # 移动所有 TTF 文件
-          sudo find MapleMono-CN -name "*.ttf" -exec mv {} /usr/share/fonts/opentype/maple-mono/ \;
+          sudo find MiSans/otf -name "*.otf" -exec mv {} /usr/share/fonts/opentype/misans/ \;
           
           # 返回原目录并删除临时目录
           cd ..
@@ -109,7 +99,7 @@ jobs:
           
           # 检查安装的字体
           echo "Installed fonts:"
-          fc-list | grep -i "maple"
+          fc-list | grep -i "misans"
         shell: /usr/bin/bash -e {0}
         env:
           GITHUB_PAGES: true
