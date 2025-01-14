@@ -19,5 +19,4 @@ tsconfig.tsbuildinfo
 
 temp.*
 backup.ts
-docs.code-workspace
-generated
+**/generated/*.png
