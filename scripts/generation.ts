@@ -36,20 +36,27 @@ enum GraphqlLanguageEnum {
   });
 
   const localesDir = path.join(__dirname, "..", "src", "locales");
+  console.log("Locales directory:", localesDir);
+  console.log("Available locale files:", fs.readdirSync(localesDir));
+
   for (const locale of fs.readdirSync(localesDir)) {
-    const data = fs.readFileSync(path.join(localesDir, locale), "utf8");
+    const filePath = path.join(localesDir, locale);
+    console.log(`Loading locale file: ${filePath}`);
+    const data = fs.readFileSync(filePath, "utf8");
+    console.log(`Locale ${locale} content preview:`, data.substring(0, 200));
+
     const ext = path.extname(locale).slice(1).toLowerCase();
     const parsedData = ext === "yml" || ext === "yaml" ? yaml.load(data) : JSON.parse(data);
 
-    // 不需要再取 dota2tracker 下的内容，而是直接使用整个解析后的数据
-    i18next.addResourceBundle(
-      locale.split(".")[0], // 语言代码
-      "translation", // 使用默认命名空间
-      parsedData, // 整个解析后的数据
-      true, // deep merge
-      true // overwrite
-    );
+    console.log(`Parsed data for ${locale}:`, JSON.stringify(parsedData).substring(0, 200));
+
+    i18next.addResourceBundle(locale.split(".")[0], "translation", parsedData, true, true);
   }
+
+  // 添加调试信息检查 i18next 是否正确加载了资源
+  console.log("Available languages:", i18next.languages);
+  console.log("Current language:", i18next.language);
+  console.log("Test translation:", i18next.t("dota2tracker.template.rank", { lng: "zh-CN" }));
 
   const browser = await puppeteer.launch({
     headless: true,
@@ -63,7 +70,7 @@ enum GraphqlLanguageEnum {
         for (const template of fs.readdirSync(path.join(templatesPath, templateType))) {
           if (template.endsWith(".ejs") && ["match"].some((targets) => template.startsWith(targets))) {
             const templateFile = fs.readFileSync(path.join(templatesPath, templateType, template), "utf-8");
-            let data: object;
+            let data: object | undefined = undefined;
             if (templateType === "match") {
               const matchQuery = JSON.parse(fs.readFileSync(path.join(dataPath, `${templateType}.json`), "utf-8"));
               const constantsQuery = JSON.parse(fs.readFileSync(path.join(dataPath, `constants_${languageTag}.json`), "utf-8"));

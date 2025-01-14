@@ -2,7 +2,7 @@ name: Deploy VitePress site to Pages
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - 'src/docs/**'
       - '.github/workflows/deploy.yml'
@@ -81,7 +81,19 @@ jobs:
           npm install dotaconstants moment i18next js-yaml
           npm install @cordisjs/vitepress
           npm install
-      
+      - name: Copy locale files
+        run: |
+          echo "Checking source locale directory..."
+          ls -la src/locales/
+          
+          echo "Ensuring target directories exist..."
+          mkdir -p dist/locales/
+          
+          echo "Copying locale files..."
+          cp -r src/locales/* dist/locales/
+          
+          echo "Checking copied files..."
+          ls -la dist/locales/
       - name: Generate Preview Images
         run: |
           npx tsx scripts/generation.ts
