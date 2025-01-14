@@ -8,6 +8,9 @@ import moment from "moment";
 import i18next from "i18next";
 import yaml from "js-yaml";
 import puppeteer, { Browser } from "puppeteer";
+import http from "http";
+import https from "https";
+import url from "url";
 
 enum GraphqlLanguageEnum {
   "en-US" = "ENGLISH",
@@ -56,7 +59,7 @@ enum GraphqlLanguageEnum {
     for (const languageTag of Object.keys(GraphqlLanguageEnum)) {
       for (const templateType of fs.readdirSync(templatesPath)) {
         for (const template of fs.readdirSync(path.join(templatesPath, templateType))) {
-          if (template.endsWith(".ejs") && ["match", "player"].some((targets) => template.startsWith(targets))) {
+          if (template.endsWith(".ejs") && ["match", "player", "hero"].some((targets) => template.startsWith(targets))) {
             // const templateFile = fs.readFileSync(path.join(templatesPath, templateType, template), "utf-8");
             const templateFile = path.join(templatesPath, templateType, template);
             if (templateType === "match") {
@@ -77,6 +80,13 @@ enum GraphqlLanguageEnum {
               anonymousPlayerQuery.player.heroesPerformance = [];
               const anonymousData = utils.getFormattedPlayerData({ playerQuery: anonymousPlayerQuery });
               await renderImage({ data: anonymousData, languageTag, templateFile, template, browser, imageFileName: "player_1-anonymous" });
+            }
+            if (templateType === "hero") {
+              const heroIds = getRandomThree(Object.keys(dotaconstants.heroes));
+              for (let i = 0; i < heroIds.length; i++) {
+                const data = await utils.getFormattedHeroData(await queryHeroFromValve(Number(heroIds[i]), languageTag));
+                await renderImage({ data, languageTag, templateFile, template, browser, imageFileName: `${template.split(".")[0]}-${i}` });
+              }
             }
           }
         }
@@ -155,4 +165,42 @@ async function renderImage(params: { data: object; languageTag: string; template
   fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName ?? template.split(".")[0]}.png`), buffer);
   console.log(template, dimensions);
   await page.close();
+}
+async function queryHeroFromValve(heroId: number, languageTag = "zh-CN") {
+  enum language {
+    "zh-CN" = "schinese",
+    "en-US" = "english",
+  }
+  return JSON.parse(await httpGet(`https://www.dota2.com/datafeed/herodata?language=${language[languageTag]}&hero_id=${heroId}`)).result.data.heroes[0];
+}
+
+function httpGet(urlString: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const parsedUrl = url.parse(urlString);
+    const protocol = parsedUrl.protocol === "https:" ? https : http;
+
+    protocol
+      .get(urlString, (res) => {
+        let data = "";
+
+        res.on("data", (chunk) => {
+          data += chunk;
+        });
+
+        res.on("end", () => {
+          resolve(data);
+        });
+      })
+      .on("error", (err) => {
+        reject(err);
+      });
+  });
+}
+function getRandomThree<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, 3);
 }

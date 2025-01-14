@@ -4,13 +4,13 @@
 
 ### 对线评估 `match_1` `player_1`
 
-对线结果，由stratz分析比赛各玩家数据得出，此处共5种对线类型
+对线结果，由stratz分析比赛各玩家数据得出，此处共5+1种类型
 * ![stomp](/images/lane/stomp.png) 对线碾压  
 * ![victory](/images/lane/victory.png) 对线优势
 * ![tie](/images/lane/tie.png) 对线平手
 * ![fail](/images/lane/fail.png) 对线劣势
 * ![stomped](/images/lane/stomped.png) 对线被碾
-> 还有一种特殊类型：打野
+> 特殊类型：打野
 * ![jungle](/images/lane/jungle.png) 野区霸主
 
 ### 称号系统 `match_1` `match_2`

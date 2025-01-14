@@ -17,14 +17,14 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: "安装与使用",
+        text: "安装与配置",
         items: [
           { text: "安装插件", link: "/starter" },
           { text: "插件配置说明", link: "/configs" },
         ],
       },
       {
-        text: "其他",
+        text: "使用",
         items: [
           {
             text: "模板展示",
@@ -36,6 +36,11 @@ export default defineConfig({
             ],
           },
           { text: "展示区", link: "/previews" },
+        ],
+      },
+      {
+        text: "其他",
+        items: [
           { text: "更新日志", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
           { text: "鸣谢", link: "/thanks" },
         ],
