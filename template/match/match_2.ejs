@@ -307,7 +307,8 @@
 
             .player > .titles {
                 grid-row: 4;
-                grid-column: 3;
+                grid-column: 2/4;
+                margin-left: 4px;
                 /* text-shadow: 1px 1px 0 #333; 设置阴影颜色及偏移 */
             }
             .player > .titles > span {
@@ -563,7 +564,7 @@
                     <span class="rank">${`[${$t("dota2tracker.template.ranks."+player.rank.medal)}${player.rank.star||""}]`}</span>
                     <span class="name">${eh(player.steamAccount.name)}</span>
                 </div>
-                <p class="pick">${player.isRandom?$t("dota2tracker.template.random"):$t("dota2tracker.template.pick_order",(player.order == null ? "?" : player.order + 1))} ${$t("dota2tracker.template.position_"+player.position?.slice(-1))??''}</p>
+                <p class="pick">${player.isRandom?$t("dota2tracker.template.random"):$t("dota2tracker.template.pick_order", [player.order == null ? "?" : player.order + 1])} ${$t("dota2tracker.template.position_"+player.position?.slice(-1))??''}</p>
                 <p class="networth">
                     <span class="gold">${utils.formatNumber(player.networth)}</span>
                     (${(player.heroDamage / player.networth)?.toFixed(2)})

@@ -1,0 +1,4827 @@
+{
+  "player": {
+    "steamAccount": {
+      "avatar": "https://avatars.fastly.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg",
+      "name": "(ノ°口°)ノ（",
+      "seasonRank": null,
+      "seasonLeaderboardRank": null,
+      "id": 186736378,
+      "isAnonymous": false
+    },
+    "guildMember": {
+      "guild": {
+        "tag": "哈咕"
+      }
+    },
+    "matchCount": 4822,
+    "winCount": 2424,
+    "performance": {
+      "imp": -16
+    },
+    "heroesPerformance": [
+      {
+        "hero": {
+          "id": 98,
+          "shortName": "shredder"
+        },
+        "imp": -10,
+        "winCount": 4,
+        "matchCount": 7
+      },
+      {
+        "hero": {
+          "id": 99,
+          "shortName": "bristleback"
+        },
+        "imp": 5,
+        "winCount": 2,
+        "matchCount": 2
+      },
+      {
+        "hero": {
+          "id": 91,
+          "shortName": "wisp"
+        },
+        "imp": 32,
+        "winCount": 2,
+        "matchCount": 2
+      },
+      {
+        "hero": {
+          "id": 43,
+          "shortName": "death_prophet"
+        },
+        "imp": 16,
+        "winCount": 2,
+        "matchCount": 2
+      },
+      {
+        "hero": {
+          "id": 108,
+          "shortName": "abyssal_underlord"
+        },
+        "imp": -9,
+        "winCount": 1,
+        "matchCount": 1
+      },
+      {
+        "hero": {
+          "id": 96,
+          "shortName": "centaur"
+        },
+        "imp": 6,
+        "winCount": 1,
+        "matchCount": 1
+      },
+      {
+        "hero": {
+          "id": 86,
+          "shortName": "rubick"
+        },
+        "imp": 0,
+        "winCount": 1,
+        "matchCount": 1
+      },
+      {
+        "hero": {
+          "id": 78,
+          "shortName": "brewmaster"
+        },
+        "imp": -4,
+        "winCount": 1,
+        "matchCount": 2
+      },
+      {
+        "hero": {
+          "id": 69,
+          "shortName": "doom_bringer"
+        },
+        "imp": -18,
+        "winCount": 1,
+        "matchCount": 2
+      },
+      {
+        "hero": {
+          "id": 55,
+          "shortName": "dark_seer"
+        },
+        "imp": -9,
+        "winCount": 1,
+        "matchCount": 1
+      },
+      {
+        "hero": {
+          "id": 22,
+          "shortName": "zuus"
+        },
+        "imp": 24,
+        "winCount": 1,
+        "matchCount": 1
+      },
+      {
+        "hero": {
+          "id": 84,
+          "shortName": "ogre_magi"
+        },
+        "imp": -33,
+        "winCount": 0,
+        "matchCount": 1
+      },
+      {
+        "hero": {
+          "id": 70,
+          "shortName": "ursa"
+        },
+        "imp": -30,
+        "winCount": 0,
+        "matchCount": 1
+      },
+      {
+        "hero": {
+          "id": 58,
+          "shortName": "enchantress"
+        },
+        "imp": -28,
+        "winCount": 0,
+        "matchCount": 1
+      }
+    ],
+    "matches": [
+      {
+        "id": 8127482090,
+        "rank": 60,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736776276,
+        "parsedDateTime": 1736779219,
+        "durationSeconds": 2363,
+        "didRadiantWin": false,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "TIE",
+        "bottomLaneOutcome": "RADIANT_VICTORY",
+        "radiantKills": [0, 0, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0, 2, 0, 0, 1, 0, 2, 0, 1, 0, 0, 0, 4, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 4, 0, 1, 0, 1],
+        "direKills": [1, 0, 0, 0, 1, 1, 1, 1, 2, 1, 0, 2, 2, 2, 0, 0, 3, 2, 1, 2, 1, 3, 4, 1, 1, 1, 2, 4, 0, 1, 1, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 179852531
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 6,
+            "deaths": 4,
+            "assists": 7,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -4,
+            "hero": {
+              "id": 1,
+              "shortName": "antimage"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 14,
+            "assists": 17,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -24,
+            "hero": {
+              "id": 53,
+              "shortName": "furion"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 9,
+            "deaths": 10,
+            "assists": 11,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -20,
+            "hero": {
+              "id": 98,
+              "shortName": "shredder"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 191575419
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 7,
+            "deaths": 12,
+            "assists": 9,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -26,
+            "hero": {
+              "id": 36,
+              "shortName": "necrolyte"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 147945777
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 1,
+            "deaths": 9,
+            "assists": 13,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": 4,
+            "hero": {
+              "id": 64,
+              "shortName": "jakiro"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 338821223
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 7,
+            "deaths": 5,
+            "assists": 14,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -4,
+            "hero": {
+              "id": 60,
+              "shortName": "night_stalker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129115922
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 10,
+            "deaths": 7,
+            "assists": 19,
+            "position": "POSITION_5",
+            "award": "MVP",
+            "imp": 20,
+            "hero": {
+              "id": 31,
+              "shortName": "lich"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 161012358
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 11,
+            "deaths": 5,
+            "assists": 12,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -3,
+            "hero": {
+              "id": 76,
+              "shortName": "obsidian_destroyer"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 296683983
+            },
+            "isRadiant": false,
+            "lane": "JUNGLE",
+            "kills": 13,
+            "deaths": 7,
+            "assists": 19,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": 11,
+            "hero": {
+              "id": 88,
+              "shortName": "nyx_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 138037927
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 8,
+            "deaths": 3,
+            "assists": 14,
+            "position": "POSITION_1",
+            "award": "TOP_CORE",
+            "imp": 17,
+            "hero": {
+              "id": 8,
+              "shortName": "juggernaut"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8125984191,
+        "rank": 54,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736689411,
+        "parsedDateTime": 1736692532,
+        "durationSeconds": 2546,
+        "didRadiantWin": true,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "DIRE_VICTORY",
+        "bottomLaneOutcome": "TIE",
+        "radiantKills": [0, 0, 1, 1, 1, 0, 0, 2, 0, 1, 3, 1, 0, 3, 1, 0, 0, 1, 3, 1, 4, 0, 0, 4, 1, 2, 0, 0, 1, 0, 2, 1, 0, 0, 1, 4, 0, 1, 1, 3, 0, 2, 3, 0],
+        "direKills": [0, 0, 1, 3, 0, 1, 1, 2, 1, 2, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 4, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 3, 1, 0, 0, 2, 3, 0, 0, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 8,
+            "deaths": 9,
+            "assists": 24,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": 1,
+            "hero": {
+              "id": 53,
+              "shortName": "furion"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 12,
+            "deaths": 7,
+            "assists": 20,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -10,
+            "hero": {
+              "id": 98,
+              "shortName": "shredder"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 183463807
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 6,
+            "assists": 24,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": 16,
+            "hero": {
+              "id": 100,
+              "shortName": "tusk"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 174441871
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 8,
+            "deaths": 4,
+            "assists": 30,
+            "position": "POSITION_2",
+            "award": "TOP_CORE",
+            "imp": 14,
+            "hero": {
+              "id": 22,
+              "shortName": "zuus"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 174343275
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 16,
+            "deaths": 5,
+            "assists": 14,
+            "position": "POSITION_1",
+            "award": "MVP",
+            "imp": 19,
+            "hero": {
+              "id": 8,
+              "shortName": "juggernaut"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 260174309
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 4,
+            "deaths": 11,
+            "assists": 10,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -28,
+            "hero": {
+              "id": 62,
+              "shortName": "bounty_hunter"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 136377250
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 6,
+            "deaths": 7,
+            "assists": 7,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -24,
+            "hero": {
+              "id": 44,
+              "shortName": "phantom_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 135406917
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 6,
+            "deaths": 8,
+            "assists": 13,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -13,
+            "hero": {
+              "id": 31,
+              "shortName": "lich"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 148702418
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 4,
+            "deaths": 9,
+            "assists": 14,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -14,
+            "hero": {
+              "id": 84,
+              "shortName": "ogre_magi"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 263078644
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 11,
+            "deaths": 14,
+            "assists": 5,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -30,
+            "hero": {
+              "id": 2,
+              "shortName": "axe"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8125907304,
+        "rank": 60,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736687000,
+        "parsedDateTime": 1736689552,
+        "durationSeconds": 2065,
+        "didRadiantWin": true,
+        "topLaneOutcome": "DIRE_VICTORY",
+        "midLaneOutcome": "TIE",
+        "bottomLaneOutcome": "TIE",
+        "radiantKills": [0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 1, 5, 1, 0, 2, 0, 3, 2, 2, 0, 3, 0, 1, 0, 4, 0, 0, 0, 1, 3, 2, 0],
+        "direKills": [0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 1, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 263078644
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 4,
+            "deaths": 2,
+            "assists": 19,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": 18,
+            "hero": {
+              "id": 41,
+              "shortName": "faceless_void"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 447996564
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 11,
+            "deaths": 3,
+            "assists": 20,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": 27,
+            "hero": {
+              "id": 37,
+              "shortName": "warlock"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 109818668
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 10,
+            "deaths": 2,
+            "assists": 21,
+            "position": "POSITION_2",
+            "award": "MVP",
+            "imp": 34,
+            "hero": {
+              "id": 60,
+              "shortName": "night_stalker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 341632095
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 2,
+            "deaths": 3,
+            "assists": 18,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": 20,
+            "hero": {
+              "id": 3,
+              "shortName": "bane"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 194658012
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 9,
+            "deaths": 0,
+            "assists": 11,
+            "position": "POSITION_1",
+            "award": "TOP_CORE",
+            "imp": 33,
+            "hero": {
+              "id": 8,
+              "shortName": "juggernaut"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 1076022249
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 3,
+            "deaths": 10,
+            "assists": 4,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -30,
+            "hero": {
+              "id": 30,
+              "shortName": "witch_doctor"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 1014330041
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 4,
+            "deaths": 5,
+            "assists": 1,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -28,
+            "hero": {
+              "id": 17,
+              "shortName": "storm_spirit"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 107362883
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 0,
+            "deaths": 6,
+            "assists": 3,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -30,
+            "hero": {
+              "id": 72,
+              "shortName": "gyrocopter"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 0,
+            "deaths": 9,
+            "assists": 2,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -43,
+            "hero": {
+              "id": 129,
+              "shortName": "mars"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 2,
+            "deaths": 6,
+            "assists": 2,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -28,
+            "hero": {
+              "id": 58,
+              "shortName": "enchantress"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8125832035,
+        "rank": 62,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736684486,
+        "parsedDateTime": 1736687251,
+        "durationSeconds": 1981,
+        "didRadiantWin": true,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "TIE",
+        "bottomLaneOutcome": "TIE",
+        "radiantKills": [0, 0, 1, 0, 0, 0, 1, 0, 2, 1, 2, 2, 0, 0, 1, 0, 0, 1, 2, 0, 1, 3, 1, 1, 0, 0, 1, 4, 0, 1, 5, 3, 1, 1, 0],
+        "direKills": [0, 0, 0, 2, 0, 0, 2, 0, 0, 1, 2, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2, 0, 1, 0, 0, 0, 1, 0, 2, 1],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 174619631
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 3,
+            "deaths": 5,
+            "assists": 21,
+            "position": "POSITION_5",
+            "award": "MVP",
+            "imp": 26,
+            "hero": {
+              "id": 5,
+              "shortName": "crystal_maiden"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 199804112
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 10,
+            "deaths": 3,
+            "assists": 10,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -11,
+            "hero": {
+              "id": 63,
+              "shortName": "weaver"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 145707355
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 7,
+            "deaths": 2,
+            "assists": 17,
+            "position": "POSITION_2",
+            "award": "TOP_CORE",
+            "imp": -6,
+            "hero": {
+              "id": 43,
+              "shortName": "death_prophet"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 8,
+            "deaths": 6,
+            "assists": 11,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -16,
+            "hero": {
+              "id": 88,
+              "shortName": "nyx_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 7,
+            "deaths": 3,
+            "assists": 19,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -9,
+            "hero": {
+              "id": 55,
+              "shortName": "dark_seer"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 142713033
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 8,
+            "deaths": 3,
+            "assists": 4,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -10,
+            "hero": {
+              "id": 25,
+              "shortName": "lina"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 294316774
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 5,
+            "deaths": 8,
+            "assists": 5,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -39,
+            "hero": {
+              "id": 44,
+              "shortName": "phantom_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 852835906
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 2,
+            "deaths": 11,
+            "assists": 8,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -36,
+            "hero": {
+              "id": 108,
+              "shortName": "abyssal_underlord"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 138227144
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 1,
+            "deaths": 9,
+            "assists": 10,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -22,
+            "hero": {
+              "id": 53,
+              "shortName": "furion"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129294940
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 4,
+            "assists": 10,
+            "position": "POSITION_4",
+            "award": "TOP_SUPPORT",
+            "imp": 6,
+            "hero": {
+              "id": 97,
+              "shortName": "magnataur"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8124250871,
+        "rank": 63,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736606395,
+        "parsedDateTime": 1736609020,
+        "durationSeconds": 2059,
+        "didRadiantWin": true,
+        "topLaneOutcome": "RADIANT_VICTORY",
+        "midLaneOutcome": "RADIANT_VICTORY",
+        "bottomLaneOutcome": "DIRE_VICTORY",
+        "radiantKills": [1, 0, 0, 0, 0, 0, 0, 2, 3, 0, 1, 1, 2, 4, 1, 0, 1, 0, 1, 0, 1, 2, 1, 1, 2, 1, 1, 0, 3, 0, 3, 0, 4, 1, 2, 2],
+        "direKills": [0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 2, 3, 0, 0, 3, 0, 3, 0, 0, 0, 0, 2],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 10,
+            "deaths": 5,
+            "assists": 6,
+            "position": "POSITION_4",
+            "award": "TOP_SUPPORT",
+            "imp": 0,
+            "hero": {
+              "id": 88,
+              "shortName": "nyx_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 6,
+            "deaths": 4,
+            "assists": 22,
+            "position": "POSITION_3",
+            "award": "TOP_CORE",
+            "imp": 16,
+            "hero": {
+              "id": 43,
+              "shortName": "death_prophet"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 136261453
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 2,
+            "deaths": 7,
+            "assists": 16,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -2,
+            "hero": {
+              "id": 57,
+              "shortName": "omniknight"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 111406338
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 5,
+            "deaths": 5,
+            "assists": 15,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -14,
+            "hero": {
+              "id": 72,
+              "shortName": "gyrocopter"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 436265316
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 18,
+            "deaths": 2,
+            "assists": 12,
+            "position": "POSITION_2",
+            "award": "MVP",
+            "imp": 23,
+            "hero": {
+              "id": 104,
+              "shortName": "legion_commander"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 288831632
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 1,
+            "deaths": 7,
+            "assists": 3,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -29,
+            "hero": {
+              "id": 93,
+              "shortName": "slark"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 388190614
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 2,
+            "deaths": 6,
+            "assists": 12,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -15,
+            "hero": {
+              "id": 105,
+              "shortName": "techies"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 989954124
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 12,
+            "assists": 18,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -8,
+            "hero": {
+              "id": 20,
+              "shortName": "vengefulspirit"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 142952845
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 8,
+            "deaths": 10,
+            "assists": 4,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -37,
+            "hero": {
+              "id": 76,
+              "shortName": "obsidian_destroyer"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 158597896
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 7,
+            "deaths": 6,
+            "assists": 7,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -21,
+            "hero": {
+              "id": 39,
+              "shortName": "queenofpain"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8124167594,
+        "rank": 60,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736603724,
+        "parsedDateTime": 1736606702,
+        "durationSeconds": 2302,
+        "didRadiantWin": true,
+        "topLaneOutcome": "RADIANT_STOMP",
+        "midLaneOutcome": "TIE",
+        "bottomLaneOutcome": "DIRE_VICTORY",
+        "radiantKills": [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 1, 0, 1, 3, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 4, 1, 0, 1, 0, 0, 4, 0, 1, 2, 2, 0],
+        "direKills": [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 1, 0, 0, 3, 0, 0, 1, 1, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 253480525
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 1,
+            "deaths": 5,
+            "assists": 17,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": 16,
+            "hero": {
+              "id": 75,
+              "shortName": "silencer"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 388190614
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 5,
+            "deaths": 3,
+            "assists": 19,
+            "position": "POSITION_4",
+            "award": "MVP",
+            "imp": 28,
+            "hero": {
+              "id": 86,
+              "shortName": "rubick"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 142952845
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 10,
+            "deaths": 0,
+            "assists": 12,
+            "position": "POSITION_2",
+            "award": "TOP_CORE",
+            "imp": 27,
+            "hero": {
+              "id": 19,
+              "shortName": "tiny"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 989954124
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 10,
+            "deaths": 7,
+            "assists": 10,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": 5,
+            "hero": {
+              "id": 20,
+              "shortName": "vengefulspirit"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 388960670
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 6,
+            "deaths": 2,
+            "assists": 5,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -17,
+            "hero": {
+              "id": 1,
+              "shortName": "antimage"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 146263247
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 6,
+            "deaths": 8,
+            "assists": 4,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -30,
+            "hero": {
+              "id": 70,
+              "shortName": "ursa"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 4,
+            "deaths": 6,
+            "assists": 5,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -23,
+            "hero": {
+              "id": 53,
+              "shortName": "furion"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 6,
+            "assists": 4,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -40,
+            "hero": {
+              "id": 98,
+              "shortName": "shredder"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 140289758
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 1,
+            "deaths": 4,
+            "assists": 6,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -31,
+            "hero": {
+              "id": 35,
+              "shortName": "sniper"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 142729214
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 3,
+            "deaths": 9,
+            "assists": 11,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -31,
+            "hero": {
+              "id": 22,
+              "shortName": "zuus"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8124075194,
+        "rank": 53,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736600650,
+        "parsedDateTime": 1736603603,
+        "durationSeconds": 2322,
+        "didRadiantWin": true,
+        "topLaneOutcome": "RADIANT_VICTORY",
+        "midLaneOutcome": "RADIANT_STOMP",
+        "bottomLaneOutcome": "RADIANT_VICTORY",
+        "radiantKills": [0, 0, 0, 1, 0, 0, 2, 1, 2, 1, 2, 1, 3, 2, 3, 2, 1, 1, 2, 1, 2, 0, 4, 1, 0, 0, 2, 0, 0, 4, 0, 0, 2, 3, 2, 3, 0, 2, 3, 1],
+        "direKills": [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 5, 0, 1, 0, 1, 1, 3, 3, 0, 0, 0, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 11,
+            "deaths": 5,
+            "assists": 24,
+            "position": "POSITION_4",
+            "award": "MVP",
+            "imp": 34,
+            "hero": {
+              "id": 45,
+              "shortName": "pugna"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 12,
+            "deaths": 7,
+            "assists": 20,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -7,
+            "hero": {
+              "id": 69,
+              "shortName": "doom_bringer"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 387162001
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 13,
+            "deaths": 2,
+            "assists": 23,
+            "position": "POSITION_1",
+            "award": "TOP_CORE",
+            "imp": 18,
+            "hero": {
+              "id": 41,
+              "shortName": "faceless_void"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 90186333
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 4,
+            "assists": 34,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": 18,
+            "hero": {
+              "id": 22,
+              "shortName": "zuus"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 178868351
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 14,
+            "deaths": 6,
+            "assists": 17,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": 4,
+            "hero": {
+              "id": 7,
+              "shortName": "earthshaker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 1009348702
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 1,
+            "deaths": 7,
+            "assists": 10,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -25,
+            "hero": {
+              "id": 29,
+              "shortName": "tidehunter"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 131403972
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 8,
+            "deaths": 14,
+            "assists": 12,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -15,
+            "hero": {
+              "id": 27,
+              "shortName": "shadow_shaman"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 126995369
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 10,
+            "deaths": 5,
+            "assists": 5,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -9,
+            "hero": {
+              "id": 63,
+              "shortName": "weaver"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 340699161
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 3,
+            "deaths": 14,
+            "assists": 11,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -36,
+            "hero": {
+              "id": 15,
+              "shortName": "razor"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 136526272
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 2,
+            "deaths": 14,
+            "assists": 12,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -32,
+            "hero": {
+              "id": 74,
+              "shortName": "invoker"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8123978723,
+        "rank": 53,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736597100,
+        "parsedDateTime": 1736600682,
+        "durationSeconds": 3007,
+        "didRadiantWin": true,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "RADIANT_VICTORY",
+        "bottomLaneOutcome": "TIE",
+        "radiantKills": [0, 0, 1, 1, 3, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 3, 2, 1, 0, 3, 0, 1, 3, 2, 3, 1, 1, 2, 0, 4, 0, 0, 2, 1, 0, 0, 0, 1, 1, 0, 0, 2, 2, 2, 1, 0, 0, 0, 0, 1, 4, 0],
+        "direKills": [0, 0, 0, 0, 1, 1, 0, 2, 1, 0, 1, 2, 2, 1, 0, 2, 0, 3, 0, 2, 1, 1, 0, 0, 2, 1, 0, 1, 0, 0, 0, 0, 4, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 3, 2, 0, 1, 0, 0, 1, 0, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 13,
+            "deaths": 10,
+            "assists": 13,
+            "position": "POSITION_3",
+            "award": null,
+            "imp": null,
+            "hero": {
+              "id": 2,
+              "shortName": "axe"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 7,
+            "deaths": 7,
+            "assists": 31,
+            "position": "POSITION_4",
+            "award": null,
+            "imp": null,
+            "hero": {
+              "id": 86,
+              "shortName": "rubick"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 139417698
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 9,
+            "deaths": 5,
+            "assists": 23,
+            "position": "POSITION_2",
+            "award": null,
+            "imp": null,
+            "hero": {
+              "id": 35,
+              "shortName": "sniper"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 77786689
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 14,
+            "deaths": 6,
+            "assists": 16,
+            "position": "POSITION_1",
+            "award": null,
+            "imp": null,
+            "hero": {
+              "id": 145,
+              "shortName": "kez"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 378239317
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 12,
+            "deaths": 9,
+            "assists": 25,
+            "position": "POSITION_5",
+            "award": null,
+            "imp": null,
+            "hero": {
+              "id": 22,
+              "shortName": "zuus"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 325357335
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 5,
+            "deaths": 9,
+            "assists": 18,
+            "position": "POSITION_3",
+            "award": null,
+            "imp": null,
+            "hero": {
+              "id": 135,
+              "shortName": "dawnbreaker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 142855961
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 8,
+            "deaths": 14,
+            "assists": 15,
+            "position": "POSITION_4",
+            "award": null,
+            "imp": null,
+            "hero": {
+              "id": 71,
+              "shortName": "spirit_breaker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 246378279
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 11,
+            "deaths": 7,
+            "assists": 13,
+            "position": "POSITION_1",
+            "award": null,
+            "imp": null,
+            "hero": {
+              "id": 114,
+              "shortName": "monkey_king"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 255987239
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 6,
+            "deaths": 12,
+            "assists": 13,
+            "position": "POSITION_2",
+            "award": null,
+            "imp": null,
+            "hero": {
+              "id": 13,
+              "shortName": "puck"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 217082402
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 7,
+            "deaths": 13,
+            "assists": 14,
+            "position": "POSITION_5",
+            "award": null,
+            "imp": null,
+            "hero": {
+              "id": 26,
+              "shortName": "lion"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8122546280,
+        "rank": 61,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736519771,
+        "parsedDateTime": 1736522642,
+        "durationSeconds": 2335,
+        "didRadiantWin": true,
+        "topLaneOutcome": "DIRE_VICTORY",
+        "midLaneOutcome": "DIRE_VICTORY",
+        "bottomLaneOutcome": "RADIANT_VICTORY",
+        "radiantKills": [0, 0, 2, 0, 0, 0, 1, 0, 0, 2, 1, 3, 0, 5, 2, 0, 1, 3, 2, 1, 2, 0, 2, 1, 0, 1, 3, 1, 0, 0, 0, 2, 0, 0, 2, 0, 3, 3, 0, 2],
+        "direKills": [0, 1, 1, 1, 2, 1, 0, 1, 1, 1, 1, 1, 2, 2, 1, 1, 0, 2, 0, 2, 0, 0, 1, 3, 1, 0, 0, 3, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 331938126
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 10,
+            "deaths": 3,
+            "assists": 12,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -17,
+            "hero": {
+              "id": 106,
+              "shortName": "ember_spirit"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 136569009
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 6,
+            "deaths": 12,
+            "assists": 19,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -14,
+            "hero": {
+              "id": 62,
+              "shortName": "bounty_hunter"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 441412793
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 18,
+            "deaths": 5,
+            "assists": 18,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": 21,
+            "hero": {
+              "id": 93,
+              "shortName": "slark"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 150038613
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 3,
+            "deaths": 7,
+            "assists": 33,
+            "position": "POSITION_5",
+            "award": "MVP",
+            "imp": 39,
+            "hero": {
+              "id": 31,
+              "shortName": "lich"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 1120089012
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 8,
+            "deaths": 5,
+            "assists": 23,
+            "position": "POSITION_3",
+            "award": "TOP_CORE",
+            "imp": 28,
+            "hero": {
+              "id": 135,
+              "shortName": "dawnbreaker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 172185122
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 8,
+            "deaths": 8,
+            "assists": 6,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": 2,
+            "hero": {
+              "id": 25,
+              "shortName": "lina"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 139598397
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 9,
+            "assists": 11,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -36,
+            "hero": {
+              "id": 71,
+              "shortName": "spirit_breaker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 166835452
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 6,
+            "assists": 15,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": 0,
+            "hero": {
+              "id": 84,
+              "shortName": "ogre_magi"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 7,
+            "deaths": 13,
+            "assists": 7,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -18,
+            "hero": {
+              "id": 88,
+              "shortName": "nyx_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 10,
+            "deaths": 9,
+            "assists": 6,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -30,
+            "hero": {
+              "id": 70,
+              "shortName": "ursa"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8122428444,
+        "rank": 54,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736515481,
+        "parsedDateTime": 1736519980,
+        "durationSeconds": 3909,
+        "didRadiantWin": true,
+        "topLaneOutcome": "RADIANT_STOMP",
+        "midLaneOutcome": "TIE",
+        "bottomLaneOutcome": "RADIANT_VICTORY",
+        "radiantKills": [0, 1, 0, 0, 1, 1, 1, 3, 1, 1, 4, 0, 2, 1, 2, 0, 1, 1, 4, 1, 1, 0, 5, 0, 0, 0, 0, 0, 4, 2, 0, 2, 2, 1, 0, 0, 0, 0, 3, 1, 0, 2, 0, 0, 0, 3, 1, 0, 0, 0, 3, 1, 0, 0, 3, 2, 1, 0, 0, 0, 1, 1, 1, 1, 1, 5, 0],
+        "direKills": [0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 1, 0, 0, 1, 1, 0, 0, 2, 2, 1, 0, 0, 3, 1, 0, 2, 0, 0, 1, 0, 1, 4, 0, 3, 1, 1, 2, 0, 0, 1, 1, 2, 1, 0, 0, 3, 0, 0, 0, 1, 1, 2, 3, 1, 1, 3, 0, 0, 0, 0, 2, 1, 0, 1, 0, 3, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 163501017
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 5,
+            "deaths": 14,
+            "assists": 33,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": 22,
+            "hero": {
+              "id": 37,
+              "shortName": "warlock"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 163547709
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 17,
+            "deaths": 11,
+            "assists": 29,
+            "position": "POSITION_2",
+            "award": "TOP_CORE",
+            "imp": 16,
+            "hero": {
+              "id": 62,
+              "shortName": "bounty_hunter"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 163690129
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 13,
+            "deaths": 8,
+            "assists": 23,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": 0,
+            "hero": {
+              "id": 114,
+              "shortName": "monkey_king"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 9,
+            "deaths": 15,
+            "assists": 37,
+            "position": "POSITION_4",
+            "award": "MVP",
+            "imp": 35,
+            "hero": {
+              "id": 45,
+              "shortName": "pugna"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 28,
+            "deaths": 10,
+            "assists": 15,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": 3,
+            "hero": {
+              "id": 98,
+              "shortName": "shredder"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 317999860
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 2,
+            "deaths": 14,
+            "assists": 27,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -25,
+            "hero": {
+              "id": 86,
+              "shortName": "rubick"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 137091722
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 13,
+            "assists": 31,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -14,
+            "hero": {
+              "id": 29,
+              "shortName": "tidehunter"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 328132625
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 2,
+            "deaths": 21,
+            "assists": 30,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -12,
+            "hero": {
+              "id": 85,
+              "shortName": "undying"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 425192071
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 30,
+            "deaths": 9,
+            "assists": 16,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": 0,
+            "hero": {
+              "id": 25,
+              "shortName": "lina"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 205095478
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 19,
+            "deaths": 15,
+            "assists": 26,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -11,
+            "hero": {
+              "id": 67,
+              "shortName": "spectre"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8122371018,
+        "rank": 63,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736513221,
+        "parsedDateTime": 1736515687,
+        "durationSeconds": 1881,
+        "didRadiantWin": true,
+        "topLaneOutcome": "DIRE_VICTORY",
+        "midLaneOutcome": "RADIANT_VICTORY",
+        "bottomLaneOutcome": "RADIANT_STOMP",
+        "radiantKills": [0, 0, 3, 1, 2, 1, 1, 1, 1, 1, 1, 0, 0, 3, 1, 1, 2, 2, 1, 0, 1, 1, 2, 3, 1, 1, 2, 3, 1, 3, 2, 0, 1],
+        "direKills": [0, 0, 1, 0, 0, 0, 2, 0, 0, 1, 1, 0, 0, 2, 0, 1, 1, 2, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0, 0, 0, 1],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 97061672
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 5,
+            "deaths": 5,
+            "assists": 21,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -30,
+            "hero": {
+              "id": 67,
+              "shortName": "spectre"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 139618638
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 8,
+            "deaths": 1,
+            "assists": 14,
+            "position": "POSITION_2",
+            "award": "TOP_CORE",
+            "imp": 24,
+            "hero": {
+              "id": 36,
+              "shortName": "necrolyte"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 139994144
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 24,
+            "deaths": 1,
+            "assists": 15,
+            "position": "POSITION_1",
+            "award": "MVP",
+            "imp": 60,
+            "hero": {
+              "id": 112,
+              "shortName": "winter_wyvern"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 380886755
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 1,
+            "deaths": 4,
+            "assists": 19,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": 9,
+            "hero": {
+              "id": 71,
+              "shortName": "spirit_breaker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 235199214
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 5,
+            "deaths": 5,
+            "assists": 33,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": 39,
+            "hero": {
+              "id": 100,
+              "shortName": "tusk"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 212697546
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 1,
+            "deaths": 10,
+            "assists": 4,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -41,
+            "hero": {
+              "id": 10,
+              "shortName": "morphling"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 164163987
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 0,
+            "deaths": 10,
+            "assists": 9,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -18,
+            "hero": {
+              "id": 84,
+              "shortName": "ogre_magi"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 145904355
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 8,
+            "deaths": 2,
+            "assists": 2,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": 10,
+            "hero": {
+              "id": 8,
+              "shortName": "juggernaut"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 12,
+            "assists": 8,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -38,
+            "hero": {
+              "id": 88,
+              "shortName": "nyx_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 2,
+            "deaths": 9,
+            "assists": 5,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -46,
+            "hero": {
+              "id": 78,
+              "shortName": "brewmaster"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8121049628,
+        "rank": 60,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736431456,
+        "parsedDateTime": 1736434219,
+        "durationSeconds": 2128,
+        "didRadiantWin": true,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "TIE",
+        "bottomLaneOutcome": "DIRE_VICTORY",
+        "radiantKills": [0, 0, 1, 0, 1, 1, 1, 4, 0, 1, 0, 0, 2, 0, 0, 1, 0, 0, 4, 1, 0, 1, 1, 4, 0, 1, 0, 2, 0, 1, 2, 1, 3, 0, 0, 4, 2],
+        "direKills": [0, 1, 1, 0, 0, 1, 0, 2, 1, 2, 3, 0, 3, 0, 0, 0, 0, 0, 1, 2, 1, 4, 1, 0, 0, 2, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 177782669
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 1,
+            "deaths": 10,
+            "assists": 24,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": 4,
+            "hero": {
+              "id": 84,
+              "shortName": "ogre_magi"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 303214002
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 12,
+            "deaths": 6,
+            "assists": 11,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": 2,
+            "hero": {
+              "id": 44,
+              "shortName": "phantom_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 9,
+            "deaths": 3,
+            "assists": 14,
+            "position": "POSITION_3",
+            "award": "MVP",
+            "imp": 26,
+            "hero": {
+              "id": 99,
+              "shortName": "bristleback"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 6,
+            "assists": 18,
+            "position": "POSITION_4",
+            "award": "TOP_SUPPORT",
+            "imp": 7,
+            "hero": {
+              "id": 86,
+              "shortName": "rubick"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 111468018
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 13,
+            "deaths": 3,
+            "assists": 7,
+            "position": "POSITION_2",
+            "award": "TOP_CORE",
+            "imp": 16,
+            "hero": {
+              "id": 25,
+              "shortName": "lina"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 123759080
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 11,
+            "assists": 8,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -32,
+            "hero": {
+              "id": 51,
+              "shortName": "rattletrap"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 361228658
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 11,
+            "deaths": 8,
+            "assists": 12,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": 5,
+            "hero": {
+              "id": 135,
+              "shortName": "dawnbreaker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 149606797
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 6,
+            "deaths": 6,
+            "assists": 10,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -11,
+            "hero": {
+              "id": 35,
+              "shortName": "sniper"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 257887549
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 1,
+            "deaths": 5,
+            "assists": 8,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -23,
+            "hero": {
+              "id": 6,
+              "shortName": "drow_ranger"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 142392746
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 6,
+            "deaths": 9,
+            "assists": 15,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -5,
+            "hero": {
+              "id": 45,
+              "shortName": "pugna"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8114870988,
+        "rank": 62,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736084824,
+        "parsedDateTime": 1736088174,
+        "durationSeconds": 2587,
+        "didRadiantWin": false,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "DIRE_VICTORY",
+        "bottomLaneOutcome": "TIE",
+        "radiantKills": [0, 0, 0, 0, 0, 0, 0, 3, 1, 0, 2, 3, 3, 1, 0, 4, 2, 0, 5, 1, 0, 0, 1, 1, 0, 3, 0, 3, 1, 1, 0, 3, 0, 1, 1, 0, 1, 0, 0, 0, 3, 0, 0, 0, 0],
+        "direKills": [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 3, 1, 3, 2, 0, 1, 0, 0, 1, 0, 0, 0, 1, 3, 0, 3, 0, 1, 0, 0, 1, 5, 0, 1, 3, 0, 0, 0, 2, 1, 2, 2, 0, 5, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 34172221
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 16,
+            "deaths": 6,
+            "assists": 17,
+            "position": "POSITION_3",
+            "award": "MVP",
+            "imp": 26,
+            "hero": {
+              "id": 2,
+              "shortName": "axe"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 151941505
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 5,
+            "deaths": 11,
+            "assists": 23,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": 25,
+            "hero": {
+              "id": 31,
+              "shortName": "lich"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 139056270
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 4,
+            "deaths": 11,
+            "assists": 23,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -14,
+            "hero": {
+              "id": 86,
+              "shortName": "rubick"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 179134804
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 8,
+            "deaths": 8,
+            "assists": 14,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -1,
+            "hero": {
+              "id": 67,
+              "shortName": "spectre"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129849870
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 11,
+            "deaths": 7,
+            "assists": 15,
+            "position": "POSITION_2",
+            "award": "TOP_CORE",
+            "imp": 2,
+            "hero": {
+              "id": 15,
+              "shortName": "razor"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 12,
+            "deaths": 10,
+            "assists": 14,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -7,
+            "hero": {
+              "id": 88,
+              "shortName": "nyx_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 11,
+            "deaths": 9,
+            "assists": 16,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -15,
+            "hero": {
+              "id": 99,
+              "shortName": "bristleback"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 338821223
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 6,
+            "deaths": 5,
+            "assists": 19,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -4,
+            "hero": {
+              "id": 74,
+              "shortName": "invoker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 344428414
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 5,
+            "deaths": 13,
+            "assists": 14,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -34,
+            "hero": {
+              "id": 101,
+              "shortName": "skywrath_mage"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 191471064
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 9,
+            "deaths": 7,
+            "assists": 10,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -20,
+            "hero": {
+              "id": 44,
+              "shortName": "phantom_assassin"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8114781528,
+        "rank": 53,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736081821,
+        "parsedDateTime": 1736084883,
+        "durationSeconds": 2529,
+        "didRadiantWin": true,
+        "topLaneOutcome": "RADIANT_VICTORY",
+        "midLaneOutcome": "DIRE_VICTORY",
+        "bottomLaneOutcome": "DIRE_VICTORY",
+        "radiantKills": [0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 2, 2, 1, 3, 0, 1, 0, 2, 3, 0, 0, 1, 0, 1, 0, 0, 0, 0, 3, 0, 3, 1, 2, 2, 0, 4, 0, 0, 0, 0, 0, 0, 4, 0],
+        "direKills": [0, 0, 0, 0, 1, 1, 0, 1, 0, 2, 1, 0, 1, 2, 0, 1, 0, 2, 0, 0, 2, 1, 0, 1, 0, 0, 3, 0, 2, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 10,
+            "deaths": 7,
+            "assists": 15,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -25,
+            "hero": {
+              "id": 104,
+              "shortName": "legion_commander"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 2,
+            "deaths": 3,
+            "assists": 24,
+            "position": "POSITION_4",
+            "award": "TOP_SUPPORT",
+            "imp": 9,
+            "hero": {
+              "id": 91,
+              "shortName": "wisp"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 164078456
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 5,
+            "deaths": 6,
+            "assists": 29,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -5,
+            "hero": {
+              "id": 111,
+              "shortName": "oracle"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 1687572434
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 11,
+            "deaths": 3,
+            "assists": 19,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -7,
+            "hero": {
+              "id": 60,
+              "shortName": "night_stalker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 459310156
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 10,
+            "deaths": 6,
+            "assists": 13,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -38,
+            "hero": {
+              "id": 8,
+              "shortName": "juggernaut"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 1715377540
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 13,
+            "deaths": 3,
+            "assists": 8,
+            "position": "POSITION_2",
+            "award": "TOP_CORE",
+            "imp": 13,
+            "hero": {
+              "id": 15,
+              "shortName": "razor"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 166269342
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 4,
+            "deaths": 8,
+            "assists": 13,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -4,
+            "hero": {
+              "id": 97,
+              "shortName": "magnataur"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 147421630
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 5,
+            "deaths": 12,
+            "assists": 9,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -23,
+            "hero": {
+              "id": 16,
+              "shortName": "sand_king"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 337543219
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 1,
+            "deaths": 7,
+            "assists": 17,
+            "position": "POSITION_5",
+            "award": "MVP",
+            "imp": 14,
+            "hero": {
+              "id": 37,
+              "shortName": "warlock"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 103259176
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 2,
+            "deaths": 8,
+            "assists": 8,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -23,
+            "hero": {
+              "id": 1,
+              "shortName": "antimage"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8114702224,
+        "rank": 61,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736078950,
+        "parsedDateTime": 1736082070,
+        "durationSeconds": 2556,
+        "didRadiantWin": false,
+        "topLaneOutcome": "DIRE_VICTORY",
+        "midLaneOutcome": "RADIANT_VICTORY",
+        "bottomLaneOutcome": "TIE",
+        "radiantKills": [0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 4, 1, 3, 0, 1, 0, 0, 0, 0, 0, 2, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1],
+        "direKills": [0, 0, 1, 0, 1, 0, 1, 1, 0, 3, 0, 1, 1, 2, 0, 2, 1, 1, 2, 4, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 3, 2, 3, 0, 0, 4, 0, 1, 4, 0, 3, 0, 1, 4],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 6,
+            "assists": 12,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -30,
+            "hero": {
+              "id": 53,
+              "shortName": "furion"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 12,
+            "assists": 9,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -33,
+            "hero": {
+              "id": 84,
+              "shortName": "ogre_magi"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 141186030
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 5,
+            "deaths": 10,
+            "assists": 9,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -37,
+            "hero": {
+              "id": 6,
+              "shortName": "drow_ranger"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 170603699
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 11,
+            "deaths": 11,
+            "assists": 7,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -26,
+            "hero": {
+              "id": 52,
+              "shortName": "leshrac"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 164078456
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 4,
+            "deaths": 10,
+            "assists": 10,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -30,
+            "hero": {
+              "id": 2,
+              "shortName": "axe"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 65119495
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 9,
+            "deaths": 8,
+            "assists": 30,
+            "position": "POSITION_5",
+            "award": "MVP",
+            "imp": 15,
+            "hero": {
+              "id": 31,
+              "shortName": "lich"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 404768565
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 12,
+            "deaths": 3,
+            "assists": 22,
+            "position": "POSITION_3",
+            "award": "TOP_CORE",
+            "imp": 9,
+            "hero": {
+              "id": 96,
+              "shortName": "centaur"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 913264300
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 10,
+            "deaths": 6,
+            "assists": 25,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": 2,
+            "hero": {
+              "id": 67,
+              "shortName": "spectre"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 1687572434
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 14,
+            "deaths": 6,
+            "assists": 22,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -5,
+            "hero": {
+              "id": 15,
+              "shortName": "razor"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 459310156
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 5,
+            "assists": 23,
+            "position": "POSITION_4",
+            "award": "TOP_SUPPORT",
+            "imp": -18,
+            "hero": {
+              "id": 3,
+              "shortName": "bane"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8113240456,
+        "rank": 52,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1736003284,
+        "parsedDateTime": 1736006182,
+        "durationSeconds": 2316,
+        "didRadiantWin": false,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "TIE",
+        "bottomLaneOutcome": "TIE",
+        "radiantKills": [0, 1, 0, 1, 1, 0, 0, 2, 1, 2, 0, 0, 1, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 2, 0, 0, 0, 0, 3, 0, 0, 0],
+        "direKills": [0, 1, 1, 0, 1, 3, 0, 0, 1, 1, 3, 0, 1, 3, 0, 0, 1, 4, 0, 1, 2, 2, 0, 0, 1, 2, 0, 2, 3, 2, 0, 3, 2, 0, 0, 3, 2, 1, 1, 5],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 154568414
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 9,
+            "assists": 6,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -31,
+            "hero": {
+              "id": 8,
+              "shortName": "juggernaut"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 221296357
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 7,
+            "deaths": 7,
+            "assists": 4,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -28,
+            "hero": {
+              "id": 17,
+              "shortName": "storm_spirit"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 432554878
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 5,
+            "assists": 5,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -30,
+            "hero": {
+              "id": 29,
+              "shortName": "tidehunter"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 473424895
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 13,
+            "assists": 6,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -18,
+            "hero": {
+              "id": 114,
+              "shortName": "monkey_king"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 917099904
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 3,
+            "deaths": 18,
+            "assists": 13,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -29,
+            "hero": {
+              "id": 50,
+              "shortName": "dazzle"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 165305128
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 17,
+            "deaths": 2,
+            "assists": 11,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": 11,
+            "hero": {
+              "id": 41,
+              "shortName": "faceless_void"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 299517226
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 13,
+            "deaths": 4,
+            "assists": 16,
+            "position": "POSITION_2",
+            "award": "TOP_CORE",
+            "imp": 12,
+            "hero": {
+              "id": 97,
+              "shortName": "magnataur"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 371343209
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 5,
+            "deaths": 6,
+            "assists": 23,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": 3,
+            "hero": {
+              "id": 25,
+              "shortName": "lina"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 4,
+            "deaths": 8,
+            "assists": 24,
+            "position": "POSITION_4",
+            "award": "TOP_SUPPORT",
+            "imp": 5,
+            "hero": {
+              "id": 101,
+              "shortName": "skywrath_mage"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 12,
+            "deaths": 0,
+            "assists": 26,
+            "position": "POSITION_3",
+            "award": "MVP",
+            "imp": 37,
+            "hero": {
+              "id": 78,
+              "shortName": "brewmaster"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8113127636,
+        "rank": 50,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1735999705,
+        "parsedDateTime": 1736003458,
+        "durationSeconds": 3104,
+        "didRadiantWin": false,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "DIRE_VICTORY",
+        "bottomLaneOutcome": "RADIANT_VICTORY",
+        "radiantKills": [0, 0, 0, 0, 2, 0, 2, 1, 0, 3, 2, 0, 0, 0, 3, 0, 0, 2, 1, 0, 0, 3, 0, 0, 0, 1, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0, 3, 1, 0, 0, 0, 3, 2, 0, 0, 0, 4, 0, 1, 4, 2, 0, 2],
+        "direKills": [0, 1, 1, 0, 0, 0, 1, 2, 0, 2, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 4, 1, 0, 5, 0, 3, 0, 1, 3, 1, 0, 0, 0, 0, 4, 0, 0, 0, 1, 2, 1, 0, 1, 0, 0, 1, 1, 2, 2, 1, 2],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 238653493
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 15,
+            "deaths": 6,
+            "assists": 17,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -8,
+            "hero": {
+              "id": 39,
+              "shortName": "queenofpain"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 457713519
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 4,
+            "deaths": 12,
+            "assists": 22,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -27,
+            "hero": {
+              "id": 131,
+              "shortName": "ringmaster"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 138533426
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 1,
+            "deaths": 6,
+            "assists": 39,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": 4,
+            "hero": {
+              "id": 87,
+              "shortName": "disruptor"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 139458985
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 10,
+            "deaths": 12,
+            "assists": 20,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -43,
+            "hero": {
+              "id": 38,
+              "shortName": "beastmaster"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 135307385
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 12,
+            "deaths": 13,
+            "assists": 13,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -35,
+            "hero": {
+              "id": 11,
+              "shortName": "nevermore"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 172499796
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 7,
+            "deaths": 8,
+            "assists": 16,
+            "position": "POSITION_2",
+            "award": "TOP_CORE",
+            "imp": 12,
+            "hero": {
+              "id": 36,
+              "shortName": "necrolyte"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 94225199
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 27,
+            "deaths": 7,
+            "assists": 8,
+            "position": "POSITION_1",
+            "award": "MVP",
+            "imp": 21,
+            "hero": {
+              "id": 44,
+              "shortName": "phantom_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 145092289
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 11,
+            "assists": 25,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": 17,
+            "hero": {
+              "id": 5,
+              "shortName": "crystal_maiden"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 6,
+            "deaths": 7,
+            "assists": 22,
+            "position": "POSITION_4",
+            "award": "TOP_SUPPORT",
+            "imp": 21,
+            "hero": {
+              "id": 53,
+              "shortName": "furion"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 5,
+            "deaths": 12,
+            "assists": 34,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": 6,
+            "hero": {
+              "id": 96,
+              "shortName": "centaur"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8113027918,
+        "rank": 60,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1735996389,
+        "parsedDateTime": 1736000037,
+        "durationSeconds": 2814,
+        "didRadiantWin": true,
+        "topLaneOutcome": "DIRE_VICTORY",
+        "midLaneOutcome": "TIE",
+        "bottomLaneOutcome": "RADIANT_STOMP",
+        "radiantKills": [0, 1, 0, 0, 0, 1, 3, 1, 2, 2, 0, 0, 0, 0, 0, 3, 2, 1, 4, 1, 3, 0, 0, 3, 0, 0, 2, 4, 0, 0, 2, 0, 0, 0, 0, 1, 2, 0, 1, 0, 3, 1, 1, 0, 0, 2, 2, 3],
+        "direKills": [2, 1, 0, 0, 1, 2, 0, 1, 1, 1, 1, 3, 1, 4, 1, 0, 1, 2, 1, 1, 3, 1, 0, 1, 2, 0, 1, 2, 0, 0, 2, 0, 1, 2, 0, 1, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 2],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 7,
+            "deaths": 16,
+            "assists": 24,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -15,
+            "hero": {
+              "id": 53,
+              "shortName": "furion"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 15,
+            "deaths": 13,
+            "assists": 17,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -8,
+            "hero": {
+              "id": 98,
+              "shortName": "shredder"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 359068720
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 9,
+            "deaths": 6,
+            "assists": 19,
+            "position": "POSITION_1",
+            "award": "TOP_CORE",
+            "imp": 32,
+            "hero": {
+              "id": 8,
+              "shortName": "juggernaut"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 138197045
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 11,
+            "deaths": 6,
+            "assists": 17,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": 20,
+            "hero": {
+              "id": 13,
+              "shortName": "puck"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 130636808
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 8,
+            "deaths": 9,
+            "assists": 26,
+            "position": "POSITION_5",
+            "award": "MVP",
+            "imp": 41,
+            "hero": {
+              "id": 99,
+              "shortName": "bristleback"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 137778952
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 11,
+            "deaths": 12,
+            "assists": 26,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": -2,
+            "hero": {
+              "id": 31,
+              "shortName": "lich"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 50292257
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 16,
+            "deaths": 6,
+            "assists": 24,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": 30,
+            "hero": {
+              "id": 67,
+              "shortName": "spectre"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 141055138
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 15,
+            "deaths": 5,
+            "assists": 19,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -18,
+            "hero": {
+              "id": 22,
+              "shortName": "zuus"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 323434082
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 1,
+            "deaths": 15,
+            "assists": 18,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -26,
+            "hero": {
+              "id": 85,
+              "shortName": "undying"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 137822194
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 5,
+            "deaths": 13,
+            "assists": 13,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -35,
+            "hero": {
+              "id": 21,
+              "shortName": "windrunner"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8111375975,
+        "rank": 54,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1735912271,
+        "parsedDateTime": 1735914649,
+        "durationSeconds": 1915,
+        "didRadiantWin": false,
+        "topLaneOutcome": "DIRE_VICTORY",
+        "midLaneOutcome": "DIRE_VICTORY",
+        "bottomLaneOutcome": "TIE",
+        "radiantKills": [0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "direKills": [0, 2, 0, 0, 0, 0, 3, 0, 1, 1, 2, 0, 3, 1, 1, 0, 0, 2, 1, 1, 3, 1, 1, 1, 4, 1, 1, 1, 2, 1, 0, 4, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 179304547
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 2,
+            "deaths": 10,
+            "assists": 5,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -23,
+            "hero": {
+              "id": 102,
+              "shortName": "abaddon"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 315558576
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 2,
+            "deaths": 8,
+            "assists": 3,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -39,
+            "hero": {
+              "id": 106,
+              "shortName": "ember_spirit"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 143424898
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 1,
+            "deaths": 8,
+            "assists": 6,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -25,
+            "hero": {
+              "id": 6,
+              "shortName": "drow_ranger"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 300716114
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 4,
+            "deaths": 7,
+            "assists": 1,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -22,
+            "hero": {
+              "id": 30,
+              "shortName": "witch_doctor"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 1033994614
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 0,
+            "deaths": 5,
+            "assists": 2,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -30,
+            "hero": {
+              "id": 29,
+              "shortName": "tidehunter"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 145345018
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 2,
+            "deaths": 3,
+            "assists": 14,
+            "position": "POSITION_4",
+            "award": "TOP_SUPPORT",
+            "imp": 15,
+            "hero": {
+              "id": 64,
+              "shortName": "jakiro"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 7,
+            "deaths": 3,
+            "assists": 17,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": 4,
+            "hero": {
+              "id": 71,
+              "shortName": "spirit_breaker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 11,
+            "deaths": 1,
+            "assists": 22,
+            "position": "POSITION_2",
+            "award": "MVP",
+            "imp": 24,
+            "hero": {
+              "id": 22,
+              "shortName": "zuus"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 179134804
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 8,
+            "deaths": 2,
+            "assists": 8,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": 1,
+            "hero": {
+              "id": 100,
+              "shortName": "tusk"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 34172221
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 8,
+            "deaths": 1,
+            "assists": 20,
+            "position": "POSITION_1",
+            "award": "TOP_CORE",
+            "imp": 11,
+            "hero": {
+              "id": 56,
+              "shortName": "clinkz"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8111302879,
+        "rank": 53,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1735909720,
+        "parsedDateTime": 1735912500,
+        "durationSeconds": 2172,
+        "didRadiantWin": true,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "RADIANT_VICTORY",
+        "bottomLaneOutcome": "RADIANT_VICTORY",
+        "radiantKills": [1, 0, 0, 0, 1, 3, 0, 0, 1, 1, 2, 0, 3, 3, 0, 0, 3, 3, 0, 0, 0, 3, 1, 1, 0, 4, 1, 0, 3, 2, 1, 0, 1, 3, 0, 4, 1, 0],
+        "direKills": [0, 1, 0, 0, 0, 3, 1, 0, 0, 1, 2, 0, 1, 1, 3, 0, 2, 0, 2, 0, 0, 1, 4, 0, 0, 2, 0, 0, 1, 0, 1, 0, 2, 0, 0, 0, 1, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 122038767
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 17,
+            "deaths": 4,
+            "assists": 11,
+            "position": "POSITION_2",
+            "award": "TOP_CORE",
+            "imp": 20,
+            "hero": {
+              "id": 25,
+              "shortName": "lina"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 122059996
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 4,
+            "deaths": 3,
+            "assists": 34,
+            "position": "POSITION_4",
+            "award": "MVP",
+            "imp": 29,
+            "hero": {
+              "id": 86,
+              "shortName": "rubick"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 168187403
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 10,
+            "deaths": 6,
+            "assists": 13,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -26,
+            "hero": {
+              "id": 77,
+              "shortName": "lycan"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 1025582209
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 12,
+            "deaths": 4,
+            "assists": 17,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": 7,
+            "hero": {
+              "id": 93,
+              "shortName": "slark"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 136919856
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 2,
+            "deaths": 12,
+            "assists": 32,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": 0,
+            "hero": {
+              "id": 40,
+              "shortName": "venomancer"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 315558576
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 9,
+            "assists": 11,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -5,
+            "hero": {
+              "id": 26,
+              "shortName": "lion"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 143424898
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 11,
+            "assists": 15,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -36,
+            "hero": {
+              "id": 73,
+              "shortName": "alchemist"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 156780148
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 7,
+            "deaths": 7,
+            "assists": 9,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -13,
+            "hero": {
+              "id": 15,
+              "shortName": "razor"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 11,
+            "assists": 13,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -33,
+            "hero": {
+              "id": 53,
+              "shortName": "furion"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 10,
+            "deaths": 8,
+            "assists": 11,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -8,
+            "hero": {
+              "id": 98,
+              "shortName": "shredder"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8111245751,
+        "rank": 52,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1735907586,
+        "parsedDateTime": 1735909902,
+        "durationSeconds": 1722,
+        "didRadiantWin": true,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "TIE",
+        "bottomLaneOutcome": "RADIANT_VICTORY",
+        "radiantKills": [0, 0, 0, 0, 1, 0, 0, 1, 2, 0, 1, 3, 1, 2, 2, 0, 1, 1, 3, 0, 1, 3, 0, 1, 3, 1, 3, 1, 2, 0],
+        "direKills": [0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 198088585
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 3,
+            "assists": 14,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": 6,
+            "hero": {
+              "id": 100,
+              "shortName": "tusk"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 349014637
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 6,
+            "deaths": 2,
+            "assists": 15,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": 19,
+            "hero": {
+              "id": 138,
+              "shortName": "muerta"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 7,
+            "deaths": 2,
+            "assists": 15,
+            "position": "POSITION_4",
+            "award": "MVP",
+            "imp": 22,
+            "hero": {
+              "id": 88,
+              "shortName": "nyx_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 11,
+            "deaths": 1,
+            "assists": 9,
+            "position": "POSITION_2",
+            "award": "TOP_CORE",
+            "imp": 17,
+            "hero": {
+              "id": 43,
+              "shortName": "death_prophet"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 155539712
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 5,
+            "deaths": 1,
+            "assists": 11,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": 17,
+            "hero": {
+              "id": 93,
+              "shortName": "slark"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 141621026
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 11,
+            "assists": 2,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -46,
+            "hero": {
+              "id": 62,
+              "shortName": "bounty_hunter"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 362609933
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 2,
+            "deaths": 5,
+            "assists": 4,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -19,
+            "hero": {
+              "id": 60,
+              "shortName": "night_stalker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 148184978
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 2,
+            "deaths": 3,
+            "assists": 4,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -28,
+            "hero": {
+              "id": 40,
+              "shortName": "venomancer"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 135669706
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 2,
+            "deaths": 9,
+            "assists": 3,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -36,
+            "hero": {
+              "id": 49,
+              "shortName": "dragon_knight"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 185804223
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 0,
+            "deaths": 5,
+            "assists": 2,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -38,
+            "hero": {
+              "id": 41,
+              "shortName": "faceless_void"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8109830296,
+        "rank": 52,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1735827218,
+        "parsedDateTime": 1735837574,
+        "durationSeconds": 2692,
+        "didRadiantWin": true,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "DIRE_VICTORY",
+        "bottomLaneOutcome": "DIRE_VICTORY",
+        "radiantKills": [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 2, 2, 0, 2, 2, 3, 1, 2, 1, 0, 1, 1, 4, 0, 0, 1, 3, 0, 0, 0, 2, 4, 1, 3, 1, 3, 1, 2, 0, 2, 2, 2, 3, 1, 2, 3],
+        "direKills": [0, 0, 0, 0, 0, 1, 2, 0, 1, 1, 1, 1, 1, 0, 1, 3, 0, 0, 1, 0, 0, 2, 4, 0, 2, 2, 0, 0, 0, 0, 2, 0, 0, 2, 0, 1, 0, 2, 3, 2, 0, 0, 1, 0, 0, 1],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 138562529
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 18,
+            "deaths": 6,
+            "assists": 27,
+            "position": "POSITION_1",
+            "award": "TOP_CORE",
+            "imp": 9,
+            "hero": {
+              "id": 67,
+              "shortName": "spectre"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 136773800
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 7,
+            "deaths": 6,
+            "assists": 26,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -6,
+            "hero": {
+              "id": 62,
+              "shortName": "bounty_hunter"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 287314536
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 7,
+            "assists": 20,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -17,
+            "hero": {
+              "id": 68,
+              "shortName": "ancient_apparition"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 9,
+            "deaths": 13,
+            "assists": 21,
+            "position": "POSITION_4",
+            "award": "TOP_SUPPORT",
+            "imp": -3,
+            "hero": {
+              "id": 88,
+              "shortName": "nyx_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 21,
+            "deaths": 5,
+            "assists": 25,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": 9,
+            "hero": {
+              "id": 98,
+              "shortName": "shredder"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 296642282
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 8,
+            "deaths": 9,
+            "assists": 23,
+            "position": "POSITION_4",
+            "award": "MVP",
+            "imp": 18,
+            "hero": {
+              "id": 71,
+              "shortName": "spirit_breaker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 136307807
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 11,
+            "deaths": 9,
+            "assists": 10,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -7,
+            "hero": {
+              "id": 25,
+              "shortName": "lina"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 160921577
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 15,
+            "assists": 21,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -16,
+            "hero": {
+              "id": 84,
+              "shortName": "ogre_magi"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 198868288
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 7,
+            "deaths": 11,
+            "assists": 13,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -9,
+            "hero": {
+              "id": 41,
+              "shortName": "faceless_void"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 133723038
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 7,
+            "deaths": 15,
+            "assists": 12,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -16,
+            "hero": {
+              "id": 28,
+              "shortName": "slardar"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8109756881,
+        "rank": 61,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1735824673,
+        "parsedDateTime": 1735835335,
+        "durationSeconds": 1745,
+        "didRadiantWin": true,
+        "topLaneOutcome": "RADIANT_STOMP",
+        "midLaneOutcome": "RADIANT_VICTORY",
+        "bottomLaneOutcome": "RADIANT_VICTORY",
+        "radiantKills": [0, 0, 1, 0, 0, 2, 2, 0, 4, 0, 3, 3, 0, 0, 1, 1, 2, 2, 0, 0, 2, 4, 1, 1, 2, 1, 1, 0, 2, 1, 0],
+        "direKills": [0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 11,
+            "deaths": 3,
+            "assists": 11,
+            "position": "POSITION_3",
+            "award": "TOP_CORE",
+            "imp": 26,
+            "hero": {
+              "id": 14,
+              "shortName": "pudge"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 2,
+            "deaths": 2,
+            "assists": 21,
+            "position": "POSITION_4",
+            "award": "MVP",
+            "imp": 56,
+            "hero": {
+              "id": 91,
+              "shortName": "wisp"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 338054282
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 5,
+            "deaths": 4,
+            "assists": 12,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": -3,
+            "hero": {
+              "id": 30,
+              "shortName": "witch_doctor"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 240521927
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 3,
+            "deaths": 0,
+            "assists": 7,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": 8,
+            "hero": {
+              "id": 41,
+              "shortName": "faceless_void"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 381720368
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 15,
+            "deaths": 3,
+            "assists": 6,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": 21,
+            "hero": {
+              "id": 25,
+              "shortName": "lina"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 148184978
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 0,
+            "deaths": 6,
+            "assists": 4,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -34,
+            "hero": {
+              "id": 97,
+              "shortName": "magnataur"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 137025515
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 3,
+            "deaths": 9,
+            "assists": 2,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -46,
+            "hero": {
+              "id": 43,
+              "shortName": "death_prophet"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 145019715
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 0,
+            "deaths": 10,
+            "assists": 8,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -40,
+            "hero": {
+              "id": 45,
+              "shortName": "pugna"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 139676813
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 2,
+            "deaths": 5,
+            "assists": 3,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -39,
+            "hero": {
+              "id": 44,
+              "shortName": "phantom_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 170516147
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 5,
+            "deaths": 6,
+            "assists": 3,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -27,
+            "hero": {
+              "id": 60,
+              "shortName": "night_stalker"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8109697919,
+        "rank": 60,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1735822529,
+        "parsedDateTime": 1735833944,
+        "durationSeconds": 1715,
+        "didRadiantWin": true,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "DIRE_VICTORY",
+        "bottomLaneOutcome": "TIE",
+        "radiantKills": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 2, 0, 0, 2, 3, 3, 1, 2, 2, 3, 2],
+        "direKills": [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 3, 0, 1, 0, 3, 0, 1, 2, 1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 6,
+            "deaths": 4,
+            "assists": 5,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -27,
+            "hero": {
+              "id": 88,
+              "shortName": "nyx_assassin"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 1,
+            "deaths": 2,
+            "assists": 14,
+            "position": "POSITION_3",
+            "award": "TOP_CORE",
+            "imp": -9,
+            "hero": {
+              "id": 108,
+              "shortName": "abyssal_underlord"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 280535650
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 6,
+            "deaths": 3,
+            "assists": 9,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -12,
+            "hero": {
+              "id": 54,
+              "shortName": "life_stealer"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 1216465029
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 6,
+            "deaths": 2,
+            "assists": 7,
+            "position": "POSITION_5",
+            "award": "TOP_SUPPORT",
+            "imp": 0,
+            "hero": {
+              "id": 26,
+              "shortName": "lion"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 136502813
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 5,
+            "deaths": 4,
+            "assists": 13,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -24,
+            "hero": {
+              "id": 61,
+              "shortName": "broodmother"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 266904472
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 4,
+            "assists": 9,
+            "position": "POSITION_4",
+            "award": "MVP",
+            "imp": 8,
+            "hero": {
+              "id": 71,
+              "shortName": "spirit_breaker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 244365133
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 6,
+            "deaths": 7,
+            "assists": 2,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -17,
+            "hero": {
+              "id": 7,
+              "shortName": "earthshaker"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 136403173
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 2,
+            "deaths": 3,
+            "assists": 5,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -11,
+            "hero": {
+              "id": 86,
+              "shortName": "rubick"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 138562316
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 2,
+            "deaths": 5,
+            "assists": 5,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -13,
+            "hero": {
+              "id": 84,
+              "shortName": "ogre_magi"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 91693991
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 1,
+            "deaths": 5,
+            "assists": 5,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -17,
+            "hero": {
+              "id": 41,
+              "shortName": "faceless_void"
+            }
+          }
+        ]
+      },
+      {
+        "id": 8109639797,
+        "rank": 53,
+        "lobbyType": "UNRANKED",
+        "gameMode": "ALL_PICK_RANKED",
+        "startDateTime": 1735820323,
+        "parsedDateTime": 1735832684,
+        "durationSeconds": 1888,
+        "didRadiantWin": true,
+        "topLaneOutcome": "TIE",
+        "midLaneOutcome": "RADIANT_VICTORY",
+        "bottomLaneOutcome": "RADIANT_VICTORY",
+        "radiantKills": [0, 0, 1, 2, 0, 1, 1, 1, 0, 0, 3, 1, 0, 2, 1, 0, 2, 1, 1, 3, 3, 0, 4, 0, 2, 1, 1, 3, 1, 3, 1, 0, 4],
+        "direKills": [0, 1, 0, 0, 2, 0, 0, 2, 1, 0, 0, 0, 1, 0, 0, 3, 0, 2, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1],
+        "players": [
+          {
+            "steamAccount": {
+              "id": 163228940
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 11,
+            "deaths": 4,
+            "assists": 6,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -3,
+            "hero": {
+              "id": 21,
+              "shortName": "windrunner"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 139688684
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 8,
+            "deaths": 2,
+            "assists": 17,
+            "position": "POSITION_1",
+            "award": "TOP_CORE",
+            "imp": 10,
+            "hero": {
+              "id": 10,
+              "shortName": "morphling"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 973906188
+            },
+            "isRadiant": true,
+            "lane": "MID_LANE",
+            "kills": 13,
+            "deaths": 2,
+            "assists": 15,
+            "position": "POSITION_2",
+            "award": "MVP",
+            "imp": 29,
+            "hero": {
+              "id": 76,
+              "shortName": "obsidian_destroyer"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 1020009116
+            },
+            "isRadiant": true,
+            "lane": "SAFE_LANE",
+            "kills": 1,
+            "deaths": 2,
+            "assists": 21,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": 9,
+            "hero": {
+              "id": 40,
+              "shortName": "venomancer"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 318206397
+            },
+            "isRadiant": true,
+            "lane": "OFF_LANE",
+            "kills": 9,
+            "deaths": 7,
+            "assists": 21,
+            "position": "POSITION_4",
+            "award": "TOP_SUPPORT",
+            "imp": 15,
+            "hero": {
+              "id": 86,
+              "shortName": "rubick"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 274100744
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 12,
+            "assists": 4,
+            "position": "POSITION_1",
+            "award": "NONE",
+            "imp": -33,
+            "hero": {
+              "id": 95,
+              "shortName": "troll_warlord"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 240321585
+            },
+            "isRadiant": false,
+            "lane": "MID_LANE",
+            "kills": 3,
+            "deaths": 8,
+            "assists": 2,
+            "position": "POSITION_2",
+            "award": "NONE",
+            "imp": -39,
+            "hero": {
+              "id": 36,
+              "shortName": "necrolyte"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 129696262
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 7,
+            "assists": 3,
+            "position": "POSITION_4",
+            "award": "NONE",
+            "imp": -34,
+            "hero": {
+              "id": 51,
+              "shortName": "rattletrap"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 186736378
+            },
+            "isRadiant": false,
+            "lane": "OFF_LANE",
+            "kills": 3,
+            "deaths": 5,
+            "assists": 6,
+            "position": "POSITION_3",
+            "award": "NONE",
+            "imp": -30,
+            "hero": {
+              "id": 69,
+              "shortName": "doom_bringer"
+            }
+          },
+          {
+            "steamAccount": {
+              "id": 872421895
+            },
+            "isRadiant": false,
+            "lane": "SAFE_LANE",
+            "kills": 4,
+            "deaths": 11,
+            "assists": 10,
+            "position": "POSITION_5",
+            "award": "NONE",
+            "imp": -14,
+            "hero": {
+              "id": 31,
+              "shortName": "lich"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

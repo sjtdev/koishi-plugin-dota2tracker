@@ -28,7 +28,7 @@ export default defineConfig({
         items: [
           {
             text: "模板展示",
-            link:"/template",
+            link: "/template",
             items: [
               { text: "对局信息模板", link: "/template-match" },
               { text: "玩家信息模板", link: "/template-player" },
@@ -37,6 +37,7 @@ export default defineConfig({
           },
           { text: "展示区", link: "/previews" },
           { text: "更新日志", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
+          { text: "鸣谢", link: "/thanks" },
         ],
       },
     ],
@@ -54,6 +55,11 @@ export default defineConfig({
     "en-US": {
       label: "English",
       lang: "en-US",
+    },
+  },
+  markdown: {
+    container: {
+      tipLabel: "提示",
     },
   },
 });

@@ -668,7 +668,7 @@ export function getFormattedPlayerData(param: { playerQuery: graphql.PlayerInfoW
   });
 
   // 取场次前十的英雄表现数据附加到原player对象中
-  player.heroesPerformanceTop10 = playerExtra?.heroesPerformance.slice(0, 10);
+  player.heroesPerformanceTop10 = playerExtra?.heroesPerformance.slice(0, 10) ?? [];
 
   if (genHero) {
     const { matchCount, winCount, imp } = player.heroesPerformanceTop10[0];

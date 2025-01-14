@@ -1,11 +1,12 @@
 # 安装
 ### 安装插件
-在`koishi`插件市场搜索安装，有关`koishi`安装请见 [koishi官方文档](https://koishi.chat)
+在`koishi`插件市场搜索安装。  
+`koishi`安装、插件的安装及配置方式请见 [koishi官方文档](https://koishi.chat)
 
 ### 安装服务
-目前版本`^1.3.0`需要`http(发送数据请求)` `database(存储数据)` `cron(定时任务)` `puppeteer(生成图片)` `cache(缓存数据)`这些服务，请按照koishi平台指引依次安装对应所需插件。
+目前版本（`1.3.0`以上）需要`http(发送网络请求)` `database(存储数据)` `cron(定时任务)` `puppeteer(生成图片)` `cache(缓存数据)`服务，请按照koishi平台指引依次安装对应所需插件。
 
-> [!TIP]对应插件推荐：  
+> [!TIP]对应插件推荐：
 > [cache]     cache-database  
 > [database]  database-sqlite  
 
