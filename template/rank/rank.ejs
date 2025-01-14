@@ -8,6 +8,7 @@
             margin: 0;
             padding: 0;
             background-color: #0000;
+            font-family: 'Maple Mono', sans-serif;
         }
         div {
             width: 128px;
@@ -29,7 +30,7 @@
     </style>
 </head>
 <div>
-    <img src="<%= utils.getImageUrl('medal_' + (rank.inTop100 ?? rank.medal)) %>" /> 
+    <img src="<%= utils.getImageUrl('medal_' + (rank.inTop100 ?? rank.medal)) %>" />
     <img src="<%= utils.getImageUrl("star_" + rank.star) %>" />
     <p><%= rank.leader %></p>
 </div>

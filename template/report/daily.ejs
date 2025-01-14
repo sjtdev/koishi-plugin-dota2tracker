@@ -12,6 +12,7 @@
                 color: white;
                 width: 600px;
                 font-size: 14px;
+                font-family: 'Maple Mono', sans-serif;
             }
             body > * {
                 width: 100%;
@@ -154,8 +155,8 @@
                     <% if (player.avgImp < 0) imp.sign = "-"; %>
                     <% if (imp.absValue > 25) { %>
                         <% imp.isOver = true; %>
-                        <% if (player.avgImp > 0) imp.right = imp.absValue; %> 
-                        <% if (player.avgImp < 0) imp.left = imp.absValue; %> 
+                        <% if (player.avgImp > 0) imp.right = imp.absValue; %>
+                        <% if (player.avgImp < 0) imp.left = imp.absValue; %>
                     <% } else imp.left = imp.right = imp.absValue; %>
                     <div class="score_bar<%= player.avgImp > 0 ? " pos" : " neg" %><%= Math.abs(player.avgImp) > 25 ? " over" : "" %>">
                         <div class="left" <%- `style="width: ${imp.left}px"` %>></div>

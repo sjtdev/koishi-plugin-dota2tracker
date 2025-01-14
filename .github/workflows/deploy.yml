@@ -74,31 +74,25 @@ jobs:
             xdg-utils \
             wget
 
-      - name: Install fonts
+      - name: Install Maple Mono fonts
         run: |
-          sudo apt-get update
-          sudo apt-get install -y fonts-noto-cjk fonts-noto-color-emoji
+          # 安装基础英文字体
+          wget -q https://github.com/subframe7536/maple-font/releases/download/v7.0-beta34/MapleMono-OTF.zip
+          unzip -q MapleMono-OTF.zip
+          sudo mkdir -p /usr/share/fonts/opentype/maple-mono
+          sudo mv MapleMono-OTF/*.otf /usr/share/fonts/opentype/maple-mono/
 
-      - name: Install additional fonts
-        run: |
-          # 安装思源黑体
-          wget -q https://github.com/adobe-fonts/source-han-sans/releases/download/2.004R/SourceHanSansSC.zip
-          unzip -q SourceHanSansSC.zip
-          sudo mkdir -p /usr/share/fonts/opentype/source-han-sans
-          sudo mv SourceHanSansSC/OTF/SimplifiedChinese/* /usr/share/fonts/opentype/source-han-sans/
-          
-          # 安装楷体
-          wget -q https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/Chinese-Simplified/NotoSansSC-Regular.otf
-          sudo mkdir -p /usr/share/fonts/opentype/noto-sans-sc
-          sudo mv NotoSansSC-Regular.otf /usr/share/fonts/opentype/noto-sans-sc/
-          
+          # 安装中文支持
+          wget -q https://github.com/subframe7536/maple-font/releases/download/v7.0-beta34/MapleMono-CN.zip
+          unzip -q MapleMono-CN.zip
+          sudo mv MapleMono-CN/*.otf /usr/share/fonts/opentype/maple-mono/
+
           # 更新字体缓存
           sudo fc-cache -f -v
-        
-      - name: Check installed fonts
-        run: |
-          fc-list : file family style
 
+          # 检查安装的字体
+          echo "Installed fonts:"
+          fc-list | grep -i "maple"
 
       - name: Install dependencies
         run: |

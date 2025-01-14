@@ -11,6 +11,7 @@
                 background-color: black;
                 color: white;
                 width: 800px;
+                font-family: 'Maple Mono', sans-serif;
             }
 
             .wrapper > *:not(.skills) {
@@ -818,13 +819,13 @@
                     <div class="attributes">
                     ${item.special_values
                         .filter(sv => sv.heading_loc)
-                        .map((sv) => 
+                        .map((sv) =>
                         `<p>
                             <span class="heading">${sv.heading_loc}</span>
                             <span class="values">
                                 ${!(sv.values_float.every(value => value === 0) || sv.values_float.length == 0) ?
                                 `<span class="primary${(sv.values_float.every(value => value === 0) || sv.values_float.length == 0)?" empty":""}">
-                                    ${(!((sv.values_float.every(value => value === 0) || sv.values_float.length == 0) && (sv.values_scepter.length || sv.values_shard.length || sv.facet_bonus.name)) 
+                                    ${(!((sv.values_float.every(value => value === 0) || sv.values_float.length == 0) && (sv.values_scepter.length || sv.values_shard.length || sv.facet_bonus.name))
                                         ? (sv.values_float.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")) : "")}
                                 </span>` : "" }
                                 ${sv.values_scepter && sv.values_scepter.length ?
@@ -839,7 +840,7 @@
                                 `<span class="alternative facet">
                                     <span class="facet"><span class="name_back type_${hero.facets.find(facet=>facet.name==sv.facet_bonus.name).color}"><img src="${utils.getImageUrl(hero.facets.find(facet=>facet.name==sv.facet_bonus.name).icon, ImageType.IconsFacets)}" />${sv.facet_bonus.values.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")}</span></span>
                                 </span>` : "" }
-                                ${sv.bonuses.length ? 
+                                ${sv.bonuses.length ?
                                 `<span class="alternative talent">
                                     ${sv.bonuses.map(bonus=>` <img src="${utils.getImageUrl("talents","icons","svg")}"/>${(bonus.value>0?'<span class="plus">+</span>':"")+bonus.value+(sv.is_percentage?"%":"")}`).join(" ")}
                                 </span>` : "" }
