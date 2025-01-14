@@ -78,11 +78,26 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y fonts-noto-cjk fonts-noto-color-emoji
+
+      - name: Install additional fonts
+        run: |
+          # 安装思源黑体
           wget -q https://github.com/adobe-fonts/source-han-sans/releases/download/2.004R/SourceHanSansSC.zip
-          unzip -q SourceHanSansSC.zip -d SourceHanSansSC
+          unzip -q SourceHanSansSC.zip
           sudo mkdir -p /usr/share/fonts/opentype/source-han-sans
-          sudo mv SourceHanSansSC/SubsetOTF/SC/* /usr/share/fonts/opentype/source-han-sans/
+          sudo mv SourceHanSansSC/OTF/SimplifiedChinese/* /usr/share/fonts/opentype/source-han-sans/
+          
+          # 安装楷体
+          wget -q https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/Chinese-Simplified/NotoSansSC-Regular.otf
+          sudo mkdir -p /usr/share/fonts/opentype/noto-sans-sc
+          sudo mv NotoSansSC-Regular.otf /usr/share/fonts/opentype/noto-sans-sc/
+          
+          # 更新字体缓存
           sudo fc-cache -f -v
+        
+      - name: Check installed fonts
+        run: |
+          fc-list : file family style
 
 
       - name: Install dependencies
