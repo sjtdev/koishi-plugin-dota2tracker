@@ -25,15 +25,6 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: doc-link
-    attributes:
-      label: 文档链接
-      description: 请提供相关文档的链接（如果适用）
-      placeholder: https://github.com/...
-    validations:
-      required: false
-
   - type: textarea
     id: current-problem
     attributes:
