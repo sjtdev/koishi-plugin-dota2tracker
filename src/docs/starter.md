@@ -17,7 +17,7 @@
 ### 插件更新提示
 `1.4.2`版本起，插件更新时会在Github发布一个无附件release，用于插件更新提醒。  
 如有需要可以使用 `Watch` 功能接收插件更新通知，以下为详细步骤：
-1. 访问[仓库页面](https://github.com/sjtdev/koishi-plugin-dota2tracker/)
+1. 访问[仓库页面](https://github.com/sjtdev/koishi-plugin-dota2tracker)
 2. 点击右上方的 "Watch" 按钮
 3. 选择 "Custom" 选项
 4. 在弹出的设置中勾选 "Releases" 选项
