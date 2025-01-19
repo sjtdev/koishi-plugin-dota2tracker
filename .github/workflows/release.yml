@@ -51,14 +51,14 @@ jobs:
       - name: Create Release
         if: steps.check_version.outputs.should_release == 'true'
         run: |
-          RELEASE_BODY="🎉 这是一个自动生成的release，请到 \`koishi\` \`依赖管理\` 中更新或 \`插件市场\` 中搜索安装。
+          RELEASE_BODY="🎉 这是一个自动生成的release，用于发布插件版本更新提醒。请于 \`koishi\` \`依赖管理\` 中更新插件或 \`插件市场\` 中搜索安装。
 
           📦 NPM 包地址：https://www.npmjs.com/package/${{ steps.check_version.outputs.package_name }}
 
           📝 更新日志：https://github.com/${{ github.repository }}/blob/master/changelog.md
 
 
-          🎉 This is an auto-generated release. Please update via \`koishi\` \`Dependencies\` or search and install in the \`Plugin Market\`.
+          🎉 This is an automatically generated release for plugin version update notifications. Please update in `koishi` `Dependencies` or search for installation in the `Plugin market`.
 
           📦 NPM Package: https://www.npmjs.com/package/${{ steps.check_version.outputs.package_name }}
 

@@ -14,6 +14,18 @@
 > [cache]     cache-database  
 > [database]  database-sqlite  
 
+### 插件更新提示
+`1.4.2`版本起，插件更新时会在Github发布一个无附件release，用于插件更新提醒。  
+如有需要可以使用 `Watch` 功能接收插件更新通知，以下为详细步骤：
+1. 访问[仓库页面](https://github.com/sjtdev/koishi-plugin-dota2tracker/)
+2. 点击右上方的 "Watch" 按钮
+3. 选择 "Custom" 选项
+4. 在弹出的设置中勾选 "Releases" 选项
+5. 点击 "Apply" 保存设置
+
+这样就可以在Github通知中心收到通知了。  
+如果你开启了邮件通知，也会收到一封Github发出的邮件提醒。
+
 # 启用
 所需的服务插件都安装完成并启用后，还需在 [STRATZ API 页面](https://stratz.com/api) 获取 API Token，然后将其填入本插件配置页面的 `STRATZ_API_TOKEN` 配置项中并保存配置。插件需要有效的 API Token 才能正常工作。 
 
