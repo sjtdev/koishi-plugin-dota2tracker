@@ -85,15 +85,21 @@
     </head>
     <% const {name, avatar, isRising, prevRank, currRank, date} = data; %>
     <% const kind = isRising ? "xi" : "bei"; %>
+    <% const rankInfo = {
+      name,
+      avatar: `<img src="${avatar}" />`,
+      prev: `<span class="rank prev">${$t("dota2tracker.template.ranks."+prevRank.medal)}${prevRank.leader ?? prevRank.star}</span>`,
+      curr: `<span class="rank curr">${$t("dota2tracker.template.ranks."+currRank.medal)}${currRank.leader ?? currRank.star}</span>`,
+    } %>
     <body class="<%= kind %>" <%- `style="background-image: url( ${utils.getImageUrl(kind, undefined, "jpg")} )"`%>>
         <div class="wrapper">
-            <p class="xi">热烈祝贺群友 <img src="<%= avatar %>" /><%= name %> 在天梯中再获进步，</p>
-            <p class="xi">由
-                <span class="rank prev"><%= $t("dota2tracker.template.ranks."+prevRank.medal) %><%= prevRank.leader ?? prevRank.star %></span>升为
-                <span class="rank curr"><%= $t("dota2tracker.template.ranks."+currRank.medal) %><%= currRank.leader ?? currRank.star %></span>，再接再厉，再创辉煌！
+            <p class="<%= kind %>">
+              <%- kind == "xi" ?
+              $t("dota2tracker.template.rank_fun_up_message", rankInfo) :
+              $t("dota2tracker.template.rank_fun_down_message", rankInfo)
+              %>
             </p>
-            <p class="bei"><img src="<%= avatar %>" /></p>
-            <p class="bei">寄</p>
+            <p></p>
             <div class="ranks">
                 <div class="rank prev">
                     <img src="<%= utils.getImageUrl('medal_' +(prevRank.inTop100 ?? prevRank.medal)) %>" alt="" />

@@ -1,6 +1,5 @@
 # [@sjtdev/koishi-plugin-dota2tracker](https://sjtdev.github.io/koishi-plugin-dota2tracker/)
-
-[新文档](https://sjtdev.github.io/koishi-plugin-dota2tracker/)正在缓慢构建中……
+↑ 文档已构建完毕，点击上方移步到文档页面阅读。
 
 [![npm](https://img.shields.io/npm/v/@sjtdev/koishi-plugin-dota2tracker/latest?style=flat-square)](https://www.npmjs.com/package/@sjtdev/koishi-plugin-dota2tracker)
 [![npm](https://img.shields.io/npm/v/@sjtdev/koishi-plugin-dota2tracker/next?style=flat-square)](https://www.npmjs.com/package/@sjtdev/koishi-plugin-dota2tracker)

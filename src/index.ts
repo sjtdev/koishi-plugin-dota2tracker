@@ -175,7 +175,7 @@ export async function apply(ctx: Context, config: Config) {
             guildId: session.event.channel.id,
             platform: session.event.platform,
           });
-          session.send(session.text(".cancel_success"));
+          session.send(session.text(".unsubscribe_success"));
           return;
         }
       } else session.send(session.text(".not_subscribed"));
@@ -944,7 +944,12 @@ export async function apply(ctx: Context, config: Config) {
                     await ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], img);
                   } else {
                     // 常规播报
-                    const message = `群友 ${name} 段位变动：${$t(languageTag, "dota2tracker.template.ranks." + prevRank.medal)}${prevRank.star} → ${$t(languageTag, "dota2tracker.template.ranks." + currRank.medal)}${currRank.star} `;
+                    // const message = `群友 ${name} 段位变动：${$t(languageTag, "dota2tracker.template.ranks." + prevRank.medal)}${prevRank.star} → ${$t(languageTag, "dota2tracker.template.ranks." + currRank.medal)}${currRank.star} `;
+                    const message = $t(languageTag, "dota2tracker.broadcast.rank_changed", {
+                      name,
+                      prev: { medal: $t(languageTag, "dota2tracker.template.ranks." + prevRank.medal), star: prevRank.star },
+                      curr: { medal: $t(languageTag, "dota2tracker.template.ranks." + currRank.medal), star: currRank.star },
+                    });
                     const img = await ctx.puppeteer.render(await genImageHTML(currRank, "rank" + (config.rankBroadFun ? "2" : ""), TemplateType.Rank, ctx, languageTag));
                     await ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], message + img);
                   }
@@ -1149,7 +1154,7 @@ export async function apply(ctx: Context, config: Config) {
     const result =
       ctx.i18n
         .render([languageTag], originalKey, (param as any) ?? {})
-        .map((element) => element?.attrs?.content)
+        .map((element) => (element.type == "br" ? "<br/>" : element?.attrs?.content))
         .join("") ?? "";
     if (result == key) return;
     return result;

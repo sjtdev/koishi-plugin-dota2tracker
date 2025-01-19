@@ -1,7 +1,7 @@
 <template>
   <div class="image-container" :style="containerStyle">
     <div class="image-viewer">
-      <img :src="imageSrc" :alt="props.alt" ref="image">
+      <img :src="imageSrc" :alt="props.alt" ref="image" />
       <div class="gradient-overlay"></div>
       <div class="click-hint">查看完整模板</div>
     </div>
@@ -13,6 +13,25 @@ import { ref, onMounted, computed } from "vue";
 import { useData } from "vitepress";
 import Viewer from "viewerjs";
 import "viewerjs/dist/viewer.css";
+const { lang, site } = useData();
+
+// 定义多语言文本对象
+const i18n = {
+  "en-US": {
+    fullTip: "Full Template",
+    zoomTip: "Double-click/scroll to zoom image",
+  },
+  "zh-CN": {
+    fullTip: "查看完整模板",
+    zoomTip: "双击/滚轮缩放图片",
+  },
+};
+
+// 创建一个计算属性来获取当前语言的文本
+const t = (key) => {
+  // 如果没有对应的语言，回退到英文
+  return (i18n[lang.value] || i18n["en-US"])[key];
+};
 
 const props = defineProps({
   src: String,
@@ -22,7 +41,6 @@ const props = defineProps({
     default: "400px",
   },
 });
-const { site } = useData();
 
 // 处理图片路径
 const imageSrc = computed(() => {
@@ -45,6 +63,7 @@ const containerStyle = computed(() => ({
 
 onMounted(() => {
   new Viewer(image.value, {
+    title: false,
     navbar: false,
     toolbar: {
       zoomIn: true,
@@ -52,6 +71,14 @@ onMounted(() => {
       reset: true,
       rotateLeft: true,
       rotateRight: true,
+    },
+    ready() {
+      // 在 Viewer 实例准备好时添加提示文字
+      const footer = this.viewer.footer;
+      const title = document.createElement("div");
+      title.className = "viewer-title";
+      title.textContent = t("zoomTip");
+      footer.insertBefore(title, footer.children[0]);
     },
   });
 });
@@ -84,17 +111,13 @@ onMounted(() => {
   left: 0;
   right: 0;
   height: 100px; /* 控制渐变区域的高度 */
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(0, 0, 0, 0.4) 100%
-  );
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.4) 100%);
   pointer-events: none; /* 确保点击事件能穿透到图片 */
 }
 
 .click-hint {
   position: absolute;
-  top:360px;
+  top: 360px;
   left: 50%;
   transform: translateX(-50%);
   color: white;
@@ -106,11 +129,7 @@ onMounted(() => {
 
 /* 悬停效果 */
 .image-container:hover .gradient-overlay {
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(0, 0, 0, 0.75) 100%
-  );
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.75) 100%);
 }
 
 .image-container:hover .click-hint {

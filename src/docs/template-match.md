@@ -17,5 +17,5 @@
 
 <ImageViewer src="generated/match_2.png" />
 
-MAX+风格的一张模板，来源为[Steam_watcher](https://github.com/SonodaHanami/Steam_watcher)。  
+MAX+风格的一张模板，来源于[Steam_watcher](https://github.com/SonodaHanami/Steam_watcher)。  
 相比`match_1`会缺少一些细节，例如：对线结果、对局结束时的永久Buff状态、辅助道具购买数量等。但可读性更好，也更符合DOTA2玩家的浏览数据习惯。

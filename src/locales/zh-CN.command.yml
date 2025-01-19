@@ -1,7 +1,7 @@
 commands:
   dota2tracker:
     subscribe:
-      description: 订阅后还需玩家在本群绑定SteamID
+      description: 订阅本群。
       usage: 订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。
       messages:
         subscribed: 本群已订阅，无需重复订阅。
@@ -12,7 +12,7 @@ commands:
         unsubscribe_success: 取消订阅成功。
         not_subscribed: 本群尚未订阅，无需取消订阅。
     bind:
-      description: 绑定SteamID，并起一个别名（也可以不起）
+      description: 绑定SteamID，并起一个别名（也可以不起）。
       usage: 将你的SteamID与你的账号绑定，若本群已订阅将会实时获取你的新比赛数据发布至群中。
       examples: |-
         绑定 123456789
@@ -39,12 +39,12 @@ commands:
           请注意：你的Steam玩家数据并未公开，将无法使用BOT的主要功能，如“战报追踪”、“查询最近指令”等。
           如需公开数据，请在DOTA2游戏内设置中公开。
     unbind:
-      description: 取消绑定你的个人信息
+      description: 取消绑定你的个人信息。
       messages:
         unbind_success: 取消绑定成功。
         not_binded: 尚未绑定，无需取消绑定。
     rename:
-      description: 修改绑定时设定的别名
+      description: 修改绑定时设定的别名。
       examples: |-
         改名 李四
         改名 "李 四"
@@ -54,14 +54,14 @@ commands:
         not_binded: 请先绑定，绑定时即可设定别名。
         nick_name_too_long: 别名过长，请限制在20个字符以内。
     query-members:
-      description: 查询本群已绑定的玩家
+      description: 查询本群已绑定的玩家。
       messages:
         no_members: 本群尚无绑定玩家。
         query_failed: 查询群友失败。
     query-match:
-      description: 查询指定比赛ID的比赛数据，生成图片发布
+      description: 查询指定比赛ID的比赛数据，生成图片发布。
       options:
-        parse: 是否等待解析比赛数据
+        parse: -p 是否等待解析比赛数据
       examples: |-
         查询比赛 1234567890
         查询比赛 1234567890 -p
@@ -73,12 +73,12 @@ commands:
         query_failed: 获取比赛数据失败。
         waiting_for_parse: 比赛数据尚未解析，已发送解析请求到服务器，战报将在解析完成或超时后发送。
     query-recent-match:
-      description: 查询最近的比赛数据，生成图片发布
+      description: 查询最近的比赛数据，生成图片发布。
       options:
-        parse: 是否等待解析比赛数据
+        parse: -p 是否等待解析比赛数据
       usage: |-
         查询指定玩家的最近一场比赛的比赛数据，生成图片发布。
-        参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID
+        参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID。
       examples: |-
         查询最近比赛
         查询最近比赛 123456789
@@ -100,12 +100,12 @@ commands:
           你的比赛数据未公开，无法获取最近比赛数据。
           如需公开数据，请在DOTA2游戏内设置中公开。
     query-player:
-      description: 查询玩家的个人信息，可指定英雄
+      description: 查询玩家的个人信息，可指定英雄。
       options:
-        hero: 查询玩家指定英雄使用情况（同查询英雄，可用别名或ID）
+        hero: -o 查询玩家指定英雄使用情况（同查询英雄，可用别名或ID）
       usage: |-
         查询指定玩家的个人信息，生成图片发布，可指定英雄。
-        参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID
+        参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID。
       examples: |-
         查询玩家
         查询玩家 123456789
@@ -124,9 +124,9 @@ commands:
           指令调用失败。
           当前不属于群聊状态，必须提供指定玩家的SteamID。
     query-hero:
-      description: 查询英雄技能/面板信息
+      description: 查询英雄技能/面板信息。
       options:
-        random: 随机选择英雄
+        random: -r 随机选择英雄
       usage: |-
         查询英雄的技能说明与各项数据，生成图片发布。
         参数可输入英雄ID、英雄名、英雄常用别名。

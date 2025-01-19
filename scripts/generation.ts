@@ -59,8 +59,8 @@ enum GraphqlLanguageEnum {
     for (const languageTag of Object.keys(GraphqlLanguageEnum)) {
       for (const templateType of fs.readdirSync(templatesPath)) {
         for (const template of fs.readdirSync(path.join(templatesPath, templateType))) {
-          if (template.endsWith(".ejs") && ["match", "player", "hero"].some((targets) => template.startsWith(targets))) {
-            // const templateFile = fs.readFileSync(path.join(templatesPath, templateType, template), "utf-8");
+          if (template.endsWith(".ejs") && ["match", "player", "hero", "rank", "daily"].some((targets) => template.startsWith(targets))) {
+            // if (template.endsWith(".ejs") && ["daily"].some((targets) => template.startsWith(targets))) {
             const templateFile = path.join(templatesPath, templateType, template);
             if (templateType === "match") {
               const matchQuery = JSON.parse(fs.readFileSync(path.join(dataPath, `${templateType}.json`), "utf-8"));
@@ -73,20 +73,45 @@ enum GraphqlLanguageEnum {
               const playerExtraQuery = JSON.parse(fs.readFileSync(path.join(dataPath, `${templateType}ExtraInfo.json`), "utf-8"));
               const data = utils.getFormattedPlayerData({ playerQuery, playerExtraQuery });
               await renderImage({ data, languageTag, templateFile, template, browser });
-              const anonymousPlayerQuery = Object.assign({}, playerQuery);
-              anonymousPlayerQuery.player.steamAccount.isAnonymous = true;
-              anonymousPlayerQuery.player.matches = [];
-              anonymousPlayerQuery.player.performance = null;
-              anonymousPlayerQuery.player.heroesPerformance = [];
-              const anonymousData = utils.getFormattedPlayerData({ playerQuery: anonymousPlayerQuery });
-              await renderImage({ data: anonymousData, languageTag, templateFile, template, browser, fileName: "player_1-anonymous" });
+              const miniPlayerData = Object.assign({}, playerQuery);
+              const miniPlayerExtraData = Object.assign({}, playerExtraQuery);
+              miniPlayerData.player.matches = miniPlayerData.player.matches.slice(0, 10);
+              miniPlayerExtraData.player.heroesPerformance = miniPlayerExtraData.player.heroesPerformance.slice(0, 5);
+              miniPlayerExtraData.player.dotaPlus = miniPlayerExtraData.player.dotaPlus.sort((a, b) => (a.level < b.level ? 1 : -1)).slice(0, 3);
+              await renderImage({ data: utils.getFormattedPlayerData({ playerQuery: miniPlayerData, playerExtraQuery: miniPlayerExtraData }), languageTag, templateFile, template, browser, suffix: "mini" });
+              const anonymousPlayerData = Object.assign({}, playerQuery);
+              anonymousPlayerData.player.steamAccount.isAnonymous = true;
+              anonymousPlayerData.player.matches = [];
+              anonymousPlayerData.player.performance = null;
+              anonymousPlayerData.player.heroesPerformance = [];
+              const anonymousData = utils.getFormattedPlayerData({ playerQuery: anonymousPlayerData });
+              await renderImage({ data: anonymousData, languageTag, templateFile, template, browser, suffix: "anonymous" });
             }
             if (templateType === "hero") {
               const heroIds = getRandomThree(Object.keys(dotaconstants.heroes));
               for (let i = 0; i < heroIds.length; i++) {
                 const data = await utils.getFormattedHeroData(await queryHeroFromValve(Number(heroIds[i]), languageTag));
-                await renderImage({ data, languageTag, templateFile, template, browser, fileName: `${template.split(".")[0]}-${i}` });
+                await renderImage({ data, languageTag, templateFile, template, browser, suffix: i as any });
               }
+            }
+            if (templateType === "rank") {
+              const data = Object.assign(JSON.parse(fs.readFileSync(path.join(dataPath, `${templateType}.json`), "utf-8")), { date: moment.utc("2025-01-01 00:00:00") });
+              await renderImage({ data, languageTag, templateFile, template, browser, suffix: "up" });
+              Object.assign(data, {
+                isRising: false,
+                prevRank: { medal: 2, star: 2 },
+                currRank: { medal: 2, star: 1 },
+              });
+              await renderImage({ data, languageTag, templateFile, template, browser, suffix: "down" });
+            }
+            if (templateType === "report") {
+              let titleKey = "dota2tracker.template.yesterdays_summary";
+              const data = {
+                ...JSON.parse(fs.readFileSync(path.join(dataPath, `${templateType}.json`), "utf-8")),
+                title: i18next.t(titleKey, { lng: languageTag }),
+              };
+              await renderImage({ data, languageTag, templateFile, template, browser });
+              await renderImage({ data: Object.assign(data, { showCombi: false }), languageTag, templateFile, template, browser, suffix: "hideCombi" });
             }
           }
         }
@@ -99,9 +124,9 @@ enum GraphqlLanguageEnum {
   }
 })();
 
-async function renderImage(params: { data: object; languageTag: string; templateFile: string; template: string; browser: Browser; fileName?: string }) {
-  const { data, languageTag, templateFile, template, browser, fileName } = params;
-  const imageFileName = fileName ?? template.split(".")[0];
+async function renderImage(params: { data: object; languageTag: string; templateFile: string; template: string; browser: Browser; suffix?: string[] | string }) {
+  const { data, languageTag, templateFile, template, browser, suffix } = params;
+  const imageFileName = [template.split(".")[0], ...(Array.isArray(suffix) ? suffix : [suffix])].filter((item) => item !== null && item !== undefined).join("-");
 
   const templateData = {
     data,
@@ -147,7 +172,7 @@ async function renderImage(params: { data: object; languageTag: string; template
   });
   // 获取页面的实际尺寸
   const dimensions = await page.evaluate(() => {
-    const body = document.documentElement;
+    const body = document.documentElement.getElementsByTagName("body")[0];
     return {
       width: body?.scrollWidth ?? 0,
       height: body?.scrollHeight ?? 0,
@@ -162,7 +187,7 @@ async function renderImage(params: { data: object; languageTag: string; template
   });
 
   const buffer = await page.screenshot({ type: "png", fullPage: true });
-  // fs.writeFileSync(path.join(__dirname, "..", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "images", `${template}-result.html`), html);
+  // fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.html`), html);
   fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.png`), buffer);
   console.log(languageTag, imageFileName);
   await page.close();

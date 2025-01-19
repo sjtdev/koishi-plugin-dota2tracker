@@ -1,0 +1,7 @@
+{
+  "name": "张三",
+  "avatar": "https://avatars.fastly.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg",
+  "isRising": true,
+  "prevRank": { "medal": 1, "star": 5, "leader": null, "inTop100": null },
+  "currRank": { "medal": 2, "star": 1, "leader": null, "inTop100": null }
+}

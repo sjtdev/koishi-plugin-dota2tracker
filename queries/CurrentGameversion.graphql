@@ -1,8 +1,0 @@
-query CurrentGameversion {
-  constants {
-    gameVersions {
-      name
-      id
-    }
-  }
-}

@@ -20,3 +20,6 @@ tsconfig.tsbuildinfo
 temp.*
 backup.ts
 **/generated/*.png
+
+# VitePress cache
+**/.vitepress/cache

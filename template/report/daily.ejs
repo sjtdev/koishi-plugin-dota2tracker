@@ -169,7 +169,7 @@
             </div>
             <% } %>
         </div>
-        <div class="combinations"<%= !showCombi ? ` style="display:none;"` : "" %>>
+        <div class="combinations"<%- !showCombi ? ` style="display:none;"` : "" %>>
             <span style="grid-column: 1/-1"><%- $t("dota2tracker.template.combined_win_loss_summary") %></span>
             <% combinations.forEach((combi) => {%>
                 <div class="players">

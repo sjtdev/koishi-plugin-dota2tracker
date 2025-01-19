@@ -4,25 +4,25 @@ dota2tracker:
     dire: Dire
     won: Won
     lost: Lost
-    match_id_: 'Match ID: {0}'
-    game_mode_: 'Mode: {0}'
-    start_time_: 'Start Time: {0}'
-    end_time_: 'End Time: {0}'
-    pick_order: '#{0}'
+    match_id_: "Match ID: {0}"
+    game_mode_: "Mode: {0}"
+    start_time_: "Start Time: {0}"
+    end_time_: "End Time: {0}"
+    pick_order: "#{0}"
     random: R
-    hero_damage_: 'Damage: {0}'
-    building_damage_: 'Building: {0}'
-    damage_received_: 'Received: {0}'
-    lasthit_: 'LastHit: {0}'
-    deny_: 'Deny: {0}'
-    lh/dn_: 'LH/DN: {0}'
-    GPM: 'GPM'
-    XPM: 'XPM'
-    heal_: 'Heal: {0}'
-    crowd_control_duration_: 'CCD: {0}'
-    GPM/XPM_: 'GPM/XPM: {0}'
+    hero_damage_: "Damage: {0}"
+    building_damage_: "Building: {0}"
+    damage_received_: "Received: {0}"
+    lasthit_: "LastHit: {0}"
+    deny_: "Deny: {0}"
+    lh/dn_: "LH/DN: {0}"
+    GPM: GPM
+    XPM: XPM
+    heal_: "Heal: {0}"
+    crowd_control_duration_: "CCD: {0}"
+    GPM/XPM_: "GPM/XPM: {0}"
     lane: Lane
-    lane_: 'Lane: '
+    lane_: "Lane: "
     lane_advantage: Lane +
     lane_disadvantage: Lane -
     lane_jungle: Jungle
@@ -32,9 +32,9 @@ dota2tracker:
     analysis_successful: Analysis successful
     analysis_incomplete: Analysis incomplete
     kill: Kill
-    kill_contribution_: 'KC: {0}'
+    kill_contribution_: "KC: {0}"
     position: Position
-    position_: 'Position: '
+    position_: "Position: "
     position_1: Carry
     position_2: Mid
     position_3: OffLane
@@ -45,24 +45,24 @@ dota2tracker:
     total_damage: Damage
     total_experience: Exp.
     total_gold: Gold
-    region_: 'Region: {0}'
-    duration_: 'Duration: {0}'
-    position_undefined: '?'
-    top10_: 'Top 10 Heroes by Matches: '
-    match_count_: 'Matches: '
-    last25matches_: 'Last 25 Matches: '
-    winrate_: 'Winrate: '
-    imp_: 'IMP: '
-    lane_advantage_rate_: 'Lane Advantage Rate: '
+    region_: "Region: {0}"
+    duration_: "Duration: {0}"
+    position_undefined: "?"
+    top10_: "Top 10 Heroes by Matches: "
+    match_count_: "Matches: "
+    last25matches_: "Last 25 Matches: "
+    winrate_: "Winrate: "
+    imp_: "IMP: "
+    lane_advantage_rate_: "Lane Advantage Rate: "
     hero: Hero
-    all_matches_: 'All Matches: '
+    all_matches_: "All Matches: "
     match_count: Matches
     winrate: Winrate
     imp: IMP
     win_count: Wins
     lose_count: Losses
-    recently_heroes: 'Heroes used more than once recently: '
-    recently_positions: 'Performance in the last 25 matches across all positions: '
+    recently_heroes: "Heroes used more than once recently: "
+    recently_positions: "Performance in the last 25 matches across all positions: "
     winning_streak: Winning Streak
     losing_streak: Losing Streak
     id: ID
@@ -80,3 +80,5 @@ dota2tracker:
     report_winrate: WR
     anonymous_player_1: This profile is private.
     anonymous_player_2: Background is for display purposes only. It is not {player}’s data.
+    rank_fun_down_message: "{avatar}<br/>Sad"
+    rank_fun_up_message: Hip hip hooray! Our awesome member {avatar}{name} has leveled up from {prev} to {curr}! #<br/>Keep crushing it and let's see what heights you'll reach next! 🎉

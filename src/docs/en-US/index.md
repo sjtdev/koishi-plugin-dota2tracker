@@ -3,7 +3,7 @@
 layout: home
 
 hero:
-  name: "@sjtdev/dota2tracker"
+  name: "@sjtdev/dota2tracker（文档施工中！）"
   text: "koishi插件-追踪群友的DOTA2对局"
   # tagline: My great project tagline
   actions:

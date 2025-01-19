@@ -141,8 +141,9 @@ dota2tracker:
     message: |-
       {name}的{hero_name}{comment}。
       KDA：{kda}，GPM/XPM：{gpm_xpm}，补刀/反补：{lh_dn}，伤害/塔伤：{damage}，参战/参葬率：{kc_dc}
+    rank_changed: 群友 {name} 段位变动：{prev.medal}{prev.star} → {curr.medal}{curr.star}
   logger:
-    fetch_guilds_failed: 获取群组信息失败。
+    fetch_guilds_failed: 获取群组信息失败，将继续后续步骤。
     match_tracked: 追踪到来自{#each messageToLogger as item}群组 {item.platform}:{item.guildId} 的用户[{#each item.players as player}{player.nickName}({player.steamId}){#if player === item.players[item.players.length - 1]}{/if}{#if player !== item.players[item.players.length - 1]}、{/if}{/each}]{#if item !== messageToLogger[messageToLogger.length - 1]}、{/if}{/each}的尚未播报过的最新比赛 {match.id}。
     parse_request_sent: 比赛 {matchId} 解析请求已成功发送至STRATZ服务器。
     parse_request_failed: 比赛 {matchId} 解析请求发送失败。

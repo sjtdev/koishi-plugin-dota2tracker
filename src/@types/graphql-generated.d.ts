@@ -1946,29 +1946,12 @@ export enum XpReason {
   TomeOfKnowledge = 'TOME_OF_KNOWLEDGE'
 }
 
-export type AllAbilitiesChineseNameQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type AllAbilitiesChineseNameQuery = { __typename?: 'DotaQuery', constants?: { __typename?: 'ConstantQuery', abilities?: Array<{ __typename?: 'AbilityType', id?: any | null, language?: { __typename?: 'AbilityLanguageType', displayName?: string | null } | null } | null> | null, gameVersions?: Array<{ __typename?: 'GameVersionType', name?: string | null, id?: any | null } | null> | null } | null };
-
 export type ConstantsQueryVariables = Exact<{
   language?: InputMaybe<LanguageEnum>;
 }>;
 
 
 export type ConstantsQuery = { __typename?: 'DotaQuery', constants?: { __typename?: 'ConstantQuery', gameVersions?: Array<{ __typename?: 'GameVersionType', id?: any | null } | null> | null, facets?: Array<{ __typename?: 'FacetType', name?: string | null, id?: any | null, color?: string | null, icon?: string | null, language?: { __typename?: 'FacetLanguageType', displayName?: string | null } | null } | null> | null } | null };
-
-export type CurrentGameversionQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type CurrentGameversionQuery = { __typename?: 'DotaQuery', constants?: { __typename?: 'ConstantQuery', gameVersions?: Array<{ __typename?: 'GameVersionType', name?: string | null, id?: any | null } | null> | null } | null };
-
-export type HeroInfoQueryVariables = Exact<{
-  heroId: Scalars['Short']['input'];
-}>;
-
-
-export type HeroInfoQuery = { __typename?: 'DotaQuery', constants?: { __typename?: 'ConstantQuery', hero?: { __typename?: 'HeroType', id?: any | null, name?: string | null, shortName?: string | null, aliases?: Array<string | null> | null, roles?: Array<{ __typename?: 'HeroRoleType', roleId?: HeroRoleEnum | null, level?: any | null } | null> | null, language?: { __typename?: 'HeroLanguageType', displayName?: string | null, lore?: string | null, hype?: string | null } | null, abilities?: Array<{ __typename?: 'HeroAbilityType', ability?: { __typename?: 'AbilityType', name?: string | null, language?: { __typename?: 'AbilityLanguageType', displayName?: string | null, description?: Array<string | null> | null, attributes?: Array<string | null> | null, lore?: string | null, aghanimDescription?: string | null, shardDescription?: string | null, notes?: Array<string | null> | null } | null, stat?: { __typename?: 'AbilityStatType', type?: number | null, behavior?: any | null, unitTargetType?: any | null, unitTargetTeam?: number | null, unitTargetFlags?: any | null, unitDamageType?: number | null, cooldown?: Array<number | null> | null, manaCost?: Array<number | null> | null, spellImmunity?: number | null, isOnCastbar?: boolean | null, isGrantedByShard?: boolean | null, isGrantedByScepter?: boolean | null, hasShardUpgrade?: boolean | null, hasScepterUpgrade?: boolean | null } | null } | null } | null> | null, talents?: Array<{ __typename?: 'HeroTalentType', abilityId?: any | null, slot?: any | null } | null> | null } | null } | null };
 
 export type HeroMatchupWinrateQueryVariables = Exact<{
   heroId: Scalars['Short']['input'];

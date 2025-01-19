@@ -153,6 +153,7 @@ dota2tracker:
     message: |-
       {name}'s {hero_name} {comment}.
       KDA: {kda}, GPM/XPM: {gpm_xpm}, Last Hits/Denies: {lh_dn}, Damage/Tower Damage: {damage}, Kill/Death Contribution Rate: {kc_dc}
+    rank_changed: "Player {name} rank changed: {prev.medal}{prev.star} → {curr.medal}{curr.star}"
   logger:
     fetch_guilds_failed: Failed to fetch guild information.
     match_tracked: Tracked the latest unreported match {match.id} from group {#each messageToLogger as item}{item.platform}:{item.guildId} for users [{#each item.players as player}{player.nickName}({player.steamId}){#if player === item.players[item.players.length - 1]}{/if}{#if player !== item.players[item.players.length - 1]} and {/if}{/each}]{#if item !== messageToLogger[messageToLogger.length - 1]}, {/if}{/each}.

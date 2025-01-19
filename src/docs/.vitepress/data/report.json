@@ -1,0 +1,748 @@
+{
+  "players": [
+    {
+      "id": 10,
+      "userId": "11111",
+      "guildId": "1",
+      "steamId": 1,
+      "nickName": "Player 1",
+      "name": "Player 1",
+      "steamAccount": {
+        "id": 1,
+        "avatar": "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHRleHQgeD0iOCIgeT0iMjgiIGZvbnQtc2l6ZT0iMjAiIHN0eWxlPSIKICAgIGZpbGw6ICNmZmY7CiI+UDE8L3RleHQ+PC9zdmc+"
+      },
+      "matches": [
+        {
+          "id": 5132523,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 8, "deaths": 10, "assists": 8, "imp": -21, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 8, "deaths": 11, "assists": 8, "imp": -45, "isRadiant": false, "steamAccount": { "id": 2 } }
+          ]
+        },
+        {
+          "id": 234623,
+          "didRadiantWin": false,
+          "players": [
+            { "kills": 5, "deaths": 12, "assists": 10, "imp": -41, "isRadiant": true, "steamAccount": { "id": 1 } },
+            { "kills": 4, "deaths": 10, "assists": 15, "imp": -29, "isRadiant": true, "steamAccount": { "id": 2 } }
+          ]
+        },
+        {
+          "id": 274572,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 0, "deaths": 4, "assists": 1, "imp": -37, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 0, "deaths": 2, "assists": 0, "imp": -26, "isRadiant": false, "steamAccount": { "id": 2 } }
+          ]
+        },
+        {
+          "id": 17345712,
+          "didRadiantWin": false,
+          "players": [
+            { "kills": 10, "deaths": 1, "assists": 14, "imp": null, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 4, "deaths": 2, "assists": 16, "imp": null, "isRadiant": false, "steamAccount": { "id": 2 } }
+          ]
+        },
+        {
+          "id": 732436,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 8, "deaths": 8, "assists": 10, "imp": -8, "isRadiant": false, "steamAccount": { "id": 2 } },
+            { "kills": 1, "deaths": 12, "assists": 6, "imp": -49, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 1, "deaths": 13, "assists": 6, "imp": -51, "isRadiant": false, "steamAccount": { "id": 3 } }
+          ]
+        },
+        {
+          "id": 132152,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 4, "deaths": 9, "assists": 5, "imp": -48, "isRadiant": false, "steamAccount": { "id": 2 } },
+            { "kills": 7, "deaths": 13, "assists": 7, "imp": -45, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 1, "deaths": 13, "assists": 11, "imp": -36, "isRadiant": false, "steamAccount": { "id": 3 } }
+          ]
+        },
+        {
+          "id": 45845,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 15, "deaths": 5, "assists": 19, "imp": 17, "isRadiant": true, "steamAccount": { "id": 2 } },
+            { "kills": 4, "deaths": 8, "assists": 22, "imp": -7, "isRadiant": true, "steamAccount": { "id": 3 } },
+            { "kills": 5, "deaths": 5, "assists": 26, "imp": 8, "isRadiant": true, "steamAccount": { "id": 1 } }
+          ]
+        }
+      ],
+      "winCount": 2,
+      "loseCount": 5,
+      "avgKills": 5.14,
+      "avgDeaths": 8.14,
+      "avgAssists": 10.29,
+      "avgKDA": 1.9,
+      "avgImp": -26
+    },
+    {
+      "id": 28,
+      "userId": "2643874829",
+      "guildId": "1",
+      "steamId": 2,
+      "nickName": "Player 2",
+      "name": "Player 2",
+      "steamAccount": {
+        "id": 2,
+        "avatar": "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHRleHQgeD0iOCIgeT0iMjgiIGZpbGw9InBpbmsiIGZvbnQtc2l6ZT0iMjAiPlAyPC90ZXh0Pjwvc3ZnPg=="
+      },
+      "matches": [
+        {
+          "id": 5132523,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 8, "deaths": 10, "assists": 8, "imp": -21, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 8, "deaths": 11, "assists": 8, "imp": -45, "isRadiant": false, "steamAccount": { "id": 2 } }
+          ]
+        },
+        {
+          "id": 234623,
+          "didRadiantWin": false,
+          "players": [
+            { "kills": 5, "deaths": 12, "assists": 10, "imp": -41, "isRadiant": true, "steamAccount": { "id": 1 } },
+            { "kills": 4, "deaths": 10, "assists": 15, "imp": -29, "isRadiant": true, "steamAccount": { "id": 2 } }
+          ]
+        },
+        {
+          "id": 274572,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 0, "deaths": 4, "assists": 1, "imp": -37, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 0, "deaths": 2, "assists": 0, "imp": -26, "isRadiant": false, "steamAccount": { "id": 2 } }
+          ]
+        },
+        {
+          "id": 17345712,
+          "didRadiantWin": false,
+          "players": [
+            { "kills": 10, "deaths": 1, "assists": 14, "imp": null, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 4, "deaths": 2, "assists": 16, "imp": null, "isRadiant": false, "steamAccount": { "id": 2 } }
+          ]
+        },
+        {
+          "id": 732436,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 8, "deaths": 8, "assists": 10, "imp": -8, "isRadiant": false, "steamAccount": { "id": 2 } },
+            { "kills": 1, "deaths": 12, "assists": 6, "imp": -49, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 1, "deaths": 13, "assists": 6, "imp": -51, "isRadiant": false, "steamAccount": { "id": 3 } }
+          ]
+        },
+        {
+          "id": 132152,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 4, "deaths": 9, "assists": 5, "imp": -48, "isRadiant": false, "steamAccount": { "id": 2 } },
+            { "kills": 7, "deaths": 13, "assists": 7, "imp": -45, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 1, "deaths": 13, "assists": 11, "imp": -36, "isRadiant": false, "steamAccount": { "id": 3 } }
+          ]
+        },
+        {
+          "id": 45845,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 15, "deaths": 5, "assists": 19, "imp": 17, "isRadiant": true, "steamAccount": { "id": 2 } },
+            { "kills": 4, "deaths": 8, "assists": 22, "imp": -7, "isRadiant": true, "steamAccount": { "id": 3 } },
+            { "kills": 5, "deaths": 5, "assists": 26, "imp": 8, "isRadiant": true, "steamAccount": { "id": 1 } }
+          ]
+        }
+      ],
+      "winCount": 2,
+      "loseCount": 5,
+      "avgKills": 6.14,
+      "avgDeaths": 6.71,
+      "avgAssists": 10.43,
+      "avgKDA": 2.47,
+      "avgImp": -20
+    },
+    {
+      "id": 29,
+      "userId": "15251241",
+      "guildId": "1",
+      "steamId": 3,
+      "nickName": "Player 3",
+      "name": "Player 3",
+      "steamAccount": {
+        "id": 3,
+        "avatar": "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHRleHQgeD0iOCIgeT0iMjgiIGZpbGw9IiM2Y2YiIGZvbnQtc2l6ZT0iMjAiPlAzPC90ZXh0Pjwvc3ZnPg=="
+      },
+      "matches": [
+        { "id": 51125151, "didRadiantWin": true, "players": [{ "kills": 0, "deaths": 6, "assists": 3, "imp": -33, "isRadiant": false, "steamAccount": { "id": 3 } }] },
+        { "id": 845684, "didRadiantWin": false, "players": [{ "kills": 2, "deaths": 10, "assists": 15, "imp": -12, "isRadiant": true, "steamAccount": { "id": 3 } }] },
+        {
+          "id": 2845000,
+          "didRadiantWin": true,
+          "players": [{ "kills": 0, "deaths": 11, "assists": 6, "imp": -53, "isRadiant": false, "steamAccount": { "id": 3 } }]
+        },
+        {
+          "id": 732436,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 8, "deaths": 8, "assists": 10, "imp": -8, "isRadiant": false, "steamAccount": { "id": 2 } },
+            { "kills": 1, "deaths": 12, "assists": 6, "imp": -49, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 1, "deaths": 13, "assists": 6, "imp": -51, "isRadiant": false, "steamAccount": { "id": 3 } }
+          ]
+        },
+        {
+          "id": 132152,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 4, "deaths": 9, "assists": 5, "imp": -48, "isRadiant": false, "steamAccount": { "id": 2 } },
+            { "kills": 7, "deaths": 13, "assists": 7, "imp": -45, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 1, "deaths": 13, "assists": 11, "imp": -36, "isRadiant": false, "steamAccount": { "id": 3 } }
+          ]
+        },
+        {
+          "id": 45845,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 15, "deaths": 5, "assists": 19, "imp": 17, "isRadiant": true, "steamAccount": { "id": 2 } },
+            { "kills": 4, "deaths": 8, "assists": 22, "imp": -7, "isRadiant": true, "steamAccount": { "id": 3 } },
+            { "kills": 5, "deaths": 5, "assists": 26, "imp": 8, "isRadiant": true, "steamAccount": { "id": 1 } }
+          ]
+        }
+      ],
+      "winCount": 1,
+      "loseCount": 5,
+      "avgKills": 1.33,
+      "avgDeaths": 10.17,
+      "avgAssists": 10.5,
+      "avgKDA": 1.16,
+      "avgImp": -32
+    }
+  ],
+  "combinations": [
+    {
+      "players": [
+        {
+          "id": 10,
+          "userId": "11111",
+          "guildId": "1",
+          "steamId": 1,
+          "nickName": "Player 1",
+          "name": "Player 1",
+          "steamAccount": {
+            "id": 1,
+            "name": "",
+            "avatar": "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHRleHQgeD0iOCIgeT0iMjgiIGZvbnQtc2l6ZT0iMjAiIHN0eWxlPSIKICAgIGZpbGw6ICNmZmY7CiI+UDE8L3RleHQ+PC9zdmc+"
+          },
+          "matches": [
+            {
+              "id": 5132523,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 8, "deaths": 10, "assists": 8, "imp": -21, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 8, "deaths": 11, "assists": 8, "imp": -45, "isRadiant": false, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 234623,
+              "didRadiantWin": false,
+              "players": [
+                { "kills": 5, "deaths": 12, "assists": 10, "imp": -41, "isRadiant": true, "steamAccount": { "id": 1 } },
+                { "kills": 4, "deaths": 10, "assists": 15, "imp": -29, "isRadiant": true, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 274572,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 0, "deaths": 4, "assists": 1, "imp": -37, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 0, "deaths": 2, "assists": 0, "imp": -26, "isRadiant": false, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 17345712,
+              "didRadiantWin": false,
+              "players": [
+                { "kills": 10, "deaths": 1, "assists": 14, "imp": null, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 4, "deaths": 2, "assists": 16, "imp": null, "isRadiant": false, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 732436,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 8, "deaths": 8, "assists": 10, "imp": -8, "isRadiant": false, "steamAccount": { "id": 2 } },
+                { "kills": 1, "deaths": 12, "assists": 6, "imp": -49, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 1, "deaths": 13, "assists": 6, "imp": -51, "isRadiant": false, "steamAccount": { "id": 3 } }
+              ]
+            },
+            {
+              "id": 132152,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 4, "deaths": 9, "assists": 5, "imp": -48, "isRadiant": false, "steamAccount": { "id": 2 } },
+                { "kills": 7, "deaths": 13, "assists": 7, "imp": -45, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 1, "deaths": 13, "assists": 11, "imp": -36, "isRadiant": false, "steamAccount": { "id": 3 } }
+              ]
+            },
+            {
+              "id": 45845,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 15, "deaths": 5, "assists": 19, "imp": 17, "isRadiant": true, "steamAccount": { "id": 2 } },
+                { "kills": 4, "deaths": 8, "assists": 22, "imp": -7, "isRadiant": true, "steamAccount": { "id": 3 } },
+                { "kills": 5, "deaths": 5, "assists": 26, "imp": 8, "isRadiant": true, "steamAccount": { "id": 1 } }
+              ]
+            }
+          ],
+          "winCount": 2,
+          "loseCount": 5,
+          "avgKills": 5.14,
+          "avgDeaths": 8.14,
+          "avgAssists": 10.29,
+          "avgKDA": 1.9,
+          "avgImp": -26
+        },
+        {
+          "id": 28,
+          "userId": "2643874829",
+          "guildId": "1",
+          "steamId": 2,
+          "nickName": "Player 2",
+          "name": "Player 2",
+          "steamAccount": {
+            "id": 2,
+            "name": "",
+            "avatar": "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHRleHQgeD0iOCIgeT0iMjgiIGZpbGw9InBpbmsiIGZvbnQtc2l6ZT0iMjAiPlAyPC90ZXh0Pjwvc3ZnPg=="
+          },
+          "matches": [
+            {
+              "id": 5132523,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 8, "deaths": 10, "assists": 8, "imp": -21, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 8, "deaths": 11, "assists": 8, "imp": -45, "isRadiant": false, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 234623,
+              "didRadiantWin": false,
+              "players": [
+                { "kills": 5, "deaths": 12, "assists": 10, "imp": -41, "isRadiant": true, "steamAccount": { "id": 1 } },
+                { "kills": 4, "deaths": 10, "assists": 15, "imp": -29, "isRadiant": true, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 274572,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 0, "deaths": 4, "assists": 1, "imp": -37, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 0, "deaths": 2, "assists": 0, "imp": -26, "isRadiant": false, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 17345712,
+              "didRadiantWin": false,
+              "players": [
+                { "kills": 10, "deaths": 1, "assists": 14, "imp": null, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 4, "deaths": 2, "assists": 16, "imp": null, "isRadiant": false, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 732436,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 8, "deaths": 8, "assists": 10, "imp": -8, "isRadiant": false, "steamAccount": { "id": 2 } },
+                { "kills": 1, "deaths": 12, "assists": 6, "imp": -49, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 1, "deaths": 13, "assists": 6, "imp": -51, "isRadiant": false, "steamAccount": { "id": 3 } }
+              ]
+            },
+            {
+              "id": 132152,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 4, "deaths": 9, "assists": 5, "imp": -48, "isRadiant": false, "steamAccount": { "id": 2 } },
+                { "kills": 7, "deaths": 13, "assists": 7, "imp": -45, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 1, "deaths": 13, "assists": 11, "imp": -36, "isRadiant": false, "steamAccount": { "id": 3 } }
+              ]
+            },
+            {
+              "id": 45845,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 15, "deaths": 5, "assists": 19, "imp": 17, "isRadiant": true, "steamAccount": { "id": 2 } },
+                { "kills": 4, "deaths": 8, "assists": 22, "imp": -7, "isRadiant": true, "steamAccount": { "id": 3 } },
+                { "kills": 5, "deaths": 5, "assists": 26, "imp": 8, "isRadiant": true, "steamAccount": { "id": 1 } }
+              ]
+            }
+          ],
+          "winCount": 2,
+          "loseCount": 5,
+          "avgKills": 6.14,
+          "avgDeaths": 6.71,
+          "avgAssists": 10.43,
+          "avgKDA": 2.47,
+          "avgImp": -20
+        }
+      ],
+      "name": "Player 1/Player 2",
+      "winCount": 1,
+      "matches": [
+        {
+          "id": 5132523,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 8, "deaths": 10, "assists": 8, "imp": -21, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 8, "deaths": 11, "assists": 8, "imp": -45, "isRadiant": false, "steamAccount": { "id": 2 } }
+          ]
+        },
+        {
+          "id": 234623,
+          "didRadiantWin": false,
+          "players": [
+            { "kills": 5, "deaths": 12, "assists": 10, "imp": -41, "isRadiant": true, "steamAccount": { "id": 1 } },
+            { "kills": 4, "deaths": 10, "assists": 15, "imp": -29, "isRadiant": true, "steamAccount": { "id": 2 } }
+          ]
+        },
+        {
+          "id": 274572,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 0, "deaths": 4, "assists": 1, "imp": -37, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 0, "deaths": 2, "assists": 0, "imp": -26, "isRadiant": false, "steamAccount": { "id": 2 } }
+          ]
+        },
+        {
+          "id": 17345712,
+          "didRadiantWin": false,
+          "players": [
+            { "kills": 10, "deaths": 1, "assists": 14, "imp": null, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 4, "deaths": 2, "assists": 16, "imp": null, "isRadiant": false, "steamAccount": { "id": 2 } }
+          ]
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "id": 10,
+          "userId": "11111",
+          "guildId": "1",
+          "steamId": 1,
+          "nickName": "Player 1",
+          "name": "Player 1",
+          "steamAccount": {
+            "id": 1,
+            "name": "",
+            "avatar": "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHRleHQgeD0iOCIgeT0iMjgiIGZvbnQtc2l6ZT0iMjAiIHN0eWxlPSIKICAgIGZpbGw6ICNmZmY7CiI+UDE8L3RleHQ+PC9zdmc+"
+          },
+          "matches": [
+            {
+              "id": 5132523,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 8, "deaths": 10, "assists": 8, "imp": -21, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 8, "deaths": 11, "assists": 8, "imp": -45, "isRadiant": false, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 234623,
+              "didRadiantWin": false,
+              "players": [
+                { "kills": 5, "deaths": 12, "assists": 10, "imp": -41, "isRadiant": true, "steamAccount": { "id": 1 } },
+                { "kills": 4, "deaths": 10, "assists": 15, "imp": -29, "isRadiant": true, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 274572,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 0, "deaths": 4, "assists": 1, "imp": -37, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 0, "deaths": 2, "assists": 0, "imp": -26, "isRadiant": false, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 17345712,
+              "didRadiantWin": false,
+              "players": [
+                { "kills": 10, "deaths": 1, "assists": 14, "imp": null, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 4, "deaths": 2, "assists": 16, "imp": null, "isRadiant": false, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 732436,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 8, "deaths": 8, "assists": 10, "imp": -8, "isRadiant": false, "steamAccount": { "id": 2 } },
+                { "kills": 1, "deaths": 12, "assists": 6, "imp": -49, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 1, "deaths": 13, "assists": 6, "imp": -51, "isRadiant": false, "steamAccount": { "id": 3 } }
+              ]
+            },
+            {
+              "id": 132152,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 4, "deaths": 9, "assists": 5, "imp": -48, "isRadiant": false, "steamAccount": { "id": 2 } },
+                { "kills": 7, "deaths": 13, "assists": 7, "imp": -45, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 1, "deaths": 13, "assists": 11, "imp": -36, "isRadiant": false, "steamAccount": { "id": 3 } }
+              ]
+            },
+            {
+              "id": 45845,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 15, "deaths": 5, "assists": 19, "imp": 17, "isRadiant": true, "steamAccount": { "id": 2 } },
+                { "kills": 4, "deaths": 8, "assists": 22, "imp": -7, "isRadiant": true, "steamAccount": { "id": 3 } },
+                { "kills": 5, "deaths": 5, "assists": 26, "imp": 8, "isRadiant": true, "steamAccount": { "id": 1 } }
+              ]
+            }
+          ],
+          "winCount": 2,
+          "loseCount": 5,
+          "avgKills": 5.14,
+          "avgDeaths": 8.14,
+          "avgAssists": 10.29,
+          "avgKDA": 1.9,
+          "avgImp": -26
+        },
+        {
+          "id": 28,
+          "userId": "2643874829",
+          "guildId": "1",
+          "steamId": 2,
+          "nickName": "Player 2",
+          "name": "Player 2",
+          "steamAccount": {
+            "id": 2,
+            "name": "",
+            "avatar": "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHRleHQgeD0iOCIgeT0iMjgiIGZpbGw9InBpbmsiIGZvbnQtc2l6ZT0iMjAiPlAyPC90ZXh0Pjwvc3ZnPg=="
+          },
+          "matches": [
+            {
+              "id": 5132523,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 8, "deaths": 10, "assists": 8, "imp": -21, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 8, "deaths": 11, "assists": 8, "imp": -45, "isRadiant": false, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 234623,
+              "didRadiantWin": false,
+              "players": [
+                { "kills": 5, "deaths": 12, "assists": 10, "imp": -41, "isRadiant": true, "steamAccount": { "id": 1 } },
+                { "kills": 4, "deaths": 10, "assists": 15, "imp": -29, "isRadiant": true, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 274572,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 0, "deaths": 4, "assists": 1, "imp": -37, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 0, "deaths": 2, "assists": 0, "imp": -26, "isRadiant": false, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 17345712,
+              "didRadiantWin": false,
+              "players": [
+                { "kills": 10, "deaths": 1, "assists": 14, "imp": null, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 4, "deaths": 2, "assists": 16, "imp": null, "isRadiant": false, "steamAccount": { "id": 2 } }
+              ]
+            },
+            {
+              "id": 732436,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 8, "deaths": 8, "assists": 10, "imp": -8, "isRadiant": false, "steamAccount": { "id": 2 } },
+                { "kills": 1, "deaths": 12, "assists": 6, "imp": -49, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 1, "deaths": 13, "assists": 6, "imp": -51, "isRadiant": false, "steamAccount": { "id": 3 } }
+              ]
+            },
+            {
+              "id": 132152,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 4, "deaths": 9, "assists": 5, "imp": -48, "isRadiant": false, "steamAccount": { "id": 2 } },
+                { "kills": 7, "deaths": 13, "assists": 7, "imp": -45, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 1, "deaths": 13, "assists": 11, "imp": -36, "isRadiant": false, "steamAccount": { "id": 3 } }
+              ]
+            },
+            {
+              "id": 45845,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 15, "deaths": 5, "assists": 19, "imp": 17, "isRadiant": true, "steamAccount": { "id": 2 } },
+                { "kills": 4, "deaths": 8, "assists": 22, "imp": -7, "isRadiant": true, "steamAccount": { "id": 3 } },
+                { "kills": 5, "deaths": 5, "assists": 26, "imp": 8, "isRadiant": true, "steamAccount": { "id": 1 } }
+              ]
+            }
+          ],
+          "winCount": 2,
+          "loseCount": 5,
+          "avgKills": 6.14,
+          "avgDeaths": 6.71,
+          "avgAssists": 10.43,
+          "avgKDA": 2.47,
+          "avgImp": -20
+        },
+        {
+          "id": 29,
+          "userId": "15251241",
+          "guildId": "1",
+          "steamId": 3,
+          "nickName": "Player 3",
+          "name": "Player 3",
+          "steamAccount": {
+            "id": 3,
+            "name": "",
+            "avatar": "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHRleHQgeD0iOCIgeT0iMjgiIGZpbGw9IiM2Y2YiIGZvbnQtc2l6ZT0iMjAiPlAzPC90ZXh0Pjwvc3ZnPg=="
+          },
+          "matches": [
+            { "id": 51125151, "didRadiantWin": true, "players": [{ "kills": 0, "deaths": 6, "assists": 3, "imp": -33, "isRadiant": false, "steamAccount": { "id": 3 } }] },
+            { "id": 845684, "didRadiantWin": false, "players": [{ "kills": 2, "deaths": 10, "assists": 15, "imp": -12, "isRadiant": true, "steamAccount": { "id": 3 } }] },
+            {
+              "id": 2845000,
+              "didRadiantWin": true,
+              "players": [{ "kills": 0, "deaths": 11, "assists": 6, "imp": -53, "isRadiant": false, "steamAccount": { "id": 3 } }]
+            },
+            {
+              "id": 732436,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 8, "deaths": 8, "assists": 10, "imp": -8, "isRadiant": false, "steamAccount": { "id": 2 } },
+                { "kills": 1, "deaths": 12, "assists": 6, "imp": -49, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 1, "deaths": 13, "assists": 6, "imp": -51, "isRadiant": false, "steamAccount": { "id": 3 } }
+              ]
+            },
+            {
+              "id": 132152,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 4, "deaths": 9, "assists": 5, "imp": -48, "isRadiant": false, "steamAccount": { "id": 2 } },
+                { "kills": 7, "deaths": 13, "assists": 7, "imp": -45, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 1, "deaths": 13, "assists": 11, "imp": -36, "isRadiant": false, "steamAccount": { "id": 3 } }
+              ]
+            },
+            {
+              "id": 45845,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 15, "deaths": 5, "assists": 19, "imp": 17, "isRadiant": true, "steamAccount": { "id": 2 } },
+                { "kills": 4, "deaths": 8, "assists": 22, "imp": -7, "isRadiant": true, "steamAccount": { "id": 3 } },
+                { "kills": 5, "deaths": 5, "assists": 26, "imp": 8, "isRadiant": true, "steamAccount": { "id": 1 } }
+              ]
+            }
+          ],
+          "winCount": 1,
+          "loseCount": 5,
+          "avgKills": 1.33,
+          "avgDeaths": 10.17,
+          "avgAssists": 10.5,
+          "avgKDA": 1.16,
+          "avgImp": -32
+        }
+      ],
+      "name": "Player 1/Player 2/Player 3",
+      "winCount": 1,
+      "matches": [
+        {
+          "id": 732436,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 8, "deaths": 8, "assists": 10, "imp": -8, "isRadiant": false, "steamAccount": { "id": 2 } },
+            { "kills": 1, "deaths": 12, "assists": 6, "imp": -49, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 1, "deaths": 13, "assists": 6, "imp": -51, "isRadiant": false, "steamAccount": { "id": 3 } }
+          ]
+        },
+        {
+          "id": 132152,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 4, "deaths": 9, "assists": 5, "imp": -48, "isRadiant": false, "steamAccount": { "id": 2 } },
+            { "kills": 7, "deaths": 13, "assists": 7, "imp": -45, "isRadiant": false, "steamAccount": { "id": 1 } },
+            { "kills": 1, "deaths": 13, "assists": 11, "imp": -36, "isRadiant": false, "steamAccount": { "id": 3 } }
+          ]
+        },
+        {
+          "id": 45845,
+          "didRadiantWin": true,
+          "players": [
+            { "kills": 15, "deaths": 5, "assists": 19, "imp": 17, "isRadiant": true, "steamAccount": { "id": 2 } },
+            { "kills": 4, "deaths": 8, "assists": 22, "imp": -7, "isRadiant": true, "steamAccount": { "id": 3 } },
+            { "kills": 5, "deaths": 5, "assists": 26, "imp": 8, "isRadiant": true, "steamAccount": { "id": 1 } }
+          ]
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "id": 29,
+          "userId": "15251241",
+          "guildId": "1",
+          "steamId": 3,
+          "nickName": "Player 3",
+          "name": "Player 3",
+          "steamAccount": {
+            "id": 3,
+            "name": "",
+            "avatar": "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHRleHQgeD0iOCIgeT0iMjgiIGZpbGw9IiM2Y2YiIGZvbnQtc2l6ZT0iMjAiPlAzPC90ZXh0Pjwvc3ZnPg=="
+          },
+          "matches": [
+            { "id": 51125151, "didRadiantWin": true, "players": [{ "kills": 0, "deaths": 6, "assists": 3, "imp": -33, "isRadiant": false, "steamAccount": { "id": 3 } }] },
+            { "id": 845684, "didRadiantWin": false, "players": [{ "kills": 2, "deaths": 10, "assists": 15, "imp": -12, "isRadiant": true, "steamAccount": { "id": 3 } }] },
+            {
+              "id": 2845000,
+              "didRadiantWin": true,
+              "players": [{ "kills": 0, "deaths": 11, "assists": 6, "imp": -53, "isRadiant": false, "steamAccount": { "id": 3 } }]
+            },
+            {
+              "id": 732436,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 8, "deaths": 8, "assists": 10, "imp": -8, "isRadiant": false, "steamAccount": { "id": 2 } },
+                { "kills": 1, "deaths": 12, "assists": 6, "imp": -49, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 1, "deaths": 13, "assists": 6, "imp": -51, "isRadiant": false, "steamAccount": { "id": 3 } }
+              ]
+            },
+            {
+              "id": 132152,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 4, "deaths": 9, "assists": 5, "imp": -48, "isRadiant": false, "steamAccount": { "id": 2 } },
+                { "kills": 7, "deaths": 13, "assists": 7, "imp": -45, "isRadiant": false, "steamAccount": { "id": 1 } },
+                { "kills": 1, "deaths": 13, "assists": 11, "imp": -36, "isRadiant": false, "steamAccount": { "id": 3 } }
+              ]
+            },
+            {
+              "id": 45845,
+              "didRadiantWin": true,
+              "players": [
+                { "kills": 15, "deaths": 5, "assists": 19, "imp": 17, "isRadiant": true, "steamAccount": { "id": 2 } },
+                { "kills": 4, "deaths": 8, "assists": 22, "imp": -7, "isRadiant": true, "steamAccount": { "id": 3 } },
+                { "kills": 5, "deaths": 5, "assists": 26, "imp": 8, "isRadiant": true, "steamAccount": { "id": 1 } }
+              ]
+            }
+          ],
+          "winCount": 1,
+          "loseCount": 5,
+          "avgKills": 1.33,
+          "avgDeaths": 10.17,
+          "avgAssists": 10.5,
+          "avgKDA": 1.16,
+          "avgImp": -32
+        }
+      ],
+      "name": "Player 3",
+      "winCount": 0,
+      "matches": [
+        { "id": 51125151, "didRadiantWin": true, "players": [{ "kills": 0, "deaths": 6, "assists": 3, "imp": -33, "isRadiant": false, "steamAccount": { "id": 3 } }] },
+        { "id": 845684, "didRadiantWin": false, "players": [{ "kills": 2, "deaths": 10, "assists": 15, "imp": -12, "isRadiant": true, "steamAccount": { "id": 3 } }] },
+        {
+          "id": 2845000,
+          "didRadiantWin": true,
+          "players": [{ "kills": 0, "deaths": 11, "assists": 6, "imp": -53, "isRadiant": false, "steamAccount": { "id": 3 } }]
+        }
+      ]
+    }
+  ],
+  "showCombi": true
+}
