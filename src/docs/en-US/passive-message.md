@@ -14,7 +14,7 @@ You can check the [command instructions](./commands.md) or invoke `command -h` i
 <chat-message nickname="Koishi">Searching for match details, please wait...</chat-message>
 <chat-message nickname="Koishi">
   https://stratz.com/matches/8127571787
-  <img src="./generated/match_2.png" />
+  <img src="/en-US/generated/match_2.png" />
 </chat-message>
 </chat-panel>
 
@@ -27,7 +27,7 @@ Query the specified SteamID player, generating an image with the [player templat
 <chat-message nickname="Koishi">Retrieving player data, please wait...</chat-message>
 <chat-message nickname="Koishi">
   https://stratz.com/players/**********
-  <img src="./generated/player_1-mini.png" />
+  <img src="/en-US/generated/player_1-mini.png" />
 </chat-message>
 </chat-panel>
 

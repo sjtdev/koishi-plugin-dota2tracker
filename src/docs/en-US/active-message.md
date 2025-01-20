@@ -26,7 +26,7 @@ The plugin will track the latest match information of **bound friends** in **sub
 <chat-message nickname="Koishi">
   (Steam account name)'s Axe led the team to victory.<br>
   KDA: 10.00 [10/2/10], GPM/XPM: 744/742, Last Hits/Deny: 276/17, Damage/Tower Damage: 45613/15976, Kill/Death Contribution Rate: 66.67%/33.33%
-  <img src="./generated/match_2.png" />
+  <img src="/en-US/generated/match_2.png" />
 </chat-message>
 </chat-panel>
 
@@ -39,7 +39,7 @@ The plugin will also track the rank information of bound friends, which can be d
 <chat-panel><chat-message nickname="Koishi">Player Tom's rank changed: Herald 5 → Guardian 1</chat-message></chat-panel>
 
 * The configuration item [Fun Template Switch](./configs#rankbroadfun-boolean), when enabled, will use the [Fun Template](./template-rank.md) to report changes.
-<chat-panel><chat-message nickname="Koishi"><img src="./generated/rank_fun-up.png" /></chat-message></chat-panel>
+<chat-panel><chat-message nickname="Koishi"><img src="/en-US/generated/rank_fun-up.png" /></chat-message></chat-panel>
 
 #### Daily/Weekly Reports
 > [!TIP] Tip
@@ -47,7 +47,7 @@ The plugin will also track the rank information of bound friends, which can be d
 > Currently, daily and weekly reports use the same template, only differing in the time span.
 
 After enabling [Configuration Items: dailyReportSwitch/weeklyReportSwitch](./configs.md#daily-weekly-reports), the plugin will compile recent performance statistics of friends in each subscribed channel at specified times, generate report summary images using templates, and push them to the channel.
-<chat-panel><chat-message nickname="Koishi"><img src="./generated/daily.png" /></chat-message></chat-panel>
+<chat-panel><chat-message nickname="Koishi"><img src="/en-US/generated/daily.png" /></chat-message></chat-panel>
 
 If you don't like<del> the combined win rate display of friends</del>, you can also disable this feature in [Configuration Items:](./configs.md).
-<chat-panel><chat-message nickname="Koishi"><img src="./generated/daily-hideCombi.png" /></chat-message></chat-panel>
+<chat-panel><chat-message nickname="Koishi"><img src="/en-US/generated/daily-hideCombi.png" /></chat-message></chat-panel>
