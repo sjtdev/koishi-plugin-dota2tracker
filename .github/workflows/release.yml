@@ -58,7 +58,7 @@ jobs:
           📝 更新日志：https://github.com/${{ github.repository }}/blob/master/changelog.md
 
 
-          🎉 This is an automatically generated release for plugin version update notifications. Please update in `koishi` `Dependencies` or search for installation in the `Plugin market`.
+          🎉 This is an automatically generated release for plugin version update notifications. Please update in \`koishi\` \`Dependencies\` or search for installation in the `Plugin market\`.
 
           📦 NPM Package: https://www.npmjs.com/package/${{ steps.check_version.outputs.package_name }}
 
