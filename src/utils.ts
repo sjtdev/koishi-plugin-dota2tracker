@@ -62,10 +62,8 @@ const pluginDir = path.join(__dirname, "..");
 export const CONFIGS = { STRATZ_API: { URL: "https://api.stratz.com/graphql", TOKEN: "" } };
 let http: HTTP = null;
 let setTimeout: Function;
-export function init(newHttp: HTTP, newSetTimeout: Function, APIKEY: string) {
-  http = newHttp;
-  setTimeout = newSetTimeout;
-  CONFIGS.STRATZ_API.TOKEN = APIKEY;
+export function init(params: { http: HTTP; setTimeout: Function; APIKEY: string }) {
+  ({ http, setTimeout, APIKEY: CONFIGS.STRATZ_API.TOKEN } = params);
 }
 async function fetchData(query: QueryFormat): Promise<QueryResult> {
   return await http.post(CONFIGS.STRATZ_API.URL, JSON.stringify(query), {
@@ -182,7 +180,7 @@ interface PlayerTypeEx extends PlayerType {
   killContribution: number;
   deathContribution: number;
   damageReceived: number;
-  titles: { name: string; color: string }[];
+  titles: string[];
   mvpScore: number;
   order: number;
   buffs: {
@@ -496,14 +494,14 @@ export function getFormattedMatchData(matchQuery: graphql.MatchInfoQuery, consta
     "mvpScore",
     undefined,
     match.players.filter((player) => match.didRadiantWin == player.isRadiant)
-  )?.titles.push({ name: "MVP", color: "#FFA500" });
+  )?.titles.push("dota2tracker.template.titles.MVP");
   findMaxByProperty(
     "mvpScore",
     undefined,
     match.players.filter((player) => match.didRadiantWin != player.isRadiant)
-  )?.titles.push({ name: "魂", color: "#6cf" });
-  findMaxByProperty("networth")?.titles.push({ name: "富", color: "#FFD700" });
-  findMaxByProperty("experiencePerMinute")?.titles.push({ name: "睿", color: "#8888FF" });
+  )?.titles.push("dota2tracker.template.titles.Soul");
+  findMaxByProperty("networth")?.titles.push("dota2tracker.template.titles.Rich");
+  findMaxByProperty("experiencePerMinute")?.titles.push("dota2tracker.template.titles.Wise");
   if (match.parsedDateTime && match.players.every((player) => player?.stats?.heroDamageReport?.dealtTotal)) {
     (
       match.players.reduce((max, player) =>
@@ -512,7 +510,7 @@ export function getFormattedMatchData(matchQuery: graphql.MatchInfoQuery, consta
           ? player
           : max
       ) as PlayerTypeEx
-    ).titles.push({ name: "控", color: "#FF00FF" });
+    ).titles.push("dota2tracker.template.titles.Controller");
     (
       match.players.reduce((max, player) =>
         player.stats.heroDamageReport.receivedTotal.physicalDamage + player.stats.heroDamageReport.receivedTotal.magicalDamage + player.stats.heroDamageReport.receivedTotal.pureDamage >
@@ -520,14 +518,14 @@ export function getFormattedMatchData(matchQuery: graphql.MatchInfoQuery, consta
           ? player
           : max
       ) as PlayerTypeEx
-    ).titles.push({ name: "耐", color: "#84A1C7" });
+    ).titles.push("dota2tracker.template.titles.Tank");
   }
-  findMaxByProperty("heroDamage")?.titles.push({ name: "爆", color: "#CC0088" });
-  findMaxByProperty("kills", "heroDamage")?.titles.push({ name: "破", color: "#DD0000" });
-  findMaxByProperty("deaths", "networth", undefined, undefined, ComparisonMode.Min)?.titles.push({ name: "鬼", color: "#CCCCCC" });
-  findMaxByProperty("assists", "heroDamage")?.titles.push({ name: "助", color: "#006400" });
-  findMaxByProperty("towerDamage", "heroDamage")?.titles.push({ name: "拆", color: "#FEDCBA" });
-  findMaxByProperty("heroHealing")?.titles.push({ name: "奶", color: "#00FF00" });
+  findMaxByProperty("heroDamage")?.titles.push("dota2tracker.template.titles.Nuker");
+  findMaxByProperty("kills", "heroDamage")?.titles.push("dota2tracker.template.titles.Breaker");
+  findMaxByProperty("deaths", "networth", undefined, undefined, ComparisonMode.Min)?.titles.push("dota2tracker.template.titles.Ghost");
+  findMaxByProperty("assists", "heroDamage")?.titles.push("dota2tracker.template.titles.Assister");
+  findMaxByProperty("towerDamage", "heroDamage")?.titles.push("dota2tracker.template.titles.Demolisher");
+  findMaxByProperty("heroHealing")?.titles.push("dota2tracker.template.titles.Healer");
   (
     match.players.reduce((lowest: PlayerTypeEx, player: PlayerTypeEx) => {
       const currentContribution = (player.kills + player.assists) / match[player.team].killsCount;
@@ -549,7 +547,7 @@ export function getFormattedMatchData(matchQuery: graphql.MatchInfoQuery, consta
       }
       return lowest; // 保持当前最低的玩家
     }) as PlayerTypeEx
-  ).titles.push({ name: "摸", color: "#DDDDDD" });
+  ).titles.push("dota2tracker.template.titles.Idle");
   return match;
 }
 
@@ -813,9 +811,7 @@ export function readDirectoryFilesSync(directoryPath: string): string[] {
     const files = fs.readdirSync(directoryPath);
 
     // 过滤出 .ejs 文件并去除扩展名
-    const fileNames = files
-      .filter(file => path.extname(file).toLowerCase() === '.ejs')
-      .map(file => path.basename(file, '.ejs'));
+    const fileNames = files.filter((file) => path.extname(file).toLowerCase() === ".ejs").map((file) => path.basename(file, ".ejs"));
 
     return fileNames;
   } catch (error) {

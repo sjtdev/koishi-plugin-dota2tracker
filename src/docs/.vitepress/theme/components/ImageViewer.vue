@@ -3,7 +3,7 @@
     <div class="image-viewer">
       <img :src="imageSrc" :alt="props.alt" ref="image" />
       <div class="gradient-overlay"></div>
-      <div class="click-hint">查看完整模板</div>
+      <div class="click-hint">{{t("fullTip")}}</div>
     </div>
   </div>
 </template>

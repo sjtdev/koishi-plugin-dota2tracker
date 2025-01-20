@@ -119,7 +119,7 @@ const days_30: number = 2592000000; // 30天
 const constantLocales = {};
 export async function apply(ctx: Context, config: Config) {
   // write your plugin here
-  utils.init(ctx.http, ctx.setTimeout, config.STRATZ_API_TOKEN);
+  utils.init({ http: ctx.http, setTimeout: ctx.setTimeout, APIKEY: config.STRATZ_API_TOKEN });
   for (const supportLanguageTag of Object.keys(GraphqlLanguageEnum)) {
     constantLocales[supportLanguageTag] = require(`./locales/${supportLanguageTag}.constants.json`);
     ctx.i18n.define(supportLanguageTag, require(`./locales/${supportLanguageTag}.yml`));
@@ -599,7 +599,7 @@ export async function apply(ctx: Context, config: Config) {
       if (input_data) {
         let heroId = findingHero(input_data);
         if (!heroId) {
-          session.send(session.text(".hero_not_found"));
+          session.send(session.text(".not_found"));
           return;
         }
         await session.send(session.text(".querying_hero"));

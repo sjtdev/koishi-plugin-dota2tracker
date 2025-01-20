@@ -82,3 +82,17 @@ dota2tracker:
     anonymous_player_2: 背景仅供展示目的，不属于{player}的数据。
     rank_fun_up_message: 热烈祝贺群友 {avatar}{name} 在天梯中再获进步，<br/>由 {prev} 升为 {curr}，再接再厉，再创辉煌！
     rank_fun_down_message: "{avatar}<br/>寄"
+    titles:
+      MVP: MVP-#FFA500
+      Soul: 魂-#66CCFF
+      Rich: 富-#FFD700
+      Wise: 睿-#8888FF
+      Controller: 控-#FF00FF
+      Nuker: 爆-#CC0088
+      Breaker: 破-#DD0000
+      Ghost: 鬼-#CCCCCC
+      Assister: 助-#006400
+      Demolisher: 拆-#FEDCBA
+      Healer: 奶-#00FF00
+      Tank: 耐-#84A1C7
+      Idle: 摸-#DDDDDD

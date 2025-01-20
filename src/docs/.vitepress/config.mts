@@ -75,7 +75,7 @@ export default defineConfig({
                   { text: "段位整活模板", link: "/template-rank" },
                 ],
               },
-              { text: "本地化", link: "/i18n" },
+              { text: "本地化与自定义文本", link: "/i18n" },
             ],
           },
           {
@@ -94,6 +94,60 @@ export default defineConfig({
     "en-US": {
       label: "English",
       lang: "en-US",
+      description:"Koishi Plugin - Track Friends' DOTA2 Matches",
+      themeConfig: {
+        // https://vitepress.dev/reference/default-theme-config
+        nav: [
+          { text: "Home", link: "/en-US/" },
+          { text: "Guide", link: "/en-US/starter" },
+          { text: "Changelog", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
+        ],
+
+        sidebar: [
+          {
+            text: "Installation and Usage",
+            items: [
+              { text: "Install Plugin", link: "/en-US/starter" },
+              {
+                text: "Use Plugin",
+                link: "/en-US/usage",
+                items: [
+                  { text: "Active Messages", link: "/en-US/active-message" },
+                  { text: "Passive Messages (Query Commands)", link: "/en-US/passive-message" },
+                ],
+              },
+            ],
+          },
+          {
+            text: "Detailed Description",
+            items: [
+              { text: "Configuration Items", link: "/en-US/configs" },
+              { text: "Command Instructions", link: "/en-US/commands" },
+              {
+                text: "Template Display",
+                link: "/en-US/template",
+                items: [
+                  { text: "Match Info Template", link: "/en-US/template-match" },
+                  { text: "Player Info Template", link: "/en-US/template-player" },
+                  { text: "Hero Info Template", link: "/en-US/template-hero" },
+                  { text: "Rank Template", link: "/en-US/template-rank" },
+                ],
+              },
+              { text: "Localization", link: "/en-US/i18n" },
+            ],
+          },
+          {
+            text: "Others",
+            items: [
+              { text: "Changelog", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
+              { text: "Acknowledgments", link: "/en-US/thanks" },
+            ],
+          },
+        ],
+
+        outline: "deep",
+        outlineTitle: "Page Navigation",
+      },
     },
   },
   markdown: {

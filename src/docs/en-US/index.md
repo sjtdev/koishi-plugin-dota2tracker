@@ -3,23 +3,23 @@
 layout: home
 
 hero:
-  name: "@sjtdev/dota2tracker（文档施工中！）"
-  text: "koishi插件-追踪群友的DOTA2对局"
+  name: "@sjtdev/dota2tracker"
+  text: "Koishi Plugin - Track Friends' DOTA2 Matches"
   # tagline: My great project tagline
   actions:
     - theme: brand
-      text: 开始使用
-      link: /starter
+      text: Get Started
+      link: /en-US/starter
     - theme: alt
       text: Github
       link: https://github.com/sjtdev/koishi-plugin-dota2tracker
 
 features:
-  - title: 查询指令
-    details: 查询比赛、查询玩家、查询英雄等信息
-  - title: 战报追踪/段位追踪
-    details: 追踪群友的DOTA2对局与段位变动
-  - title: 报告总结
-    details: 日报/周报总结群友表现
+  - title: Query Commands
+    details: Query match, player, hero, and other information
+  - title: Match and Rank Tracking
+    details: Track friends' DOTA2 matches and rank changes
+  - title: Report Summary
+    details: Daily/Weekly summaries of friends' performances
 ---
 

@@ -559,7 +559,7 @@
                     <img src="${utils.getImageUrl('star_' + player.rank.star)}" class="stars" />
                     <p>${player.steamAccount.seasonLeaderboardRank??""}</p>
                 </div>
-                <div class="titles">${player.titles.map((item) => `<span style="color: ${darkenHexColor(item.color, 25)};">${item.name}</span>`).join('')}</div>
+                <div class="titles">${player.titles.map((item) => {const [title, color] = $t(item).split("-"); return `<span style="color: ${darkenHexColor(color, 25)};">${title}</span>`}).join("&nbsp;")}</div>
                 <div class="player_name row-1">
                     <span class="rank">${`[${$t("dota2tracker.template.ranks."+player.rank.medal)}${player.rank.star||""}]`}</span>
                     <span class="name">${eh(player.steamAccount.name)}</span>

@@ -82,3 +82,17 @@ dota2tracker:
     anonymous_player_2: Background is for display purposes only. It is not {player}’s data.
     rank_fun_down_message: "{avatar}<br/>Sad"
     rank_fun_up_message: Hip hip hooray! Our awesome member {avatar}{name} has leveled up from {prev} to {curr}! #<br/>Keep crushing it and let's see what heights you'll reach next! 🎉
+    titles:
+      MVP: MVP-#FFA500
+      Soul: Soul-#66CCFF
+      Rich: R-#FFD700
+      Wise: W-#8888FF
+      Controller: C-#FF00FF
+      Nuker: N-#CC0088
+      Breaker: B-#DD0000
+      Ghost: G-#CCCCCC
+      Assister: A-#006400
+      Demolisher: D-#FEDCBA
+      Healer: H-#00FF00
+      Tank: T-#84A1C7
+      Idle: I-#DDDDDD

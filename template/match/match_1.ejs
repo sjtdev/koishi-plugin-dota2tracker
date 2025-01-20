@@ -799,7 +799,7 @@
                         </div>
                     </div>
                     <div class="titles">
-                        ${player.titles.map((item) => `<span style="color: ${item.color};">${item.name}</span>`).join("&nbsp;")}
+                        ${player.titles.map((item) => {const [title, color] = $t(item).split("-"); return `<span style="color: ${color};">${title}</span>`}).join("&nbsp;")}
                     </div>
                     ${player.hero.id != 80 ? `
                     <div class="items">

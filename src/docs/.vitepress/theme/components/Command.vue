@@ -1,12 +1,12 @@
 <template>
   <div class="command-help">
     <div class="description">
-      <h3>命令描述</h3>
+      <h3>{{ t("description") }}</h3>
       <p>{{ command.description }}</p>
     </div>
 
     <div v-if="command.options" class="options">
-      <h3>选项参数</h3>
+      <h3>{{t("options")}}</h3>
       <ul>
         <li v-for="(desc, name) in command.options" :key="name">
           <div class="param-names">
@@ -21,14 +21,14 @@
     </div>
 
     <div v-if="command.usage" class="usage">
-      <h3>使用说明</h3>
+      <h3>{{t("usage")}}</h3>
       <div class="content">
         {{ command.usage }}
       </div>
     </div>
 
     <div v-if="command.examples" class="examples">
-      <h3>使用示例</h3>
+      <h3>{{t("examples")}}</h3>
       <div class="content">
         <code v-for="(example, index) in exampleList" :key="index" class="example">{{ example }}</code>
       </div>
@@ -37,30 +37,54 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed } from "vue";
+import { useData } from "vitepress";
+const { lang } = useData();
+
+// 定义多语言文本对象
+const i18n = {
+  "en-US": {
+    description: "Description",
+    options: "Option parameters",
+    usage: "Usage instructions",
+    examples: "Usage examples",
+  },
+  "zh-CN": {
+    description: "命令描述",
+    options: "选项参数",
+    usage: "使用说明",
+    examples: "使用示例",
+  },
+};
+
+// 创建一个计算属性来获取当前语言的文本
+const t = (key) => {
+  // 如果没有对应的语言，回退到英文
+  return (i18n[lang.value] || i18n["en-US"])[key];
+};
 
 const props = defineProps({
   command: {
     type: Object,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
 // 解析参数简写和描述
 const getShortParam = (desc) => {
-  const match = desc.match(/^(-\w+)/)
-  return match ? match[1] : null
-}
+  const match = desc.match(/^(-\w+)/);
+  return match ? match[1] : null;
+};
 
 const getParamDesc = (desc) => {
-  return desc.replace(/^-\w+\s+/, '')
-}
+  return desc.replace(/^-\w+\s+/, "");
+};
 
 // 将示例文本分割成数组
 const exampleList = computed(() => {
-  if (!props.command.examples) return []
-  return props.command.examples.split('\n').filter(line => line.trim())
-})
+  if (!props.command.examples) return [];
+  return props.command.examples.split("\n").filter((line) => line.trim());
+});
 </script>
 
 <style scoped>
