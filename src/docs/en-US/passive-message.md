@@ -8,9 +8,9 @@ You can check the [command instructions](./commands.md) or invoke `command -h` i
   After generating the image using the [match template](./template-match.md) set in [Configuration Item: template_match](./configs.md#template_match) based on the match data, it will be sent.
 > The Stratz match page link carried in the message can be disabled in [Configuration Item: urlinmessagetype](./configs.md#urlinmessagetype-checkbox).
 <chat-panel>
-<chat-message nickname="Alice">Query match 8127571787</chat-message>
+<chat-message nickname="Alice">dota2tracker.query-match 8127571787</chat-message>
 <blockquote><p><em>or</em></p></blockquote>
-<chat-message nickname="Alice">Query recent match</chat-message>
+<chat-message nickname="Alice">dota2tracker.query-recent-match</chat-message>
 <chat-message nickname="Koishi">Searching for match details, please wait...</chat-message>
 <chat-message nickname="Koishi">
   https://stratz.com/matches/8127571787
@@ -23,7 +23,7 @@ You can check the [command instructions](./commands.md) or invoke `command -h` i
 #### [**Query Player**](./commands.md#dota2tracker-query-player-input-data)
 Query the specified SteamID player, generating an image with the [player template](./template-player.md) before sending.
 <chat-panel>
-<chat-message nickname="Alice">Query player</chat-message>
+<chat-message nickname="Alice">dota2tracker.query-player</chat-message>
 <chat-message nickname="Koishi">Retrieving player data, please wait...</chat-message>
 <chat-message nickname="Koishi">
   https://stratz.com/players/**********
