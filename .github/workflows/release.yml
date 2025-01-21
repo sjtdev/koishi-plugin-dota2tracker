@@ -54,14 +54,10 @@ jobs:
           RELEASE_BODY=$(cat <<EOF
           🎉 这是一个自动生成的release，用于发布插件版本更新提醒。请于 \`koishi\` \`依赖管理\` 中更新插件或 \`插件市场\` 中搜索安装。
 
-          📦 NPM 包地址：https://www.npmjs.com/package/${{ steps.check_version.outputs.package_name }}
-
           📝 更新日志：https://github.com/${{ github.repository }}/blob/master/changelog.md
 
 
           🎉 This is an automatically generated release for plugin version update notifications. Please update in \`koishi\` \`Dependencies\` or search for installation in the \`Plugin market\`.
-
-          📦 NPM Package: https://www.npmjs.com/package/${{ steps.check_version.outputs.package_name }}
 
           📝 Changelog: https://github.com/${{ github.repository }}/blob/master/changelog.md
           EOF
