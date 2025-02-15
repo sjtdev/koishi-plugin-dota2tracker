@@ -1,0 +1,44 @@
+html {
+  overflow: auto;
+}
+
+body {
+  /* width: 1200px; */
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+#regular {
+  width: 800px;
+}
+
+#extra {
+  display: flex;
+  width: 800px;
+}
+
+#charts {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+#charts > svg {
+  font-size: 10px;
+}
+
+#charts > .title {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+#charts > .title > .logo {
+  display: flex;
+  padding: 0 25px;
+}
+
+#charts > .title > .logo > img{
+  width: 20px;
+}

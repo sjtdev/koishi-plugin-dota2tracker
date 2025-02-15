@@ -60,7 +60,6 @@ enum GraphqlLanguageEnum {
       for (const templateType of fs.readdirSync(templatesPath)) {
         for (const template of fs.readdirSync(path.join(templatesPath, templateType))) {
           if (template.endsWith(".ejs") && ["match", "player", "hero", "rank", "daily"].some((targets) => template.startsWith(targets))) {
-            // if (template.endsWith(".ejs") && ["daily"].some((targets) => template.startsWith(targets))) {
             const templateFile = path.join(templatesPath, templateType, template);
             if (templateType === "match") {
               const matchQuery = JSON.parse(fs.readFileSync(path.join(dataPath, `${templateType}.json`), "utf-8"));

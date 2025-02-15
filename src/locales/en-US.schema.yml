@@ -24,7 +24,7 @@ _config:
     weeklyReportShowCombi: Show combinations in weekly report
   template:
     $desc: Template Settings
-    template_match: Template used to generate match information images, see https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki for template display.
+    template_match: Template used to generate match information images, see https://sjtdev.github.io/koishi-plugin-dota2tracker/template-match.html for template display.
     template_player: Template used to generate player information images. (Currently only one template available)
     template_hero: Template used to generate hero information images. (Currently only one template available)
     playerRankEstimate: Estimate the rank of players without a rank in the player template <br>Estimated rank will be displayed as a gray image

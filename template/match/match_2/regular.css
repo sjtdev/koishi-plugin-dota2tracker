@@ -1,0 +1,459 @@
+
+p {
+  margin: 0;
+}
+
+img {
+  width: 100%;
+  vertical-align: middle;
+}
+
+html,
+body {
+  overflow: hidden;
+  width: 800px;
+  font-family: 'MiSans', sans-serif;
+}
+
+nav {
+  font-size: 14px;
+  line-height: 1.8;
+  height: 72px;
+  color: #fff;
+  background-color: #000;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+nav > div > p:first-of-type {
+  font-weight: bold;
+}
+
+nav .match_id p:first-of-type {
+  font-size: 16px;
+}
+
+nav > div.match_id > p.success::after {
+  content: "※<%= $t('dota2tracker.template.analysis_successful') %>";
+  color: #7ba334;
+}
+nav > div.match_id > p.fail::after {
+  content: "※<%= $t('dota2tracker.template.analysis_incomplete') %>";
+  color: #ffb400;
+}
+
+nav > .rank {
+  width: 48px;
+  height: 48px;
+  position: relative;
+}
+
+nav > .rank > img {
+  width: 48px;
+  height: 48px;
+  position: absolute;
+}
+
+.radiant {
+  color: #3c9028;
+}
+
+.dire {
+  color: #9c3628;
+}
+
+.match_result {
+  font-weight: bold;
+  height: 49px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.match_result .win {
+  margin: 0 25px;
+}
+
+.match_result .win.radiant::after {
+  content: "<%=$t('dota2tracker.template.radiant_won')%>";
+}
+
+.match_result .win.dire::after {
+  content: "<%=$t('dota2tracker.template.dire_won')%>";
+}
+
+.players {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel {
+  padding: 0 10px;
+}
+
+.panel {
+  padding-top: 4px;
+  height: 40px;
+  border-top: 3px solid #fff;
+  font-size: 13.3px;
+  display: grid;
+  grid-template-columns: 32px 56px 378px repeat(4,1fr);
+}
+.panel.radiant {
+  border-color: #3c9028;
+}
+.panel.dire {
+  border-color: #9c3628;
+}
+.panel p{
+  line-height: 16px;
+  margin-left: 8px;
+}
+.panel .win{
+  font-size: 20px;
+  line-height: 32px;
+}
+.panel .data{
+  color: #aaa;
+}
+
+.player:not(:last-child) {
+  border-bottom: 1px solid #e1e1e1; /* 示例边框样式 */
+}
+
+.player {
+  color: #000;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 64px 48px 88px 160px 112px 252px 36px 20px;
+  grid-template-rows: 19px 14px 14px 14px;
+  padding-bottom: 3px;
+  font-size: 12px;
+  line-height: 14px;
+  overflow: hidden;
+  justify-content: center;
+}
+
+.player > .row-1 {
+  margin-top: 6px;
+}
+
+.player > .hero_avatar {
+  margin-bottom: 5px;
+  width: 64px;
+  grid-row: 1 / span 3;
+  grid-column: 1;
+  position: relative;
+}
+.player > .hero_avatar > .level {
+  width: 20px;
+  height: 15px;
+  background-color: #323232;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 12px;
+  line-height: 15px;
+  color: #fff;
+  text-align: center;
+}
+
+.player > .hero_avatar > .party_line {
+  position: absolute;
+  height: 2px;
+  top: 0;
+  width: 100%;
+}
+
+.player > .hero_avatar > .party_mark {
+  position: absolute;
+  line-height: 1.5;
+  text-align: center;
+  width: 16px;
+  font-size: 10px;
+  top: 3px;
+  left: 1px;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.player > .hero_avatar.party_I > .party_line {
+  background-color: #caffe5;
+}
+
+.player > .hero_avatar.party_I > .party_mark {
+  color: #caffe5;
+}
+
+.player > .hero_avatar.party_I > .party_mark::after {
+  content: "I";
+}
+
+.player > .hero_avatar.party_II > .party_line {
+  background-color: #ffe484;
+}
+
+.player > .hero_avatar.party_II > .party_mark {
+  color: #ffe484;
+}
+
+.player > .hero_avatar.party_II > .party_mark::after {
+  content: "II";
+}
+
+.player > .hero_avatar.party_III > .party_line {
+  background-color: #e19be2;
+}
+
+.player > .hero_avatar.party_III > .party_mark {
+  color: #e19be2;
+}
+
+.player > .hero_avatar.party_III > .party_mark::after {
+  content: "III";
+}
+
+.player > .hero_avatar.party_IV > .party_line {
+  background-color: #ccdaf4;
+}
+
+.player > .hero_avatar.party_IV > .party_mark {
+  color: #ccdaf4;
+}
+
+.player > .hero_avatar.party_IV > .party_mark::after {
+  content: "IV";
+}
+
+.player > .facet {
+  color: #fff;
+  width: 100%;
+  height: 16px;
+  grid-row: 4;
+  grid-column: 1;
+  display: grid;
+  grid-template-columns: 16px auto;
+  z-index: 1;
+  position: relative;
+  top: -5px;
+}
+.player > .facet > img {
+  padding: 2px;
+  width: 12px;
+  height: 12px;
+  background-color: #4444;
+}
+.player > .facet > span {
+  padding: 0 2px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.player > .facet > span > * {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.player > .facet.Red {
+  background: linear-gradient(to right, #9f3c3c, #4a2026);
+}
+.player > .facet.Yellow {
+  background: linear-gradient(to right, #c8a45c, #6f3d21);
+}
+.player > .facet.Green {
+  background: linear-gradient(to right, #a2b23e, #2d5a18);
+}
+.player > .facet.Blue {
+  background: linear-gradient(to right, #547ea6, #2a385e);
+}
+.player > .facet.Purple {
+  background: linear-gradient(to right, #675cae, #261c44);
+}
+.player > .facet.Gray {
+  background: linear-gradient(to right, #adb6be, #4e5557);
+}
+
+.player > .rank {
+  position: relative;
+  grid-row: 1 / span 3;
+  grid-column: 2;
+  width: 48px;
+  height: 48px;
+}
+.player > .rank > img {
+  position: absolute;
+}
+.player > .rank > p {
+  position: absolute;
+  width: 100%;
+  bottom: 1.5px;
+  text-align: center;
+  font-size: 8px;
+  color: #fff;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; /* 文字描边 */
+}
+
+.player > .titles {
+  grid-row: 4;
+  grid-column: 2/4;
+  margin-left: 4px;
+  /* text-shadow: 1px 1px 0 #333; 设置阴影颜色及偏移 */
+}
+.player > .titles > span {
+  margin-right: 2px;
+}
+
+.player > .player_name {
+  grid-row: 1;
+  grid-column: 3 / span 2;
+  white-space: nowrap;        /* 禁止换行 */
+  overflow: hidden;           /* 隐藏溢出部分 */
+  text-overflow: ellipsis;    /* 用省略号表示溢出的文本 */
+}
+.player > .player_name > .rank {
+  color: #aaa;
+}
+.player.radiant > .player_name > .name {
+  color: #3c9028;
+}
+.player.dire > .player_name > .name {
+  color: #9c3628;
+}
+
+.player .pick {
+  grid-column: 3;
+}
+
+.player .networth {
+  grid-column: 3;
+}
+.player .networth .gold {
+  color: rgb(203, 176, 42);
+  text-shadow: 1px 1px 0 #000; /* 设置阴影颜色及偏移 */
+}
+
+.player .hero_damage {
+  grid-row: 2;
+  grid-column: 4;
+}
+.player .damage_received {
+  grid-row: 3;
+  grid-column: 4;
+}
+.player .tower_damage {
+  grid-row: 4;
+  grid-column: 4;
+}
+.player .kda {
+  grid-row: 1;
+  grid-column: 5;
+}
+.player .kill_contribution {
+  grid-row: 2;
+  grid-column: 5;
+}
+.player .stun_duration {
+  grid-row: 3;
+  grid-column: 5;
+}
+.player .heal {
+  grid-row: 4;
+  grid-column: 5;
+}
+
+.player .items {
+  grid-row: 1 / span 4;
+  grid-column: 6;
+  display: grid;
+  grid-template-columns: 24px 192px auto;
+  grid-template-rows: 32px 24px;
+}
+.player .items > div {
+  display: flex;
+  background-color: #c0c0c0;
+}
+.player .items .normal {
+  height: 32px;
+  grid-column: 1/-1;
+  grid-row: 1;
+}
+.player .items .backpack {
+  height: 24px;
+  width: 96px;
+  grid-row: 2;
+  /* grid-column: 1; */
+}
+.player .items .normal .item {
+  width: 40px;
+  height: 30px;
+  margin: 1px;
+  position: relative;
+}
+.player .items .time {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  bottom: 0;
+  height: 11px;
+  line-height: 11px;
+  color: #ccc;
+  background-color: #323232;
+}
+.player .items .backpack{
+  filter: grayscale(100%);
+}
+.player .items .backpack .item,
+.player .items .bear .item {
+  width: 30px;
+  height: 22px;
+  margin: 1px;
+  position: relative;
+}
+.player .neutral_item {
+  grid-row: 1 / span 3;
+  grid-column: 7;
+  overflow: hidden;
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  background-size: auto 100%;
+  background-position: center;
+  margin-left: 2px;
+}
+.player .items .item.recipe {
+  background-image: url("https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/recipe.png");
+  background-size: 100%;
+}
+
+.player .ahgs {
+  grid-row: 1 / span 3;
+  grid-column: 8;
+}
+.player .items .bear{
+  height: 24px;
+  width: 192px;
+  grid-row: 2;
+  grid-column: 2;
+}
+.player.bear .items .bear .time{
+  font-size: 10px;
+}
+.player.bear .items .bear_icon{
+  grid-row: 2;
+  grid-column: 1;
+}
+.player.bear .items .neutral_item{
+  height: 24px;
+  width: 24px;
+  grid-row: 2;
+  grid-column: 3;
+}
+/* .player .items .backpack .item img{
+  height: 22px;
+  width: auto;
+} */

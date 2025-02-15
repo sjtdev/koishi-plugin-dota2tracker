@@ -96,3 +96,6 @@ dota2tracker:
       Healer: H-#00FF00
       Tank: T-#84A1C7
       Idle: I-#DDDDDD
+    situation: Situation
+    networth: Net Worth
+    experience: Experience

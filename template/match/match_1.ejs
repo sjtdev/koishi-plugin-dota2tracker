@@ -455,6 +455,10 @@
                 /* text-shadow: -1px -1px 2px #aaa, 1px -1px 2px #aaa, -1px 1px 2px #aaa, 1px 1px 2px #aaa; */ /*描边效果 */
             }
 
+            .titles > span {
+                margin-right: 4px;
+            }
+
             .items {
                 margin-bottom: 2px;
                 position: relative;
@@ -799,7 +803,7 @@
                         </div>
                     </div>
                     <div class="titles">
-                        ${player.titles.map((item) => {const [title, color] = $t(item).split("-"); return `<span style="color: ${color};">${title}</span>`}).join("&nbsp;")}
+                        ${player.titles.map((item) => {const [title, color] = $t(item).split("-"); return `<span style="color: ${color};">${title}</span>`}).join("")}
                     </div>
                     ${player.hero.id != 80 ? `
                     <div class="items">

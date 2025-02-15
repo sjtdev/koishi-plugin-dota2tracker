@@ -1,5 +1,7 @@
 # [@sjtdev/koishi-plugin-dota2tracker](https://sjtdev.github.io/koishi-plugin-dota2tracker/)
-↑ 文档已构建完毕，点击上方移步到文档页面阅读。
+
+### 完整使用文档
+[中文文档](https://sjtdev.github.io/koishi-plugin-dota2tracker/) | [English Documentation](https://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/)
 
 [![npm](https://img.shields.io/npm/v/@sjtdev/koishi-plugin-dota2tracker/latest?style=flat-square)](https://www.npmjs.com/package/@sjtdev/koishi-plugin-dota2tracker)
 [![npm](https://img.shields.io/npm/v/@sjtdev/koishi-plugin-dota2tracker/next?style=flat-square)](https://www.npmjs.com/package/@sjtdev/koishi-plugin-dota2tracker)
@@ -60,12 +62,10 @@ DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑�
   `查询英雄`指令已适配7.36改动，所以此指令已废弃
 
 ### 英雄ID|英雄名|英雄常用别名 列表
-<del>[dotaconstants_add.json](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/src/dotaconstants_add.json#L102-L226)  
-补充或纠错请提issue</del>  
-已可在本地化中定义
+可在`koishi-本地化`中定义，见[文档-自定义文本](https://sjtdev.github.io/koishi-plugin-dota2tracker/i18n.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%87%E6%9C%AC)
 
 ### 图片模板列表
-展示见[wiki](https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki)  
+展示见[文档-模板展示](https://sjtdev.github.io/koishi-plugin-dota2tracker/template.html)  
 生成图片已使用ejs模板实现，所有模板都在[template]文件夹下，若是有大佬想自己设计模板欢迎联系我完善数据接口。（当前有很多在模板中后处理的数据，不是很友好）  
 
 ## 灵感来源&鸣谢
