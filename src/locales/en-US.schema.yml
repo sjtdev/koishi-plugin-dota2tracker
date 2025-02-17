@@ -9,6 +9,7 @@ _config:
         - Include stratz match page link in match query and report messages
         - Include stratz player page link in player information query messages
         - Include Dota Encyclopedia hero page link in hero data query messages
+    proxyAddress: Proxy address. Leave blank to disable the proxy.
   rank:
     rankBroadSwitch: Rank change broadcast
     rankBroadStar: Star change broadcast

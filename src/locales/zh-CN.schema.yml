@@ -9,6 +9,7 @@ _config:
         - 在查询比赛与战报消息中附带stratz比赛页面链接
         - 在查询玩家信息消息中附带stratz玩家页面链接
         - 在查询英雄数据消息中附带刀塔百科对应英雄页面链接
+    proxyAddress: 代理地址，留空时不使用代理
   rank:
     rankBroadSwitch: 段位变动播报
     rankBroadStar: 星级变动播报

@@ -6,6 +6,7 @@ import os from "os";
 import path from "path";
 import * as graphql from "./@types/graphql-generated";
 import {} from "@koishijs/cache";
+import {} from "@koishijs/plugin-proxy-agent";
 import { Random } from "koishi";
 
 declare module "koishi" {
@@ -62,8 +63,9 @@ const pluginDir = path.join(__dirname, "..");
 export const CONFIGS = { STRATZ_API: { URL: "https://api.stratz.com/graphql", TOKEN: "" } };
 let http: HTTP = null;
 let setTimeout: Function;
-export function init(params: { http: HTTP; setTimeout: Function; APIKEY: string }) {
-  ({ http, setTimeout, APIKEY: CONFIGS.STRATZ_API.TOKEN } = params);
+let proxyAddress: string;
+export function init(params: { http: HTTP; setTimeout: Function; APIKEY: string; proxyAddress: string }) {
+  ({ http, setTimeout, APIKEY: CONFIGS.STRATZ_API.TOKEN, proxyAddress } = params);
 }
 async function fetchData(query: QueryFormat): Promise<QueryResult> {
   return await http.post(CONFIGS.STRATZ_API.URL, JSON.stringify(query), {
@@ -73,6 +75,7 @@ async function fetchData(query: QueryFormat): Promise<QueryResult> {
       "Content-Type": "application/json",
       Authorization: `Bearer ${CONFIGS.STRATZ_API.TOKEN}`,
     },
+    proxyAgent: proxyAddress || undefined,
   });
 }
 export async function query<TVariables, TData>(

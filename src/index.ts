@@ -16,7 +16,10 @@ import {} from "@koishijs/cache";
 
 export const name = "dota2tracker";
 export let usage = "";
-export const inject = ["http", "database", "cron", "puppeteer", "cache"]; // 声明依赖
+// export const inject = ["http", "database", "cron", "puppeteer", "cache"]; // 声明依赖
+export const inject = {
+  required: ["http", "database", "cron", "puppeteer", "cache"],
+};
 const pluginDir = path.resolve(__dirname, "..");
 const pluginVersion = require(path.join(pluginDir, "package.json")).version;
 
@@ -30,17 +33,18 @@ export enum GraphqlLanguageEnum {
 export interface Config {
   STRATZ_API_TOKEN: string;
   dataParsingTimeoutMinutes: number;
+  urlInMessageType: Array<string>;
+  proxyAddress: string;
+  rankBroadSwitch: boolean;
+  rankBroadStar: boolean;
+  rankBroadLeader: boolean;
+  rankBroadFun: boolean;
   dailyReportSwitch: boolean;
   dailyReportHours: number;
   dailyReportShowCombi: boolean;
   weeklyReportSwitch: boolean;
   weeklyReportDayHours: Array<number>;
   weeklyReportShowCombi: boolean;
-  urlInMessageType: Array<string>;
-  rankBroadSwitch: boolean;
-  rankBroadStar: boolean;
-  rankBroadLeader: boolean;
-  rankBroadFun: boolean;
   template_match: string;
   template_player: string;
   template_hero: string;
@@ -51,6 +55,7 @@ export const Config: Schema = Schema.intersect([
     STRATZ_API_TOKEN: Schema.string().required().role("secret"),
     dataParsingTimeoutMinutes: Schema.number().default(60).min(0).max(1440),
     urlInMessageType: Schema.array(Schema.union([Schema.const("match"), Schema.const("player"), Schema.const("hero")])).role("checkbox"),
+    proxyAddress: Schema.string(),
   }).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.base), acc), {})),
   Schema.intersect([
     Schema.object({
@@ -120,7 +125,7 @@ const days_30: number = 2592000000; // 30天
 const constantLocales = {};
 export async function apply(ctx: Context, config: Config) {
   // write your plugin here
-  utils.init({ http: ctx.http, setTimeout: ctx.setTimeout, APIKEY: config.STRATZ_API_TOKEN });
+  utils.init({ http: ctx.http, setTimeout: ctx.setTimeout, APIKEY: config.STRATZ_API_TOKEN ,proxyAddress: config.proxyAddress});
   for (const supportLanguageTag of Object.keys(GraphqlLanguageEnum)) {
     constantLocales[supportLanguageTag] = require(`./locales/${supportLanguageTag}.constants.json`);
     ctx.i18n.define(supportLanguageTag, require(`./locales/${supportLanguageTag}.yml`));
