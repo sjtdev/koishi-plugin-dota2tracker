@@ -44,7 +44,7 @@ export interface dt_subscribed_guilds {
 declare module "@koishijs/cache" {
   interface Tables {
     dt_facets_constants: graphql.ConstantsQuery; // 游戏数据
-    dt_previous_query_results: graphql.MatchInfoQuery;
+    dt_previous_query_results: { data: graphql.MatchInfoQuery; pluginVersion: string };
     dt_sended_match_id: undefined;
   }
 }

@@ -1,12 +1,12 @@
 html {
-  overflow: auto;
+  overflow: visible;
 }
 
 body {
   /* width: 1200px; */
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow: visible;
 }
 
 #regular {
@@ -41,4 +41,11 @@ body {
 
 #charts > .title > .logo > img{
   width: 20px;
+}
+
+#extra > .tip {
+  width: 100%;
+  line-height: 4;
+  text-align: center;
+  color: #ccc;
 }

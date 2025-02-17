@@ -18,6 +18,7 @@ export const name = "dota2tracker";
 export let usage = "";
 export const inject = ["http", "database", "cron", "puppeteer", "cache"]; // 声明依赖
 const pluginDir = path.resolve(__dirname, "..");
+const pluginVersion = require(path.join(pluginDir, "package.json")).version;
 
 // At the same time, SupportLanguageTags can also be obtained from the Keys of GraphqlLanguageEnum.
 // const SupportLanguageTags = Object.keys(GraphqlLanguageEnum);
@@ -333,8 +334,8 @@ export async function apply(ctx: Context, config: Config) {
       // Step 1: 检查本地缓存
       let queryLocal = await ctx.cache.get("dt_previous_query_results", String(matchId));
       let matchQuery: graphql.MatchInfoQuery;
-      if (queryLocal) {
-        matchQuery = queryLocal;
+      if (queryLocal?.data && queryLocal.pluginVersion == pluginVersion) {
+        matchQuery = queryLocal.data;
         // 更新缓存时间
         ctx.cache.set("dt_previous_query_results", String(matchQuery.match.id), queryLocal, days_30);
       } else {
@@ -342,7 +343,7 @@ export async function apply(ctx: Context, config: Config) {
         matchQuery = await query<graphql.MatchInfoQueryVariables, graphql.MatchInfoQuery>("MatchInfo", { matchId });
         // 如果比赛已解析，写入缓存
         if (matchQuery.match?.parsedDateTime && matchQuery.match.players.filter((player) => player?.stats?.heroDamageReport?.dealtTotal).length > 0)
-          ctx.cache.set("dt_previous_query_results", String(matchQuery.match.id), matchQuery, days_30);
+          ctx.cache.set("dt_previous_query_results", String(matchQuery.match.id), { data: matchQuery, pluginVersion }, days_30);
       }
       return matchQuery;
     } catch (error) {
