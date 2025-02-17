@@ -1,7 +1,7 @@
 # 模板展示
+> 以下对局信息为东南亚服的一场高分局比赛
 
 ### match_1
-> 对局信息为东南亚服的一场高分局比赛
 <ImageViewer src="generated/match_1.png" />
 
 ##### 玩家信息说明
@@ -20,3 +20,11 @@
 
 MAX+风格的一张模板，来源于[Steam_watcher](https://github.com/SonodaHanami/Steam_watcher)。  
 相比`match_1`会缺少一些细节，例如：对线结果、对局结束时的永久Buff状态、辅助道具购买数量等。但可读性更好，也更符合DOTA2玩家的浏览数据习惯。
+
+***
+### match_2+
+
+<ImageViewer src="generated/match_2+.png" />
+
+对`match_2`的补充，增加了一些额外信息。
+> 开发中。

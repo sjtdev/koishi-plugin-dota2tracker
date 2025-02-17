@@ -1,5 +1,8 @@
 # Installation
 
+> [!DANGER] Attention
+> This English document was translated from the Chinese version using Google Translate or GPT AI and might contain some phrasing issues.
+
 > [!TIP] Tip
 > Keywords with underlines are clickable and navigate to the corresponding documentation pages for more details.
 
@@ -14,6 +17,13 @@ The current version (above `1.3.0`) requires `http (sending network requests)`, 
 > [cache]     cache-database  
 > [database]  database-sqlite  
 
+# Enable
+Once all required service plugins are installed and enabled, you still need to obtain an API Token from the [STRATZ API page](https://stratz.com/api), and enter it in the `STRATZ_API_TOKEN` configuration field on the plugin configuration page, then save the settings. The plugin needs a valid API Token to function properly.
+
+At this point, all preparations for using the plugin are complete. Next, the various features of the plugin will be introduced.
+
+# Update
+
 ### Plugin Update Notification
 Starting from version `1.4.2`, plugin updates will publish a release on Github without attachments, serving as an update reminder.  
 If needed, you can use the `Watch` feature to receive notifications about plugin updates. Here are the detailed steps:
@@ -25,8 +35,3 @@ If needed, you can use the `Watch` feature to receive notifications about plugin
 
 You will then receive notifications in the Github notification center.  
 If you have email notifications enabled, you will also receive an email reminder from Github.
-
-# Enable
-Once all required service plugins are installed and enabled, you still need to obtain an API Token from the [STRATZ API page](https://stratz.com/api), and enter it in the `STRATZ_API_TOKEN` configuration field on the plugin configuration page, then save the settings. The plugin needs a valid API Token to function properly.
-
-At this point, all preparations for using the plugin are complete. Next, the various features of the plugin will be introduced.

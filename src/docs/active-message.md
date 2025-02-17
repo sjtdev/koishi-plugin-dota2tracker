@@ -30,8 +30,17 @@
 </chat-message>
 </chat-panel>
 
-此处展示的图片由[`match_2`](./template-match.md#match-2)模板生成，模板相关见 [对局信息模板](./template-match.md) 。  
-以上文本内容都可自定义，见 [本地化](./i18n.md#自定义文本) 。
+此处展示的图片由[`match_2`](./template-match.md#match-2)模板生成，模板相关见 [对局信息模板](./template-match.md) 。
+
+评语（*带领团队走向了胜利*）为内置的**积极**评语，目前判断规则为：  
+[查看代码](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/df0abb9ccca5faefb27cc1a366fdaadbd27316ed/src/index.ts#L385-L393)
+
+> [!TIP] 规则
+> 位于胜方 参葬率小于20% 或 参战率大于75% 或 输出经济比大于1.5 或 塔伤大于一万 或 表现分大于0  
+> 位于败方 参葬率小于25% 或 参战率大于75% 或 输出经济比大于1 或 塔伤大于五千 或 表现分大于0  
+> 以上有任意一项是判定通过即为积极评语，否则是负面评语  
+
+以上包括评语和模板在内的文本内容都可自定义，见 [本地化](./i18n.md#自定义文本) 。
 
 #### 段位追踪
 插件也会追踪绑定群友的段位信息，可在 [配置项：段位追踪](./configs.md#段位追踪) 关闭。

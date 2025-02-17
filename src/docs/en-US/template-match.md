@@ -20,3 +20,11 @@
 
 A MAX+ style template, sourced from [Steam_watcher](https://github.com/SonodaHanami/Steam_watcher).  
 Compared to `match_1`, it lacks some details like: laning outcome, permanent buffs at game end, support item purchase counts, etc. However, it offers better readability and aligns more with DOTA2 players' data browsing habits.
+
+***
+### match_2+
+
+<ImageViewer src="generated/match_2+.png" />
+
+Added additional information to `match_2`.
+> Under development.

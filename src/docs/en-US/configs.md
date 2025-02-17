@@ -20,6 +20,9 @@
 - Include corresponding Stratz player page links in `dota2tracker.query-player` commands.
 - Include links to the corresponding hero pages on `刀塔百科` in `dota2tracker.query-hero` commands.
 
+#### proxyAddress `string`
+- Proxy address. Leave blank to disable the proxy.
+
 #### Rank Tracking
 ##### rankBroadSwitch `boolean`
 - Enables tracking of bound players’ rank information; changes will result in sending rank change reports to the subscribed groups.
