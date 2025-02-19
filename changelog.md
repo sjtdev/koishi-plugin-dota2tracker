@@ -13,7 +13,7 @@
 
 # 1.5.0-pre.1
 **新增**：
-- 新增比赛模板`match_2+`，对`match_2`模板进行了一些扩充，加入了局势图表、经济图表。
+- 新增比赛模板`match_2+`，对`match_2`模板进行了一些扩充，加入了局势图表、经济图表。[模板展示](https://sjtdev.github.io/koishi-plugin-dota2tracker/template-match.html#match-2-1)
 > 原有部分直接引用了`match_2`模板的代码，节省体积。
 
 **改进**：
