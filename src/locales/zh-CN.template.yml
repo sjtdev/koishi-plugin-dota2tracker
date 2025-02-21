@@ -99,4 +99,13 @@ dota2tracker:
     situation: 局势
     networth: 财产总和
     experience: 经验
+    OUTCOME_MAP: 
+      RADIANT_VICTORY: '天辉优势'
+      RADIANT_STOMP: '天辉碾压'
+      DIRE_VICTORY: '夜魇优势'
+      DIRE_STOMP: '夜魇碾压'
+      TIE: '势均力敌'
+    lane_top: 上路
+    lane_mid: 中路
+    lane_bottom: 下路
 

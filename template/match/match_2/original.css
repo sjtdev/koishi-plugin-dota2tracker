@@ -89,11 +89,11 @@ nav > .rank > img {
   flex-direction: column;
 }
 
-.panel {
+.players .panel {
   padding: 0 10px;
 }
 
-.panel {
+.players .panel {
   padding-top: 4px;
   height: 40px;
   border-top: 3px solid #fff;
@@ -101,21 +101,21 @@ nav > .rank > img {
   display: grid;
   grid-template-columns: 32px 56px 378px repeat(4,1fr);
 }
-.panel.radiant {
+.players .panel.radiant {
   border-color: #3c9028;
 }
-.panel.dire {
+.players .panel.dire {
   border-color: #9c3628;
 }
-.panel p{
+.players .panel p{
   line-height: 16px;
   margin-left: 8px;
 }
-.panel .win{
+.players .panel .win{
   font-size: 20px;
   line-height: 32px;
 }
-.panel .data{
+.players .panel .data{
   color: #aaa;
 }
 

@@ -70,6 +70,10 @@ query MatchInfo($matchId: Long!) {
           stackCount
         }
         networthPerMinute
+        experiencePerMinute
+        killEvents{time}
+        deathEvents{time}
+        assistEvents{time}
       }
       heroDamage
       towerDamage

@@ -452,7 +452,7 @@ export async function apply(ctx: Context, config: Config) {
           }).then((response) => ctx.logger.info($t(GlobalLanguageTag, `dota2tracker.logger.parse_request_${response.stratz.matchRetry ? "sent" : "failed"}`, { matchId: matchQuery.match.id })));
         }
       } catch (error) {
-        session.send(session.text(".query_failed"));
+        session.send(session.text("commands.dota2tracker.query-match.messages.query_failed"));
         ctx.logger.error(error);
       }
     });
