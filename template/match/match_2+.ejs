@@ -7,14 +7,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
     <%- "<style>" %>
       <%- include("./match_2/original.css") %>
-      <%- include("./match_2/extra.css") %>
+      <%- include("./match_2+/extra.css") %>
     <%- "</style>" %>
   </head>
   <body>
     <section id="regular"><%- include('./match_2/original') %></section>
     <section id="extra">
       <% if (data.parsedDateTime && data.radiantNetworthLeads && data.radiantExperienceLeads) { %>
-        <%- include('./match_2/charts') %>
+        <%- include('./match_2+/charts') %>
+        <%- include('./match_2+/lane_outcome') %>
       <% } else { %>
         <div class="tip">比赛未解析或无局势信息，无法展示更多数据。</div>
       <% } %>
