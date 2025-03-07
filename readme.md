@@ -3,11 +3,8 @@
 ### 完整使用文档
 [中文文档](https://sjtdev.github.io/koishi-plugin-dota2tracker/) | [English Documentation](https://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/)
 
-[![npm](https://img.shields.io/npm/v/@sjtdev/koishi-plugin-dota2tracker/latest?style=flat-square)](https://www.npmjs.com/package/@sjtdev/koishi-plugin-dota2tracker)
-[![npm](https://img.shields.io/npm/v/@sjtdev/koishi-plugin-dota2tracker/next?style=flat-square)](https://www.npmjs.com/package/@sjtdev/koishi-plugin-dota2tracker)
+[![GitHub Release](https://img.shields.io/github/v/release/sjtdev/koishi-plugin-dota2tracker?color=blue)](https://github.com/{username}/{repository}/releases/latest)
 [![npm downloads](https://img.shields.io/npm/dm/@sjtdev/koishi-plugin-dota2tracker.svg?style=flat-square)](https://www.npmjs.com/package/@sjtdev/koishi-plugin-dota2tracker)  
-> [!TIP]
-> 两个标签取版本号最高为最新版本
 
 DOTA2Bot插件-提供自动追踪群友的最新对局的功能（需群友绑定），以及一系列查询功能。
 ### 安装
