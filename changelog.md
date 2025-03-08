@@ -3,7 +3,7 @@
 # 1.5.0-pre.5
 **新增**：
 - 新增`查询物品 [物品名/ID]`指令，支持模糊搜索，查询到的结果小于等于5(*可配置*)时依次发送物品图片；未输入关键词或查询结果大于限制时，将发送物品列表图片(*可配置*)。
-> 内置了一份物品别名常用词典，如有疏漏可在插件配置页自行添加，也可提出issue或pull request协助完善词典。
+> 内置了一份[物品别名常用词典](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/src/locales/zh-CN.constants.json#L304-L407)，如有疏漏可在插件配置页自行添加，也可提出issue或pull request协助完善词典。
 
 **改进**：
 - 调整优化配置页布局，将消息设置从基础设置中分离。
