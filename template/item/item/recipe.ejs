@@ -27,9 +27,9 @@
     </div>
   </div>
   <% if (item.recipes.length) { %>
-    <% if (item.required_recipe) {
-      recipe.items = recipe.items.concat((item.required_recipe ? [{name:"recipe",name_loc:$t("dota2tracker.template.recipe")}] : []))
-     } %>
+  <% if (dotaconstants.items["recipe_"+item.name]) {
+    recipe.items = recipe.items.concat([{name:"recipe",name_loc:$t("dota2tracker.template.recipe")}])
+  } %>
   <% const multiple = recipe.items.length > 1 ? " multiple" : ""; %>
   <div class="vline<%= multiple ? " direct" : "" %>"><div class="item line"></div></div>
   <div class="hline<%= multiple %>"></div>
