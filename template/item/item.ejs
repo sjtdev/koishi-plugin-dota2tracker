@@ -1,0 +1,137 @@
+<% const item = data; %>
+<%
+// 构建占位符字典（兼容数值类型和百分比类型）
+const valueMap = item.special_values.reduce((map, val) => {
+  map[val.name] = val.is_percentage ?
+    `${val.values_float.join("/")}%` :  // 百分比类型加%后缀
+    val.values_float.join("/")          // 普通数值直接取用
+  return map
+}, {})
+%>
+<% function parseAbilityDesc(desc) {
+  const abilityRegExp = /<h1>(.*?)<\/h1>((?:(?!<h1>).|\n)*)/g;
+  return Array.from(desc.matchAll(abilityRegExp)).map(match => ({
+    name: match[1].trim(),
+    desc: match[2]
+      // 保留原有替换逻辑
+      // .replace(/<br>\s*<br>/g, '\n')
+      .replace(/%(\w+)%/g, (_, key) =>
+        `<span class="value">${valueMap[key] ?? `[${key}]`}</span>`
+      )
+      .replace(/%%/g, '<span class="value">%</span>')
+      .trim()
+  }));
+} %>
+<% function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+} %>
+<% function toArray(obj) {
+  return Array.isArray(obj) ? obj : [obj];
+} %>
+<!DOCTYPE html>
+<html lang="<%= languageTag %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%- `<style>` %>
+    <%- include('./item/style.css') %>
+  <%- `</style>` %>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="<%= utils.getImageUrl(item.name, ImageType.Items) %>">
+      <div>
+        <p class="name"><%= item.name_loc %> <span class="item_id"><%= item.name %></span></p>
+        <% if (item.item_cost) { %>
+        <p class="cost"><img style="height: 20px; width: auto; margin-right: 4px;" src="<%= utils.getImageUrl("gold", ImageType.Icons) %>"> <%= item.item_cost %></p>
+        <% } %>
+      </div>
+    </div>
+    <% const citem = dotaconstants.items[item.name]; %>
+    <% if (citem?.abilities?.length) { %>
+    <div class="stats">
+      <p class="behavior">
+        <%= $t("dota2tracker.template.ability") %><!--
+        --><% if (citem.abilities.some(ability => capitalize(ability.type) === 'Active')) { %><!--
+          --><%= toArray(citem.behavior).map((beh)=>$t("dota2tracker.template.behavior."+beh)).join("/") %><!--
+        --><% } else { %><!--
+          --><%= $t("dota2tracker.template.behavior.Passive") %><!--
+        --><% } %>
+      </p>
+      <% if (citem.target_team && citem.target_team.length) { %>
+      <p class="target_team"><%= $t("dota2tracker.template.affects") %><%= toArray(citem.target_team).map((tt) => $t("dota2tracker.template.target_team."+tt)).join("/") %></p>
+      <% } %>
+      <% if (citem.dmg_type) { %>
+      <p class="dmg_type"><%= $t("dota2tracker.template.damage_type") %><span class="<%= citem.dmg_type %>"><%= $t("dota2tracker.template.damage_type_"+citem.dmg_type) %></span></p>
+      <% } %>
+      <% if (citem.dispellable) { %>
+      <p class="dispellable"><%= $t("dota2tracker.template.dispellable") %><span class="<%= citem.dispellable %>"><%= $t("dota2tracker.template."+(citem.dispellable == "Strong Dispels Only" ? "dispellable_Strong" : citem.dispellable)) %></span></p>
+      <% } %>
+      <% if (citem.bkbpierce) { %>
+      <p class="bkbpierce"><%= $t("dota2tracker.template.bkbpierce") %><span class="<%= citem.bkbpierce %>"><%= $t("dota2tracker.template."+citem.bkbpierce) %></span></p>
+      <% } %>
+    </div>
+    <% } %>
+    <div class="attrs">
+      <% item.special_values.filter(value=>value.heading_loc).forEach(value=>{ %>
+      <%
+      const [_, sign = '+', rawText] = value.heading_loc.match(/^([+-]?)(.*)/) || [];
+      const processedText = rawText.replace(/\$(\w+)/, (_, p1) => $t(`dota2tracker.template.item_token.${p1}`));
+      %>
+      <p class="attr_item <%= value.values_float[0] > 0 ? "positive" : "negative" %>">
+        <%= sign %>
+        <span class="value"><%= value.values_float.map(v=>v+(value.is_percentage?"%":"")).join("/") %></span>
+        <span class="desc"><%= processedText %></span>
+      </p>
+      <% }) %>
+    </div>
+    <% const abilities = parseAbilityDesc(item.desc_loc, valueMap); %>
+    <% if (abilities.length) { %>
+    <div class="abilities">
+      <% abilities.forEach(ability => { %>
+      <% const type = ability.name.startsWith($t("dota2tracker.template.behavior.Passive")) ? "passive" : "active"; %>
+      <div class="ability <%= type %>">
+        <h1>
+          <p class="name"><%= ability.name %></p>
+          <% if (type === "active") { %>
+          <div class="attrs">
+            <% if (item.mana_costs && item.mana_costs[0]) { %>
+            <div class="attr">
+              <div class="icon" style="background: linear-gradient(#00A4DB, #007196);"></div>
+              <span class="value"><%= item.mana_costs.join("/") %></span>
+            </div>
+            <% } %>
+            <% if (item.cooldowns && item.cooldowns[0]) { %>
+            <div class="attr">
+              <img class="icon" src="<%= utils.getImageUrl("cooldown", ImageType.Icons) %>">
+              <span class="value"><%= item.cooldowns.join("/") %></span>
+            </div>
+            <% } %>
+            </div>
+          <% } %>
+        </h1>
+        <p><%- ability.desc %></p>
+      </div>
+      <% }); %>
+    </div>
+    <% } %>
+    <% const notes = item.notes_loc.map(note => note.replace(/%(\w+)%/g, (_, key) => `<span class="value">${valueMap[key] ?? `[${key}]`}</span>`).replace(/%%/g, '<span class="value">%</span>').trim()); %>
+    <% if (notes && notes.length) { %>
+    <div class="notes">
+      <% notes.forEach(note => { %>
+      <p class="note"><%- note %></p>
+      <% }) %>
+    </div>
+    <% } %>
+    <% if (item.lore_loc) { %>
+    <div class="lore">
+      <p><%= item.lore_loc %></p>
+    </div>
+    <% } %>
+  </div>
+  <% if (item.recipes.length || item.builds_into.length) { %>
+    <%- include("./item/recipe") %>
+  <% } %>
+</body>
+</html>

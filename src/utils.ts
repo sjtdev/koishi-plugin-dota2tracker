@@ -45,6 +45,7 @@ export interface dt_subscribed_guilds {
 declare module "@koishijs/cache" {
   interface Tables {
     dt_facets_constants: graphql.ConstantsQuery; // 游戏数据
+    dt_itemlist_constants: { itemList: ItemList; gameVersion: string };
     dt_previous_query_results: { data: graphql.MatchInfoQuery; pluginVersion: string };
     dt_sended_match_id: undefined;
   }
@@ -121,12 +122,25 @@ function loadGraphqlFile(queryName: string): string {
   return fs.readFileSync(path.join(pluginDir, "queries", `${queryName}.graphql`), { encoding: "utf-8" }).replace(/[\r\n]+/g, " ");
 }
 
-export async function queryHeroFromValve(heroId: number, languageTag = "zh-CN") {
-  enum language {
-    "zh-CN" = "schinese",
-    "en-US" = "english",
-  }
-  return (await http.get(`https://www.dota2.com/datafeed/herodata?language=${language[languageTag]}&hero_id=${heroId}`)).result.data.heroes[0];
+enum valveLanguageTag {
+  "zh-CN" = "schinese",
+  "en-US" = "english",
+}
+
+export async function queryHeroDetailsFromValve(heroId: number, languageTag = "zh-CN") {
+  return (await http.get(`https://www.dota2.com/datafeed/herodata?language=${valveLanguageTag[languageTag]}&hero_id=${heroId}`)).result.data.heroes[0];
+}
+
+export async function queryItemListFromValve(languageTag = "zh-CN"): Promise<any[]> {
+  return (await http.get(`https://www.dota2.com/datafeed/itemlist?language=${valveLanguageTag[languageTag]}`)).result.data.itemabilities;
+}
+
+export async function queryItemDetailsFromValve(itemId: number, languageTag = "zh-CN") {
+  return (await http.get(`https://www.dota2.com/datafeed/itemdata?language=${valveLanguageTag[languageTag]}&item_id=${itemId}`)).result.data.items[0];
+}
+
+export async function queryLastPatchNumber(): Promise<string> {
+  return (await http.get("https://www.dota2.com/datafeed/patchnoteslist")).patches.at(-1).patch_number;
 }
 
 export enum HeroDescType {
@@ -160,7 +174,7 @@ export function getImageUrl(image: string, type: ImageType = ImageType.Local, fo
       console.error(error);
       return "";
     }
-  } else return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/${type}/${image}.${format}`;
+  } else return `https://cdn.akamai.steamstatic.com/apps/dota2/images/dota_react/${type}/${image}.${format}`;
 }
 
 export interface MatchInfoEx extends NonNullable<graphql.MatchInfoQuery["match"]> {
@@ -795,6 +809,91 @@ export function getFormattedHeroData(rawHero: any) {
     }
   });
   return hero;
+}
+
+export type ItemList = {
+  id: number;
+  name: string;
+  name_loc: string;
+  name_english_loc: string;
+  neutral_item_tier: number;
+  is_pregame_suggested: boolean;
+  is_earlygame_suggested: boolean;
+  is_lategame_suggested: boolean;
+  recipes: { items: number[] }[];
+  required_recipe: boolean;
+  builds_into: number[];
+}[];
+export async function getFormattedItemListData(languageTag): Promise<ItemList> {
+  const rawItems = await queryItemListFromValve(languageTag);
+
+  // 预处理阶段：去除item_前缀并创建ID映射表
+  const processItemName = (name: string) => name.replace(/^item_/i, "").replace(/^recipe_/i, "recipe_"); // 保留recipe前缀
+
+  const [recipes, items] = rawItems.reduce(
+    (acc, item) => {
+      const processed = {
+        ...item,
+        name: processItemName(item.name),
+        name_loc: item.name_loc,
+        name_english_loc: item.name_english_loc,
+      };
+      item.name.includes("_recipe_") ? acc[0].push(processed) : acc[1].push(processed);
+      return acc;
+    },
+    [[], []] as [any[], any[]]
+  );
+
+  // 创建ID到物品对象的映射表
+  const itemMap = new Map<number, any>();
+  items.concat(recipes).forEach((item) =>
+    itemMap.set(item.id, {
+      id: item.id,
+      name: item.name,
+      name_loc: item.name_loc,
+    })
+  );
+
+  // 第一阶段：合并基础物品与配方
+  const processedItems = items.map((baseItem) => {
+    const recipe = recipes.find((r) => r.name === `recipe_${baseItem.name.replace("item_", "")}`);
+
+    return {
+      ...baseItem,
+      recipes: (recipe?.recipes || baseItem.recipes).map((recipe) => ({
+        ...recipe,
+        // 转换ID数组为对象数组
+        items: recipe.items.map((id) => itemMap.get(id)).filter(Boolean),
+      })),
+      required_recipe: recipe ? !!recipe.name_loc.trim() : false,
+      builds_into: [],
+    };
+  });
+
+  // 第二阶段：构建合成关系映射表（存储对象）
+  const buildsIntoMap = new Map<number, any[]>();
+  processedItems.forEach((item) => {
+    item.recipes.forEach((recipe) => {
+      recipe.items.forEach((material) => {
+        // 这里material已经是对象
+        if (!buildsIntoMap.has(material.id)) {
+          buildsIntoMap.set(material.id, []);
+        }
+        // 存入完整的物品对象
+        buildsIntoMap.get(material.id).push(itemMap.get(item.id));
+      });
+    });
+  });
+
+  // 第三阶段：转换最终结构
+  return processedItems.map((item) => ({
+    ...item,
+    builds_into: (buildsIntoMap.get(item.id) || []).map((target) => ({
+      id: target.id,
+      name: target.name,
+      name_loc: target.name_loc,
+    })),
+  }));
 }
 
 /** 秒数格式化，返回"分钟:秒数"，运算失败返回"--:--"。 */

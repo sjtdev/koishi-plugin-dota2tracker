@@ -3,18 +3,29 @@ _config:
     $desc: Basic Settings
     STRATZ_API_TOKEN: Required. API TOKEN from stratz.com, available at https://stratz.com/api.
     dataParsingTimeoutMinutes: Time to wait for match data parsing (in minutes). If the data parsing time exceeds the waiting time, the report will be generated directly without waiting for the parsing to complete.
+    proxyAddress: Proxy address. Leave blank to disable the proxy.
+  message:
+    $desc: Message Settings
     urlInMessageType:
       $desc: "Include links in messages, <br/>please select the message type:"
       $inner:
         - Include stratz match page link in match query and report messages
         - Include stratz player page link in player information query messages
         - Include Dota Encyclopedia hero page link in hero data query messages
-    proxyAddress: Proxy address. Leave blank to disable the proxy.
-  rank:
     rankBroadSwitch: Rank change broadcast
     rankBroadStar: Star change broadcast
     rankBroadLeader: Leaderboard rank change broadcast
     rankBroadFun: Fun broadcast template
+    maxSendItemCount: Maximum number of item images to send<br/>When exceeded, the following option determines whether to send the item list
+    showItemListAtTooMuchItems: Send item list when exceeding max count<br/>Controls whether to send the item list image when search results exceed maxSendItemCount
+    customItemAlias: 
+      $desc: |-
+        Custom item aliases<br/>
+        Add additional aliases when built-in list is insufficient. 
+        For widely-used missing aliases, please submit issues/pull requests to the source repository.<br/>
+        (Example **Keyword**: Blink Dagger，**Alias**: Blink)
+      keyword: Keyword
+      alias: Alias
   report:
     $desc: Summary Settings
     dailyReportSwitch: "Daily Report Function"

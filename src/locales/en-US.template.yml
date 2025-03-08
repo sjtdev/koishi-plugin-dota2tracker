@@ -99,3 +99,13 @@ dota2tracker:
     situation: Situation
     networth: Net Worth
     experience: Experience
+    OUTCOME_MAP: 
+      RADIANT_VICTORY: 'RADIANT VICTORY'
+      RADIANT_STOMP: 'RADIANT STOMP'
+      DIRE_VICTORY: 'DIRE VICTORY'
+      DIRE_STOMP: 'DIRE STOMP'
+      TIE: 'TIE'
+    lane_top: Top
+    lane_mid: Mid
+    lane_bottom: Bottom
+    empty_extra_info: "No extra info"

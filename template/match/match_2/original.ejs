@@ -123,7 +123,7 @@
                     <img src="${item ? utils.getImageUrl(item.name, ImageType.Items) : ""}" alt="" />
                 </div>`).join("")}
             </div>`:`
-            <img class="bear_icon" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/lone_druid_spirit_bear.png" alt="">
+            <img class="bear_icon" src="${utils.getImageUrl("lone_druid_spirit_bear", ImageType.Abilities)}" alt="">
             <div class="bear">
                 ${player.unitItems.map((item) =>`
                 <div class="item${item?.isRecipe ? " recipe" : ""}" data-id="${item?.id??0}">

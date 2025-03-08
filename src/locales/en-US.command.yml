@@ -145,3 +145,29 @@ commands:
         querying_hero: Retrieving hero data, please wait...
         query_failed: Failed to get hero data.
         empty_input: Please enter a parameter.
+    query-item:
+      description: Query item information
+      usage: |-
+        Query item descriptions and attributes, then generate and publish an image report.
+        Parameters can be item name (supports fuzzy search), item alias, or item ID.
+      examples: |-
+        query-item Vanguard
+      messages:
+        query_list_failed: Failed to retrieve item list data
+        query_item_failed: Failed to retrieve data for item '{0}'
+        querying_item: Querying item data, please wait...
+        cache_building: Initializing or rebuilding item cache for the current version, please wait...
+        empty_input: |-
+          No keywords provided. 
+          {#if show}Displaying full item list per current configuration
+          {:else}No content available
+          {/if}
+        not_found: No items found matching the keywords, please verify and retry
+        too_many_items: |-
+          Found {count} items, exceeding maximum display limit ({max} items)
+          {#if show}(Displaying item list){/if}
+        finded_items: |-
+          Matching items: 
+          {#each items as item}
+          {item.name_loc}{#if item !== items[items.length - 1]}, {/if}
+          {/each}

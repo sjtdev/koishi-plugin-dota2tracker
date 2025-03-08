@@ -1,0 +1,93 @@
+<%
+function calculateFontSize(text) {
+  // 中文字符正则（包含常见中文符号）
+  const chineseRegex = /[\u4e00-\u9fa5\u3000-\u303f\uff00-\uffef]/g
+  // 计算等效字符数（中文按2单位，其他按1单位）
+  const totalUnits = text.split('').reduce((acc, char) => {
+    return acc + (chineseRegex.test(char) ? 2 : 1)
+  }, 0)
+
+  // 容器可用宽度（根据.item的48px减去2px边距）
+  const maxWidth = 44
+  // 根据经验公式计算字号（系数需实际调试）
+  let fontSize = Math.floor((maxWidth / totalUnits) * 1.8)
+
+  // 边界限制
+  return Math.min(12, Math.max(6, fontSize))
+}
+%>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        height: auto;
+        background-color: #000;
+        color: #fff;
+      }
+
+      html {
+        width: 232px;
+      }
+
+      body {
+        width: 220px;
+        margin: 6px;
+      }
+
+      .container {
+        width: 220px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        row-gap: 8px;
+      }
+
+      .container img {
+        width: 44px;
+        height: 32px;
+      }
+
+      .container .item {
+        width: 48px;
+        height: 54px;
+        display: flex;
+        flex-direction: column;
+        font-size: 12px;
+        align-items: center;
+        justify-content: space-around;
+      }
+
+      .name {
+        /* white-space: nowrap; */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
+        line-height: 1.2;
+        min-height: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <% const items = data; %>
+    <div class="container">
+      <% items.forEach(function(item) { %>
+        <div class="item">
+          <img src="<%= utils.getImageUrl(item.name, ImageType.Items) %>" />
+          <div class="name" <%- `style="font-size: ${calculateFontSize(item.name_loc)}px"`  %>>
+            <%= item.name_loc %>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </body>
+</html>

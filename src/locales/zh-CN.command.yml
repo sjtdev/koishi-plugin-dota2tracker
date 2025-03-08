@@ -139,3 +139,20 @@ commands:
         querying_hero: 正在获取英雄数据，请稍后……
         query_failed: 获取英雄数据失败。
         empty_input: 请输入参数。
+    query-item:
+      description: 查询物品信息。
+      usage: |-
+        查询物品的描述与各项数据，生成图片发布。
+        参数可输入物品名（可模糊查找）、物品别名、物品ID。
+      examples: |-
+        查询物品 先锋盾
+      messages:
+        query_list_failed: 获取物品列表数据失败。
+        query_item_failed: 获取物品「{0}」数据失败
+        querying_item: 正在查询物品数据，请稍候…
+        cache_building: 初次使用或缓存已过期，正在生成当前版本的物品缓存，请稍后……
+        empty_input: 未输入关键字参数。根据当前配置{#if show}，将返回全部物品列表{:else}无内容可发送{/if}。
+        not_found: 未找到与关键字匹配的物品，请确认后重试。
+        too_many_items: 找到{count}个物品，超过最大发送限制（{max}个）{#if show}，将发送物品列表{/if}。
+        finded_items: 找到以下物品：{#each items as item}{item.name_loc}{#if item !== items[items.length - 1]}、{/if}{/each}
+

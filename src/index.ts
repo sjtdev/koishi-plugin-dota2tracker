@@ -49,16 +49,29 @@ export interface Config {
   template_player: string;
   template_hero: string;
   playerRankEstimate: boolean;
+  maxSendItemCount: number;
+  showItemListAtTooMuchItems: boolean;
+  customItemAlias: { keyword: string; alias: string }[];
 }
 export const Config: Schema = Schema.intersect([
   Schema.object({
     STRATZ_API_TOKEN: Schema.string().required().role("secret"),
     dataParsingTimeoutMinutes: Schema.number().default(60).min(0).max(1440),
-    urlInMessageType: Schema.array(Schema.union([Schema.const("match"), Schema.const("player"), Schema.const("hero")])).role("checkbox"),
     proxyAddress: Schema.string(),
   }).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.base), acc), {})),
   Schema.intersect([
     Schema.object({
+      urlInMessageType: Schema.array(Schema.union([Schema.const("match"), Schema.const("player"), Schema.const("hero")])).role("checkbox"),
+      maxSendItemCount: Schema.number().default(5).min(1).max(10),
+      showItemListAtTooMuchItems: Schema.boolean().default(true),
+      customItemAlias: Schema.array(
+        Schema.object({
+          keyword: Schema.string().required(),
+          alias: Schema.string().required(),
+        })
+      )
+        .default([])
+        .role("table"),
       rankBroadSwitch: Schema.boolean().default(false),
     }),
     Schema.union([
@@ -70,7 +83,7 @@ export const Config: Schema = Schema.intersect([
       }),
       Schema.object({}),
     ]),
-  ]).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.rank), acc), {})),
+  ]).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.message), acc), {})),
   Schema.intersect([
     Schema.object({
       dailyReportSwitch: Schema.boolean().default(false),
@@ -125,7 +138,7 @@ const days_30: number = 2592000000; // 30天
 const constantLocales = {};
 export async function apply(ctx: Context, config: Config) {
   // write your plugin here
-  utils.init({ http: ctx.http, setTimeout: ctx.setTimeout, APIKEY: config.STRATZ_API_TOKEN ,proxyAddress: config.proxyAddress});
+  utils.init({ http: ctx.http, setTimeout: ctx.setTimeout, APIKEY: config.STRATZ_API_TOKEN, proxyAddress: config.proxyAddress });
   for (const supportLanguageTag of Object.keys(GraphqlLanguageEnum)) {
     constantLocales[supportLanguageTag] = require(`./locales/${supportLanguageTag}.constants.json`);
     ctx.i18n.define(supportLanguageTag, require(`./locales/${supportLanguageTag}.yml`));
@@ -610,7 +623,7 @@ export async function apply(ctx: Context, config: Config) {
         }
         await session.send(session.text(".querying_hero"));
         try {
-          let hero = await utils.queryHeroFromValve(heroId, languageTag);
+          let hero = await utils.queryHeroDetailsFromValve(heroId, languageTag);
           // 处理命石新增的技能
           hero = utils.getFormattedHeroData(hero);
           await session.send(
@@ -625,67 +638,6 @@ export async function apply(ctx: Context, config: Config) {
         session.send(session.text(".empty_input"));
       }
     });
-
-  // ctx.command("查询英雄对战 <input_data:string>", "查询英雄近一周的最佳搭档与最佳克星英雄")
-  //     .usage("根据输入英雄查询最近一周比赛数据（传奇~万古分段）中与该英雄组合胜率最高英雄和与该英雄对抗胜率最低英雄。\n参数可输入英雄ID、英雄名、英雄常用别名")
-  //     .option("limit", "-l <value:number> 返回英雄个数（默认值 5）", {
-  //         fallback: 5,
-  //     })
-  //     .option("filter", "-f <value:number> 过滤场数过低的组合（单位：%，默认值0.75）", { fallback: 0.5 })
-  //     .example("查询英雄对战 敌法师\t（无额外参数默认返回5个英雄，过滤舍弃场次占比0.75%以下）")
-  //     .example("查询英雄对战 敌法师 -l=10 -f=1\t（返回10个英雄，过滤舍弃场次占比1%以下）")
-  //     .example("查询英雄对战 敌法师 -l 10 -f 1\t（等同于上例，参数接空格也可使用）")
-  //     .action(async ({ session, options }, input_data) => {
-  //         if (input_data) {
-  //             const languageTag = await getLanguageTag(session);
-  //             let heroId = findingHero(input_data);
-  //             if (!heroId) {
-  //                 session.send("未找到输入的英雄，请确认后重新输入。");
-  //                 return;
-  //             }
-  //             try {
-  //                 let heroStats = (
-  //                     await query<graphql.HeroMatchupWinrateQueryVariables, graphql.HeroMatchupWinrateQuery>("HeroMatchupWinrate", {
-  //                         heroId: heroId,
-  //                         take: Object.keys(dotaconstants.heroes).length - 1,
-  //                     })
-  //                 ).heroStats;
-  //                 let withTopFive = heroStats.matchUp[0].with
-  //                     .filter((item) => item.matchCount / heroStats.matchUp[0].matchCountWith > Math.max(0, Math.min(5, options.filter)) / 100)
-  //                     .map((item) => {
-  //                         const winRate = item.winCount / item.matchCount;
-  //                         return {
-  //                             ...item,
-  //                             winRate: winRate.toFixed(3),
-  //                         } as any;
-  //                     })
-  //                     .sort((a, b) => b.winRate - a.winRate)
-  //                     .slice(0, Math.max(1, Math.min(Object.keys(dotaconstants.heroes).length - 1, options.limit)));
-  //                 let vsBottomFive = heroStats.matchUp[0].vs
-  //                     .filter((item) => item.matchCount / heroStats.matchUp[0].matchCountVs > Math.max(0, Math.min(5, options.filter)) / 100)
-  //                     .map((item) => {
-  //                         const winRate = item.winCount / item.matchCount;
-  //                         return {
-  //                             ...item,
-  //                             winRate: winRate.toFixed(3),
-  //                         } as any;
-  //                     })
-  //                     .sort((a, b) => a.winRate - b.winRate)
-  //                     .slice(0, Math.max(1, Math.min(Object.keys(dotaconstants.heroes).length - 1, options.limit)));
-  //                 session.send(
-  //                     `你查询的英雄是${d2a.HEROES_NAMES[heroStats.matchUp[0].heroId][0]}（ID：${heroStats.matchUp[0].heroId}），\n以下是7天内传奇-万古分段比赛数据总结而来的搭档与克制关系\n最佳搭档（组合胜率前${
-  //                         options.limit
-  //                     }）：${withTopFive.map((item) => `${d2a.HEROES_NAMES[languageTag][item.heroId2][0]}(胜率${(item.winRate * 100).toFixed(1)}%)`).join("、")}\n最佳克星（对抗胜率倒${options.limit}）：${vsBottomFive
-  //                         .map((item) => `${d2a.HEROES_NAMES[languageTag][item.heroId2][0]}(胜率${(item.winRate * 100).toFixed(1)}%)`)
-  //                         .join("、")}`
-  //                 );
-  //             } catch (error) {
-  //                 ctx.logger.error(error);
-  //                 session.send("获取数据失败。");
-  //                 return;
-  //             }
-  //         }
-  //     });
 
   function findingHero(input: string | number): number | undefined {
     // 获取所有英雄的ID
@@ -742,6 +694,119 @@ export async function apply(ctx: Context, config: Config) {
 
     // 如果输入是单个 heroId，返回字符串数组而非对象
     return Array.isArray(heroIds) ? result : result[0][heroIds as number];
+  }
+
+  ctx
+    .command("dota2tracker.query-item")
+    .alias("查询物品")
+    .action(async ({ session }, input_data) => {
+      if (!input_data && !config.showItemListAtTooMuchItems) {
+        await session.send(session.text(".empty_input"));
+        return;
+      }
+      await session.send(session.text(".querying_item"));
+      const languageTag = await getLanguageTag({ session });
+      const currentGameVersion = await utils.queryLastPatchNumber();
+      // Step 1: 读取物品列表缓存
+      let itemList: utils.ItemList;
+      const cache = await ctx.cache.get("dt_itemlist_constants", languageTag);
+      try {
+        // Step 1.1: 检测缓存状态，判断是否需要重新获取
+        if (!cache || cache.gameVersion != currentGameVersion) {
+          await session.send(session.text(".cache_building"));
+          itemList = await utils.getFormattedItemListData(languageTag);
+          await ctx.cache.set("dt_itemlist_constants", languageTag, {
+            gameVersion: currentGameVersion,
+            itemList,
+          });
+        } else {
+          itemList = cache.itemList;
+        }
+      } catch (error) {
+        ctx.logger.error(error);
+        await session.send(session.text(".query_list_failed"));
+        return;
+      }
+      // Step 2: 根据输入参数作为关键词搜索物品
+      const matchedItemList: utils.ItemList = searchItems(itemList, input_data, languageTag);
+      if (!input_data || matchedItemList.length > config.maxSendItemCount || !matchedItemList.length) {
+        if (!input_data) await session.send(session.text(".empty_input", { show: config.showItemListAtTooMuchItems }));
+        if (matchedItemList.length > config.maxSendItemCount) await session.send(session.text(".too_many_items", { count: matchedItemList.length, max: config.maxSendItemCount, show: config.showItemListAtTooMuchItems }));
+        if (input_data && matchedItemList.length === 0) await session.send(session.text(".not_found"));
+        if (config.showItemListAtTooMuchItems && (matchedItemList.length || !input_data))
+          await session.send(await ctx.puppeteer.render(await genImageHTML(matchedItemList.length ? matchedItemList : itemList, "itemlist", TemplateType.Item, ctx, languageTag)));
+      } else {
+        await session.send(session.text(".finded_items", { items: matchedItemList }));
+        for (const litem of matchedItemList) {
+          try {
+            const item = Object.assign(await utils.queryItemDetailsFromValve(litem.id, languageTag), litem);
+            await session.send(await ctx.puppeteer.render(await genImageHTML(item, "item", TemplateType.Item, ctx, languageTag)));
+          } catch (error) {
+            ctx.logger.error(error);
+            await session.send(session.text(".query_item_failed", [litem.name_loc]));
+          }
+        }
+      }
+    });
+
+  function searchItems(items: utils.ItemList, keyword: string, languageTag: string): utils.ItemList {
+    if (!keyword) return [];
+    const alias = constantLocales[languageTag].dota2tracker.items_alias[keyword]; //?? config.customItemAlias.filter((cia) => cia.alias == keyword).map((cia) => cia.keyword);
+    // 优先检查完全匹配项（不区分大小写和前后空格）
+    const exactMatch = items.filter(
+      (item) => alias?.some((a) => item.name_loc.trim().toLowerCase() == a.toLowerCase()) || item.name_loc.trim().toLowerCase() === keyword.trim().toLowerCase() || (Number.isInteger(Number(keyword)) && item.id === Number(keyword))
+    );
+    if (exactMatch.length) return exactMatch;
+
+    return fuzzySearchItems([...(alias ?? keyword)], items);
+  }
+
+  function fuzzySearchItems(keywords: string[], items: utils.ItemList) {
+    const resultMap = new Map<number, utils.ItemList[number]>();
+
+    // 遍历物品列表
+    for (const item of items) {
+      // 预处理物品名称
+      const cleanName = item.name_loc
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}]/gu, "")
+        .trim();
+
+      let matchAllKeywords = true;
+
+      // 检查是否匹配所有关键词
+      for (const keyword of keywords) {
+        // 预处理关键词
+        const cleanKeyword = keyword
+          .toLowerCase()
+          .replace(/[^\p{L}\p{N}]/gu, "")
+          .trim();
+
+        // 空关键词跳过
+        if (cleanKeyword.length === 0) continue;
+
+        // 核心匹配逻辑
+        const keywordChars = Array.from(cleanKeyword);
+        const isMatched =
+          // 完全连续匹配（如"水剑"）
+          cleanName.includes(cleanKeyword) ||
+          // 包含所有字符（如同时有"水"和"剑"）
+          keywordChars.every((c) => cleanName.includes(c));
+
+        // 发现任一关键词不匹配则终止检查
+        if (!isMatched) {
+          matchAllKeywords = false;
+          break;
+        }
+      }
+
+      // 满足所有关键词时加入结果
+      if (matchAllKeywords) {
+        resultMap.set(item.id, item);
+      }
+    }
+
+    return Array.from(resultMap.values());
   }
 
   // ctx.command("来个笑话").action(async ({ session }) => {
@@ -1204,6 +1269,7 @@ enum TemplateType {
   GuildMember = "guild_member",
   Report = "report",
   Rank = "rank",
+  Item = "item",
 }
 
 function escapeHTML(str) {

@@ -3,18 +3,25 @@ _config:
     $desc: 基础设置
     STRATZ_API_TOKEN: ※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取。
     dataParsingTimeoutMinutes: 等待比赛数据解析的时间（单位：分钟）。如果数据解析时间超过等待时间，将直接生成战报而不再等待解析完成。
+    proxyAddress: 代理地址，留空时不使用代理
+  message:
+    $desc: 消息设置
     urlInMessageType:
       $desc: 在消息中附带链接，<br/>请选择消息类型：
       $inner:
         - 在查询比赛与战报消息中附带stratz比赛页面链接
         - 在查询玩家信息消息中附带stratz玩家页面链接
         - 在查询英雄数据消息中附带刀塔百科对应英雄页面链接
-    proxyAddress: 代理地址，留空时不使用代理
-  rank:
     rankBroadSwitch: 段位变动播报
     rankBroadStar: 星级变动播报
     rankBroadLeader: 冠绝名次变动播报
     rankBroadFun: 整活播报模板
+    maxSendItemCount: 最大发送物品图片数量，<br/> 当超过指定数量时将由下方选项决定是否发送查询结果的物品列表图片
+    showItemListAtTooMuchItems: 在查询结果的物品数量超过指定数量时，是否发送查询结果的物品列表图片
+    customItemAlias: 
+      $desc: "额外物品别名设置<br/>当插件内置的物品别名列表中没有想要的物品别名可在此处追加，如果是插件疏漏的广为人知的物品别名推荐到源码仓库提交issue或pull request完善列表。<br/>（例如 **关键词**: 闪烁匕首，**别名**: 跳刀）"
+      keyword: 关键词
+      alias: 别名
   report:
     $desc: 总结设置
     dailyReportSwitch: "日报功能"

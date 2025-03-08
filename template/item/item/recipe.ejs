@@ -1,0 +1,51 @@
+<% const item = data; %>
+<% (item.recipes.length ? item.recipes : [undefined]).forEach(recipe => { %>
+<div class="recipes">
+  <% if (item.builds_into.length) { %>
+  <% const multiple = item.builds_into.length > 1 ? " multiple" : ""; %>
+  <div class="upper<%= multiple %>">
+    <% item.builds_into.forEach(item => { %>
+    <div class="item">
+      <img src="<%= utils.getImageUrl(item.name.startsWith("recipe_") ? "recipe" : item.name, ImageType.Items) %>">
+      <p><%= item.name_loc %></p>
+    </div>
+    <% }) %>
+  </div>
+
+  <div class="vline<%= multiple %>">
+    <% for( let index = 0; index < item.builds_into.length; index++ ) { %>
+    <div class="item line"></div>
+    <% } %>
+  </div>
+  <div class="hline<%= multiple %>"></div>
+  <div class="vline<%= multiple ? " direct" : "" %>"><div class="item line"></div></div>
+  <% } %>
+  <div class="middle">
+    <div class="item">
+      <img src="<%= utils.getImageUrl(item.name.startsWith("recipe_") ? "recipe" : item.name, ImageType.Items) %>">
+      <p><%= item.name_loc %></p>
+    </div>
+  </div>
+  <% if (item.recipes.length) { %>
+    <% if (item.required_recipe) {
+      recipe.items = recipe.items.concat((item.required_recipe ? [{name:"recipe",name_loc:$t("dota2tracker.template.recipe")}] : []))
+     } %>
+  <% const multiple = recipe.items.length > 1 ? " multiple" : ""; %>
+  <div class="vline<%= multiple ? " direct" : "" %>"><div class="item line"></div></div>
+  <div class="hline<%= multiple %>"></div>
+  <div class="vline<%= multiple %>">
+    <% for( let index = 0; index < recipe.items.length; index++ ) { %>
+    <div class="item line"></div>
+    <% } %>
+  </div>
+  <div class="lower<%= multiple %>">
+    <% recipe.items.forEach(item => { %>
+    <div class="item">
+      <img src="<%= utils.getImageUrl(item.name.startsWith("recipe_") ? "recipe" : item.name, ImageType.Items) %>">
+      <p><%= item.name_loc %></p>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+</div>
+<% }) %>

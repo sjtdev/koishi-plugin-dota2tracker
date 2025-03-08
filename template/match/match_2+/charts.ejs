@@ -180,7 +180,7 @@
   %>
   <!-- 新增的经济图表 -->
   <svg width="<%= svgWidth %>" height="<%= svgHeight %>" xmlns="http://www.w3.org/2000/svg">
-    <text x="50%" y="30" text-anchor="middle" font-size="16" font-weight="bold">经济</text>
+    <text x="50%" y="30" text-anchor="middle" font-size="16" font-weight="bold"><%= $t("dota2tracker.template.networth") %></text>
     <!-- 横轴线与标签 -->
     <% for (let i = 0; i < 5; i++) { %>
       <% const y = padding + i * ((svgHeight - padding * 2) / 4) %>

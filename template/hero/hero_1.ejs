@@ -103,15 +103,15 @@
             }
 
             .hero .info .attrs > span.str::before {
-                background-image: url("https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/hero_strength.png");
+                background-image: url("<%= utils.getImageUrl('hero_strength', ImageType.Icons) %>");
             }
 
             .hero .info .attrs > span.agi::before {
-                background-image: url("https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/hero_agility.png");
+                background-image: url("<%= utils.getImageUrl('hero_agility', ImageType.Icons) %>");
             }
 
             .hero .info .attrs > span.int::before {
-                background-image: url("https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/hero_intelligence.png");
+                background-image: url("<%= utils.getImageUrl('hero_intelligence', ImageType.Icons) %>");
             }
 
             .details {
