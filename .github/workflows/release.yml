@@ -74,7 +74,7 @@ jobs:
           body: |
             ${{ fromJSON(steps.extract_changelog.outputs.section) }}
 
-            **自动更新说明**  
-            请于 Koishi 的 `依赖管理` 中更新插件或 `插件市场` 中搜索安装
+            > 请于 Koishi 的 `依赖管理` 中更新插件或 `插件市场` 中搜索安装  
+            > To update, go to `Dependencies` in Koishi or search in the `Plugin Market`
           prerelease: false
           draft: false
