@@ -22,57 +22,59 @@ jobs:
         with:
           node-version: "18"
       
-      - name: Install jq
-        run: sudo apt-get install jq
+      - name: Install dependencies
+        run: |
+          sudo apt-get install jq
+          sudo npm install -g @actions/core
 
-      - name: Check version
-        id: check_version
+      - name: Get version info
+        id: version_info
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          PACKAGE_NAME=$(node -p "require('./package.json').name")
           echo "package_version=${PACKAGE_VERSION}" >> $GITHUB_OUTPUT
-          echo "package_name=${PACKAGE_NAME}" >> $GITHUB_OUTPUT
 
-          LATEST_RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/latest" \
-            | jq -r '.tag_name // empty')
-
-          if [ -z "$LATEST_RELEASE" ]; then
-            echo "should_release=true" >> $GITHUB_OUTPUT
-          else
-            LATEST_VERSION=${LATEST_RELEASE#v}
-            if [ "$PACKAGE_VERSION" != "$LATEST_VERSION" ]; then
-              echo "should_release=true" >> $GITHUB_OUTPUT
-            else
-              echo "should_release=false" >> $GITHUB_OUTPUT
-            fi
-          fi
+      - name: Extract changelog
+        id: extract_changelog
+        run: |
+          VERSION="${{ steps.version_info.outputs.package_version }}"
+          SECTION=$(awk -v version="$VERSION" '
+            BEGIN { 
+              print_flag = 0 
+              in_details = 0
+            }
+            # 检测<details>标签
+            /^<details>/ { in_details = 1 }
+            /^<\/details>/ { in_details = 0 }
+            
+            # 仅处理非折叠区域的内容
+            in_details == 0 {
+              if ($0 ~ "^# " version "(\\s|$)") {  # 严格匹配版本号
+                print_flag = 1
+                next
+              }
+              else if (print_flag == 1 && $0 ~ /^# [0-9]+\.[0-9]+/) {  # 遇到下个主版本停止
+                print_flag = 0
+                exit
+              }
+              if (print_flag == 1) {
+                gsub(/^* \* /, "")  # 清理列表符号
+                print
+              }
+            }
+          ' changelog.md)
+          
+          ESCAPED_SECTION=$(echo "$SECTION" | jq -R -s -c .)
+          echo "section=${ESCAPED_SECTION}" >> $GITHUB_OUTPUT
 
       - name: Create Release
-        if: steps.check_version.outputs.should_release == 'true'
-        run: |
-          RELEASE_BODY=$(cat <<EOF
-          🎉 这是一个自动生成的release，用于发布插件版本更新提醒。请于 \`koishi\` \`依赖管理\` 中更新插件或 \`插件市场\` 中搜索安装。
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version_info.outputs.package_version }}
+          name: v${{ steps.version_info.outputs.package_version }}
+          body: |
+            ${{ fromJSON(steps.extract_changelog.outputs.section) }}
 
-          📝 更新日志：https://github.com/${{ github.repository }}/blob/master/changelog.md
-
-
-          🎉 This is an automatically generated release for plugin version update notifications. Please update in \`koishi\` \`Dependencies\` or search for installation in the \`Plugin market\`.
-
-          📝 Changelog: https://github.com/${{ github.repository }}/blob/master/changelog.md
-          EOF
-          )
-
-          curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/releases" \
-            -d @- << EOF
-          {
-            "tag_name": "v${{ steps.check_version.outputs.package_version }}",
-            "name": "v${{ steps.check_version.outputs.package_version }}",
-            "body": $(echo "$RELEASE_BODY" | jq -R -s .),
-            "draft": false,
-            "prerelease": false
-          }
-          EOF
+            **自动更新说明**  
+            请于 Koishi 的 `依赖管理` 中更新插件或 `插件市场` 中搜索安装
+          prerelease: false
+          draft: false
