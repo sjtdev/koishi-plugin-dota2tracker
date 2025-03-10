@@ -59,7 +59,7 @@ enum GraphqlLanguageEnum {
     for (const languageTag of Object.keys(GraphqlLanguageEnum)) {
       for (const templateType of fs.readdirSync(templatesPath)) {
         for (const template of fs.readdirSync(path.join(templatesPath, templateType))) {
-          if (template.endsWith(".ejs") && ["match", "player", "hero", "rank", "daily"].some((targets) => template.startsWith(targets))) {
+          if (template.endsWith(".ejs") && ["match", "player", "hero", "rank", "daily", "item"].some((targets) => template.startsWith(targets))) {
             const templateFile = path.join(templatesPath, templateType, template);
             if (templateType === "match") {
               const matchQuery = JSON.parse(fs.readFileSync(path.join(dataPath, `${templateType}.json`), "utf-8"));
@@ -89,7 +89,7 @@ enum GraphqlLanguageEnum {
             if (templateType === "hero") {
               const heroIds = getRandomThree(Object.keys(dotaconstants.heroes));
               for (let i = 0; i < heroIds.length; i++) {
-                const data = await utils.getFormattedHeroData(await queryHeroFromValve(Number(heroIds[i]), languageTag));
+                const data = await utils.getFormattedHeroData(await queryHeroDetailsFromValve(Number(heroIds[i]), languageTag));
                 await renderImage({ data, languageTag, templateFile, template, browser, suffix: i as any });
               }
             }
@@ -111,6 +111,15 @@ enum GraphqlLanguageEnum {
               };
               await renderImage({ data, languageTag, templateFile, template, browser });
               await renderImage({ data: Object.assign(data, { showCombi: false }), languageTag, templateFile, template, browser, suffix: "hideCombi" });
+            }
+            if (templateType === "item") {
+              const itemList = await utils.getFormattedItemListData(await queryItemListFromValve(languageTag));
+              const item = Object.assign(
+                await queryItemDetailsFromValve(125, languageTag),
+                itemList.find((item) => item.id === 125)
+              );
+              if (templateFile.endsWith("item.ejs")) await renderImage({ data: item, languageTag, templateFile, template, browser });
+              if (templateFile.endsWith("itemlist.ejs")) await renderImage({ data: itemList, languageTag, templateFile, template, browser });
             }
           }
         }
@@ -191,12 +200,21 @@ async function renderImage(params: { data: object; languageTag: string; template
   console.log(languageTag, imageFileName);
   await page.close();
 }
-async function queryHeroFromValve(heroId: number, languageTag = "zh-CN") {
-  enum language {
-    "zh-CN" = "schinese",
-    "en-US" = "english",
-  }
-  return JSON.parse(await httpGet(`https://www.dota2.com/datafeed/herodata?language=${language[languageTag]}&hero_id=${heroId}`)).result.data.heroes[0];
+enum valveLanguageTag {
+  "zh-CN" = "schinese",
+  "en-US" = "english",
+}
+async function queryHeroDetailsFromValve(heroId: number, languageTag = "zh-CN") {
+  return JSON.parse(await httpGet(`https://www.dota2.com/datafeed/herodata?language=${valveLanguageTag[languageTag]}&hero_id=${heroId}`)).result.data.heroes[0];
+}
+async function queryItemListFromValve(languageTag = "zh-CN"): Promise<any[]> {
+  return JSON.parse(await httpGet(`https://www.dota2.com/datafeed/itemlist?language=${valveLanguageTag[languageTag]}`)).result.data.itemabilities;
+}
+async function queryItemDetailsFromValve(itemId: number, languageTag = "zh-CN") {
+  return JSON.parse(await httpGet(`https://www.dota2.com/datafeed/itemdata?language=${valveLanguageTag[languageTag]}&item_id=${itemId}`)).result.data.items[0];
+}
+async function queryLastPatchNumber(): Promise<string> {
+  return JSON.parse(await httpGet("https://www.dota2.com/datafeed/patchnoteslist")).patches.at(-1).patch_number;
 }
 
 function httpGet(urlString: string): Promise<string> {

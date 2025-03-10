@@ -14,14 +14,25 @@
 - 虽然比赛中有登录过stratz网站的玩家时会自动解析，而且目前插件在追踪到比赛数据时也会发送一次解析比赛请求，但也不排除stratz抽风、游戏版本更新stratz未跟进、非标准模式等各种导致解析优先级靠后或未能解析的情况；
 - 从比赛结束时间算起，超过此配置项的等待时间后将直接发布不完整数据的战报。
 
+#### proxyAddress `string`
+- 代理地址，留空时不使用代理。
+
+### 消息设置
+
 #### urlInMessageType `checkbox`
 - 消息中附带链接
 - 在`查询比赛`指令与`战报消息`中附带对应stratz比赛页面的链接。
 - 在`查询玩家`指令中附带对应stratz玩家页面的链接。
 - 在`查询英雄`指令中附带`刀塔百科`对应的英雄页面的链接。
 
-#### proxyAddress `string`
-- 代理地址，留空时不使用代理。
+#### maxSendItemCount `number`
+- 使用`查询物品`指令发送物品图片数量限制，大于此数值将不会发送物品图片。
+
+#### showItemListAtTooMuchItems `boolean`
+- 使用`查询物品`指令查询结果数量大于*maxSendItemCount*限制时、或查询参数为空时，是否发送物品列表图片。
+
+#### customItemAlias `array`
+- 插件会从[内置别名列表](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/src/locales/zh-CN.constants.json#L304-L407)通过一些常见物品别名检索物品，如有疏漏可在此配置处自行添加。如果是内置列表遗漏的广为流传的别名也可提出*issue*或*pull request*协助完善词典。
 
 #### 段位追踪
 ##### rankBroadSwitch `boolean`

@@ -14,14 +14,25 @@
 - While player logins during games will automatically trigger parsing, and the plugin sends a parse request when tracking match data, issues like Stratz outages, game version updates not followed by Stratz, and non-standard modes could delay or prevent parsing. 
 - After the match ends, if the wait time exceeds this configured value, incomplete match reports will be published.
 
+#### proxyAddress `string`
+- Proxy address. Leave blank to disable the proxy.
+
+### Message Settings
+
 #### urlInMessageType `checkbox`
 - Include links in messages
 - Include corresponding Stratz match page links in `dota2tracker.query-match/query-recent-match` commands and `push match messages`.
 - Include corresponding Stratz player page links in `dota2tracker.query-player` commands.
 - Include links to the corresponding hero pages on `刀塔百科` in `dota2tracker.query-hero` commands.
 
-#### proxyAddress `string`
-- Proxy address. Leave blank to disable the proxy.
+#### maxSendItemCount `number`
+- Maximum number of item images to send via `query-item` command. Results exceeding this limit will not generate item images.
+
+#### showItemListAtTooMuchItems `boolean`
+- Whether to send item list image when query results exceed *maxSendItemCount* limit or when no search parameters are provided.
+
+#### customItemAlias `array`
+- Define custom alias list for in-game items.
 
 #### Rank Tracking
 ##### rankBroadSwitch `boolean`

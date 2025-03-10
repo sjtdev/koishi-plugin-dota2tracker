@@ -51,3 +51,7 @@ import locale from "../../locales/en-US.command.yml"
 ***
 ##### `dota2tracker.query-hero <input_data>`
 <Command :command="locale.commands.dota2tracker['query-hero']"/>
+
+***
+##### `dota2tracker.query-item <input_data>`
+<Command :command="locale.commands.dota2tracker['query-item']"/>

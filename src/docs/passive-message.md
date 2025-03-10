@@ -37,3 +37,7 @@
 请见 [指令：查询英雄](./commands.md#dota2tracker-query-hero-input-data) 与 [英雄信息模板](./template-hero.md)。
 > [!WARNING] 注意
 > 由于数据源是直接访问DOTA2官方API，没有文档和规范，每次数据结构变动需要花费大量精力进行适配，如果有好的适配方案或使用时发现问题欢迎反馈。
+
+#### [**查询物品**](./commands.md#dota2tracker-query-item-input-data)
+请见 [指令：查询物品](./commands.md#dota2tracker-query-item-input-data) 与 [物品信息模板](./template-item.md)。
+> 注意事项同**查询英雄**。

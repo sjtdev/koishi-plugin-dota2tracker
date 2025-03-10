@@ -37,3 +37,7 @@ Query the specified SteamID player, generating an image with the [player templat
 Please refer to [Command: Query Hero](./commands.md#dota2tracker-query-hero-input-data) and [Hero Information Template](./template-hero.md).
 > [!WARNING] Note
 > Since the data source directly accesses the DOTA2 official API without documentation or specifications, any changes in data structure require substantial effort for adaptation. Feedback on better adaptation solutions or issues encountered during use is welcome.
+
+#### [**Query Item**](./commands.md#dota2tracker-query-item-input-data)
+Please refer to [Command: Query Item](./commands.md#dota2tracker-query-item-input-data) and [Item Information Template](./template-item.md).
+> Note the same as for *Query Hero*.

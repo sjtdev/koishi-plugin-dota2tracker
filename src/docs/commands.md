@@ -60,3 +60,8 @@ import locale from "../locales/zh-CN.command.yml"
 ##### `dota2tracker.query-hero <input_data>`
 `查询英雄 <input_data>`
 <Command :command="locale.commands.dota2tracker['query-hero']"/>
+
+***
+##### `dota2tracker.query-item <input_data>`
+`查询物品 <input_data>`
+<Command :command="locale.commands.dota2tracker['query-item']"/>

@@ -26,5 +26,4 @@ MAX+风格的一张模板，来源于[Steam_watcher](https://github.com/SonodaHa
 
 <ImageViewer src="generated/match_2+.png" />
 
-对`match_2`的补充，增加了一些额外信息。
-> 开发中。
+对`match_2`的补充，增加了一些额外信息，例如局势与经济折线图，对线情况。

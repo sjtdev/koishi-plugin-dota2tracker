@@ -26,5 +26,4 @@ Compared to `match_1`, it lacks some details like: laning outcome, permanent buf
 
 <ImageViewer src="generated/match_2+.png" />
 
-Added additional information to `match_2`.
-> Under development.
+Supplement to `match_2`, adding some additional information, such as the situation and economic line charts, and the results of the lines.
