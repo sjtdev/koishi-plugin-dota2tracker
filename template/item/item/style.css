@@ -11,9 +11,10 @@ body {
 }
 
 .container {
-  border: #000 2px solid;
+  margin: 2px;
   background-color: #222d35;
   width: 400px;
+  overflow: hidden;
 }
 
 .container > * {
@@ -231,7 +232,7 @@ body {
   height: 10px;
 }
 
-.middle .item::after {
+/* .middle .item::after {
   content: "";
   display: block;
   width: 1px;
@@ -240,4 +241,4 @@ body {
   position: absolute;
   top: 0;
   right: 0;
-}
+} */

@@ -714,7 +714,7 @@ export async function apply(ctx: Context, config: Config) {
         // Step 1.1: 检测缓存状态，判断是否需要重新获取
         if (!cache || cache.gameVersion != currentGameVersion) {
           await session.send(session.text(".cache_building"));
-          itemList = await utils.getFormattedItemListData(languageTag);
+          itemList = await utils.getFormattedItemListData(await utils.queryItemListFromValve(languageTag));
           await ctx.cache.set("dt_itemlist_constants", languageTag, {
             gameVersion: currentGameVersion,
             itemList,
@@ -751,7 +751,7 @@ export async function apply(ctx: Context, config: Config) {
 
   function searchItems(items: utils.ItemList, keyword: string, languageTag: string): utils.ItemList {
     if (!keyword) return [];
-    const alias = constantLocales[languageTag].dota2tracker.items_alias[keyword]; //?? config.customItemAlias.filter((cia) => cia.alias == keyword).map((cia) => cia.keyword);
+    const alias = constantLocales[languageTag].dota2tracker.items_alias?.[keyword] ?? config.customItemAlias.filter((cia) => cia.alias == keyword).map((cia) => cia.keyword);
     // 优先检查完全匹配项（不区分大小写和前后空格）
     const exactMatch = items.filter(
       (item) => alias?.some((a) => item.name_loc.trim().toLowerCase() == a.toLowerCase()) || item.name_loc.trim().toLowerCase() === keyword.trim().toLowerCase() || (Number.isInteger(Number(keyword)) && item.id === Number(keyword))
@@ -763,6 +763,8 @@ export async function apply(ctx: Context, config: Config) {
 
   function fuzzySearchItems(keywords: string[], items: utils.ItemList) {
     const resultMap = new Map<number, utils.ItemList[number]>();
+
+    if (!keywords.length) return [];
 
     // 遍历物品列表
     for (const item of items) {

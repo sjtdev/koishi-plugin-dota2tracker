@@ -824,9 +824,7 @@ export type ItemList = {
   required_recipe: boolean;
   builds_into: number[];
 }[];
-export async function getFormattedItemListData(languageTag): Promise<ItemList> {
-  const rawItems = await queryItemListFromValve(languageTag);
-
+export async function getFormattedItemListData(rawItems): Promise<ItemList> {
   // 预处理阶段：去除item_前缀并创建ID映射表
   const processItemName = (name: string) => name.replace(/^item_/i, "").replace(/^recipe_/i, "recipe_"); // 保留recipe前缀
 

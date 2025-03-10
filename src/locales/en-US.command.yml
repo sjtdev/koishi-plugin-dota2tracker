@@ -150,6 +150,7 @@ commands:
       usage: |-
         Query item descriptions and attributes, then generate and publish an image report.
         Parameters can be item name (supports fuzzy search), item alias, or item ID.
+        You can set the maximum number of items to send per query on the configuration page, as well as whether to send the item list when the limit is exceeded or parameters are not entered.
       examples: |-
         query-item Vanguard
       messages:
