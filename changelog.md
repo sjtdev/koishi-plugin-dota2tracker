@@ -1,5 +1,26 @@
 # 更新日志
 
+# 1.5.0
+> 将1.5.0-pre.x版本汇总，功能与`1.5.0-pre.7`一致。  
+> 以下为pre.1~pre.7的更新日志汇总
+
+**新增**：
+- 新增比赛模板`match_2+`，对`match_2`模板进行了一些扩充，加入了局势图表、经济图表、对线情况展示。[模板展示](https://sjtdev.github.io/koishi-plugin-dota2tracker/template-match.html#match-2-1)
+- 新增`查询物品 [物品名/ID]`指令，支持模糊搜索，查询到的结果小于等于5(*可配置*)时依次发送物品图片；未输入关键词或查询结果大于限制时，将发送物品列表图片(*可配置*)。[模板展示](https://sjtdev.github.io/koishi-plugin-dota2tracker/template-item.html)
+  > 内置了一份[物品别名常用词典](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/src/locales/zh-CN.constants.json#L304-L407)，如有疏漏可在插件配置页自行添加，也欢迎提出issue或pull request协助完善词典。
+- 实现了由[issue](../../issues/6)提出的代理设置。
+
+**改进**：
+- 调整优化配置页布局，将消息设置从基础设置中分离。
+- 配置项`比赛模板`的说明中的模板展示链接更换为新文档对应链接。
+
+**修复**：
+- 修复一项在使用`查询比赛/查询最近比赛`指令时引发错误后不会返回查询失败消息的问题。
+- 修复因上版本改动称号系统导致`match_2`模板称号间隔意外变宽的样式问题。
+
+<details>
+<summary><b>1.5.0-pre.1~pre.7 更新日志</b></summary>
+
 # 1.5.0-pre.7
 **修复**：
 - 修复`查询物品`自定义物品别名列表未生效的问题。
@@ -41,6 +62,7 @@
 
 **修复**：
 - 修复因上版本改动称号系统导致`match_2`模板称号间隔意外变宽的样式问题。
+</details>
 
 # 1.4.3
 **改进**：
