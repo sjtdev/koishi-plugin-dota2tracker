@@ -758,7 +758,7 @@ export async function apply(ctx: Context, config: Config) {
     );
     if (exactMatch.length) return exactMatch;
 
-    return fuzzySearchItems([...(alias ?? keyword)], items);
+    return fuzzySearchItems(alias.length ? alias : [keyword], items);
   }
 
   function fuzzySearchItems(keywords: string[], items: utils.ItemList) {
