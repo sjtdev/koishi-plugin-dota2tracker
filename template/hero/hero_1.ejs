@@ -823,7 +823,7 @@
                         `<p>
                             <span class="heading">${sv.heading_loc}</span>
                             <span class="values">
-                                ${!(sv.values_float.every(value => value === 0) || sv.values_float.length == 0) ?
+                                ${!(sv.values_float?.every(value => value === 0) || sv.values_float.length == 0) ?
                                 `<span class="primary${(sv.values_float.every(value => value === 0) || sv.values_float.length == 0)?" empty":""}">
                                     ${(!((sv.values_float.every(value => value === 0) || sv.values_float.length == 0) && (sv.values_scepter.length || sv.values_shard.length || sv.facet_bonus.name))
                                         ? (sv.values_float.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")) : "")}
@@ -849,10 +849,10 @@
                         .join("")}
                     </div>
                     <p>
-                        ${item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float.length && !(item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float.length === 1 && item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float[0] === 0) ?
+                        ${item.special_values.find(sv=>sv.name=="AbilityCooldown")?.values_float.length && !(item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float.length === 1 && item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float[0] === 0) ?
                         `<span class="cooldown"> ${item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float.join(" / ")}
                         </span>` : ""}
-                        ${item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float.length && !(item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float.length === 1 && item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float[0] === 0) ?
+                        ${item.special_values.find(sv=>sv.name=="AbilityManaCost")?.values_float.length && !(item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float.length === 1 && item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float[0] === 0) ?
                         `<span class="mana_cost"> ${item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float.join(" / ")}
                         </span>` : ""}
                     </p>
