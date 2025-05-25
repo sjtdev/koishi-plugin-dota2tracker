@@ -330,6 +330,11 @@
             .hero > .player_avatar > .facet.Gray {
                 background: linear-gradient(to right, #adb6be, #4e5557);
             }
+            .hero > .player_avatar > .facet.Black {
+                background: linear-gradient(to right, #2d2d2d, #000000);
+                display: flex;
+                justify-content: center;
+            }
 
             .hero .player_info {
                 /* width: 210px; */
@@ -763,11 +768,10 @@
                             <p class="party_mark${player.partyId != null ? " party_" + match.party[player.partyId] : ""}"></p>
                             <p class="position p${Math.floor(player.order / 4) + 1}">${player.isRandom ? $t("dota2tracker.template.random") : $t("dota2tracker.template.pick_order",[`<span>${player.order == null ? "?" : player.order + 1}</span>`])}<br/>${$t("dota2tracker.template.position_"+player.position?.slice(-1))??''}</p>
                             <p class="level">${player.level}</p>
-                            ${player.facet ? `
-                            <div class="facet ${player.facet.color}">
-                                <img src="${utils.getImageUrl(player.facet.icon, ImageType.IconsFacets)}">
-                                <span><p style="font-size: ${player.facet.name.length > 7 ? 10 : player.facet.name.length > 5 ? 12 : 14}px;">${player.facet.name}</p></span>
-                            </div>` : ""}
+                            <div class="facet ${player.facet?.color ?? "Black"}">
+                                ${player.facet ? `<img src="${utils.getImageUrl(player.facet.icon, ImageType.IconsFacets)}">` : ""}
+                                <span style="font-size: ${player.facet?.name?.length>4?8:11}px;"><p>${player.facet?.name??"?"}</p></span>
+                            </div>
                         </div>
                         <div class="player_info">
                             <summary class="player_name">${eh(player.steamAccount.name)}</summary>

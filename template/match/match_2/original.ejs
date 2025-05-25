@@ -78,11 +78,10 @@
             <p class="party_line"></p>
             <p class="party_mark"></p>
         </div>
-        ${player.facet ? `
-        <div class="facet ${player.facet.color}">
-            <img src="${utils.getImageUrl(player.facet.icon, ImageType.IconsFacets)}">
-            <span style="font-size: ${player.facet.name?.length>4?8:11}px;"><p>${player.facet.name??""}</p></span>
-        </div>` : ""}
+        <div class="facet ${player.facet?.color ?? "Black"}">
+            ${player.facet ? `<img src="${utils.getImageUrl(player.facet.icon, ImageType.IconsFacets)}">` : ""}
+            <span style="font-size: ${player.facet?.name?.length>4?8:11}px;"><p>${player.facet?.name??"?"}</p></span>
+        </div>
         <div class="rank">
             <img
                 src="${utils.getImageUrl('medal_' +(player.rank.inTop100??player.rank.medal))}"
