@@ -76,6 +76,12 @@ function calculateFontSize(text) {
         min-height: 12px;
       }
     </style>
+
+    <% if (fontFamily && fontFamily.length > 0) { %>
+    <%- "<style>" %>
+    <%- `body { font-family: ${fontFamily.map(f => `${f}`).join(", ")}; }` %>
+    <%- "</style>" %>
+    <% } %>
   </head>
   <body>
     <% const items = data; %>

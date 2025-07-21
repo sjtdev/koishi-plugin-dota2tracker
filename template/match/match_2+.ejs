@@ -8,6 +8,9 @@
     <%- "<style>" %>
       <%- include("./match_2/original.css") %>
       <%- include("./match_2+/extra.css") %>
+    <% if (fontFamily && fontFamily.length > 0) { %>
+    <%- `body { font-family: ${fontFamily.map(f => `${f}`).join(", ")}; }` %>
+    <% } %>
     <%- "</style>" %>
   </head>
   <body>

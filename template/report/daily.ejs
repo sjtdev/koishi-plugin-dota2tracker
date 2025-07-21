@@ -12,7 +12,6 @@
                 color: white;
                 width: 600px;
                 font-size: 14px;
-                font-family: 'MiSans', sans-serif;
             }
             body > * {
                 width: 100%;
@@ -135,6 +134,12 @@
                 color: #B30000;
             }
         </style>
+
+        <% if (fontFamily && fontFamily.length > 0) { %>
+        <%- "<style>" %>
+        <%- `body { font-family: ${fontFamily.map(f => `${f}`).join(", ")}; }` %>
+        <%- "</style>" %>
+        <% } %>
     </head>
     <body>
         <% const { title, players, combinations, showCombi } = data; %>

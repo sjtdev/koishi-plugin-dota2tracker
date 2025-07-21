@@ -153,3 +153,4 @@ dota2tracker:
     report_sent: 发布{title}于{platform}:{guildId}。
     rank_sent: 向{platform}:{guildId}发布{player.nickName}({player.steamId})的段位变动信息。
     ejs_error: EJS模板渲染错误：{error}
+    cron_not_enabled: 未启用cron服务，无法运行战报追踪。

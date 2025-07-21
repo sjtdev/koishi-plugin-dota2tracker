@@ -32,8 +32,17 @@ _config:
     weeklyReportShowCombi: 周报是否显示组合
   template:
     $desc: 模板设置
-    template_match: 生成比赛信息图片使用的模板，见 https://sjtdev.github.io/koishi-plugin-dota2tracker/template-match.html 有模板展示。
+    template_match: 生成比赛信息图片使用的模板，显示效果见 [📖 文档-模板展示页](https://sjtdev.github.io/koishi-plugin-dota2tracker/template-match.html)。
     template_player: 生成玩家信息图片使用的模板。（目前仅有一张模板）
     template_hero: 生成英雄信息图片使用的模板。（目前仅有一张模板）
     playerRankEstimate: 在player模板中对没有段位的玩家进行段位估算 <br>估算的段位将以灰色图片显示
-
+    templateFonts: |-
+      模板所使用的字体名。需要 koishi 所在设备安装字体文件。  
+      可添加多个字体名，将从上到下回退到第一个可用字体；若所有字体都不可用，则使用系统默认字体。  
+      其中字体名若包含空格或特殊字符需要在名称首尾添加引号（此处建议尽量强制使用引号）；  
+      若使用字体族名则必须**不使用引号**，如：
+      ```
+      "Microsoft YaHei"
+      sans-serif
+      ```
+      有关font-family的更多信息，请查阅 [📖 MDN: font-family](https://developer.mozilla.org/zh-CN/docs/Web/CSS/font-family)  

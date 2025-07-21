@@ -40,3 +40,17 @@ _config:
     template_player: Template used to generate player information images. (Currently only one template available)
     template_hero: Template used to generate hero information images. (Currently only one template available)
     playerRankEstimate: Estimate the rank of players without a rank in the player template <br>Estimated rank will be displayed as a gray image
+    templateFonts: |-
+      Font names used in the template. Requires font files installed on the koishi host machine.  
+      Multiple fonts can be added; the system will use the first available font from top to bottom.  
+      If all fonts are unavailable, falls back to system defaults.  
+      Important formatting rules:  
+      - Enclose font names in quotes (" ") if they contain spaces or special characters (recommended for all font names)
+      - Do NOT enclose generic font family names (e.g. sans-serif, monospace) in quotes
+      Examples:
+      ```
+      "Microsoft YaHei"
+      sans-serif
+      ```
+      For details on font-family syntax, see:
+      [📖 MDN: font-family](https://developer.mozilla.org/en-US/docs/Web/CSS/font-family)

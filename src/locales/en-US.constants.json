@@ -1,6 +1,7 @@
 {
   "dota2tracker": {
     "usage": "DOTA2Bot plugin - provides the functionality to automatically track the latest matches of group members (requires group members to bind), as well as a series of query functions. \n[Localization/dota2tracker](../../locales/dota2tracker) allows customization of hero aliases and position nicknames, etc. \n**For more information, please visit the [plugin homepage](https://sjtdev.github.io/koishi-plugin-dota2tracker/) and [changelog](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md).**",
+    "usage_cron": "<p style='color: #FF9800;'> currently does not have<b> cron service </b>enabled, and can only provide query services. <br>If you need to enable active messaging services such as battle report tracking, please restart the plugin after the <b> cron service </b> is configured. </p>",
     "template": {
       "game_modes": {
         "NONE": "None",

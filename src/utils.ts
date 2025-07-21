@@ -201,11 +201,12 @@ interface PlayerTypeEx extends PlayerType {
   mvpScore: number;
   order: number;
   buffs: {
-    key: string;
-    stackCount?: number | null;
+    id: number;
+    type: "ability" | "item";
+    stackCount: number;
   }[];
   laneResult: "stomp" | "stomped" | "tie" | "advantage" | "disadvantage" | "jungle";
-  supportItemsCount: { [key: number]: number };
+  supportItemsCount: { name: string; count: number }[];
   items: ItemInfo[];
   backpacks?: ItemInfo[];
   unitItems?: ItemInfo[];
@@ -318,22 +319,33 @@ export function getFormattedMatchData(matchQuery: graphql.MatchInfoQuery, consta
 
     // 对player.stats.matchPlayerBuffEvent（buff列表）进行处理，取stackCount（叠加层数）最高的对象并去重
     if (player.stats.matchPlayerBuffEvent) {
-      // 使用 reduce 方法处理，筛选出 stackCount 最大的 buff
-      const maxStackCountsByAbilityOrItem = player.stats.matchPlayerBuffEvent.reduce((acc, event) => {
-        // 确定唯一键
-        const key = event.abilityId !== null ? `ability-${event.abilityId}` : `item-${event.itemId}`;
-        // 更新逻辑
-        if (!acc[key] || event.stackCount > acc[key].stackCount) {
-          acc[key] = event;
-        }
-        return acc;
-      }, {});
+      // 使用 Map 代替对象提升性能 (O(1) 查找)
+      const buffMap = new Map<string, { type: "ability" | "item"; id: number; stackCount: number }>();
 
-      // 将结果存入 player.buffs，转换为数组格式
-      player.buffs = Object.entries(maxStackCountsByAbilityOrItem).map(([key, event]) => ({
-        key,
-        event,
-      }));
+      for (const event of player.stats.matchPlayerBuffEvent) {
+        // 确定类型和ID
+        const isAbility = event.abilityId != null;
+        const id = isAbility ? event.abilityId! : event.itemId!;
+        const type = isAbility ? "ability" : "item";
+
+        // 生成复合键 (类型+ID)
+        const compositeKey = `${type}|${id}`;
+
+        // 仅保留最大层数
+        const current = buffMap.get(compositeKey);
+        if (!current || event.stackCount > current.stackCount) {
+          buffMap.set(compositeKey, {
+            id,
+            type,
+            stackCount: event.stackCount ?? 0,
+          });
+        }
+      }
+
+      // 转换为数组并赋值
+      player.buffs = Array.from(buffMap.values());
+    } else {
+      player.buffs = []; // 确保始终是数组
     }
 
     switch (player.lane) {
@@ -353,7 +365,7 @@ export function getFormattedMatchData(matchQuery: graphql.MatchInfoQuery, consta
 
     let items_timelist = {};
     const supportItemIds = [30, 40, 42, 43, 188];
-    player.supportItemsCount = supportItemIds.reduce((obj, key) => {
+    const supportItemsCount: { [key: number]: number } = supportItemIds.reduce((obj, key) => {
       obj[key] = 0;
       return obj;
     }, {});
@@ -385,11 +397,21 @@ export function getFormattedMatchData(matchQuery: graphql.MatchInfoQuery, consta
           case 42:
           case 43:
           case 188:
-            player.supportItemsCount[item.itemId]++;
+            supportItemsCount[item.itemId]++;
             break;
         }
       }
     }
+
+    player.supportItemsCount = [];
+    for (let itemId in supportItemsCount) {
+      if (supportItemsCount[itemId] === 0) continue;
+      player.supportItemsCount.push({
+        name: dotaconstants.item_ids[itemId],
+        count: supportItemsCount[itemId],
+      });
+    }
+
     // 为玩家创建物品数组
     player.items = [];
     player.backpacks = [];

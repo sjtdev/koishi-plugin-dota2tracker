@@ -11,7 +11,6 @@
                 background-color: black;
                 color: white;
                 width: 800px;
-                font-family: 'MiSans', sans-serif;
             }
 
             .wrapper > *:not(.skills) {
@@ -616,6 +615,12 @@
                 color: #aaa;
             }
         </style>
+
+        <% if (fontFamily && fontFamily.length > 0) { %>
+        <%- "<style>" %>
+        <%- `body { font-family: ${fontFamily.map(f => `${f}`).join(", ")}; }` %>
+        <%- "</style>" %>
+        <% } %>
     </head>
     <body>
         <% let hero = data; %>

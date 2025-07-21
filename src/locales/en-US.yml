@@ -165,3 +165,4 @@ dota2tracker:
     report_sent: Posted {title} on {platform}:{guildId}.
     rank_sent: Posted rank change information of {player.nickName} ({player.steamId}) on {platform}:{guildId}.
     ejs_error: "Error rendering EJS template: {error}"
+    cron_not_enabled: "Cron service is not enabled; match report tracking cannot run."

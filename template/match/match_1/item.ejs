@@ -1,0 +1,11 @@
+<% const isRecipe = item?.isRecipe ? ` style="background-image: url('${utils.getImageUrl("recipe", ImageType.Items)}');"` : ''; %>
+<div class="relative <%= style %>"<%- isRecipe %>>
+<% if (item) { %>
+  <% if (!isNeutral) { %>
+    <img class="w-full h-full object-cover <%= item.isRecipe ? "opacity-75 scale-[0.6] origin-top-right" : '' %>" src="<%= utils.getImageUrl(item.name, ImageType.Items) %>">
+    <p class="absolute w-full text-[#ccc] text-center bottom-0 leading-[1] text-xs bg-stone-700/50"><%= utils.sec2time(item.time) %></p>
+  <% } else { %>
+    <img class="w-full h-full object-contain" src="<%= utils.getImageUrl(dotaconstants.item_ids[player.neutral0Id], ImageType.Items) %>">
+  <% } %>
+<% } %>
+</div>

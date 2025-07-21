@@ -1,4 +1,10 @@
 ### Active Messages
+> [!WARNING] Dependency Required
+> Active messages require the **cron plugin** to function properly.  
+> Please ensure to:
+> 1. Enable the cron plugin in your Koishi configuration
+> 2. **Restart Koishi or this plugin** after enabling
+
 > [!TIP] Tip
 > You can create an alias in `koishi: commands` without the "dota2tracker" prefix for simplicity.  
 #### Match Tracking

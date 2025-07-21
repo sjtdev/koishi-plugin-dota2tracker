@@ -35,6 +35,9 @@ const valueMap = item.special_values.reduce((map, val) => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <%- `<style>` %>
     <%- include('./item/style.css') %>
+    <% if (fontFamily && fontFamily.length > 0) { %>
+    <%- `body { font-family: ${fontFamily.map(f => `${f}`).join(", ")}; }` %>
+    <% } %>
   <%- `</style>` %>
 </head>
 <body>

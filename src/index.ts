@@ -18,7 +18,8 @@ export const name = "dota2tracker";
 export let usage = "";
 // export const inject = ["http", "database", "cron", "puppeteer", "cache"]; // 声明依赖
 export const inject = {
-  required: ["http", "database", "cron", "puppeteer", "cache"],
+  required: ["http", "database", "puppeteer", "cache"],
+  optional: ["cron"],
 };
 const pluginDir = path.resolve(__dirname, "..");
 const pluginVersion = require(path.join(pluginDir, "package.json")).version;
@@ -52,6 +53,7 @@ export interface Config {
   maxSendItemCount: number;
   showItemListAtTooMuchItems: boolean;
   customItemAlias: { keyword: string; alias: string }[];
+  templateFonts: string[];
 }
 export const Config: Schema = Schema.intersect([
   Schema.object({
@@ -73,7 +75,7 @@ export const Config: Schema = Schema.intersect([
         .default([])
         .role("table"),
       rankBroadSwitch: Schema.boolean().default(false),
-    }),
+    }).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.message), acc), {})),
     Schema.union([
       Schema.object({
         rankBroadSwitch: Schema.const(true).required(),
@@ -82,12 +84,12 @@ export const Config: Schema = Schema.intersect([
         rankBroadFun: Schema.boolean().default(false),
       }),
       Schema.object({}),
-    ]),
-  ]).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.message), acc), {})),
+    ]).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.message), acc), {})),
+  ]),
   Schema.intersect([
     Schema.object({
       dailyReportSwitch: Schema.boolean().default(false),
-    }),
+    }).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {})),
     Schema.union([
       Schema.object({
         dailyReportSwitch: Schema.const(true).required(),
@@ -95,10 +97,10 @@ export const Config: Schema = Schema.intersect([
         dailyReportShowCombi: Schema.boolean().default(true),
       }),
       Schema.object({}),
-    ]),
+    ]).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {})),
     Schema.object({
       weeklyReportSwitch: Schema.boolean().default(false),
-    }),
+    }).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {})).description(undefined),
     Schema.union([
       Schema.object({
         weeklyReportSwitch: Schema.const(true).required(),
@@ -106,13 +108,14 @@ export const Config: Schema = Schema.intersect([
         weeklyReportShowCombi: Schema.boolean().default(true),
       }),
       Schema.object({}),
-    ]),
-  ]).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {})),
+    ]).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {})),
+  ]),
   Schema.object({
     template_match: Schema.union([...utils.readDirectoryFilesSync(path.join(pluginDir, "template", "match"))]).default("match_1"),
     template_player: Schema.union([...utils.readDirectoryFilesSync(path.join(pluginDir, "template", "player"))]).default("player_1"),
     template_hero: Schema.union([...utils.readDirectoryFilesSync(path.join(pluginDir, "template", "hero"))]).default("hero_1"),
     playerRankEstimate: Schema.boolean().default(true),
+    templateFonts: Schema.array(String).default([]).role("table")
   }).i18n(Object.keys(GraphqlLanguageEnum).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.template), acc), {})),
 ]);
 
@@ -154,6 +157,9 @@ export async function apply(ctx: Context, config: Config) {
   };
   const GlobalLanguageTag = await getLanguageTag();
   usage = $t(GlobalLanguageTag, "dota2tracker.usage");
+
+  if (!ctx.cron)
+  usage += "\n" + $t(GlobalLanguageTag, "dota2tracker.usage_cron");
 
   ctx
     .command("dota2tracker.subscribe")
@@ -822,6 +828,7 @@ export async function apply(ctx: Context, config: Config) {
   //     });
 
   ctx.on("ready", async () => {
+    if (!ctx.cron) ctx.logger.info($t(GlobalLanguageTag, "dota2tracker.logger.cron_not_enabled"));
     // 注册数据库-表
     ctx.model.extend("dt_subscribed_guilds", { id: "unsigned", guildId: "string", platform: "string" }, { autoInc: true });
     ctx.model.extend(
@@ -838,240 +845,242 @@ export async function apply(ctx: Context, config: Config) {
       { autoInc: true }
     );
     // 日报功能
-    if (config.dailyReportSwitch) {
+    if (config.dailyReportSwitch && ctx.cron) {
       ctx.cron(`0 ${config.dailyReportHours} * * *`, async function () {
         const oneDayAgo = moment().subtract(1, "days").unix();
         await report(oneDayAgo, "dota2tracker.template.yesterdays_summary", config.dailyReportShowCombi);
       });
     }
-    if (config.weeklyReportSwitch) {
+    if (config.weeklyReportSwitch && ctx.cron) {
       ctx.cron(`0 ${config.weeklyReportDayHours[1]} * * ${config.weeklyReportDayHours[0]}`, async function () {
         const oneWeekAgo = moment().subtract(1, "weeks").unix();
         await report(oneWeekAgo, "dota2tracker.template.last_weeks_summary", config.weeklyReportShowCombi);
       });
     }
-    // 每分钟执行一次查询玩家最近比赛记录，若未发布过则进入待发布列表；检查待发布列表，若满足发布条件（比赛已被解析）则生成图片并发布。
-    ctx.cron("* * * * *", async function () {
-      // 获取注册玩家ID，每分钟获取玩家最新比赛，判定是否播报过
-      // 获取所有订阅群组
-      const subscribedGuilds = await ctx.database.get("dt_subscribed_guilds", undefined);
-      // 获取所有绑定玩家，过滤出在订阅群组中的绑定玩家
-      const subscribedPlayersInGuild = (await ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
-      if (subscribedPlayersInGuild.length > 0) {
-        // 获取这些玩家的SteamID并去重
-        const subscribedPlayersSteamIds = subscribedPlayersInGuild
-          .map((player) => player.steamId)
-          .filter(function (value, index, self) {
-            return self.indexOf(value) === index;
-          });
-        // 获取所有查询到的玩家最新比赛并根据match.id去重
-        const players = (
-          await query<graphql.PlayersLastmatchRankinfoQueryVariables, graphql.PlayersLastmatchRankinfoQuery>("PlayersLastmatchRankinfo", {
-            steamAccountIds: subscribedPlayersSteamIds,
-          })
-        ).players;
-        const lastMatches = players
-          .map((player) => player.matches[0])
-          .filter((match) => match && match.id)
-          .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id)) // 根据match.id去重
-          .filter((match) => moment.unix(match.startDateTime).isAfter(moment().subtract(1, "days"))) // 排除1天以前的比赛，防止弃坑数年群友绑定时突然翻出上古战报
-          .filter((match) => !pendingMatches.some((pendingMatch) => pendingMatch.matchId == match.id)); // 判断是否已加入待发布列表
-        // 在发布过的比赛id中查找以上比赛
-        const sendedMatchesIds: number[] = [];
-        for await (const sendedMatchesId of ctx.cache.keys("dt_sended_match_id")) {
-          sendedMatchesIds.push(Number(sendedMatchesId));
-        }
-        // 遍历去重后的match
-        // 遍历未发送的比赛，逐一处理
-        for (const match of lastMatches.filter((match) => !sendedMatchesIds.includes(match.id))) {
-          // 临时存储每种语言的公会数据
-          const tempGuildsByLanguage: Record<
-            string,
-            Array<{
-              guildId: string;
-              platform: string;
-              players: Array<utils.dt_subscribed_players>;
-            }>
-          > = {};
+    if (ctx.cron) {
+      // 每分钟执行一次查询玩家最近比赛记录，若未发布过则进入待发布列表；检查待发布列表，若满足发布条件（比赛已被解析）则生成图片并发布。
+      ctx.cron("* * * * *", async function () {
+        // 获取注册玩家ID，每分钟获取玩家最新比赛，判定是否播报过
+        // 获取所有订阅群组
+        const subscribedGuilds = await ctx.database.get("dt_subscribed_guilds", undefined);
+        // 获取所有绑定玩家，过滤出在订阅群组中的绑定玩家
+        const subscribedPlayersInGuild = (await ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
+        if (subscribedPlayersInGuild.length > 0) {
+          // 获取这些玩家的SteamID并去重
+          const subscribedPlayersSteamIds = subscribedPlayersInGuild
+            .map((player) => player.steamId)
+            .filter(function (value, index, self) {
+              return self.indexOf(value) === index;
+            });
+          // 获取所有查询到的玩家最新比赛并根据match.id去重
+          const players = (
+            await query<graphql.PlayersLastmatchRankinfoQueryVariables, graphql.PlayersLastmatchRankinfoQuery>("PlayersLastmatchRankinfo", {
+              steamAccountIds: subscribedPlayersSteamIds,
+            })
+          ).players;
+          const lastMatches = players
+            .map((player) => player.matches[0])
+            .filter((match) => match && match.id)
+            .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id)) // 根据match.id去重
+            .filter((match) => moment.unix(match.startDateTime).isAfter(moment().subtract(1, "days"))) // 排除1天以前的比赛，防止弃坑数年群友绑定时突然翻出上古战报
+            .filter((match) => !pendingMatches.some((pendingMatch) => pendingMatch.matchId == match.id)); // 判断是否已加入待发布列表
+          // 在发布过的比赛id中查找以上比赛
+          const sendedMatchesIds: number[] = [];
+          for await (const sendedMatchesId of ctx.cache.keys("dt_sended_match_id")) {
+            sendedMatchesIds.push(Number(sendedMatchesId));
+          }
+          // 遍历去重后的match
+          // 遍历未发送的比赛，逐一处理
+          for (const match of lastMatches.filter((match) => !sendedMatchesIds.includes(match.id))) {
+            // 临时存储每种语言的公会数据
+            const tempGuildsByLanguage: Record<
+              string,
+              Array<{
+                guildId: string;
+                platform: string;
+                players: Array<utils.dt_subscribed_players>;
+              }>
+            > = {};
 
-          // 遍历比赛中的玩家，逐步处理订阅信息
-          for (const player of match.players) {
-            // 筛选出当前比赛中已订阅的玩家
-            const subscribedPlayers = subscribedPlayersInGuild.filter((subscribedPlayer) => subscribedPlayer.steamId === player.steamAccount.id);
+            // 遍历比赛中的玩家，逐步处理订阅信息
+            for (const player of match.players) {
+              // 筛选出当前比赛中已订阅的玩家
+              const subscribedPlayers = subscribedPlayersInGuild.filter((subscribedPlayer) => subscribedPlayer.steamId === player.steamAccount.id);
 
-            // 遍历订阅的玩家并归类到对应语言的群组中
-            for (const subscribedPlayer of subscribedPlayers) {
-              if (subscribedPlayer) {
-                // 获取群组的语言标签
-                const languageTag = await getLanguageTag({ channelId: subscribedPlayer.guildId });
+              // 遍历订阅的玩家并归类到对应语言的群组中
+              for (const subscribedPlayer of subscribedPlayers) {
+                if (subscribedPlayer) {
+                  // 获取群组的语言标签
+                  const languageTag = await getLanguageTag({ channelId: subscribedPlayer.guildId });
 
-                // 如果该语言的群组数据还未初始化，则初始化
-                if (!tempGuildsByLanguage[languageTag]) {
-                  tempGuildsByLanguage[languageTag] = [];
+                  // 如果该语言的群组数据还未初始化，则初始化
+                  if (!tempGuildsByLanguage[languageTag]) {
+                    tempGuildsByLanguage[languageTag] = [];
+                  }
+
+                  // 查找当前群组是否已存在于该语言分类中
+                  const tempGuild = tempGuildsByLanguage[languageTag].find((guild) => guild.guildId === subscribedPlayer.guildId && guild.platform === subscribedPlayer.platform);
+
+                  if (tempGuild) {
+                    // 如果已存在，将玩家追加到群组的玩家列表中
+                    tempGuild.players.push(subscribedPlayer);
+                  } else {
+                    // 如果不存在，创建新的群组数据并添加到分类中
+                    tempGuildsByLanguage[languageTag].push({
+                      guildId: subscribedPlayer.guildId,
+                      platform: subscribedPlayer.platform,
+                      players: [subscribedPlayer],
+                    });
+                  }
                 }
+              }
+            }
 
-                // 查找当前群组是否已存在于该语言分类中
-                const tempGuild = tempGuildsByLanguage[languageTag].find((guild) => guild.guildId === subscribedPlayer.guildId && guild.platform === subscribedPlayer.platform);
+            // 将比赛数据添加到待处理的比赛列表中
+            pendingMatches.push({
+              matchId: match.id,
+              guilds: tempGuildsByLanguage,
+              queryTime: new Date(),
+              hasMessage: true,
+            });
 
-                if (tempGuild) {
-                  // 如果已存在，将玩家追加到群组的玩家列表中
-                  tempGuild.players.push(subscribedPlayer);
-                } else {
-                  // 如果不存在，创建新的群组数据并添加到分类中
-                  tempGuildsByLanguage[languageTag].push({
-                    guildId: subscribedPlayer.guildId,
-                    platform: subscribedPlayer.platform,
-                    players: [subscribedPlayer],
+            // 生成日志数据，用于记录已跟踪的比赛
+            const messageToLogger: { languageTag: string; platform: string; guildId: string; players: Array<{ nickName: string; steamId: number }> }[] = [];
+            Object.entries(tempGuildsByLanguage).forEach(([languageTag, guilds]) => {
+              guilds.forEach((guild) => {
+                messageToLogger.push({
+                  languageTag,
+                  platform: guild.platform,
+                  guildId: guild.guildId,
+                  players: guild.players.map((player) => ({ nickName: player.nickName, steamId: player.steamId })),
+                });
+              });
+            });
+            // 发送日志，标记比赛已被跟踪
+            ctx.logger.info($t(GlobalLanguageTag, "dota2tracker.logger.match_tracked", { messageToLogger, match }));
+
+            // 如果比赛未被解析，发送解析请求
+            if (!match.parsedDateTime) {
+              const response = await query<graphql.RequestMatchDataAnalysisQueryVariables, graphql.RequestMatchDataAnalysisQuery>("RequestMatchDataAnalysis", {
+                matchId: match.id,
+              });
+              // 根据发送请求结果发送日志
+              ctx.logger.info($t(GlobalLanguageTag, `dota2tracker.logger.parse_request_${response.stratz.matchRetry ? "sent" : "failed"}`, { matchId: match.id }));
+            }
+          }
+
+          // 段位变动播报
+          // 创建 steamId 到 rank 的哈希表
+          const rankMap = players.reduce((map, player) => {
+            map[player.steamAccount.id] = {
+              rank: player.steamAccount.seasonRank,
+              leader: player.steamAccount.seasonLeaderboardRank,
+            };
+            return map;
+          }, {});
+
+          // 遍历已绑定玩家列表，判断段位是否变动
+          for (let subPlayer of subscribedPlayersInGuild) {
+            if (subPlayer.rank.rank !== rankMap[subPlayer.steamId].rank || subPlayer.rank.leader !== rankMap[subPlayer.steamId].board) {
+              // 此条判断语句为旧版本dotatracker准备，旧版升到新版后subPlayer.rank为空对象，此时为第一次绑定段位信息，所以不进行播报
+              if (Object.keys(subPlayer.rank).length != 0) {
+                if (config.rankBroadSwitch) {
+                  const ranks = ["prevRank", "currRank"].reduce((acc, key) => {
+                    const source = key === "prevRank" ? subPlayer.rank : rankMap[subPlayer.steamId];
+                    acc[key] = {
+                      medal: parseInt(source.rank?.toString().split("")[0] ?? "0"),
+                      star: parseInt(source.rank?.toString().split("")[1] ?? "0"),
+                      leader: source.leader,
+                      inTop100: source.leader ? (source.leader <= 10 ? "8c" : source.leader <= 100 ? "8b" : undefined) : undefined,
+                    };
+                    return acc;
+                  }, {});
+                  const prevRank = ranks["prevRank"];
+                  const currRank = ranks["currRank"];
+                  if (prevRank.medal !== currRank.medal || (prevRank.star !== currRank.star && config.rankBroadStar) || (prevRank.leader !== currRank.leader && config.rankBroadLeader)) {
+                    const guildMember = await ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember?.(subPlayer.guildId, subPlayer.userId);
+                    const name = subPlayer.nickName ?? guildMember?.nick ?? players.find((player) => player.steamAccount.id == subPlayer.steamId)?.steamAccount.name ?? subPlayer.steamId;
+                    const languageTag = await getLanguageTag({ channelId: subPlayer.guildId });
+                    if (config.rankBroadFun === true) {
+                      // 整活播报
+                      const img = await ctx.puppeteer.render(
+                        await genImageHTML(
+                          {
+                            name,
+                            avatar: guildMember?.avatar ?? players.find((player) => subPlayer.steamId == player.steamAccount.id).steamAccount.avatar,
+                            isRising:
+                              rankMap[subPlayer.steamId].rank > subPlayer.rank.rank ||
+                              (rankMap[subPlayer.steamId].rank == subPlayer.rank.rank && rankMap[subPlayer.steamId].leader < subPlayer.rank.leader) ||
+                              (rankMap[subPlayer.steamId].leader > 0 && subPlayer.rank.leader == null),
+                            prevRank,
+                            currRank,
+                            date: moment(),
+                          },
+                          "rank" + (config.rankBroadFun ? "_fun" : ""),
+                          TemplateType.Rank,
+                          ctx,
+                          languageTag
+                        )
+                      );
+                      await ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], img);
+                    } else {
+                      // 常规播报
+                      // const message = `群友 ${name} 段位变动：${$t(languageTag, "dota2tracker.template.ranks." + prevRank.medal)}${prevRank.star} → ${$t(languageTag, "dota2tracker.template.ranks." + currRank.medal)}${currRank.star} `;
+                      const message = $t(languageTag, "dota2tracker.broadcast.rank_changed", {
+                        name,
+                        prev: { medal: $t(languageTag, "dota2tracker.template.ranks." + prevRank.medal), star: prevRank.star },
+                        curr: { medal: $t(languageTag, "dota2tracker.template.ranks." + currRank.medal), star: currRank.star },
+                      });
+                      const img = await ctx.puppeteer.render(await genImageHTML(currRank, "rank" + (config.rankBroadFun ? "2" : ""), TemplateType.Rank, ctx, languageTag));
+                      await ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], message + img);
+                    }
+                    ctx.logger.info($t(GlobalLanguageTag, "dota2tracker.logger.rank_sent", { platform: subPlayer.platform, guildId: subPlayer.guildId, player: { nickName: subPlayer.nickName, steamId: subPlayer.steamId } }));
+                  }
+                }
+              }
+              // 更新玩家的数据记录
+              ctx.database.set("dt_subscribed_players", subPlayer.id, { rank: rankMap[subPlayer.steamId] });
+            }
+          }
+        }
+
+        // 获取待解析比赛列表并发布 (若待解析列表数量不止一场，每分钟只取第一位进行尝试防止同时高并发调用API)
+        if (pendingMatches.length > 0) {
+          const now: Moment = moment();
+          const pendingMatch: PendingMatch = pendingMatches[(now.hours() * 60 + now.minutes()) % pendingMatches.length];
+          try {
+            const matchQuery: graphql.MatchInfoQuery = await queryMatchData(pendingMatch.matchId);
+            const hasParsedData = matchQuery.match.parsedDateTime && matchQuery.match.players.filter((player) => player?.stats?.heroDamageReport?.dealtTotal).length > 0;
+            const isMatchTimeout = moment.unix(matchQuery.match.endDateTime).isBefore(now.subtract(config.dataParsingTimeoutMinutes, "minutes"));
+            const isQueryTimeout = moment(pendingMatch.queryTime).isBefore(now.subtract(config.dataParsingTimeoutMinutes, "minutes"));
+            if (hasParsedData || (isMatchTimeout && isQueryTimeout)) {
+              const guildsToLogger = [];
+              for (const languageTag of Object.keys(pendingMatch.guilds)) {
+                let match: utils.MatchInfoEx = await formatMatchData(matchQuery, languageTag);
+                const img: string = await generateMatchImage(match, languageTag);
+                for (let commingGuild of pendingMatch.guilds[languageTag]) {
+                  let broadMatchMessage: string = pendingMatch.hasMessage ? await generateMatchMessage(match, languageTag, commingGuild) : "";
+                  await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + (ctx.config.urlInMessageType.some((type) => type == "match") ? "https://stratz.com/matches/" + match.id : "") + img);
+                  guildsToLogger.push({
+                    matchId: match.id,
+                    timeout: config.dataParsingTimeoutMinutes,
+                    platform: commingGuild.platform,
+                    guildId: commingGuild.guildId,
+                    languageTag,
                   });
                 }
               }
-            }
-          }
-
-          // 将比赛数据添加到待处理的比赛列表中
-          pendingMatches.push({
-            matchId: match.id,
-            guilds: tempGuildsByLanguage,
-            queryTime: new Date(),
-            hasMessage: true,
-          });
-
-          // 生成日志数据，用于记录已跟踪的比赛
-          const messageToLogger: { languageTag: string; platform: string; guildId: string; players: Array<{ nickName: string; steamId: number }> }[] = [];
-          Object.entries(tempGuildsByLanguage).forEach(([languageTag, guilds]) => {
-            guilds.forEach((guild) => {
-              messageToLogger.push({
-                languageTag,
-                platform: guild.platform,
-                guildId: guild.guildId,
-                players: guild.players.map((player) => ({ nickName: player.nickName, steamId: player.steamId })),
-              });
-            });
-          });
-          // 发送日志，标记比赛已被跟踪
-          ctx.logger.info($t(GlobalLanguageTag, "dota2tracker.logger.match_tracked", { messageToLogger, match }));
-
-          // 如果比赛未被解析，发送解析请求
-          if (!match.parsedDateTime) {
-            const response = await query<graphql.RequestMatchDataAnalysisQueryVariables, graphql.RequestMatchDataAnalysisQuery>("RequestMatchDataAnalysis", {
-              matchId: match.id,
-            });
-            // 根据发送请求结果发送日志
-            ctx.logger.info($t(GlobalLanguageTag, `dota2tracker.logger.parse_request_${response.stratz.matchRetry ? "sent" : "failed"}`, { matchId: match.id }));
+              ctx.logger.info($t(GlobalLanguageTag, `dota2tracker.logger.match_${matchQuery.match.parsedDateTime ? "parsed" : "unparsed"}`, { matchId: matchQuery.match.id, guilds: guildsToLogger }));
+              ctx.cache.set("dt_sended_match_id", String(pendingMatch.matchId), undefined, days_30);
+              pendingMatches = pendingMatches.filter((item) => item.matchId != pendingMatch.matchId);
+            } else ctx.logger.info($t(GlobalLanguageTag, "dota2tracker.logger.waiting_for_parse", { matchId: matchQuery.match.id }));
+          } catch (error) {
+            ctx.logger.error(error);
+            await ctx.cache.delete("dt_previous_query_results", String(pendingMatch.matchId));
           }
         }
-
-        // 段位变动播报
-        // 创建 steamId 到 rank 的哈希表
-        const rankMap = players.reduce((map, player) => {
-          map[player.steamAccount.id] = {
-            rank: player.steamAccount.seasonRank,
-            leader: player.steamAccount.seasonLeaderboardRank,
-          };
-          return map;
-        }, {});
-
-        // 遍历已绑定玩家列表，判断段位是否变动
-        for (let subPlayer of subscribedPlayersInGuild) {
-          if (subPlayer.rank.rank !== rankMap[subPlayer.steamId].rank || subPlayer.rank.leader !== rankMap[subPlayer.steamId].board) {
-            // 此条判断语句为旧版本dotatracker准备，旧版升到新版后subPlayer.rank为空对象，此时为第一次绑定段位信息，所以不进行播报
-            if (Object.keys(subPlayer.rank).length != 0) {
-              if (config.rankBroadSwitch) {
-                const ranks = ["prevRank", "currRank"].reduce((acc, key) => {
-                  const source = key === "prevRank" ? subPlayer.rank : rankMap[subPlayer.steamId];
-                  acc[key] = {
-                    medal: parseInt(source.rank?.toString().split("")[0] ?? "0"),
-                    star: parseInt(source.rank?.toString().split("")[1] ?? "0"),
-                    leader: source.leader,
-                    inTop100: source.leader ? (source.leader <= 10 ? "8c" : source.leader <= 100 ? "8b" : undefined) : undefined,
-                  };
-                  return acc;
-                }, {});
-                const prevRank = ranks["prevRank"];
-                const currRank = ranks["currRank"];
-                if (prevRank.medal !== currRank.medal || (prevRank.star !== currRank.star && config.rankBroadStar) || (prevRank.leader !== currRank.leader && config.rankBroadLeader)) {
-                  const guildMember = await ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember?.(subPlayer.guildId, subPlayer.userId);
-                  const name = subPlayer.nickName ?? guildMember?.nick ?? players.find((player) => player.steamAccount.id == subPlayer.steamId)?.steamAccount.name ?? subPlayer.steamId;
-                  const languageTag = await getLanguageTag({ channelId: subPlayer.guildId });
-                  if (config.rankBroadFun === true) {
-                    // 整活播报
-                    const img = await ctx.puppeteer.render(
-                      await genImageHTML(
-                        {
-                          name,
-                          avatar: guildMember?.avatar ?? players.find((player) => subPlayer.steamId == player.steamAccount.id).steamAccount.avatar,
-                          isRising:
-                            rankMap[subPlayer.steamId].rank > subPlayer.rank.rank ||
-                            (rankMap[subPlayer.steamId].rank == subPlayer.rank.rank && rankMap[subPlayer.steamId].leader < subPlayer.rank.leader) ||
-                            (rankMap[subPlayer.steamId].leader > 0 && subPlayer.rank.leader == null),
-                          prevRank,
-                          currRank,
-                          date: moment(),
-                        },
-                        "rank" + (config.rankBroadFun ? "_fun" : ""),
-                        TemplateType.Rank,
-                        ctx,
-                        languageTag
-                      )
-                    );
-                    await ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], img);
-                  } else {
-                    // 常规播报
-                    // const message = `群友 ${name} 段位变动：${$t(languageTag, "dota2tracker.template.ranks." + prevRank.medal)}${prevRank.star} → ${$t(languageTag, "dota2tracker.template.ranks." + currRank.medal)}${currRank.star} `;
-                    const message = $t(languageTag, "dota2tracker.broadcast.rank_changed", {
-                      name,
-                      prev: { medal: $t(languageTag, "dota2tracker.template.ranks." + prevRank.medal), star: prevRank.star },
-                      curr: { medal: $t(languageTag, "dota2tracker.template.ranks." + currRank.medal), star: currRank.star },
-                    });
-                    const img = await ctx.puppeteer.render(await genImageHTML(currRank, "rank" + (config.rankBroadFun ? "2" : ""), TemplateType.Rank, ctx, languageTag));
-                    await ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], message + img);
-                  }
-                  ctx.logger.info($t(GlobalLanguageTag, "dota2tracker.logger.rank_sent", { platform: subPlayer.platform, guildId: subPlayer.guildId, player: { nickName: subPlayer.nickName, steamId: subPlayer.steamId } }));
-                }
-              }
-            }
-            // 更新玩家的数据记录
-            ctx.database.set("dt_subscribed_players", subPlayer.id, { rank: rankMap[subPlayer.steamId] });
-          }
-        }
-      }
-
-      // 获取待解析比赛列表并发布 (若待解析列表数量不止一场，每分钟只取第一位进行尝试防止同时高并发调用API)
-      if (pendingMatches.length > 0) {
-        const now: Moment = moment();
-        const pendingMatch: PendingMatch = pendingMatches[(now.hours() * 60 + now.minutes()) % pendingMatches.length];
-        try {
-          const matchQuery: graphql.MatchInfoQuery = await queryMatchData(pendingMatch.matchId);
-          const hasParsedData = matchQuery.match.parsedDateTime && matchQuery.match.players.filter((player) => player?.stats?.heroDamageReport?.dealtTotal).length > 0;
-          const isMatchTimeout = moment.unix(matchQuery.match.endDateTime).isBefore(now.subtract(config.dataParsingTimeoutMinutes, "minutes"));
-          const isQueryTimeout = moment(pendingMatch.queryTime).isBefore(now.subtract(config.dataParsingTimeoutMinutes, "minutes"));
-          if (hasParsedData || (isMatchTimeout && isQueryTimeout)) {
-            const guildsToLogger = [];
-            for (const languageTag of Object.keys(pendingMatch.guilds)) {
-              let match: utils.MatchInfoEx = await formatMatchData(matchQuery, languageTag);
-              const img: string = await generateMatchImage(match, languageTag);
-              for (let commingGuild of pendingMatch.guilds[languageTag]) {
-                let broadMatchMessage: string = pendingMatch.hasMessage ? await generateMatchMessage(match, languageTag, commingGuild) : "";
-                await ctx.broadcast([`${commingGuild.platform}:${commingGuild.guildId}`], broadMatchMessage + (ctx.config.urlInMessageType.some((type) => type == "match") ? "https://stratz.com/matches/" + match.id : "") + img);
-                guildsToLogger.push({
-                  matchId: match.id,
-                  timeout: config.dataParsingTimeoutMinutes,
-                  platform: commingGuild.platform,
-                  guildId: commingGuild.guildId,
-                  languageTag,
-                });
-              }
-            }
-            ctx.logger.info($t(GlobalLanguageTag, `dota2tracker.logger.match_${matchQuery.match.parsedDateTime ? "parsed" : "unparsed"}`, { matchId: matchQuery.match.id, guilds: guildsToLogger }));
-            ctx.cache.set("dt_sended_match_id", String(pendingMatch.matchId), undefined, days_30);
-            pendingMatches = pendingMatches.filter((item) => item.matchId != pendingMatch.matchId);
-          } else ctx.logger.info($t(GlobalLanguageTag, "dota2tracker.logger.waiting_for_parse", { matchId: matchQuery.match.id }));
-        } catch (error) {
-          ctx.logger.error(error);
-          await ctx.cache.delete("dt_previous_query_results", String(pendingMatch.matchId));
-        }
-      }
-    });
+      });
+    }
   });
 
   // 定义一个异步函数 report，用于生成和发送报告
@@ -1245,6 +1254,7 @@ export async function apply(ctx: Context, config: Config) {
       $t: templateI18nHelper,
       languageTag: languageTag,
       Random,
+      fontFamily: ctx.config.templateFonts,
     };
 
     function templateI18nHelper(key: string[] | string, param?: string[] | string | object): string {

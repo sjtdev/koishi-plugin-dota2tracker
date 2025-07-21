@@ -13,6 +13,8 @@ For installation and configuration of `koishi` and plugins, please refer to the 
 ### Install Services
 The current version (above `1.3.0`) requires `http (sending network requests)`, `database (storing data)`, `cron (scheduled tasks)`, `puppeteer (generating images)`, and `cache (caching data)` services. Please install the necessary plugins according to the koishi platform instructions.
 
+Among these, the `cron` service is **optional**. It is not required if you only need **passive messages** (such as query services) and do not require **active messages** (like match tracking, etc.).
+
 > [!TIP] Recommended Plugins:
 > [cache]     cache-database  
 > [database]  database-sqlite  

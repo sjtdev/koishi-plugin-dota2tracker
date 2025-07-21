@@ -158,6 +158,7 @@ async function renderImage(params: { data: object; languageTag: string; template
     },
     $t: (key: string, param?: object) => i18next.t(key, { ...param, lng: languageTag }),
     languageTag,
+    fontFamily: ["MiSans"],
   };
   const html = await ejs.renderFile(templateFile, templateData);
 

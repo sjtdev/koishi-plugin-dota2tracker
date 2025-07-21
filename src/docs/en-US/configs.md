@@ -67,3 +67,17 @@ Player template selection `Currently, only one template available`
 Hero template selection `Currently, only one template available`
 #### playerRankEstimate `boolean`
 When enabled, querying players without ranks will infer their ranks based on recent matches, displayed as a greyed-out icon.
+#### templateFonts `string[]`
+Font names used in the template. Requires font files installed on the koishi host machine.  
+Multiple fonts can be added; the system will use the first available font from top to bottom.  
+If all fonts are unavailable, falls back to system defaults.  
+Important formatting rules:  
+- Enclose font names in quotes (" ") if they contain spaces or special characters (recommended for all font names)
+- Do NOT enclose generic font family names (e.g. sans-serif, monospace) in quotes
+Examples:
+```
+"Microsoft YaHei"
+sans-serif
+```
+For details on font-family syntax, see:
+[📖 MDN: font-family](https://developer.mozilla.org/en-US/docs/Web/CSS/font-family)
