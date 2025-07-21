@@ -31,7 +31,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -43,26 +43,16 @@ jobs:
             libgbm1 \
             libasound2t64 \
             libatk1.0-0 \
-            libc6 \
             libcairo2 \
             libcups2 \
-            libdbus-1-3 \
-            libexpat1 \
             libfontconfig1 \
-            libgcc1 \
-            libglib2.0-0 \
+            libgdk-pixbuf-2.0-0 \
             libgtk-3-0 \
-            libnspr4 \
             libpango-1.0-0 \
-            libpangocairo-1.0-0 \
-            libstdc++6 \
-            libx11-6 \
             libx11-xcb1 \
-            libxcb1 \
             libxcomposite1 \
             libxcursor1 \
             libxdamage1 \
-            libxext6 \
             libxfixes3 \
             libxi6 \
             libxrandr2 \
@@ -73,50 +63,22 @@ jobs:
             fonts-liberation \
             libnss3 \
             lsb-release \
-            xdg-utils \
-            wget
+            xdg-utils
 
-      - name: Install MiSans fonts
-        run: |
-          # 创建临时目录和字体目录
-          mkdir -p temp_fonts /usr/share/fonts/opentype/misans
-          cd temp_fonts
-          
-          # 下载并解压 MiSans
-          wget -q https://hyperos.mi.com/font-download/MiSans.zip
-          unzip -q MiSans.zip
-          
-          echo "Directory structure after unzipping MiSans:"
-          ls -R MiSans/otf
-          
-          # 移动所有 OTF 文件
-          sudo find MiSans/otf -name "*.otf" -exec mv {} /usr/share/fonts/opentype/misans/ \;
-          
-          # 返回原目录并删除临时目录
-          cd ..
-          rm -rf temp_fonts
-          
-          # 更新字体缓存
-          sudo fc-cache -f -v
-          
-          # 检查安装的字体
-          echo "Installed fonts:"
-          fc-list | grep -i "misans"
-        shell: /usr/bin/bash -e {0}
-        env:
-          GITHUB_PAGES: true
-
+      # - name: Rebuild Font Cache
+      #   run: sudo fc-cache -f -v
+        
       - name: Install dependencies
         run: |
           npm install -D typescript @types/node @types/puppeteer @types/ejs @types/js-yaml @types/i18next
-          npm install -D tsx puppeteer ejs vitepress
-          npm install dotaconstants moment i18next js-yaml
+          # npm install -D tsx puppeteer ejs
+          npm install dotaconstants moment i18next js-yaml vitepress@2.0.0-alpha.8
           npm install @cordisjs/vitepress viewerjs
           npm install
 
-      - name: Generate Preview Images
-        run: |
-          npx tsx scripts/generation.ts
+      # - name: Generate Preview Images
+      #   run: |
+      #     npx tsx scripts/generation.ts
 
       - name: Build Docs
         run: |

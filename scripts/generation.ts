@@ -50,7 +50,7 @@ enum GraphqlLanguageEnum {
 
   const browser = await puppeteer.launch({
     headless: "new" as any,
-    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu"],
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--allow-file-access-from-files"],
   });
 
   try {
@@ -132,6 +132,19 @@ enum GraphqlLanguageEnum {
   }
 })();
 
+// const fontPath = path.resolve(__dirname, "..", "src", "docs", "public", "fonts", "MiSans-VF.ttf");
+// const fontData = fs.readFileSync(fontPath);
+// const base64Font = fontData.toString("base64");
+// const fontFaceCSS = `
+// @font-face {
+//   font-family: 'MiSans';
+//   src: url('data:font/ttf;charset=utf-8;base64,${base64Font}') format('truetype-variations');
+//   font-weight: 100 900;
+//   font-stretch: 75% 100%;
+//   font-style: normal;
+//   font-display: swap;
+// }`;
+
 async function renderImage(params: { data: object; languageTag: string; templateFile: string; template: string; browser: Browser; suffix?: string[] | string }) {
   const { data, languageTag, templateFile, template, browser, suffix } = params;
   const imageFileName = [template.split(".")[0], ...(Array.isArray(suffix) ? suffix : [suffix])].filter((item) => item !== null && item !== undefined).join("-");
@@ -158,27 +171,27 @@ async function renderImage(params: { data: object; languageTag: string; template
     },
     $t: (key: string, param?: object) => i18next.t(key, { ...param, lng: languageTag }),
     languageTag,
-    fontFamily: ["MiSans"],
+    fontFamily: [`"小米兰亭"`, `"MiSans VF"`, `MiSans`],
   };
   const html = await ejs.renderFile(templateFile, templateData);
+  // const html_fontInjected = html.replace("<head>", `<head><style>${fontFaceCSS}</style>`);
 
   const page = await browser.newPage();
-  await page.setContent(html);
-  // 等待网络空闲，确保大部分资源加载完成
-  await page.waitForNetworkIdle({
-    idleTime: 500, // 500ms内没有网络请求
-    timeout: 5000, // 最长等待5秒
-  });
-  await page.evaluate(() => {
-    return new Promise((resolve) => {
-      // 等待页面所有资源加载完成
-      if (document.readyState === "complete") {
-        resolve(null);
-      } else {
-        window.addEventListener("load", resolve);
-      }
-    });
-  });
+  await page.setContent(html, { waitUntil: "networkidle0" });
+  await Promise.all([
+    page.evaluate(async () => {
+      await document.fonts.ready;
+      document.documentElement.classList.add("fonts-loaded");
+    }),
+
+    page.waitForNetworkIdle({
+      idleTime: 500, // 500ms内没有网络请求
+      timeout: 30000, // 最长等待30秒
+    }),
+  ]);
+
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
   // 获取页面的实际尺寸
   const dimensions = await page.evaluate(() => {
     const body = document.documentElement.getElementsByTagName("body")[0];
@@ -196,7 +209,7 @@ async function renderImage(params: { data: object; languageTag: string; template
   });
 
   const buffer = await page.screenshot({ type: "png", fullPage: true });
-  // fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.html`), html);
+  // fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.html`), html_fontInjected);
   fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.png`), buffer);
   console.log(languageTag, imageFileName);
   await page.close();
