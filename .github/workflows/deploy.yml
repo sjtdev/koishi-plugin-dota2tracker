@@ -36,42 +36,42 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libgbm1 \
-            libasound2t64 \
-            libatk1.0-0 \
-            libcairo2 \
-            libcups2 \
-            libfontconfig1 \
-            libgdk-pixbuf-2.0-0 \
-            libgtk-3-0 \
-            libpango-1.0-0 \
-            libx11-xcb1 \
-            libxcomposite1 \
-            libxcursor1 \
-            libxdamage1 \
-            libxfixes3 \
-            libxi6 \
-            libxrandr2 \
-            libxrender1 \
-            libxss1 \
-            libxtst6 \
-            ca-certificates \
-            fonts-liberation \
-            libnss3 \
-            lsb-release \
-            xdg-utils
+      # - name: Install system dependencies
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y \
+      #       libgbm1 \
+      #       libasound2t64 \
+      #       libatk1.0-0 \
+      #       libcairo2 \
+      #       libcups2 \
+      #       libfontconfig1 \
+      #       libgdk-pixbuf-2.0-0 \
+      #       libgtk-3-0 \
+      #       libpango-1.0-0 \
+      #       libx11-xcb1 \
+      #       libxcomposite1 \
+      #       libxcursor1 \
+      #       libxdamage1 \
+      #       libxfixes3 \
+      #       libxi6 \
+      #       libxrandr2 \
+      #       libxrender1 \
+      #       libxss1 \
+      #       libxtst6 \
+      #       ca-certificates \
+      #       fonts-liberation \
+      #       libnss3 \
+      #       lsb-release \
+      #       xdg-utils
 
       # - name: Rebuild Font Cache
       #   run: sudo fc-cache -f -v
         
       - name: Install dependencies
         run: |
-          npm install -D typescript @types/node @types/puppeteer @types/ejs @types/js-yaml @types/i18next
-          # npm install -D tsx puppeteer ejs
+          npm install -D typescript @types/node @types/ejs @types/js-yaml @types/i18next
+          # npm install -D tsx puppeteer ejs @types/puppeteer
           npm install dotaconstants moment i18next js-yaml vitepress@2.0.0-alpha.8
           npm install @cordisjs/vitepress viewerjs
           npm install
