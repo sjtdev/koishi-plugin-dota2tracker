@@ -263,6 +263,9 @@
   .grid {
     display: grid;
   }
+  .aspect-\[11\/8\] {
+    aspect-ratio: 11/8;
+  }
   .size-\[36px\] {
     width: 36px;
     height: 36px;
@@ -343,6 +346,9 @@
   .grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .grid-cols-\[24px_1fr\] {
+    grid-template-columns: 24px 1fr;
+  }
   .grid-cols-\[112px_1fr_100px\] {
     grid-template-columns: 112px 1fr 100px;
   }
@@ -351,6 +357,9 @@
   }
   .grid-cols-\[repeat\(6\,3fr\)_10fr\] {
     grid-template-columns: repeat(6,3fr) 10fr;
+  }
+  .grid-rows-1 {
+    grid-template-rows: repeat(1, minmax(0, 1fr));
   }
   .grid-rows-2 {
     grid-template-rows: repeat(2, minmax(0, 1fr));
@@ -507,6 +516,9 @@
   }
   .px-\[2px\] {
     padding-inline: 2px;
+  }
+  .px-\[4px\] {
+    padding-inline: 4px;
   }
   .pl-\[12px\] {
     padding-left: 12px;

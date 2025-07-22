@@ -46,14 +46,14 @@
         <% } %>
       </div>
     </div>
-    <div class="facet row-2 col-1 w-full h-full flex bg-linear-to-r
+    <div class="facet row-2 col-1 w-full h-full grid grid-cols-[24px_1fr] grid-rows-1 bg-linear-to-r
     <%- facetColor[player.facet?.color ?? 'Black'] %>">
       <% if (player.facet) { %>
       <div class="w-[24px] h-[24px] flex items-center justify-center bg-[#4444]">
         <img class="h-[18px]" src="<%= utils.getImageUrl(player.facet?.icon, ImageType.IconsFacets) %>" />
       </div>
       <% } %>
-      <div class="facet_name grow text-sm flex justify-center items-center"><%= player.facet?.name ?? "?" %></div>
+      <div class="facet_name w-full truncate grow px-[4px] text-sm flex justify-center items-center"><span class="w-full truncate text-center"><%= player.facet?.name ?? "?" %></span></div>
     </div>
     <div class="titles row-2 col-start-2 col-end-3 w-full flex items-center pl-[12px] gap-[6px]">
     <% for (let item of player.titles) { %>

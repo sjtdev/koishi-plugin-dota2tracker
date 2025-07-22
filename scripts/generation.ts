@@ -209,7 +209,7 @@ async function renderImage(params: { data: object; languageTag: string; template
   });
 
   const buffer = await page.screenshot({ type: "png", fullPage: true });
-  // fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.html`), html_fontInjected);
+  // fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.html`), html);
   fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.png`), buffer);
   console.log(languageTag, imageFileName);
   await page.close();
