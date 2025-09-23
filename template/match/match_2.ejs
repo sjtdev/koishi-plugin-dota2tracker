@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
     <%- "<style>" %>
       <%- include("./match_2/original.css") %>
-    <% if (fontFamily && fontFamily.length > 0) { %>
-    <%- `body { font-family: ${fontFamily.map(f => `${f}`).join(", ")}; }` %>
+    <% if (fontFamily) { %>
+    <%- `body { font-family: ${fontFamily}; }` %>
     <% } %>
     <%- "</style>" %>
   </head>

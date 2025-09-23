@@ -36,7 +36,7 @@ export class ImageRenderer extends Service<Config> {
       $t: (key: string, params?: any) => this.ctx.dota2tracker.i18n.$t(languageTag, key, params),
       languageTag,
       Random,
-      fontFamily: this.config.templateFonts,
+      fontFamily: this.config.templateFonts.map(f => `${f}`).join(", "),
       getImageUrl: this.getImageUrl.bind(this),
     };
     try {

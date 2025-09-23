@@ -6,8 +6,8 @@
     <title>Document</title>
     <%- `<style>` %>
     <%- include(`./match_1/style.css`) %>
-    <% if (fontFamily && fontFamily.length > 0) { %>
-    <%- `body { font-family: ${fontFamily.map(f => `${f}`).join(", ")}; }` %>
+    <% if (fontFamily) { %>
+    <%- `body { font-family: ${fontFamily}; }` %>
     <% } %>
     <%- "</style>" %>
     <style>

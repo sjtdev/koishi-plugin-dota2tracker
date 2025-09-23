@@ -21,7 +21,7 @@ export class MessageBuilder extends Service<Config> {
   ) {
     const $t = (key: string, params?: any) => this.ctx.dota2tracker.i18n.$t(languageTag, `commands.dota2tracker.hero-of-the-day.messages.${key}`, params);
 
-    let ejs = "<html><head><style>body{width:fit-content;height:fit-content;margin:0;padding:12px;}</style></head><body>";
+    let ejs = "<html><head><style>body{width:fit-content;height:fit-content;margin:0;padding:12px;font-family:<%-fontFamily%>;}</style></head><body>";
 
     if (heroRcmd.recommendationType !== "LIFETIME_NO_RECORD") {
       ejs += `<h3>${$t("title_recommendation")}</h3>`;
@@ -36,13 +36,13 @@ export class MessageBuilder extends Service<Config> {
       ejs += `<p>${$t("details.table_intro")}</p>`;
       ejs += `<div style="display: grid;grid-template-columns: repeat(6, auto);gap: 10px;text-align: center;align-items: center;">`;
       ejs += `<div style="display: contents">
-              <div style="text-align:left">${$t("details.table_headers.hero")}</div>
-              <div>${$t("details.table_headers.recent_wins")}</div>
-              <div>${$t("details.table_headers.lifetime_wins")}</div>
-              <div>${$t("details.table_headers.imp_bonus")}</div>
-              <div>${$t("details.table_headers.is_hot_streak")}</div>
-              <div>${$t("details.table_headers.total_score")}</div>
-            </div>`;
+                <div style="text-align:left">${$t("details.table_headers.hero")}</div>
+                <div>${$t("details.table_headers.recent_wins")}</div>
+                <div>${$t("details.table_headers.lifetime_wins")}</div>
+                <div>${$t("details.table_headers.imp_bonus")}</div>
+                <div>${$t("details.table_headers.is_hot_streak")}</div>
+                <div>${$t("details.table_headers.total_score")}</div>
+              </div>`;
       ejs += heroRcmd.recommendationPool
         .map(
           (hero) =>
@@ -142,6 +142,7 @@ export class MessageBuilder extends Service<Config> {
             padding: 16px;
             width: fit-content;
             background-color: #f7f7f7;
+            font-family:<%-fontFamily%>;
           }
           table {
             border-collapse: collapse;
