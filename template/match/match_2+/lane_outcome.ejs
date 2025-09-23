@@ -69,7 +69,7 @@ function generateDetails(rivals) {
   const goldSplit = gold.radiant / (gold.radiant + gold.dire);
   return `
 <div class="details">
-<img src="${utils.getImageUrl(rivals[0].hero.shortName, ImageType.HeroIcons)}" class="hero radiant" />
+<img src="${getImageUrl(rivals[0].hero.shortName, ImageType.HeroIcons)}" class="hero radiant" />
 ${generateLevelCircle(rivals[0].stats.experiencePerMinute.slice(0, Math.min(11, rivals[0].stats.experiencePerMinute.length - 1)).reduce((a, b) => a + b, 0))}
 <p class="kda">${kills.radiant}/${deaths.radiant}/${assists.radiant}</p>
 <div class="graph">
@@ -108,7 +108,7 @@ ${generateLevelCircle(rivals[0].stats.experiencePerMinute.slice(0, Math.min(11, 
 </div>
 <p class="kda">${kills.dire}/${deaths.dire}/${assists.dire}</p>
 ${generateLevelCircle(rivals[1].stats.experiencePerMinute.slice(0, Math.min(11, rivals[1].stats.experiencePerMinute.length - 1)).reduce((a, b) => a + b, 0))}
-<img src="${utils.getImageUrl(rivals[1].hero.shortName, ImageType.HeroIcons)}" class="hero dire" />
+<img src="${getImageUrl(rivals[1].hero.shortName, ImageType.HeroIcons)}" class="hero dire" />
 </div>
 `
 }

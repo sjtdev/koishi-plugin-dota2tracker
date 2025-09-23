@@ -84,8 +84,8 @@
   %>
   <svg width="<%= svgWidth %>" height="<%= svgHeight %>" xmlns="http://www.w3.org/2000/svg">
     <text x="50%" y="30" text-anchor="middle" font-size="16" font-weight="bold"><%= $t("dota2tracker.template.situation") %></text>
-    <image x="<%= padding %>" y="<%= padding %>" width="20" height="20" href="<%= utils.getImageUrl("logo_radiant") %>"/>
-    <image x="<%= padding %>" y="<%= svgHeight - padding * 1.4 %>" width="20" height="20" href="<%= utils.getImageUrl("logo_dire") %>"/>
+    <image x="<%= padding %>" y="<%= padding %>" width="20" height="20" href="<%= getImageUrl("logo_radiant") %>"/>
+    <image x="<%= padding %>" y="<%= svgHeight - padding * 1.4 %>" width="20" height="20" href="<%= getImageUrl("logo_dire") %>"/>
     <text x="<%= padding + 20 %>" y="<%= padding + 10 %>" dominant-baseline="middle" fill="#3c9028"><%= $t("dota2tracker.template.radiant") %></text>
     <text x="<%= padding + 20 %>" y="<%= svgHeight - padding * 1.4  + 10 %>" dominant-baseline="middle" fill="#9c3628"><%= $t("dota2tracker.template.dire") %></text>
     <!-- 横轴线与标签 -->
@@ -228,7 +228,7 @@
           y="0"
           width="24"
           height="24"
-          href="<%= utils.getImageUrl(player.hero.shortName, ImageType.HeroIcons) %>"
+          href="<%= getImageUrl(player.hero.shortName, ImageType.HeroIcons) %>"
           clip-path="inset(0 round 6)"
         />
       <% }) %>

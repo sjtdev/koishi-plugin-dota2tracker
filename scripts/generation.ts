@@ -1,22 +1,33 @@
 import path from "path";
 import fs from "fs";
 import ejs from "ejs";
-import * as utils from "../src/utils";
-// import { GraphqlLanguageEnum } from "../src/index";
+// import * as utils from "../src/app/utils";
+// import { GraphqlLanguageEnum } from "../src/app/index";
 import * as dotaconstants from "dotaconstants";
-import moment from "moment";
 import i18next from "i18next";
 import yaml from "js-yaml";
 import puppeteer, { Browser } from "puppeteer";
 import http from "http";
 import https from "https";
 import url from "url";
+import { DateTime, Settings } from "luxon";
+
+import { Random } from "koishi";
+import { ImageType, ImageFormat } from "../src/app/common/types";
+import { MatchService } from "../src/app/core/match.service";
+import { PlayerService } from "../src/app/core/player.service";
+import { HeroService } from "../src/app/core/hero.service";
+import { ItemService } from "../src/app/core/item.service";
+import { MatchInfoEx } from "../src/app/data/types";
 
 enum GraphqlLanguageEnum {
   "en-US" = "ENGLISH",
   "zh-CN" = "S_CHINESE",
 }
 
+console.log("开始执行脚本……");
+const ROOT_PATH = path.resolve(__dirname, "..", "..", "..");
+Settings.defaultZone = "utc";
 (async () => {
   await i18next.init({
     ns: ["translation"], // 使用默认的命名空间
@@ -38,7 +49,7 @@ enum GraphqlLanguageEnum {
     },
   });
 
-  const localesDir = path.join(__dirname, "..", "src", "locales");
+  const localesDir = path.join(ROOT_PATH, "src", "locales");
 
   for (const locale of fs.readdirSync(localesDir)) {
     const filePath = path.join(localesDir, locale);
@@ -49,13 +60,14 @@ enum GraphqlLanguageEnum {
   }
 
   const browser = await puppeteer.launch({
+    executablePath: process.env.CHROMIUM_PATH,
     headless: "new" as any,
     args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--allow-file-access-from-files"],
   });
 
   try {
-    const templatesPath = path.join(__dirname, "..", "template");
-    const dataPath = path.join(__dirname, "..", "src", "docs", ".vitepress", "data");
+    const templatesPath = path.join(ROOT_PATH, "template");
+    const dataPath = path.join(ROOT_PATH, "src", "docs", ".vitepress", "data");
     for (const languageTag of Object.keys(GraphqlLanguageEnum)) {
       for (const templateType of fs.readdirSync(templatesPath)) {
         for (const template of fs.readdirSync(path.join(templatesPath, templateType))) {
@@ -64,37 +76,38 @@ enum GraphqlLanguageEnum {
             if (templateType === "match") {
               const matchQuery = JSON.parse(fs.readFileSync(path.join(dataPath, `${templateType}.json`), "utf-8"));
               const constantsQuery = JSON.parse(fs.readFileSync(path.join(dataPath, `constants_${languageTag}.json`), "utf-8"));
-              const data = utils.getFormattedMatchData(matchQuery, constantsQuery);
+              const facetData = await MatchService.constantsInjectFacetData(constantsQuery, matchQuery, languageTag);
+              const data = MatchService.extendMatchData(matchQuery, facetData);
               await renderImage({ data, languageTag, templateFile, template, browser });
             }
             if (templateType === "player") {
               const playerQuery = JSON.parse(fs.readFileSync(path.join(dataPath, `${templateType}.json`), "utf-8"));
               const playerExtraQuery = JSON.parse(fs.readFileSync(path.join(dataPath, `${templateType}ExtraInfo.json`), "utf-8"));
-              const data = utils.getFormattedPlayerData({ playerQuery, playerExtraQuery });
+              const data = PlayerService.extendPlayerData({ playerQuery, playerExtraQuery });
               await renderImage({ data, languageTag, templateFile, template, browser });
               const miniPlayerData = Object.assign({}, playerQuery);
               const miniPlayerExtraData = Object.assign({}, playerExtraQuery);
               miniPlayerData.player.matches = miniPlayerData.player.matches.slice(0, 10);
               miniPlayerExtraData.player.heroesPerformance = miniPlayerExtraData.player.heroesPerformance.slice(0, 5);
               miniPlayerExtraData.player.dotaPlus = miniPlayerExtraData.player.dotaPlus.sort((a, b) => (a.level < b.level ? 1 : -1)).slice(0, 3);
-              await renderImage({ data: utils.getFormattedPlayerData({ playerQuery: miniPlayerData, playerExtraQuery: miniPlayerExtraData }), languageTag, templateFile, template, browser, suffix: "mini" });
+              await renderImage({ data: PlayerService.extendPlayerData({ playerQuery: miniPlayerData, playerExtraQuery: miniPlayerExtraData }), languageTag, templateFile, template, browser, suffix: "mini" });
               const anonymousPlayerData = Object.assign({}, playerQuery);
               anonymousPlayerData.player.steamAccount.isAnonymous = true;
               anonymousPlayerData.player.matches = [];
               anonymousPlayerData.player.performance = null;
               anonymousPlayerData.player.heroesPerformance = [];
-              const anonymousData = utils.getFormattedPlayerData({ playerQuery: anonymousPlayerData });
+              const anonymousData = PlayerService.extendPlayerData({ playerQuery: anonymousPlayerData });
               await renderImage({ data: anonymousData, languageTag, templateFile, template, browser, suffix: "anonymous" });
             }
             if (templateType === "hero") {
               const heroIds = getRandomThree(Object.keys(dotaconstants.heroes));
               for (let i = 0; i < heroIds.length; i++) {
-                const data = await utils.getFormattedHeroData(await queryHeroDetailsFromValve(Number(heroIds[i]), languageTag));
+                const data = await HeroService.formatHeroDetails(await queryHeroDetailsFromValve(Number(heroIds[i]), languageTag));
                 await renderImage({ data, languageTag, templateFile, template, browser, suffix: i as any });
               }
             }
             if (templateType === "rank") {
-              const data = Object.assign(JSON.parse(fs.readFileSync(path.join(dataPath, `${templateType}.json`), "utf-8")), { date: moment.utc("2025-01-01 00:00:00") });
+              const data = Object.assign(JSON.parse(fs.readFileSync(path.join(dataPath, `${templateType}.json`), "utf-8")), { date: DateTime.fromSQL("2025-01-01 00:00:00") });
               await renderImage({ data, languageTag, templateFile, template, browser, suffix: "up" });
               Object.assign(data, {
                 isRising: false,
@@ -113,10 +126,10 @@ enum GraphqlLanguageEnum {
               await renderImage({ data: Object.assign(data, { showCombi: false }), languageTag, templateFile, template, browser, suffix: "hideCombi" });
             }
             if (templateType === "item") {
-              const itemList = await utils.getFormattedItemListData(await queryItemListFromValve(languageTag));
+              const itemList = await ItemService.getFormattedItemListData(await queryItemListFromValve(languageTag));
               const item = Object.assign(
                 await queryItemDetailsFromValve(125, languageTag),
-                itemList.find((item) => item.id === 125)
+                itemList.find((item) => item.id === 125),
               );
               if (templateFile.endsWith("item.ejs")) await renderImage({ data: item, languageTag, templateFile, template, browser });
               if (templateFile.endsWith("itemlist.ejs")) await renderImage({ data: itemList, languageTag, templateFile, template, browser });
@@ -132,46 +145,21 @@ enum GraphqlLanguageEnum {
   }
 })();
 
-// const fontPath = path.resolve(__dirname, "..", "src", "docs", "public", "fonts", "MiSans-VF.ttf");
-// const fontData = fs.readFileSync(fontPath);
-// const base64Font = fontData.toString("base64");
-// const fontFaceCSS = `
-// @font-face {
-//   font-family: 'MiSans';
-//   src: url('data:font/ttf;charset=utf-8;base64,${base64Font}') format('truetype-variations');
-//   font-weight: 100 900;
-//   font-stretch: 75% 100%;
-//   font-style: normal;
-//   font-display: swap;
-// }`;
-
 async function renderImage(params: { data: object; languageTag: string; templateFile: string; template: string; browser: Browser; suffix?: string[] | string }) {
   const { data, languageTag, templateFile, template, browser, suffix } = params;
   const imageFileName = [template.split(".")[0], ...(Array.isArray(suffix) ? suffix : [suffix])].filter((item) => item !== null && item !== undefined).join("-");
 
   const templateData = {
     data,
-    utils,
-    ImageType: utils.ImageType,
-    ImageFormat: utils.ImageFormat,
+    ImageType,
+    ImageFormat,
     dotaconstants,
-    moment: moment.utc,
-    eh: (str: string) => {
-      if (str == null) return "";
-      return str.replace(/[&<>"']/g, function (match) {
-        const escape = {
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        };
-        return escape[match];
-      });
-    },
+    DateTime,
     $t: (key: string, param?: object) => i18next.t(key, { ...param, lng: languageTag }),
     languageTag,
-    fontFamily: [`"小米兰亭"`, `"MiSans VF"`, `MiSans`],
+    Random,
+    fontFamily: [`"小米兰亭"`, `"MiSans"`, `"MiSans VF"`],
+    getImageUrl,
   };
   const html = await ejs.renderFile(templateFile, templateData);
   // const html_fontInjected = html.replace("<head>", `<head><style>${fontFaceCSS}</style>`);
@@ -179,14 +167,9 @@ async function renderImage(params: { data: object; languageTag: string; template
   const page = await browser.newPage();
   await page.setContent(html, { waitUntil: "networkidle0" });
   await Promise.all([
-    page.evaluate(async () => {
-      await document.fonts.ready;
-      document.documentElement.classList.add("fonts-loaded");
-    }),
-
     page.waitForNetworkIdle({
       idleTime: 500, // 500ms内没有网络请求
-      timeout: 30000, // 最长等待30秒
+      timeout: 60000, // 最长等待30秒
     }),
   ]);
 
@@ -210,7 +193,7 @@ async function renderImage(params: { data: object; languageTag: string; template
 
   const buffer = await page.screenshot({ type: "png", fullPage: true });
   // fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.html`), html);
-  fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.png`), buffer);
+  fs.writeFileSync(path.join(ROOT_PATH, "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.png`), buffer);
   console.log(languageTag, imageFileName);
   await page.close();
 }
@@ -260,4 +243,17 @@ function getRandomThree<T>(array: T[]): T[] {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled.slice(0, 3);
+}
+function getImageUrl(image: string, type: ImageType = ImageType.Local, format: ImageFormat = ImageFormat.png) {
+  if (type === ImageType.Local) {
+    try {
+      if (format === ImageFormat.svg) return fs.readFileSync(path.join(ROOT_PATH, "template", "images", `${image}.svg`));
+      const imageData = fs.readFileSync(path.join(ROOT_PATH, "template", "images", `${image}.${format}`));
+      const base64Data = imageData.toString("base64");
+      return `data:image/png;base64,${base64Data}`;
+    } catch (error) {
+      console.error(error);
+      return "";
+    }
+  } else return `https://cdn.akamai.steamstatic.com/apps/dota2/images/dota_react/${type}/${image}.${format}`;
 }

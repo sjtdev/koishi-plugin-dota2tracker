@@ -102,15 +102,15 @@
             }
 
             .hero .info .attrs > span.str::before {
-                background-image: url("<%= utils.getImageUrl('hero_strength', ImageType.Icons) %>");
+                background-image: url("<%= getImageUrl('hero_strength', ImageType.Icons) %>");
             }
 
             .hero .info .attrs > span.agi::before {
-                background-image: url("<%= utils.getImageUrl('hero_agility', ImageType.Icons) %>");
+                background-image: url("<%= getImageUrl('hero_agility', ImageType.Icons) %>");
             }
 
             .hero .info .attrs > span.int::before {
-                background-image: url("<%= utils.getImageUrl('hero_intelligence', ImageType.Icons) %>");
+                background-image: url("<%= getImageUrl('hero_intelligence', ImageType.Icons) %>");
             }
 
             .details {
@@ -625,7 +625,7 @@
     <body>
         <% let hero = data; %>
         <% if (hero.primary_attr==3) {
-            const base_damage = Math.floor((hero.str_base+hero.agi_base+hero.int_base)*0.7);
+            const base_damage = Math.floor((hero.str_base+hero.agi_base+hero.int_base)*0.45);
             hero.damage_max+=base_damage;
             hero.damage_min+=base_damage;
         } %>
@@ -634,8 +634,8 @@
         <div class="wrapper">
             <%- `
             <div class="hero" id="${hero.id}">
-                <img src="${utils.getImageUrl(hero["name"].match(/^npc_dota_hero_(.+)$/)[1], ImageType.Heroes)}"/>
-                <img class="pri_attr" src="${utils.getImageUrl(primary_attrs[hero.primary_attr], ImageType.Icons)}"/>
+                <img src="${getImageUrl(hero["name"].match(/^npc_dota_hero_(.+)$/)[1], ImageType.Heroes)}"/>
+                <img class="pri_attr" src="${getImageUrl(primary_attrs[hero.primary_attr], ImageType.Icons)}"/>
                 <div class="info">
                     <p class="name">${hero.name_loc}</p>
                     <p class="roles">
@@ -684,45 +684,45 @@
                         <div class="column">
                             <p>${$t("dota2tracker.template.attack")}</p>
                             <div class="stat">
-                                <img src="${utils.getImageUrl("icon_damage", ImageType.HeroStats)}"/>
+                                <img src="${getImageUrl("icon_damage", ImageType.HeroStats)}"/>
                                 <span>${hero.damage_min}~${hero.damage_max}</span>
                             </div>
                             <div class="stat">
-                                <img src="${utils.getImageUrl("icon_attack_time", ImageType.HeroStats)}"/>
+                                <img src="${getImageUrl("icon_attack_time", ImageType.HeroStats)}"/>
                                 <span>${hero.attack_rate.toFixed(1)}</span>
                             </div>
                             <div class="stat">
-                                <img src="${utils.getImageUrl("icon_attack_range", ImageType.HeroStats)}"/>
+                                <img src="${getImageUrl("icon_attack_range", ImageType.HeroStats)}"/>
                                 <span>${hero.attack_range}</span>
                             </div>
                             <div class="stat${hero_dc.attack_type=="Melee"?" hide":""}">
-                                <img src="${utils.getImageUrl("icon_projectile_speed", ImageType.HeroStats)}"/>
+                                <img src="${getImageUrl("icon_projectile_speed", ImageType.HeroStats)}"/>
                                 <span>${hero.projectile_speed}</span>
                             </div>
                         </div>
                         <div class="column">
                             <p>${$t("dota2tracker.template.defense")}</p>
                             <div class="stat">
-                                <img src="${utils.getImageUrl("icon_armor", ImageType.HeroStats)}"/>
+                                <img src="${getImageUrl("icon_armor", ImageType.HeroStats)}"/>
                                 <span>${hero.armor.toFixed(1)}</span>
                             </div>
                             <div class="stat">
-                                <img src="${utils.getImageUrl("icon_magic_resist", ImageType.HeroStats)}"/>
+                                <img src="${getImageUrl("icon_magic_resist", ImageType.HeroStats)}"/>
                                 <span>${hero.magic_resistance}%</span>
                             </div>
                         </div>
                         <div class="column">
                             <p>${$t("dota2tracker.template.mobility")}</p>
                             <div class="stat">
-                                <img src="${utils.getImageUrl("icon_movement_speed", ImageType.HeroStats)}"/>
+                                <img src="${getImageUrl("icon_movement_speed", ImageType.HeroStats)}"/>
                                 <span>${hero.movement_speed}</span>
                             </div>
                             <div class="stat">
-                                <img src="${utils.getImageUrl("icon_turn_rate", ImageType.HeroStats)}"/>
+                                <img src="${getImageUrl("icon_turn_rate", ImageType.HeroStats)}"/>
                                 <span>${hero.turn_rate.toFixed(1)}</span>
                             </div>
                             <div class="stat">
-                                <img src="${utils.getImageUrl("icon_vision", ImageType.HeroStats)}"/>
+                                <img src="${getImageUrl("icon_vision", ImageType.HeroStats)}"/>
                                 <span>${hero.sight_range_day} / ${hero.sight_range_night}</span>
                             </div>
                         </div>
@@ -735,7 +735,7 @@
                     <div class="name_back type_${facet.color}"></div>
                     <div class="name_line type_${facet.color}"></div>
                     <p class="name">
-                        <img src="${utils.getImageUrl(facet.icon, ImageType.IconsFacets)}"/>
+                        <img src="${getImageUrl(facet.icon, ImageType.IconsFacets)}"/>
                         <span>${facet.title_loc}</span>
                     </p>
                     <div class="content">
@@ -743,7 +743,7 @@
                         ${facet.abilities?facet.abilities.map(ability=>
                         `<div class="ability">
                             <div class="name">
-                                <img src="${utils.getImageUrl(ability.name, ImageType.Abilities)}" onerror="this.onerror=null; this.src='${utils.getImageUrl(`innate_icon`,ImageType.Icons)}';"/>
+                                <img src="${getImageUrl(ability.name, ImageType.Abilities)}" onerror="this.onerror=null; this.src='${getImageUrl(`innate_icon`,ImageType.Icons)}';"/>
                                 <span>${ability.name_loc}</span>
                             </div>
                             ${ability.description_ability_loc?`<div class="description">${ability.description_ability_loc}</div>`:""}
@@ -762,14 +762,14 @@
                 .map((item) => {const ability_dc = dotaconstants.abilities[item.name]; return `
                 <div class="skill${item.facet?' facet':''}" data-innate="${item.ability_is_innate&&!item.ability_is_facet}">
                     <p class="title${item.facet?(' name_back type_' + item.facet?.color):''}">
-                        ${item.facet?`<img src="${utils.getImageUrl(item.facet?.icon, ImageType.IconsFacets)}">`:""}
+                        ${item.facet?`<img src="${getImageUrl(item.facet?.icon, ImageType.IconsFacets)}">`:""}
                         <span class="name">${item.name_loc}</span>
                         ${item.ability_is_innate&&!item.ability_is_facet?`<span class="is_innate">${$t("dota2tracker.template.innate")}</span>`:""}
-                        ${item.ability_is_granted_by_scepter ?`<img src="${utils.getImageUrl("scepter")}" class="scepter">`:""}
-                        ${item.ability_is_granted_by_shard ?`<img src="${utils.getImageUrl("shard")}" class="shard">`:""}
+                        ${item.ability_is_granted_by_scepter ?`<img src="${getImageUrl("scepter")}" class="scepter">`:""}
+                        ${item.ability_is_granted_by_shard ?`<img src="${getImageUrl("shard")}" class="shard">`:""}
                     </p>
                     <div class="img_stats">
-                        <img src="${utils.getImageUrl(item.name, ImageType.Abilities)}" onerror="this.onerror=null; this.src='${utils.getImageUrl(`innate_icon`,ImageType.Icons)}';"/>
+                        <img src="${getImageUrl(item.name, ImageType.Abilities)}" onerror="this.onerror=null; this.src='${getImageUrl(`innate_icon`,ImageType.Icons)}';"/>
                         <div class="stats">
                             <p class="behavior">${$t("dota2tracker.template.ability")}${[].concat(ability_dc?.behavior)
                                 .filter((beh) => beh !== "Hidden" || !(item.ability_is_granted_by_shard || item.ability_is_granted_by_scepter))
@@ -798,7 +798,7 @@
                         <div class="name_back type_${hero.facets[index].color}"></div>
                         <div class="name_line type_${hero.facets[index].color}"></div>
                         <p class="name">
-                            <img src="${utils.getImageUrl(hero.facets[index].icon, ImageType.IconsFacets)}" />
+                            <img src="${getImageUrl(hero.facets[index].icon, ImageType.IconsFacets)}" />
                             <span>${hero.facets[index].title_loc}</span>
                         </p>
                         <div class="content">
@@ -810,12 +810,12 @@
                     `:"")).join("")}
                     ${item.ability_has_scepter&&!item.ability_is_granted_by_scepter&&item.scepter_loc
                     ? `<p class="aghanim_description">
-                        <span class="title"><img src="${utils.getImageUrl("scepter")}"class="scepter">${$t("dota2tracker.template.scepter")}</span>
+                        <span class="title"><img src="${getImageUrl("scepter")}"class="scepter">${$t("dota2tracker.template.scepter")}</span>
                         <span class="desc">${item.scepter_loc}</span>
                     </p>` : ""}
                     ${item.ability_has_shard&&!item.ability_is_granted_by_shard&&item.shard_loc
                     ? `<p class="aghanim_description">
-                        <span class="title"><img src="${utils.getImageUrl("shard")}"class="shard">${$t("dota2tracker.template.shard")}</span>
+                        <span class="title"><img src="${getImageUrl("shard")}"class="shard">${$t("dota2tracker.template.shard")}</span>
                         <span class="desc">${item.shard_loc}</span>
                     </p>` : ""}
                     <div class="notes"${!item.notes_loc.length ? ` style="display:none;"` : ""}>
@@ -835,19 +835,19 @@
                                 </span>` : "" }
                                 ${sv.values_scepter && sv.values_scepter.length ?
                                 `<span class="alternative scepter">
-                                    <img src="${utils.getImageUrl("scepter")}"/>${sv.values_scepter.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}
+                                    <img src="${getImageUrl("scepter")}"/>${sv.values_scepter.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}
                                 </span>`  : "" }
                                 ${sv.values_shard && sv.values_shard.length ?
                                 `<span class="alternative shard">
-                                    <img src="${utils.getImageUrl("shard")}"/>${sv.values_shard.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}
+                                    <img src="${getImageUrl("shard")}"/>${sv.values_shard.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}
                                 </span>`  : "" }
                                 ${sv.facet_bonus.name && hero.facets.some(facet=>facet.name==sv.facet_bonus.name) ?
                                 `<span class="alternative facet">
-                                    <span class="facet"><span class="name_back type_${hero.facets.find(facet=>facet.name==sv.facet_bonus.name).color}"><img src="${utils.getImageUrl(hero.facets.find(facet=>facet.name==sv.facet_bonus.name).icon, ImageType.IconsFacets)}" />${sv.facet_bonus.values.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")}</span></span>
+                                    <span class="facet"><span class="name_back type_${hero.facets.find(facet=>facet.name==sv.facet_bonus.name).color}"><img src="${getImageUrl(hero.facets.find(facet=>facet.name==sv.facet_bonus.name).icon, ImageType.IconsFacets)}" />${sv.facet_bonus.values.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")}</span></span>
                                 </span>` : "" }
                                 ${sv.bonuses.length ?
                                 `<span class="alternative talent">
-                                    ${sv.bonuses.map(bonus=>` <img src="${utils.getImageUrl("talents","icons","svg")}"/>${(bonus.value>0?'<span class="plus">+</span>':"")+bonus.value+(sv.is_percentage?"%":"")}`).join(" ")}
+                                    ${sv.bonuses.map(bonus=>` <img src="${getImageUrl("talents","icons","svg")}"/>${(bonus.value>0?'<span class="plus">+</span>':"")+bonus.value+(sv.is_percentage?"%":"")}`).join(" ")}
                                 </span>` : "" }
                             </span>
                         </p>`)
@@ -889,7 +889,7 @@
                     if (abilityIsInnate) {
                         item.style.order = -1;
                         item.style.flexBasis = "100%";
-                        img.src = '<%- utils.getImageUrl("innate_icon",ImageType.Icons) %>';  // Set backup image URL
+                        img.src = '<%- getImageUrl("innate_icon",ImageType.Icons) %>';  // Set backup image URL
                         // item.querySelector(".cooldown").style.display = "none";
                         // item.querySelector(".mana_cost").style.display = "none";
                     }

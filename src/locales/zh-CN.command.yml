@@ -1,18 +1,19 @@
 commands:
   dota2tracker:
+    description: "dota2tracker的一系列指令，可以使用dota2tracker -h查看所有可用指令。"
     subscribe:
-      description: 订阅本群。
+      description: "[订阅本群]"
       usage: 订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。
       messages:
         subscribed: 本群已订阅，无需重复订阅。
         subscribe_success: 订阅成功。
     unsubscribe:
-      description: 取消订阅本群。
+      description: "[取消订阅] 取消订阅本群。"
       messages:
         unsubscribe_success: 取消订阅成功。
         not_subscribed: 本群尚未订阅，无需取消订阅。
     bind:
-      description: 绑定SteamID，并起一个别名（也可以不起）。
+      description: "[绑定] 绑定SteamID，并起一个别名（也可以不起）。"
       usage: 将你的SteamID与你的账号绑定，若本群已订阅将会实时获取你的新比赛数据发布至群中。
       examples: |-
         绑定 123456789
@@ -35,16 +36,16 @@ commands:
           别名：{nickName}
           SteamID：{steamId}
         nick_name_too_long: 别名过长，请限制在20个字符以内。（也可以留空）
-        is_anonymous: |- 
+        is_anonymous: |-
           请注意：你的Steam玩家数据并未公开，将无法使用BOT的主要功能，如“战报追踪”、“查询最近指令”等。
           如需公开数据，请在DOTA2游戏内设置中公开。
     unbind:
-      description: 取消绑定你的个人信息。
+      description: "[取消绑定] 取消绑定你的个人信息。"
       messages:
         unbind_success: 取消绑定成功。
         not_binded: 尚未绑定，无需取消绑定。
     rename:
-      description: 修改绑定时设定的别名。
+      description: "[改名] 修改绑定时设定的别名。"
       examples: |-
         改名 李四
         改名 "李 四"
@@ -53,13 +54,19 @@ commands:
         empty_input: 请输入你的别名。
         not_binded: 请先绑定，绑定时即可设定别名。
         nick_name_too_long: 别名过长，请限制在20个字符以内。
+        nick_name_same: 目标别名与原始别名相同，无需改名。
     query-members:
-      description: 查询本群已绑定的玩家。
+      description: "[查询群友] 查询本群已绑定的玩家。"
       messages:
-        no_members: 本群尚无绑定玩家。
+        title: "本群 DOTA2 玩家名册 (共 {count} 人)"
+        table_headers:
+          nickname: "昵称/别名"
+          winrate: "胜率 (近10场)"
+          last_match: "最近比赛"
+        no_members: "本群尚无绑定玩家。"
         query_failed: 查询群友失败。
     query-match:
-      description: 查询指定比赛ID的比赛数据，生成图片发布。
+      description: "[查询比赛] 查询指定比赛ID的比赛数据，生成图片发布。"
       options:
         parse: -p 是否等待解析比赛数据
       examples: |-
@@ -73,7 +80,7 @@ commands:
         query_failed: 获取比赛数据失败。
         waiting_for_parse: 比赛数据尚未解析，已发送解析请求到服务器，战报将在解析完成或超时后发送。
     query-recent-match:
-      description: 查询最近的比赛数据，生成图片发布。
+      description: "[查询最近比赛] 查询最近的比赛数据，生成图片发布。"
       options:
         parse: -p 是否等待解析比赛数据
       usage: |-
@@ -86,11 +93,6 @@ commands:
         查询最近比赛 123456789 -p
         查询最近比赛 张三 --parse
       messages:
-        not_binded: |-
-          无参数时默认从已绑定SteamID玩家中寻找你的信息，但你似乎并没有绑定。
-          请在本群绑定SteamID。（可输入【绑定 -h】获取帮助）
-          或在指令后跟上希望查询的SteamID或已绑定玩家的别名。
-        steam_id_invalid: SteamID无效并且未在本群找到此玩家。
         querying_match: 正在搜索对局详情，请稍后……
         query_failed: 获取玩家最近比赛失败。
         not_in_group: |-
@@ -100,7 +102,7 @@ commands:
           你的比赛数据未公开，无法获取最近比赛数据。
           如需公开数据，请在DOTA2游戏内设置中公开。
     query-player:
-      description: 查询玩家的个人信息，可指定英雄。
+      description: "[查询玩家] 查询玩家的个人信息，可指定英雄。"
       options:
         hero: -o 查询玩家指定英雄使用情况（同查询英雄，可用别名或ID）
       usage: |-
@@ -113,18 +115,13 @@ commands:
         查询玩家 张三 --hero 敌法师
         查询玩家 张三 -o 15
       messages:
-        not_binded: |-
-          无参数时默认从已绑定SteamID玩家中寻找你的信息，但你似乎并没有绑定。
-          请在本群绑定SteamID。（可输入【绑定 -h】获取帮助）
-          或在指令后跟上希望查询的SteamID或已绑定玩家的别名。
-        steam_id_invalid: SteamID无效并且未在本群找到此玩家。
         querying_player: 正在获取玩家数据，请稍后……
         query_failed: 获取玩家信息失败。
         not_in_group: |-
           指令调用失败。
           当前不属于群聊状态，必须提供指定玩家的SteamID。
     query-hero:
-      description: 查询英雄技能/面板信息。
+      description: "[查询英雄] 查询英雄技能/面板信息。"
       options:
         random: -r 随机选择英雄
       usage: |-
@@ -140,7 +137,7 @@ commands:
         query_failed: 获取英雄数据失败。
         empty_input: 请输入参数。
     query-item:
-      description: 查询物品信息。
+      description: "[查询物品] 查询物品信息。"
       usage: |-
         查询物品的描述与各项数据，生成图片发布。
         参数可输入物品名（可模糊查找）、物品别名、物品ID。
@@ -156,4 +153,53 @@ commands:
         not_found: 未找到与关键字匹配的物品，请确认后重试。
         too_many_items: 找到{count}个物品，超过最大发送限制（{max}个）{#if show}，将发送物品列表{/if}。
         finded_items: 找到以下物品：{#each items as item}{item.name_loc}{#if item !== items[items.length - 1]}、{/if}{/each}
-
+    hero-of-the-day:
+      description: "[今日英雄] 获取今日英雄推荐。"
+      usage: |-
+        获取近期比赛记录、生涯比赛记录，根据胜场、表现分、是否手热等参数计算推荐英雄。
+        参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID。
+      options:
+        days: -d <number> 近期天数范围，默认值为30
+      examples: |-
+        今日英雄
+        今日英雄 -d 60
+        今日英雄 1234567890
+        今日英雄 张三
+      messages:
+        title_recommendation: "今日推荐："
+        recommendation_intro: "今日为您推荐的英雄是："
+        recommendation_heroes: "{#each heroes as hero}{hero}{#if hero !== heroes[heroes.length - 1]}、{/if}{/each}"
+        recommendation_type_lifetime_only: "您的近期英雄记录为空，本次推荐结果基于您的生涯数据。"
+        recommendation_type_no_record: "无法根据您的近期与生涯数据进行推荐。"
+        details:
+          pool_description: "推荐结果根据对您的近期与生涯英雄使用记录计分后，按总分排序后对前10位英雄以分数为权重随机取得。"
+          table_intro: "以下是前10位英雄具体得分表。"
+          table_headers:
+            hero: "英雄名称"
+            recent_wins: "近期胜场分"
+            lifetime_wins: "生涯胜场分<br>(对数)"
+            imp_bonus: "imp奖励分"
+            is_hot_streak: "是否手热"
+            total_score: "总分"
+          scoring_formula: "当前计分规则：[近期胜场数 x 1] + [log(生涯胜场数+1) x 5] + [近期imp x 0.1]"
+          hot_streak_desc: "若英雄在3天内使用过，则记为手热英雄，总分提升20%。"
+        title_meta: "环境趋势："
+        meta_intro: "一周内，基于您段位±1 ({tiers}) 范围内各位置<b>选择率≥2%</b>按胜率从高到低前三名优势英雄："
+        meta_table_header: "英雄名称(选择率% 胜率%)"
+        meta_position: "{pos}号位："
+    common:
+      messages:
+        user_not_binded_in_channel: |-
+          无参数时默认从已绑定SteamID玩家中寻找你的信息，但你似乎并没有绑定。
+          请在本群绑定SteamID。（可输入【绑定 -h】获取帮助）
+          或在指令后跟上希望查询的SteamID或已绑定玩家的别名。
+        user_not_in_group: |-
+          指令调用失败。
+          当前不属于群聊状态，必须提供指定玩家的SteamID。
+        invalid_input_include_steam_id: SteamID无效并且未在本群根据输入信息找到玩家。
+    help:
+      description: "[DOTA2指南] 获取插件的详细在线文档链接。"
+      messages:
+        content: |-
+          DOTA2Tracker 详细功能指南、指令用法、算法说明，请访问在线文档：
+          https://sjtdev.github.io/koishi-plugin-dota2tracker/

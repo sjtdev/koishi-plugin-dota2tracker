@@ -1,5 +1,5 @@
 <div class="w-[790px] h-[100px] flex justify-between box m-[5px]">
-  <div class="flag w-[100px] h-full flex justify-center items-end bg-cover <%= !match.didRadiantWin ? 'grayscale' : "" %>" style="background-image: url('<%= utils.getImageUrl("flag_radiant") %>')"><%= match.didRadiantWin ? $t("dota2tracker.template.won") : "" %></div>
+  <div class="flag w-[100px] h-full flex justify-center items-end bg-cover <%= !match.didRadiantWin ? 'grayscale' : "" %>" style="background-image: url('<%= getImageUrl("flag_radiant") %>')"><%= match.didRadiantWin ? $t("dota2tracker.template.won") : "" %></div>
   <div class="details grow relative flex-col flex">
     <p class="w-full flex justify-around">
       <span><%= $t("dota2tracker.template.match_id_") %><%= match.id %></span>
@@ -7,18 +7,18 @@
       <span><%= $t("dota2tracker.template.region_") %><%= $t("dota2tracker.template.regions." + match.regionId) %></span>
     </p>
     <p class="w-full flex justify-around">
-      <span><%= $t("dota2tracker.template.start_time_") %><%= moment(new Date(match.startDateTime * 1000)).format("YYYY-MM-DD HH:mm:ss").slice(2) %></span>
-      <span><%= $t("dota2tracker.template.end_time_") %><%= moment(new Date(match.endDateTime * 1000)).format("YYYY-MM-DD HH:mm:ss").slice(2) %></span>
+      <span><%= $t("dota2tracker.template.start_time_") %><%= DateTime.fromSeconds(match.startDateTime).toFormat("yyyy-MM-dd HH:mm:ss").slice(2) %></span>
+      <span><%= $t("dota2tracker.template.end_time_") %><%= DateTime.fromSeconds(match.endDateTime).toFormat("yyyy-MM-dd HH:mm:ss").slice(2) %></span>
     </p>
     <p class="w-full grow score flex justify-evenly items-end">
       <span class="score radiant text-3xl"><%= match.radiant.killsCount %></span>
-      <span class="time text-sm"><%= utils.sec2time(match.durationSeconds) %></span>
+      <span class="time text-sm"><%= match.durationTime %></span>
       <span class="score dire text-3xl"><%= match.dire.killsCount %></span>
     </p>
-    <img class="star absolute w-[64px] bottom-[10px] left-1/2 -translate-x-1/2" src="<%= utils.getImageUrl('star_' + (match.rank ? match.rank.toString().split('')[1] : '')) %>">
-    <img class="medal absolute w-[64px] bottom-[10px] left-1/2 -translate-x-1/2" src="<%= utils.getImageUrl('medal_' + (match.rank ? match.rank.toString().split('')[0] : '')) %>">
+    <img class="star absolute w-[64px] bottom-[10px] left-1/2 -translate-x-1/2" src="<%= getImageUrl('star_' + (match.rank ? match.rank.toString().split('')[1] : '')) %>">
+    <img class="medal absolute w-[64px] bottom-[10px] left-1/2 -translate-x-1/2" src="<%= getImageUrl('medal_' + (match.rank ? match.rank.toString().split('')[0] : '')) %>">
   </div>
-  <div class="flag w-[100px] h-full flex justify-center items-end bg-cover <%= match.didRadiantWin ? 'grayscale' : "" %>" style="background-image: url('<%= utils.getImageUrl("flag_dire") %>')"><%= !match.didRadiantWin ? $t("dota2tracker.template.won") : "" %></div>
+  <div class="flag w-[100px] h-full flex justify-center items-end bg-cover <%= match.didRadiantWin ? 'grayscale' : "" %>" style="background-image: url('<%= getImageUrl("flag_dire") %>')"><%= !match.didRadiantWin ? $t("dota2tracker.template.won") : "" %></div>
 </div>
 <div class="w-[790px] grid grid-cols-2 gap-[5px] mx-[5px]">
   <% for( let index = 0; index < match.players.length; index++ ) { %>
@@ -29,7 +29,7 @@
   <% for (const hero of (match.pickBans ?? []).filter(x => !x.isPick)) { %>
   <div class="ban_hero relative w-[10%]">
     <i class="absolute w-full h-full z-1" style="background-image: linear-gradient(to bottom left, transparent calc(50% - 1px), red calc(50% - 1px), black calc(50% + 1px), transparent calc(50% + 1px));"></i>
-    <img class="grayscale" src="<%= utils.getImageUrl(/^npc_dota_hero_(?<name>.+)$/.exec(dotaconstants.heroes[hero.bannedHeroId].name)[1], ImageType.Heroes) %>" alt="" />
+    <img class="grayscale" src="<%= getImageUrl(/^npc_dota_hero_(?<name>.+)$/.exec(dotaconstants.heroes[hero.bannedHeroId].name)[1], ImageType.Heroes) %>" alt="" />
   </div>
   <% } %>
 </div>

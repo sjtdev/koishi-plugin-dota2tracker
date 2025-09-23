@@ -1,0 +1,3 @@
+export const DAYS_30: number = 2592000000; // 30天，用于缓存 (30天*24时*60分*60秒*1000毫秒=2592000000毫秒)
+
+export const RANK_BRACKETS = ["UNCALIBRATED", "HERALD", "GUARDIAN", "CRUSADER", "ARCHON", "LEGEND", "ANCIENT", "DIVINE", "IMMORTAL"];

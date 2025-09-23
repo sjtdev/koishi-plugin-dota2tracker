@@ -2,7 +2,7 @@
   <section class="grid grid-cols-[112px_1fr_100px] grid-rows-[63px_24px]">
     <div class="avatar relative h-full relative row-1 col-1 text-[10px] text-shadow-[-1px_1px_2px_#000,1px_-1px_2px_#000,-1px_1px_2px_#000,1px_1px_2px_#000]">
       <% if (player.leaverStatus != "NONE" && player.leaverStatus != "DISCONNECTED") { %>
-      <img class="leaver absolute w-full h-full object-contain" src="<%= utils.getImageUrl("disconnected") %>" />
+      <img class="leaver absolute w-full h-full object-contain" src="<%= getImageUrl("disconnected") %>" />
       <% } %>
       <div class="party contents">
         <i class="party_line absolute w-full h-[2px]" <%- `style="background-color:${partyColor[player.partyId]};"` %>></i>
@@ -13,7 +13,7 @@
         <p class="position"><%= $t("dota2tracker.template.position_" + player.position?.slice(-1))??'' %></p>
       </div>
       <p class="level absolute bottom-0 right-0 text-xs px-[2px]"><%= player.level %></p>
-      <img class="h-full" src="<%= utils.getImageUrl(player.hero.shortName, ImageType.Heroes) %>" />
+      <img class="h-full" src="<%= getImageUrl(player.hero.shortName, ImageType.Heroes) %>" />
     </div>
     <div class="player_profile mx-[10px] row-1 col-2 w-auto h-full overflow-hidden text-center flex flex-col justify-around leading-[1]">
       <p class="player_name truncate max-w-full"><%= player.steamAccount.name %></p>
@@ -34,13 +34,13 @@
       </div>
       <div class="rank_plus w-[36px] h-full relative text-[10px] leading-[1.15] text-shadow-[-1px_1px_0_#000,1px_-1px_0_#000,-1px_1px_0_#000,1px_1px_0_#000]">
         <div class="rank absolute top-0 size-[36px] z-2">
-          <img class="medal absolute inset-0" src="<%= utils.getImageUrl('medal_' + (player.rank.inTop100 ?? player.rank.medal)) %>"/>
-          <img class="stars absolute inset-0" src="<%= utils.getImageUrl('star_' + player.rank.star) %>" />
+          <img class="medal absolute inset-0" src="<%= getImageUrl('medal_' + (player.rank.inTop100 ?? player.rank.medal)) %>"/>
+          <img class="stars absolute inset-0" src="<%= getImageUrl('star_' + player.rank.star) %>" />
           <p class="leader absolute bottom-0 text-center w-full"><%= player.steamAccount?.seasonLeaderboardRank ?? "" %></p>
         </div>
         <% if (player.dotaPlus) { %>
         <div class="plus absolute bottom-0 size-[36px] z-1">
-          <img class="" src="<%= utils.getImageUrl("hero_badge_" + (player.dotaPlus ? Math.ceil((player.dotaPlus?.level + 1) / 6) : 1)) %>">
+          <img class="" src="<%= getImageUrl("hero_badge_" + (player.dotaPlus ? Math.ceil((player.dotaPlus?.level + 1) / 6) : 1)) %>">
           <p class="level absolute bottom-0 text-center w-full"><%= player.dotaPlus?.level %></p>
         </div>
         <% } %>
@@ -50,10 +50,10 @@
     <%- facetColor[player.facet?.color ?? 'Black'] %>">
       <% if (player.facet) { %>
       <div class="w-[24px] h-[24px] flex items-center justify-center bg-[#4444]">
-        <img class="h-[18px]" src="<%= utils.getImageUrl(player.facet?.icon, ImageType.IconsFacets) %>" />
+        <img class="h-[18px]" src="<%= getImageUrl(player.facet?.icon, ImageType.IconsFacets) %>" />
       </div>
       <% } %>
-      <div class="facet_name w-full truncate grow px-[4px] text-sm flex justify-center items-center"><span class="w-full truncate text-center"><%= player.facet?.name ?? "?" %></span></div>
+      <div class="facet_name w-full truncate grow px-[4px] text-sm flex justify-center items-center"><span class="w-full truncate text-center"><%= player.facet?.displayName ?? "?" %></span></div>
     </div>
     <div class="titles row-2 col-start-2 col-end-3 w-full flex items-center pl-[12px] gap-[6px]">
     <% for (let item of player.titles) { %>
@@ -114,7 +114,7 @@
     <div class="buffs flex h-[24px]">
       <% for (const buff of player.buffs) { %>
       <div class="relative">
-        <img class="w-[33px] h-[24px]" src="<%= utils.getImageUrl(dotaconstants[`${buff.type}_ids`][buff.id], ImageType[buff.type === "ability" ? "Abilities" : "Items"]) %>" />
+        <img class="w-[33px] h-[24px]" src="<%= getImageUrl(dotaconstants[`${buff.type}_ids`][buff.id], ImageType[buff.type === "ability" ? "Abilities" : "Items"]) %>" />
         <p class="count absolute w-full bottom-0 leading-[1] text-center bg-stone-700/50 text-[10px]"><%= buff.stackCount || "" %></p>
       </div>
       <% } %>
@@ -122,7 +122,7 @@
     <div class="supports flex h-[24px]">
       <% for (const supportItem of player.supportItemsCount){ %>
       <div class="relative">
-        <img class="w-[33px] h-[24px]" src="<%= utils.getImageUrl(supportItem.name, ImageType.Items) %>" />
+        <img class="w-[33px] h-[24px]" src="<%= getImageUrl(supportItem.name, ImageType.Items) %>" />
         <p class="count absolute w-full bottom-0 leading-[1] text-center bg-stone-700/50 text-[10px]"><%= supportItem.count || "" %></p>
       </div>
       <% } %>

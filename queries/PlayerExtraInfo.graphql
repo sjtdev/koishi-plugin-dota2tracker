@@ -1,6 +1,6 @@
-query PlayerExtraInfo($steamAccountId: Long!, $totalHeroCount: Int!, $matchCount: Int!, $heroIds: [Short]) {
+query PlayerExtraInfo($steamAccountId: Long!,  $matchCount: Int!, $heroIds: [Short]) {
   player(steamAccountId: $steamAccountId) {
-    heroesPerformance(take: $totalHeroCount, request: { matchGroupOrderBy: MATCH_COUNT, take: $matchCount, heroIds: $heroIds }) {
+    heroesPerformance(take: 200, request: { matchGroupOrderBy: MATCH_COUNT, take: $matchCount, heroIds: $heroIds }) {
       hero {
         id
         shortName

@@ -8,6 +8,9 @@
 >  \+ (一次解析请求 + 战报等待解析时发送的请求次数)  
 >  \+ 查询指令调用次数
 
+> [!WARNING] 有关stratz API Forbidden 403 错误
+> 请见 [关于 API 403](./api-403.md)
+
 
 #### dataParsingTimeoutMinutes `number`
 - 数据等待解析超时（单位：分钟）
@@ -17,7 +20,25 @@
 #### proxyAddress `string`
 - 代理地址，留空时不使用代理。
 
+#### suppressStratzNetworkErrors `boolean`
+> 因为stratz服务器不稳，叠加网络环境错综复杂的原因，导致在某些情况某些时段下轮询数据时报出大量网络错误，所以推出该选项以隐藏这些错误。
+- 开启此选项后将stratz网络错误（如超时等信息）降为`debug`级输出日志。
+> [!TIP] koishi 的 debug 日志显示方式
+> koishi 默认不显示 debug 日志。若需要开启显示需要到 **koishi webui** 中 `资源管理器 > koishi.yml` 文件底部添加以下内容后重启 koishi
+> ```yaml
+> logger:
+>   levels:
+>     dota2tracker.stratz-api: 3
+>     dota2tracker.match-watcher: 3
+>     dota2tracker.parse-polling: 3
+>     dota2tracker.match: 3
+>     dota2tracker.player: 3
+> ```
+
 ### 消息设置
+
+#### useHeroNicknames `boolean`
+- 默认开启，禁用后将在`战报消息`中仅使用英雄的正式名称。
 
 #### urlInMessageType `checkbox`
 - 消息中附带链接

@@ -82,6 +82,7 @@ export default defineConfig({
           {
             text: "其他",
             items: [
+              { text: "关于 API 403", link: "/api-403" },
               { text: "更新日志", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
               { text: "鸣谢", link: "/thanks" },
             ],
@@ -95,7 +96,7 @@ export default defineConfig({
     "en-US": {
       label: "English",
       lang: "en-US",
-      description:"Koishi Plugin - Track Friends' DOTA2 Matches",
+      description: "Koishi Plugin - Track Friends' DOTA2 Matches",
       themeConfig: {
         // https://vitepress.dev/reference/default-theme-config
         nav: [
@@ -141,6 +142,7 @@ export default defineConfig({
           {
             text: "Others",
             items: [
+              { text: "About API 403", link: "/en-US/api-403" },
               { text: "Changelog", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
               { text: "Acknowledgments", link: "/en-US/thanks" },
             ],

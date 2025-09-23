@@ -12,6 +12,11 @@ import locale from "../locales/zh-CN.command.yml"
 </script>
 
 ***
+##### `dota2tracker.help`
+`DOTA2指南`
+<Command :command="locale.commands.dota2tracker.help"/>
+
+***
 ##### `dota2tracker.subscribe`
 `订阅本群`
 <Command :command="locale.commands.dota2tracker.subscribe"/>
@@ -65,3 +70,8 @@ import locale from "../locales/zh-CN.command.yml"
 ##### `dota2tracker.query-item <input_data>`
 `查询物品 <input_data>`
 <Command :command="locale.commands.dota2tracker['query-item']"/>
+
+***
+##### `dota2tracker.hero-of-the-day <input_data>`
+`今日英雄 <input_data>`
+<Command :command="locale.commands.dota2tracker['hero-of-the-day']"/>

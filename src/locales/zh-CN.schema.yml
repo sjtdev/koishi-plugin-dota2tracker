@@ -4,8 +4,12 @@ _config:
     STRATZ_API_TOKEN: ※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取。
     dataParsingTimeoutMinutes: 等待比赛数据解析的时间（单位：分钟）。如果数据解析时间超过等待时间，将直接生成战报而不再等待解析完成。
     proxyAddress: 代理地址，留空时不使用代理
+    suppressStratzNetworkErrors: |-
+      开启后将stratz网络错误日志（如超时、网络不通等，但403 Forbidden除外）使用debug级别输出，默认不显示debug级日志。  
+      若需要开启debug日志显示，请见 [📖 配置项#suppressstratznetworkerrors](http://sjtdev.github.io/koishi-plugin-dota2tracker/configs.html#suppressstratznetworkerrors-boolean)
   message:
     $desc: 消息设置
+    useHeroNicknames: 是否使用英雄别名。关闭后仅使用英雄正式名称。
     urlInMessageType:
       $desc: 在消息中附带链接，<br/>请选择消息类型：
       $inner:
@@ -32,7 +36,7 @@ _config:
     weeklyReportShowCombi: 周报是否显示组合
   template:
     $desc: 模板设置
-    template_match: 生成比赛信息图片使用的模板，显示效果见 [📖 文档-模板展示页](https://sjtdev.github.io/koishi-plugin-dota2tracker/template-match.html)。
+    template_match: 生成比赛信息图片使用的模板，显示效果见 [📖 模板展示页](https://sjtdev.github.io/koishi-plugin-dota2tracker/template-match.html)。
     template_player: 生成玩家信息图片使用的模板。（目前仅有一张模板）
     template_hero: 生成英雄信息图片使用的模板。（目前仅有一张模板）
     playerRankEstimate: 在player模板中对没有段位的玩家进行段位估算 <br>估算的段位将以灰色图片显示

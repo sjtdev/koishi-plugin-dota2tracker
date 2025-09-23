@@ -6,7 +6,7 @@
   <div class="upper<%= multiple %>">
     <% item.builds_into.forEach(item => { %>
     <div class="item">
-      <img src="<%= utils.getImageUrl(item.name.startsWith("recipe_") ? "recipe" : item.name, ImageType.Items) %>">
+      <img src="<%= getImageUrl(item.name.startsWith("recipe_") ? "recipe" : item.name, ImageType.Items) %>">
       <p><%= item.name_loc %></p>
     </div>
     <% }) %>
@@ -22,7 +22,7 @@
   <% } %>
   <div class="middle">
     <div class="item">
-      <img src="<%= utils.getImageUrl(item.name.startsWith("recipe_") ? "recipe" : item.name, ImageType.Items) %>">
+      <img src="<%= getImageUrl(item.name.startsWith("recipe_") ? "recipe" : item.name, ImageType.Items) %>">
       <p><%= item.name_loc %></p>
     </div>
   </div>
@@ -41,7 +41,7 @@
   <div class="lower<%= multiple %>">
     <% recipe.items.forEach(item => { %>
     <div class="item">
-      <img src="<%= utils.getImageUrl(item.name.startsWith("recipe_") ? "recipe" : item.name, ImageType.Items) %>">
+      <img src="<%= getImageUrl(item.name.startsWith("recipe_") ? "recipe" : item.name, ImageType.Items) %>">
       <p><%= item.name_loc %></p>
     </div>
     <% }) %>

@@ -1,0 +1,23 @@
+query PlayerPerformanceForHeroRecommendation($steamAccountId: Long!, $recentDateTime: Long!) {
+  player(steamAccountId: $steamAccountId) {
+    steamAccount {
+      seasonRank
+    }
+    matches(request: { take: 25 }) {
+      rank
+    }
+    lifetimePerformance: heroesPerformance(request: { take: 100000 }, take: 200) {
+      heroId
+      matchCount
+      winCount
+      lastPlayedDateTime
+    }
+    recentPerformance: heroesPerformance(request: { startDateTime: $recentDateTime, take: 10000 }, take: 200) {
+      heroId
+      matchCount
+      winCount
+      lastPlayedDateTime
+      imp
+    }
+  }
+}

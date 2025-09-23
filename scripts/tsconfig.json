@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", // 或者至少是 ES2020
+    "module": "nodenext",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "nodenext",
+    "outDir": "./dist",
+    "skipLibCheck": true
+    // ... 其他已有的配置
+  },
+  "include": ["./generation.ts","./types.d.ts","../src/locales/*"]
+}

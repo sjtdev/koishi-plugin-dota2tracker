@@ -1,22 +1,23 @@
 {
-    "compilerOptions": {
-        "rootDir": "src",
-        "outDir": "lib",
-        "target": "es2022",
-        "module": "ESNext",
-        "noEmit": true,
-        "allowImportingTsExtensions": true,
-        "declaration": true,
-        "composite": true,
-        "incremental": true,
-        "skipLibCheck": true,
-        "esModuleInterop": true,
-        "moduleResolution": "Bundler",
-        "jsx": "react-jsx",
-        "jsxImportSource": "@satorijs/element",
-        "types": ["node", "yml-register/types"],
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib",
+    "target": "es2022",
+    "lib": ["es2022", "ES2023"],
+    "module": "ESNext",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "declaration": true,
+    "composite": true,
+    "incremental": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@satorijs/element",
+    "types": ["node", "yml-register/types"],
 
-        "resolveJsonModule": true
-    },
-    "include": ["src", "src/data/*.json", "queries"]
+    "resolveJsonModule": true
+  },
+  "include": ["src", "src/app/data/*.json", "queries"]
 }

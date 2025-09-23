@@ -34,11 +34,11 @@
     </div>
     <div class="start_time">
         <p><%= $t("dota2tracker.template.start_time_").slice(0, -1) %></p>
-        <p><%-moment(new Date(match.startDateTime * 1000)).format("YYYY-MM-DD HH:mm:ss").slice(2)%></p>
+        <p><%-DateTime.fromSeconds(match.startDateTime).toFormat("yyyy-MM-dd HH:mm:ss").slice(2)%></p>
     </div>
     <div class="duration">
         <p><%= $t("dota2tracker.template.duration_").slice(0, -1) %></p>
-        <p><%-utils.sec2time(match.durationSeconds)%></p>
+        <p><%-match.durationTime%></p>
     </div>
     <div class="region">
         <p><%= $t("dota2tracker.template.region_").slice(0, -1) %></p>
@@ -49,8 +49,8 @@
         <p><%-$t("dota2tracker.template.lobby_types."+match.lobbyType) || match.lobbyType%>/<%-$t("dota2tracker.template.game_modes."+match.gameMode) || match.gameMode%></p>
     </div>
     <div class="rank">
-        <img src="<%-utils.getImageUrl('medal_' + (match.rank?.toString().split('')[0] ?? '0'))%>" alt="" />
-        <img style="z-index: 1;" src="<%-utils.getImageUrl('star_' + (match.rank?.toString().split('')[1] ?? '0'))%>" alt="" />
+        <img src="<%-getImageUrl('medal_' + (match.rank?.toString().split('')[0] ?? '0'))%>" alt="" />
+        <img style="z-index: 1;" src="<%-getImageUrl('star_' + (match.rank?.toString().split('')[1] ?? '0'))%>" alt="" />
     </div>
 </nav>
 <section class="match_result">
@@ -59,85 +59,125 @@
     <span class="kills dire"><%-match.dire.killsCount%></span>
 </section>
 <section class="players">
-    <%- ['radiant','dire'].map(team=>`
-    <section class="panel ${team}" style="order: ${team==="radiant"?0:50}">
-        <img src="${utils.getImageUrl("logo_"+team)}">
-        <p>${(team==="radiant"?["Radiant","天辉"]:["Dire","夜魇"]).join("<br>")}</p>
-        ${((team==="radiant")===match.didRadiantWin)?`<p class="win">${$t("dota2tracker.template.won")}</p>`:"<p></p>"}
-        <p class="data">${$t("dota2tracker.template.kill")}<br>${match[team].killsCount}</p>
-        <p class="data">${$t("dota2tracker.template.total_damage")}<br>${match[team].heroDamage}</p>
-        <p class="data">${$t("dota2tracker.template.total_gold")}<br>${match[team].networth}</p>
-        <p class="data">${$t("dota2tracker.template.total_experience")}<br>${match[team].experience}</p><!--此处无有效API，仅能通过每分钟经验推算-->
-    </section>`).join("")
-    %>
-    <%- match.players.map(player=> `
-    <div class="player ${player.team}${player.hero.id==80?" bear":""}" style="order: ${player.team==="radiant"?1:100};">
-        <div class="hero_avatar row-1${player.partyId != null ? " party_" + match.party[player.partyId] : ""}">
-            <img src="${utils.getImageUrl(player.hero.shortName, ImageType.Heroes)}" />
-            <p class="level">${player.level}</p>
-            <p class="party_line"></p>
-            <p class="party_mark"></p>
-        </div>
-        <div class="facet ${player.facet?.color ?? "Black"}">
-            ${player.facet ? `<img src="${utils.getImageUrl(player.facet.icon, ImageType.IconsFacets)}">` : ""}
-            <span style="font-size: ${player.facet?.name?.length>4?8:11}px;"><p>${player.facet?.name??"?"}</p></span>
-        </div>
-        <div class="rank">
-            <img
-                src="${utils.getImageUrl('medal_' +(player.rank.inTop100??player.rank.medal))}"
-                class="medal"
-            />
-            <img src="${utils.getImageUrl('star_' + player.rank.star)}" class="stars" />
-            <p>${player.steamAccount.seasonLeaderboardRank??""}</p>
-        </div>
-        <div class="titles">${player.titles.map((item) => {const [title, color] = $t(item).split("-"); return `<span style="color: ${darkenHexColor(color, 25)};">${title}</span>`}).join("")}</div>
-        <div class="player_name row-1">
-            <span class="rank">${`[${$t("dota2tracker.template.ranks."+player.rank.medal)}${player.rank.star||""}]`}</span>
-            <span class="name">${eh(player.steamAccount.name)}</span>
-        </div>
-        <p class="pick">${player.isRandom?$t("dota2tracker.template.random"):$t("dota2tracker.template.pick_order", [player.order == null ? "?" : player.order + 1])} ${$t("dota2tracker.template.position_"+player.position?.slice(-1))??''}</p>
-        <p class="networth">
-            <span class="gold">${utils.formatNumber(player.networth)}</span>
-            (${(player.heroDamage / player.networth)?.toFixed(2)})
-        </p>
-        <p class="hero_damage">${$t("dota2tracker.template.hero_damage_")}${player.heroDamage} (${(player.heroDamage/match[player.team].heroDamage*100).toFixed(2)}%)</p>
-        <p class="damage_received">${$t("dota2tracker.template.damage_received_")}${player.damageReceived} (${match[player.team].damageReceived>0?((player.damageReceived/match[player.team].damageReceived*100).toFixed(2)):"0.00"}%)</p>
-        <p class="tower_damage">${$t("dota2tracker.template.building_damage_")}${player.towerDamage}</p>
-        <p class="kda row-1">${player.kills}/${player.deaths}/${player.assists} (${((player.kills + player.assists) / (player.deaths || 1)).toFixed(2)})</p>
-        <p class="kill_contribution">${$t("dota2tracker.template.kill_contribution_")}${(player.killContribution * 100).toFixed(2)}%</p>
-        <p class="stun_duration">${$t("dota2tracker.template.crowd_control_duration_")}${((player.stats.heroDamageReport?.dealtTotal.stunDuration ?? 0)/ 100).toFixed(2)}s</p>
-        <p class="heal">${$t("dota2tracker.template.heal_")}${player.heroHealing}</p>
-        <div class="items row-1">
-            <div class="normal">
-                ${player.items.map((item) =>`
-                <div class="item${item?.isRecipe ? " recipe" : ""}" data-id="${item?.id??0}">
-                    <img src="${item ? utils.getImageUrl(item.name, ImageType.Items) : ""}" alt="" />
-                    ${item ? `<p class="time">${utils.sec2time(item?.time) ?? ""}</p>` : ""}
-                </div>`).join("")}
+  <% ['radiant','dire'].forEach(function(team) { %>
+    <section class="panel <%= team %>" <%- `style="order: ${team === 'radiant' ? 0 : 50 }"`%>>
+      <img src="<%- getImageUrl('logo_' + team) %>">
+      <p><%- (team === 'radiant' ? ['Radiant','天辉'] : ['Dire','夜魇']).join('<br>') %></p>
+      <% if ((team === 'radiant') === match.didRadiantWin) { %>
+        <p class="win"><%= $t('dota2tracker.template.won') %></p>
+      <% } else { %>
+        <p></p>
+      <% } %>
+      <p class="data"><%= $t('dota2tracker.template.kill') %><br><%= match[team].killsCount %></p>
+      <p class="data"><%= $t('dota2tracker.template.total_damage') %><br><%= match[team].heroDamage %></p>
+      <p class="data"><%= $t('dota2tracker.template.total_gold') %><br><%= match[team].networth %></p>
+      <p class="data"><%= $t('dota2tracker.template.total_experience') %><br><%= match[team].experience %></p>
+    </section>
+  <% }); %>
+
+  <% match.players.forEach(function(player) { %>
+    <div class="player <%= player.team %><%= player.hero.id == 80 ? ' bear' : '' %>" <%- `style="order: ${player.team === 'radiant' ? 1 : 100}"` %>;>
+      <div class="hero_avatar row-1<%= player.partyId != null ? ' party_' + match.party[player.partyId] : '' %>">
+        <img src="<%- getImageUrl(player.hero.shortName, ImageType.Heroes) %>" />
+        <p class="level"><%= player.level %></p>
+        <p class="party_line"></p>
+        <p class="party_mark"></p>
+      </div>
+      <div class="facet <%= player.facet?.color ?? 'Black' %>">
+        <% if (player.facet) { %>
+          <img src="<%- getImageUrl(player.facet.icon, ImageType.IconsFacets) %>">
+        <% } %>
+        <span <%- `style="font-size: ${player.facet?.name?.length > 4 ? 8 : 11}px;"`%>>
+          <p><%= player.facet?.displayName ?? '?' %></p>
+        </span>
+      </div>
+      <div class="rank">
+        <img src="<%- getImageUrl('medal_' + (player.rank.inTop100 ?? player.rank.medal)) %>" class="medal" />
+        <img src="<%- getImageUrl('star_' + player.rank.star) %>" class="stars" />
+        <p><%= player.steamAccount.seasonLeaderboardRank ?? '' %></p>
+      </div>
+      <div class="titles">
+        <% player.titles.forEach(function(item) {
+          const [title, color] = $t(item).split('-'); %>
+          <span <%- `style="color: ${darkenHexColor(color, 25)};"` %>><%= title %></span>
+        <% }); %>
+      </div>
+      <div class="player_name row-1">
+        <span class="rank">[<%= $t('dota2tracker.template.ranks.' + player.rank.medal) %><%= player.rank.star || '' %>]</span>
+        <span class="name"><%= player.steamAccount.name %></span>
+      </div>
+      <p class="pick">
+        <%- player.isRandom ? $t('dota2tracker.template.random') : $t('dota2tracker.template.pick_order', [player.order == null ? '?' : player.order + 1]) %>
+        <%= $t('dota2tracker.template.position_' + player.position?.slice(-1)) ?? '' %>
+      </p>
+      <p class="networth">
+        <span class="gold"><%= player.formattedNetworth %></span>
+        (<%= (player.heroDamage / player.networth)?.toFixed(2) %>)
+      </p>
+      <p class="hero_damage">
+        <%= $t('dota2tracker.template.hero_damage_') %><%= player.heroDamage %>
+        (<%= (player.heroDamage / match[player.team].heroDamage * 100).toFixed(2) %>%)
+      </p>
+      <p class="damage_received">
+        <%= $t('dota2tracker.template.damage_received_') %><%= player.damageReceived %>
+        (<%= match[player.team].damageReceived > 0 ? ((player.damageReceived / match[player.team].damageReceived * 100).toFixed(2)) : '0.00' %>%)
+      </p>
+      <p class="tower_damage">
+        <%= $t('dota2tracker.template.building_damage_') %><%= player.towerDamage %>
+      </p>
+      <p class="kda row-1">
+        <%= player.kills %>/<%= player.deaths %>/<%= player.assists %>
+        (<%= ((player.kills + player.assists) / (player.deaths || 1)).toFixed(2) %>)
+      </p>
+      <p class="kill_contribution">
+        <%= $t('dota2tracker.template.kill_contribution_') %><%= (player.killContribution * 100).toFixed(2) %>%
+      </p>
+      <p class="stun_duration">
+        <%= $t('dota2tracker.template.crowd_control_duration_') %>
+        <%= ((player.stats.heroDamageReport?.dealtTotal.stunDuration ?? 0) / 100).toFixed(2) %>s
+      </p>
+      <p class="heal">
+        <%= $t('dota2tracker.template.heal_') %><%= player.heroHealing %>
+      </p>
+      <div class="items row-1">
+        <div class="normal">
+          <% player.items.forEach(function(item) { %>
+            <div class="item<%= item?.isRecipe ? ' recipe' : '' %>" data-id="<%= item?.id ?? 0 %>">
+              <img src="<%- item ? getImageUrl(item.name, ImageType.Items) : '' %>" alt="" />
+              <% if (item) { %>
+                <p class="time"><%= item?.time ?? '' %></p>
+              <% } %>
             </div>
-            ${player.hero.id != 80?`
-            <div class="backpack">
-                ${player.backpacks.map((item) =>`
-                <div class="item${item?.isRecipe ? " recipe" : ""}">
-                    <img src="${item ? utils.getImageUrl(item.name, ImageType.Items) : ""}" alt="" />
-                </div>`).join("")}
-            </div>`:`
-            <img class="bear_icon" src="${utils.getImageUrl("lone_druid_spirit_bear", ImageType.Abilities)}" alt="">
-            <div class="bear">
-                ${player.unitItems.map((item) =>`
-                <div class="item${item?.isRecipe ? " recipe" : ""}" data-id="${item?.id??0}">
-                    <img src="${item ? utils.getImageUrl(item.name, ImageType.Items) : ""}" alt="" />
-                    ${item ? `<p class="time">${utils.sec2time(item?.time) ?? ""}</p>` : ""}
-                </div>`).join("")}
-            </div>
-            <div class="neutral_item" style="background-image: url(${utils.getImageUrl(dotaconstants.item_ids[player.additionalUnit.neutral0Id], ImageType.Items)})"></div>`
-        }
+          <% }); %>
         </div>
-        <div class="neutral_item row-1" style="background-image: url(${utils.getImageUrl(dotaconstants.item_ids[player.neutral0Id], ImageType.Items)})"></div>
-        <div class="ahgs row-1">
-            <img src="${utils.getImageUrl("scepter_"+((player.items.concat(player.backpacks).find(item=>item?.id==108)||(player.stats?.matchPlayerBuffEvent||[]).find(buff=>buff.itemId==108))?1:0))}" alt="" />
-            <img src="${utils.getImageUrl("shard_"+((player.stats?.matchPlayerBuffEvent||[]).find(buff=>buff.itemId==609)?1:0))}" alt="" />
-        </div>
+        <% if (player.hero.id != 80) { %>
+          <div class="backpack">
+            <% player.backpacks.forEach(function(item) { %>
+              <div class="item<%= item?.isRecipe ? ' recipe' : '' %>">
+                <img src="<%- item ? getImageUrl(item.name, ImageType.Items) : '' %>" alt="" />
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <img class="bear_icon" src="<%- getImageUrl('lone_druid_spirit_bear', ImageType.Abilities) %>" alt="">
+          <div class="bear">
+            <% player.unitItems.forEach(function(item) { %>
+              <div class="item<%= item?.isRecipe ? ' recipe' : '' %>" data-id="<%= item?.id ?? 0 %>">
+                <img src="<%- item ? getImageUrl(item.name, ImageType.Items) : '' %>" alt="" />
+                <% if (item) { %>
+                  <p class="time"><%= item?.time ?? '' %></p>
+                <% } %>
+              </div>
+            <% }); %>
+          </div>
+          <div class="neutral_item" <%- `style="background-image: url(${getImageUrl(dotaconstants.item_ids[player.additionalUnit.neutral0Id], ImageType.Items)})"` %>></div>
+        <% } %>
+      </div>
+      <div class="neutral_item row-1" <%- `style="background-image: url(${getImageUrl(dotaconstants.item_ids[player.neutral0Id], ImageType.Items)})"` %>></div>
+      <div class="ahgs row-1">
+        <img src="<%- getImageUrl('scepter_' + ((player.items.concat(player.backpacks).find(item => item?.id == 108) || (player.stats?.matchPlayerBuffEvent || []).find(buff => buff.itemId == 108)) ? 1 : 0)) %>" alt="" />
+        <img src="<%- getImageUrl('shard_' + ((player.stats?.matchPlayerBuffEvent || []).find(buff => buff.itemId == 609) ? 1 : 0)) %>" alt="" />
+      </div>
     </div>
-    `).join("") %>
+  <% }); %>
 </section>

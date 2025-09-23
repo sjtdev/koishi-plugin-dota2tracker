@@ -1,0 +1,29 @@
+query GetWeeklyMetaByPosition($bracketIds: [RankBracket]!) {
+  heroStats {
+    pos1: winWeek(take: 1, bracketIds: $bracketIds, positionIds: [POSITION_1]) {
+      heroId
+      winCount
+      matchCount
+    }
+    pos2: winWeek(take: 1, bracketIds: $bracketIds, positionIds: [POSITION_2]) {
+      heroId
+      winCount
+      matchCount
+    }
+    pos3: winWeek(take: 1, bracketIds: $bracketIds, positionIds: [POSITION_3]) {
+      heroId
+      winCount
+      matchCount
+    }
+    pos4: winWeek(take: 1, bracketIds: $bracketIds, positionIds: [POSITION_4]) {
+      heroId
+      winCount
+      matchCount
+    }
+    pos5: winWeek(take: 1, bracketIds: $bracketIds, positionIds: [POSITION_5]) {
+      heroId
+      winCount
+      matchCount
+    }
+  }
+}

@@ -13,6 +13,10 @@ import locale from "../../locales/en-US.command.yml"
 </script>
 
 ***
+##### `dota2tracker.help`
+<Command :command="locale.commands.dota2tracker.help"/>
+
+***
 ##### `dota2tracker.subscribe`
 <Command :command="locale.commands.dota2tracker.subscribe"/>
 
@@ -55,3 +59,7 @@ import locale from "../../locales/en-US.command.yml"
 ***
 ##### `dota2tracker.query-item <input_data>`
 <Command :command="locale.commands.dota2tracker['query-item']"/>
+
+***
+##### `dota2tracker.hero-of-the-day <input_data>`
+<Command :command="locale.commands.dota2tracker['hero-of-the-day']"/>

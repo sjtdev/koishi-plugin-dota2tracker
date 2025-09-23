@@ -1953,13 +1953,12 @@ export type ConstantsQueryVariables = Exact<{
 
 export type ConstantsQuery = { __typename?: 'DotaQuery', constants?: { __typename?: 'ConstantQuery', gameVersions?: Array<{ __typename?: 'GameVersionType', id?: any | null } | null> | null, facets?: Array<{ __typename?: 'FacetType', name?: string | null, id?: any | null, color?: string | null, icon?: string | null, language?: { __typename?: 'FacetLanguageType', displayName?: string | null } | null } | null> | null } | null };
 
-export type HeroMatchupWinrateQueryVariables = Exact<{
-  heroId: Scalars['Short']['input'];
-  take: Scalars['Int']['input'];
+export type GetWeeklyMetaByPositionQueryVariables = Exact<{
+  bracketIds: Array<InputMaybe<RankBracket>> | InputMaybe<RankBracket>;
 }>;
 
 
-export type HeroMatchupWinrateQuery = { __typename?: 'DotaQuery', heroStats?: { __typename?: 'HeroStatsQuery', matchUp?: Array<{ __typename?: 'HeroDryadType', heroId?: any | null, matchCountWith?: any | null, matchCountVs?: any | null, with?: Array<{ __typename?: 'HeroStatsHeroDryadType', heroId1?: any | null, winRateHeroId1?: any | null, heroId2?: any | null, winRateHeroId2?: any | null, winCount?: any | null, matchCount?: any | null } | null> | null, vs?: Array<{ __typename?: 'HeroStatsHeroDryadType', heroId1?: any | null, winRateHeroId1?: any | null, heroId2?: any | null, winRateHeroId2?: any | null, winCount?: any | null, matchCount?: any | null } | null> | null } | null> | null } | null };
+export type GetWeeklyMetaByPositionQuery = { __typename?: 'DotaQuery', heroStats?: { __typename?: 'HeroStatsQuery', pos1?: Array<{ __typename?: 'HeroWinWeekType', heroId: any, winCount: number, matchCount: number } | null> | null, pos2?: Array<{ __typename?: 'HeroWinWeekType', heroId: any, winCount: number, matchCount: number } | null> | null, pos3?: Array<{ __typename?: 'HeroWinWeekType', heroId: any, winCount: number, matchCount: number } | null> | null, pos4?: Array<{ __typename?: 'HeroWinWeekType', heroId: any, winCount: number, matchCount: number } | null> | null, pos5?: Array<{ __typename?: 'HeroWinWeekType', heroId: any, winCount: number, matchCount: number } | null> | null } | null };
 
 export type MatchInfoQueryVariables = Exact<{
   matchId: Scalars['Long']['input'];
@@ -1970,7 +1969,6 @@ export type MatchInfoQuery = { __typename?: 'DotaQuery', match?: { __typename?: 
 
 export type PlayerExtraInfoQueryVariables = Exact<{
   steamAccountId: Scalars['Long']['input'];
-  totalHeroCount: Scalars['Int']['input'];
   matchCount: Scalars['Int']['input'];
   heroIds?: InputMaybe<Array<InputMaybe<Scalars['Short']['input']>> | InputMaybe<Scalars['Short']['input']>>;
 }>;
@@ -1985,6 +1983,14 @@ export type PlayerInfoWith25MatchesQueryVariables = Exact<{
 
 
 export type PlayerInfoWith25MatchesQuery = { __typename?: 'DotaQuery', player?: { __typename?: 'PlayerType', matchCount?: number | null, winCount?: number | null, steamAccount?: { __typename?: 'SteamAccountType', avatar?: string | null, name?: string | null, seasonRank?: any | null, seasonLeaderboardRank?: any | null, id?: any | null, isAnonymous: boolean } | null, guildMember?: { __typename?: 'GuildMemberType', guild?: { __typename?: 'GuildType', tag?: string | null } | null } | null, performance?: { __typename?: 'PlayerPerformanceType', imp?: number | null } | null, heroesPerformance?: Array<{ __typename?: 'PlayerHeroesPerformanceType', imp?: number | null, winCount: number, matchCount: number, hero?: { __typename?: 'HeroType', id?: any | null, shortName?: string | null } | null } | null> | null, matches?: Array<{ __typename?: 'MatchType', id?: any | null, rank?: number | null, lobbyType?: LobbyTypeEnum | null, gameMode?: GameModeEnumType | null, startDateTime?: any | null, parsedDateTime?: any | null, durationSeconds?: number | null, didRadiantWin?: boolean | null, topLaneOutcome?: LaneOutcomeEnums | null, midLaneOutcome?: LaneOutcomeEnums | null, bottomLaneOutcome?: LaneOutcomeEnums | null, radiantKills?: Array<number | null> | null, direKills?: Array<number | null> | null, players?: Array<{ __typename?: 'MatchPlayerType', isRadiant?: boolean | null, lane?: MatchLaneType | null, kills?: any | null, deaths?: any | null, assists?: any | null, position?: MatchPlayerPositionType | null, award?: MatchPlayerAward | null, imp?: any | null, steamAccount?: { __typename?: 'SteamAccountType', id?: any | null } | null, hero?: { __typename?: 'HeroType', id?: any | null, shortName?: string | null } | null } | null> | null } | null> | null } | null };
+
+export type PlayerPerformanceForHeroRecommendationQueryVariables = Exact<{
+  steamAccountId: Scalars['Long']['input'];
+  recentDateTime: Scalars['Long']['input'];
+}>;
+
+
+export type PlayerPerformanceForHeroRecommendationQuery = { __typename?: 'DotaQuery', player?: { __typename?: 'PlayerType', steamAccount?: { __typename?: 'SteamAccountType', seasonRank?: any | null } | null, matches?: Array<{ __typename?: 'MatchType', rank?: number | null } | null> | null, lifetimePerformance?: Array<{ __typename?: 'PlayerHeroesPerformanceType', heroId: any, matchCount: number, winCount: number, lastPlayedDateTime?: any | null } | null> | null, recentPerformance?: Array<{ __typename?: 'PlayerHeroesPerformanceType', heroId: any, matchCount: number, winCount: number, lastPlayedDateTime?: any | null, imp?: number | null } | null> | null } | null };
 
 export type PlayersInfoWith10MatchesForGuildQueryVariables = Exact<{
   steamAccountIds: Array<InputMaybe<Scalars['Long']['input']>> | InputMaybe<Scalars['Long']['input']>;

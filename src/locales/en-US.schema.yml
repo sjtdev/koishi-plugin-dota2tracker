@@ -4,8 +4,10 @@ _config:
     STRATZ_API_TOKEN: Required. API TOKEN from stratz.com, available at https://stratz.com/api.
     dataParsingTimeoutMinutes: Time to wait for match data parsing (in minutes). If the data parsing time exceeds the waiting time, the report will be generated directly without waiting for the parsing to complete.
     proxyAddress: Proxy address. Leave blank to disable the proxy.
+    suppressStratzNetworkErrors: "When enabled, downgrades Stratz network errors (e.g. timeouts) to lower-priority output. Debug-level logs are hidden by default. To enable debug logging, see [📖 Documentation: Configuration](http://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/configs.html#suppressstratznetworkerrors-boolean)"
   message:
     $desc: Message Settings
+    useHeroNicknames: When disabled, only the official hero names will be used.
     urlInMessageType:
       $desc: "Include links in messages, <br/>please select the message type:"
       $inner:
@@ -36,7 +38,7 @@ _config:
     weeklyReportShowCombi: Show combinations in weekly report
   template:
     $desc: Template Settings
-    template_match: Template used to generate match information images, see https://sjtdev.github.io/koishi-plugin-dota2tracker/template-match.html for template display.
+    template_match: Template used to generate match information images, see [📖 Template Display](https://sjtdev.github.io/koishi-plugin-dota2tracker/template-match.html) for template display.
     template_player: Template used to generate player information images. (Currently only one template available)
     template_hero: Template used to generate hero information images. (Currently only one template available)
     playerRankEstimate: Estimate the rank of players without a rank in the player template <br>Estimated rank will be displayed as a gray image

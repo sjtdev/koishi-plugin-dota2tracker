@@ -96,7 +96,7 @@
       prev: `<span class="rank prev">${$t("dota2tracker.template.ranks."+prevRank.medal)}${prevRank.leader ?? prevRank.star}</span>`,
       curr: `<span class="rank curr">${$t("dota2tracker.template.ranks."+currRank.medal)}${currRank.leader ?? currRank.star}</span>`,
     } %>
-    <body class="<%= kind %>" <%- `style="background-image: url( ${utils.getImageUrl(kind, undefined, "jpg")} )"`%>>
+    <body class="<%= kind %>" <%- `style="background-image: url( ${getImageUrl(kind, undefined, "jpg")} )"`%>>
         <div class="wrapper">
             <p class="<%= kind %>">
               <%- kind == "xi" ?
@@ -107,17 +107,17 @@
             <p></p>
             <div class="ranks">
                 <div class="rank prev">
-                    <img src="<%= utils.getImageUrl('medal_' +(prevRank.inTop100 ?? prevRank.medal)) %>" alt="" />
-                    <img src="<%= utils.getImageUrl('star_' + prevRank.star) %>" alt="" />
+                    <img src="<%= getImageUrl('medal_' +(prevRank.inTop100 ?? prevRank.medal)) %>" alt="" />
+                    <img src="<%= getImageUrl('star_' + prevRank.star) %>" alt="" />
                     <p><%= prevRank.leader ?? "" %></p>
                 </div>
                 <div class="rank curr">
-                    <img src="<%= utils.getImageUrl('medal_' +(currRank.inTop100 ?? currRank.medal)) %>" alt="" />
-                    <img src="<%= utils.getImageUrl('star_' + currRank.star) %>" alt="" />
+                    <img src="<%= getImageUrl('medal_' +(currRank.inTop100 ?? currRank.medal)) %>" alt="" />
+                    <img src="<%= getImageUrl('star_' + currRank.star) %>" alt="" />
                     <p><%= currRank.leader ?? "" %></p>
                 </div>
             </div>
-            <p style="text-align: right; margin-top: 40px;">—— <%= date.format('YYYY/MM/DD HH点mm分') %></p>
+            <p style="text-align: right; margin-top: 40px;">—— <%= date %></p>
         </div>
     </body>
 </html>

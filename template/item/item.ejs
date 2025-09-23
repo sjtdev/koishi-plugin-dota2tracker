@@ -43,11 +43,11 @@ const valueMap = item.special_values.reduce((map, val) => {
 <body>
   <div class="container">
     <div class="header">
-      <img src="<%= utils.getImageUrl(item.name, ImageType.Items) %>">
+      <img src="<%= getImageUrl(item.name, ImageType.Items) %>">
       <div>
         <p class="name"><%= item.name_loc %> <span class="item_id"><%= item.name %></span></p>
         <% if (item.item_cost) { %>
-        <p class="cost"><img style="height: 20px; width: auto; margin-right: 4px;" src="<%= utils.getImageUrl("gold", ImageType.Icons) %>"> <%= item.item_cost %></p>
+        <p class="cost"><img style="height: 20px; width: auto; margin-right: 4px;" src="<%= getImageUrl("gold", ImageType.Icons) %>"> <%= item.item_cost %></p>
         <% } %>
       </div>
     </div>
@@ -107,7 +107,7 @@ const valueMap = item.special_values.reduce((map, val) => {
             <% } %>
             <% if (item.cooldowns && item.cooldowns[0]) { %>
             <div class="attr">
-              <img class="icon" src="<%= utils.getImageUrl("cooldown", ImageType.Icons) %>">
+              <img class="icon" src="<%= getImageUrl("cooldown", ImageType.Icons) %>">
               <span class="value"><%= item.cooldowns.join("/") %></span>
             </div>
             <% } %>

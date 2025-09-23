@@ -8,6 +8,8 @@
 >  \+ (one parse request + requests sent for parsing when waiting for reports)  
 >  \+ command query call count
 
+> [!WARNING] About stratz API Forbidden 403
+> See [API 403](./api-403.md)
 
 #### dataParsingTimeoutMinutes `number`
 - Data parsing timeout (in minutes)
@@ -17,7 +19,25 @@
 #### proxyAddress `string`
 - Proxy address. Leave blank to disable the proxy.
 
+#### suppressStratzNetworkErrors `boolean`
+> Due to the instability of the Stratz server and varying network conditions, a large number of network errors (e.g., timeouts) can occur during data polling. This option is available to suppress these errors and prevent them from flooding your logs.
+- When enabled, Stratz-related network errors will be logged at the `debug` level instead of the `error` level.
+> [!TIP] How to Display Debug Logs in Koishi
+> By default, Koishi does not display `debug` level logs. To view them, you need to add the following configuration to the bottom of your `koishi.yml` file via the **Koishi Web UI** (`File Explorer > koishi.yml`) and then restart Koishi.
+> ```yaml
+> logger:
+>   levels:
+>     dota2tracker.stratz-api: 3
+>     dota2tracker.match-watcher: 3
+>     dota2tracker.parse-polling: 3
+>     dota2tracker.match: 3
+>     dota2tracker.player: 3
+> ```
+
 ### Message Settings
+
+#### useHeroNicknames `boolean`
+- Enabled by default. When disabled, only the official hero names will be used in `push match messages`.
 
 #### urlInMessageType `checkbox`
 - Include links in messages
