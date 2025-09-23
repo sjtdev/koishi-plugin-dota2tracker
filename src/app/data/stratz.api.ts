@@ -2,7 +2,6 @@ import fs from "fs";
 import { Context, HTTP, Service } from "koishi";
 import path from "path";
 import * as graphql from "../../@types/graphql-generated";
-import PQueue from "p-queue";
 import { Config } from "../../config";
 import { ForbiddenError, NetworkError } from "../common/error";
 import {} from "@koishijs/plugin-proxy-agent";
@@ -18,16 +17,20 @@ interface QueryResult {
 
 export class StratzAPI extends Service<Config> {
   private readonly BASE_URL = "https://api.stratz.com/graphql";
-  private readonly queue: PQueue;
+  private readonly queue: MiniQueue;
   constructor(
     ctx: Context,
     private pluginDir: string,
   ) {
     super(ctx, "dota2tracker.stratz-api", true);
     this.config = ctx.config;
-
-    this.queue = new PQueue({ concurrency: 1, interval: 200, intervalCap: 1 });
+    this.queue = new MiniQueue(ctx, { interval: 200 });
   }
+  dispose() {
+    // 当 StratzAPI 服务被销毁时，自动销毁队列
+    this.queue.dispose();
+  }
+
   public async queryGetWeeklyMetaByPosition({ bracketIds }: graphql.GetWeeklyMetaByPositionQueryVariables) {
     return this.query<graphql.GetWeeklyMetaByPositionQueryVariables, graphql.GetWeeklyMetaByPositionQuery>("GetWeeklyMetaByPosition", { bracketIds }, (data) => !!data.heroStats);
   }
@@ -141,7 +144,7 @@ export class StratzAPI extends Service<Config> {
     }
   }
 
-  private fetchData<TData>(query: QueryFormat, isValid): Promise<void | TData> {
+  private async fetchData<TData>(query: QueryFormat, isValid): Promise<void | TData> {
     // 使用 queue.add() 来包装真正的请求逻辑
     return this.queue.add(async () => {
       try {
@@ -195,5 +198,61 @@ export class StratzAPI extends Service<Config> {
 
   private loadGraphqlFile(queryName: string): string {
     return fs.readFileSync(path.join(this.pluginDir, "queries", `${queryName}.graphql`), { encoding: "utf-8" }).replace(/[\r\n]+/g, " ");
+  }
+}
+
+class MiniQueue {
+  private queue: (() => Promise<any>)[] = [];
+  private isProcessing = false;
+  private interval: number;
+  private stopped = false; // 新增一个停止标志
+
+  // 1. 构造函数接收 ctx
+  constructor(
+    private ctx: Context,
+    options: { interval: number },
+  ) {
+    this.interval = options.interval;
+  }
+
+  public add<T>(task: () => Promise<T>): Promise<T> {
+    if (this.stopped) {
+      return Promise.reject(new Error("Queue has been disposed."));
+    }
+    return new Promise((resolve, reject) => {
+      this.queue.push(async () => {
+        try {
+          const result = await task();
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      });
+      this._process();
+    });
+  }
+
+  // 4. 新增 dispose 方法
+  public dispose() {
+    this.stopped = true;
+    this.queue = []; // 清空等待队列
+  }
+
+  private async _process(): Promise<void> {
+    if (this.isProcessing || this.queue.length === 0 || this.stopped) {
+      return;
+    }
+    this.isProcessing = true;
+
+    const task = this.queue.shift();
+    if (task) {
+      await task();
+      // 2. 使用 ctx.setTimeout
+      await new Promise<void>((resolve) => this.ctx.setTimeout(resolve, this.interval));
+    }
+
+    this.isProcessing = false;
+    // 递归处理队列中的下一个任务
+    this._process();
   }
 }
