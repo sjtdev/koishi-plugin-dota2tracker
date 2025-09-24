@@ -95,6 +95,7 @@ export class MatchService extends Service {
 
           constantsFacet.language.displayName = valveFacet.title_loc;
           constantsFacet.name = valveFacet.name;
+          constantsFacet.icon = valveFacet.icon;
         }
         facetData[player.steamAccountId] = { id: constantsFacet.id, name: constantsFacet.name, icon: constantsFacet.icon, color: constantsFacet.color, displayName: constantsFacet.language?.displayName };
       }
