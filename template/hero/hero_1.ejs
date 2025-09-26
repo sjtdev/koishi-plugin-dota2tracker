@@ -616,9 +616,9 @@
             }
         </style>
 
-        <% if (fontFamily && fontFamily.length > 0) { %>
+        <% if (fontFamily) { %>
         <%- "<style>" %>
-        <%- `body { font-family: ${fontFamily.map(f => `${f}`).join(", ")}; }` %>
+        <%- `body { font-family: ${fontFamily}; }` %>
         <%- "</style>" %>
         <% } %>
     </head>
