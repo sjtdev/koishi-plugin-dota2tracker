@@ -304,11 +304,8 @@ nav > .rank > img {
 .player > .titles {
   grid-row: 4;
   grid-column: 2/4;
-  margin-left: 4px;
+  margin-left: 6px;
   /* text-shadow: 1px 1px 0 #333; 设置阴影颜色及偏移 */
-}
-.player > .titles > span {
-  margin-right: 2px;
 }
 
 .player > .player_name {

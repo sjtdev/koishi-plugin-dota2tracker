@@ -87,7 +87,7 @@
         <% if (player.facet) { %>
           <img src="<%- getImageUrl(player.facet.icon, ImageType.IconsFacets) %>">
         <% } %>
-        <span <%- `style="font-size: ${player.facet?.name?.length > 4 ? 8 : 11}px;"`%>>
+        <span <%- `style="font-size: ${player.facet?.displayName?.length > 4 ? 8 : 11}px;"`%>>
           <p><%= player.facet?.displayName ?? '?' %></p>
         </span>
       </div>
