@@ -169,8 +169,8 @@ commands:
         title_recommendation: "今日推荐："
         recommendation_intro: "今日为您推荐的英雄是："
         recommendation_heroes: "{#each heroes as hero}{hero}{#if hero !== heroes[heroes.length - 1]}、{/if}{/each}"
-        recommendation_type_lifetime_only: "您的近期英雄记录为空，本次推荐结果基于您的生涯数据。"
-        recommendation_type_no_record: "无法根据您的近期与生涯数据进行推荐。"
+        recommendation_type_lifetime_only: "您的近期数据为空，本次推荐结果基于您的生涯数据。"
+        recommendation_type_no_record: "您的近期与生涯数据为空，无法生成推荐信息。"
         details:
           pool_description: "推荐结果根据对您的近期与生涯英雄使用记录计分后，按总分排序后对前10位英雄以分数为权重随机取得。"
           table_intro: "以下是前10位英雄具体得分表。"
