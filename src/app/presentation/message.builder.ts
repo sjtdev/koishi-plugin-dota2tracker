@@ -15,7 +15,7 @@ export class MessageBuilder extends Service<Config> {
     heroRcmd: {
       recommendedHeroes: number[];
       recommendationPool: HeroScoreBreakdown[];
-      recommendationType: "PERSONALIZED" | "LIFETIME_ONLY" | "LIFETIME_NO_RECORD";
+      recommendationType: "PERSONALIZED" | "LIFETIME_ONLY" | "LIFETIME_NO_RECORD" | "PLAYER_ANONYMOUS";
     },
     metaRcmd: { recommendation: WeeklyHeroMeta; targetTiers: number[] },
   ) {
@@ -23,7 +23,7 @@ export class MessageBuilder extends Service<Config> {
 
     let ejs = "<html><head><style>body{width:fit-content;height:fit-content;margin:0;padding:12px;font-family:<%-fontFamily%>;}</style></head><body>";
 
-    if (heroRcmd.recommendationType !== "LIFETIME_NO_RECORD") {
+    if (heroRcmd.recommendationType !== "LIFETIME_NO_RECORD" && heroRcmd.recommendationType !== "PLAYER_ANONYMOUS") {
       ejs += `<h3>${$t("title_recommendation")}</h3>`;
       ejs += `<p>${$t("recommendation_intro")}</p>`;
       ejs += `<p><b>${$t("recommendation_heroes", { heroes: heroRcmd.recommendedHeroes.map((heroId) => this.ctx.dota2tracker.i18n.getDisplayNameForHero(heroId, languageTag, { forceOfficialName: true })) })}</b></p>`;
@@ -60,7 +60,8 @@ export class MessageBuilder extends Service<Config> {
       ejs += `<p>${$t("details.scoring_formula")}</p>`;
       ejs += `<p>${$t("details.hot_streak_desc")}</p>`;
     } else {
-      ejs += `<p>${$t("recommendation_type_no_record")}</p>`;
+      if (heroRcmd.recommendationType === "LIFETIME_NO_RECORD") ejs += `<p>${$t("recommendation_type_no_record")}</p>`;
+      if (heroRcmd.recommendationType === "PLAYER_ANONYMOUS") ejs += `<p>${$t("recommendation_type_anonymous")}</p>`;
     }
     ejs += "<br>";
 

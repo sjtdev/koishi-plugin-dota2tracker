@@ -2,6 +2,7 @@ query PlayerPerformanceForHeroRecommendation($steamAccountId: Long!, $recentDate
   player(steamAccountId: $steamAccountId) {
     steamAccount {
       seasonRank
+      isAnonymous
     }
     matches(request: { take: 25 }) {
       rank

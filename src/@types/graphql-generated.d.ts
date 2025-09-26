@@ -1990,7 +1990,7 @@ export type PlayerPerformanceForHeroRecommendationQueryVariables = Exact<{
 }>;
 
 
-export type PlayerPerformanceForHeroRecommendationQuery = { __typename?: 'DotaQuery', player?: { __typename?: 'PlayerType', steamAccount?: { __typename?: 'SteamAccountType', seasonRank?: any | null } | null, matches?: Array<{ __typename?: 'MatchType', rank?: number | null } | null> | null, lifetimePerformance?: Array<{ __typename?: 'PlayerHeroesPerformanceType', heroId: any, matchCount: number, winCount: number, lastPlayedDateTime?: any | null } | null> | null, recentPerformance?: Array<{ __typename?: 'PlayerHeroesPerformanceType', heroId: any, matchCount: number, winCount: number, lastPlayedDateTime?: any | null, imp?: number | null } | null> | null } | null };
+export type PlayerPerformanceForHeroRecommendationQuery = { __typename?: 'DotaQuery', player?: { __typename?: 'PlayerType', steamAccount?: { __typename?: 'SteamAccountType', seasonRank?: any | null, isAnonymous: boolean } | null, matches?: Array<{ __typename?: 'MatchType', rank?: number | null } | null> | null, lifetimePerformance?: Array<{ __typename?: 'PlayerHeroesPerformanceType', heroId: any, matchCount: number, winCount: number, lastPlayedDateTime?: any | null } | null> | null, recentPerformance?: Array<{ __typename?: 'PlayerHeroesPerformanceType', heroId: any, matchCount: number, winCount: number, lastPlayedDateTime?: any | null, imp?: number | null } | null> | null } | null };
 
 export type PlayersInfoWith10MatchesForGuildQueryVariables = Exact<{
   steamAccountIds: Array<InputMaybe<Scalars['Long']['input']>> | InputMaybe<Scalars['Long']['input']>;

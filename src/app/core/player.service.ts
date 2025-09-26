@@ -67,7 +67,8 @@ export class PlayerService extends Service {
      * @LIFETIME_ONLY 仅有生涯数据无近期数据，可信度较低
      * @LIFETIME_NO_RECORD 无任何记录
      */
-    const recommendationType: "PERSONALIZED" | "LIFETIME_ONLY" | "LIFETIME_NO_RECORD" = player.recentPerformance.length > 0 ? "PERSONALIZED" : player.lifetimePerformance.length > 0 ? "LIFETIME_ONLY" : "LIFETIME_NO_RECORD";
+    const recommendationType: "PERSONALIZED" | "LIFETIME_ONLY" | "LIFETIME_NO_RECORD" | "PLAYER_ANONYMOUS" =
+      player.recentPerformance?.length > 0 ? "PERSONALIZED" : player.lifetimePerformance?.length > 0 ? "LIFETIME_ONLY" : player.steamAccount.isAnonymous ? "PLAYER_ANONYMOUS" : "LIFETIME_NO_RECORD";
     // 获取推荐池
     const recommendationPool = Array.from(scoreMap.values())
       .sort((a, b) => b.totalScore - a.totalScore)
