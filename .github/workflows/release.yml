@@ -5,7 +5,9 @@ name: Create Release
 on:
   push:
     tags:
-      - 'v*' # 只有当一个 v 开头的 tag (例如 v2.0.4) 被推送时，才触发此流程
+      - 'v*'
+  
+  workflow_dispatch:
 
 jobs:
   release:
@@ -13,43 +15,21 @@ jobs:
     permissions:
       contents: write
     steps:
-      # 步骤1: 检出代码
-      # fetch-depth: 0 是关键，它会获取所有的 git 历史，以便 changelog 工具能读取到所有 commit
+      # 步骤1: 检出代码 (检出的是插件仓库的根目录)
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # 步骤2: 提取最新版本的发布说明
+      - name: Extract release notes
+        id: extract_release_notes
+        uses: tarampampam/extract-release-notes@v2
         with:
-          fetch-depth: 0
+          # 【关键修正】路径是相对于仓库根目录的，所以直接写文件名
+          file: "changelog.md"
 
-      # 步骤2: 设置 Node.js 环境
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-
-      # 步骤3: 安装依赖
-      # 这里的依赖仅为 Actions 运行所需，主要是 changelog 生成工具
-      - name: Install dependencies
-        run: npm install conventional-changelog-cli
-
-      # 步骤4: 生成本次发布的 Release Notes
-      # 这个命令会智能地查找上一个 tag，并生成从那时起到当前 tag 之间的所有 commit 的日志
-      - name: Generate changelog body
-        id: generate_changelog
-        run: |
-          CHANGELOG_BODY=$(npx conventional-changelog-cli -p angular -r 2)
-          echo "changelog_body<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGELOG_BODY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      # 步骤5: 创建 GitHub Release
-      # 它会自动使用触发流程的 tag (例如 v2.0.4) 作为版本号
-      # 并将上一步生成的日志作为 Release 的描述
+      # 步骤3: 创建 GitHub Release
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          body: |
-            ${{ steps.generate_changelog.outputs.changelog_body }}
-
-            ---
-            > 请于 Koishi 的 `依赖管理` 中更新插件或 `插件市场` 中搜索安装
-            > To update, go to `Dependencies` in Koishi or search in the `Plugin Market`
+          body: ${{ steps.extract_release_notes.outputs.notes }}
+          draft: true
