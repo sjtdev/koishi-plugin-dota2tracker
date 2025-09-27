@@ -1,6 +1,18 @@
 # 更新日志
 
 
+## [2.1.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.0.4...v2.1.0) (2025-09-27)
+
+
+### ✨ 新增功能
+
+* 新增`match`模板称号“辅”与对应的“辅助分数”，并加入MVP分数计算。具体说明与算法见[文档展示](https://sjtdev.github.io/koishi-plugin-dota2tracker/template.html#%E7%A7%B0%E5%8F%B7%E7%B3%BB%E7%BB%9F-match-1-match-2) ([41646dc](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/41646dc0c38957fe999091e17e976911cfdb513c))
+
+
+### 📝 文档
+
+* 添加对新称号及算法的说明 ([30243ae](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/30243aec1f50499c15c5efc405fd16b4e4497014))
+
 ### [2.0.4](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.0.3...v2.0.4) (2025-09-27)
 
 
