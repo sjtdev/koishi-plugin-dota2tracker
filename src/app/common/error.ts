@@ -25,7 +25,6 @@ export function handleError(error: unknown, logger: Logger, i18n: I18NService, c
     // 情况2：根据配置处理其他网络错误
     if (config.suppressStratzNetworkErrors) {
       logger.debug(error);
-      logger.info(1)
     } else {
       logger.error(error);
     }
