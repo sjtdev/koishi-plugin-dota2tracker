@@ -39,13 +39,17 @@
       "zh": "追踪群友的DOTA2对局",
       "en": "Track Friends' DOTA2 Matches"
     },
-    "required": [
-      "http",
-      "database",
-      "puppeteer",
-      "cron",
-      "cache"
-    ],
+    "service": {
+      "required": [
+        "http",
+        "database",
+        "puppeteer",
+        "cache"
+      ],
+      "optional": [
+        "cron"
+      ]
+    },
     "locales": [
       "zh-CN",
       "en-US"
