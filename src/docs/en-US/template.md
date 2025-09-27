@@ -64,6 +64,11 @@ Awards based on player performance data.
       <td>Highest deaths, and lowest total net worth if tied</td>
     </tr>
     <tr>
+      <td style="text-align: center"><span style="color: #20B2AA;">Utility</span></td>
+      <td style="text-align: center"><span style="color: #20B2AA;">U</span></td>
+      <td>Highest Utility Score (Calculated as: Gold Spent on Support Items + Camps Stacked × 100)</td>
+    </tr>
+    <tr>
       <td style="text-align: center"><span style="color: #006400;">Assister</span></td>
       <td style="text-align: center"><span style="color: #006400;">A</span></td>
       <td>Highest assists, and highest damage dealt if tied</td>
@@ -90,7 +95,7 @@ Awards based on player performance data.
     </tr>
     <tr>
       <td colspan="2" style="text-align: center">MVP Score</td>
-      <td>Kills × 5 + Assists × 3 + Stun Time × 0.1 + Other Control Effects Time × 0.05 + Slow Time × 0.025 + Damage Dealt × 0.001 + Building Damage × 0.01 + Healing Done × 0.002 + Stratz assessed performance score × 0.25</td>
+      <td>Kills × 5 + Assists × 3 + Stun Time × 0.1 + Other Control Effects Time × 0.05 + Slow Time × 0.025 + Damage Dealt × 0.001 + Building Damage × 0.01 + Healing Done × 0.002 + Stratz assessed performance score × 0.25 + Utility Score × 0.005</td>
     </tr>
   </tbody>
 </table>
