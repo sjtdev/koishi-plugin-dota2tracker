@@ -26,7 +26,7 @@ enum GraphqlLanguageEnum {
 }
 
 console.log("开始执行脚本……");
-const ROOT_PATH = path.resolve(__dirname, "..", "..", "..");
+const ROOT_PATH = path.resolve(__dirname, "..");
 Settings.defaultZone = "utc";
 (async () => {
   await i18next.init({
@@ -60,7 +60,7 @@ Settings.defaultZone = "utc";
   }
 
   const browser = await puppeteer.launch({
-    executablePath: process.env.CHROMIUM_PATH,
+    // executablePath: process.env.CHROMIUM_PATH,
     headless: "new" as any,
     args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--allow-file-access-from-files"],
   });
@@ -165,37 +165,44 @@ async function renderImage(params: { data: object; languageTag: string; template
   // const html_fontInjected = html.replace("<head>", `<head><style>${fontFaceCSS}</style>`);
 
   const page = await browser.newPage();
-  await page.setContent(html, { waitUntil: "networkidle0" });
-  await Promise.all([
-    page.waitForNetworkIdle({
-      idleTime: 500, // 500ms内没有网络请求
-      timeout: 60000, // 最长等待30秒
-    }),
-  ]);
+  try {
+    page.setDefaultNavigationTimeout(60000); // 60秒超时
+    await page.setContent(html, { waitUntil: "networkidle0" });
+    await page.waitForSelector('body', { timeout: 10000 });
+    await Promise.all([
+      page.waitForNetworkIdle({
+        idleTime: 500, // 500ms内没有网络请求
+        timeout: 30000, // 最长等待30秒
+      }),
+    ]);
 
-  await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-  // 获取页面的实际尺寸
-  const dimensions = await page.evaluate(() => {
-    const body = document.documentElement.getElementsByTagName("body")[0];
-    return {
-      width: body?.scrollWidth ?? 0,
-      height: body?.scrollHeight ?? 0,
-    };
-  });
+    // 获取页面的实际尺寸
+    const dimensions = await page.evaluate(() => {
+      const body = document.documentElement.getElementsByTagName("body")[0];
+      return {
+        width: body?.scrollWidth ?? 0,
+        height: body?.scrollHeight ?? 0,
+      };
+    });
 
-  // 重新设置视口
-  await page.setViewport({
-    deviceScaleFactor: 1.5,
-    width: dimensions.width,
-    height: dimensions.height,
-  });
+    // 重新设置视口
+    await page.setViewport({
+      deviceScaleFactor: 1.5,
+      width: dimensions.width,
+      height: dimensions.height,
+    });
 
-  const buffer = await page.screenshot({ type: "png", fullPage: true });
-  // fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.html`), html);
-  fs.writeFileSync(path.join(ROOT_PATH, "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.png`), buffer);
-  console.log(languageTag, imageFileName);
-  await page.close();
+    const buffer = await page.screenshot({ type: "png", fullPage: true });
+    // fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.html`), html);
+    fs.writeFileSync(path.join(ROOT_PATH, "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.png`), buffer);
+    console.log(languageTag, imageFileName);
+  } catch (error) {
+    throw error;
+  } finally {
+    await page.close();
+  }
 }
 enum valveLanguageTag {
   "zh-CN" = "schinese",
