@@ -1,80 +1,53 @@
+# .github/workflows/release.yml
+
 name: Create Release
 
 on:
   push:
-    branches:
-      - master
-    paths:
-      - "package.json"
-  workflow_dispatch:
+    tags:
+      - 'v*' # 只有当一个 v 开头的 tag (例如 v2.0.4) 被推送时，才触发此流程
 
 jobs:
-  check-and-release:
+  release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
+      # 步骤1: 检出代码
+      # fetch-depth: 0 是关键，它会获取所有的 git 历史，以便 changelog 工具能读取到所有 commit
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      # 步骤2: 设置 Node.js 环境
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-      
+
+      # 步骤3: 安装依赖
+      # 这里的依赖仅为 Actions 运行所需，主要是 changelog 生成工具
       - name: Install dependencies
-        run: |
-          sudo apt-get install jq
-          sudo npm install -g @actions/core
+        run: npm install conventional-changelog-cli
 
-      - name: Get version info
-        id: version_info
+      # 步骤4: 生成本次发布的 Release Notes
+      # 这个命令会智能地查找上一个 tag，并生成从那时起到当前 tag 之间的所有 commit 的日志
+      - name: Generate changelog body
+        id: generate_changelog
         run: |
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          echo "package_version=${PACKAGE_VERSION}" >> $GITHUB_OUTPUT
+          CHANGELOG_BODY=$(npx conventional-changelog-cli -p angular -r 2)
+          echo "changelog_body<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG_BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Extract changelog
-        id: extract_changelog
-        run: |
-          VERSION="${{ steps.version_info.outputs.package_version }}"
-          SECTION=$(awk -v version="$VERSION" '
-            BEGIN { 
-              print_flag = 0 
-              in_details = 0
-            }
-            # 检测<details>标签
-            /^<details>/ { in_details = 1 }
-            /^<\/details>/ { in_details = 0 }
-            
-            # 仅处理非折叠区域的内容
-            in_details == 0 {
-              if ($0 ~ "^# " version "(\\s|$)") {  # 严格匹配版本号
-                print_flag = 1
-                next
-              }
-              else if (print_flag == 1 && $0 ~ /^# [0-9]+\.[0-9]+/) {  # 遇到下个主版本停止
-                print_flag = 0
-                exit
-              }
-              if (print_flag == 1) {
-                gsub(/^* \* /, "")  # 清理列表符号
-                print
-              }
-            }
-          ' changelog.md)
-          
-          ESCAPED_SECTION=$(echo "$SECTION" | jq -R -s -c .)
-          echo "section=${ESCAPED_SECTION}" >> $GITHUB_OUTPUT
-
+      # 步骤5: 创建 GitHub Release
+      # 它会自动使用触发流程的 tag (例如 v2.0.4) 作为版本号
+      # 并将上一步生成的日志作为 Release 的描述
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.version_info.outputs.package_version }}
-          name: v${{ steps.version_info.outputs.package_version }}
           body: |
-            ${{ fromJSON(steps.extract_changelog.outputs.section) }}
+            ${{ steps.generate_changelog.outputs.changelog_body }}
 
-            > 请于 Koishi 的 `依赖管理` 中更新插件或 `插件市场` 中搜索安装  
+            ---
+            > 请于 Koishi 的 `依赖管理` 中更新插件或 `插件市场` 中搜索安装
             > To update, go to `Dependencies` in Koishi or search in the `Plugin Market`
-          prerelease: false
-          draft: false
