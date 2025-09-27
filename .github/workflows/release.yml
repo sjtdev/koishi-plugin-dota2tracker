@@ -6,7 +6,6 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch: # 保留手动触发器，方便调试
 
 jobs:
   release:
@@ -38,4 +37,3 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.extract_release_notes.outputs.notes }}
-          draft: ${{ github.event_name == 'workflow_dispatch' }} # 手动运行时自动设为草稿
