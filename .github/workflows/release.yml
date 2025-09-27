@@ -10,6 +10,8 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       # 步骤1: 检出代码
       # fetch-depth: 0 是关键，它会获取所有的 git 历史，以便 changelog 工具能读取到所有 commit
