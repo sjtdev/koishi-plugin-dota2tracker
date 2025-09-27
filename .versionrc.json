@@ -1,6 +1,8 @@
 {
   "infile": "changelog.md",
   "header": "# 更新日志\n\n",
+  "bumpFiles": ["package.json"],
+  "packageFiles": ["package.json"],
   "types": [
     { "type": "feat", "section": "✨ 新增功能" },
     { "type": "refine", "section": "🚀 功能优化", "hidden": false },
