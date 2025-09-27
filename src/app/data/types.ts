@@ -37,6 +37,7 @@ export interface PlayerTypeEx extends PlayerType {
   unitBackpacks?: ItemInfo[];
   facet: { id: number; name: string; displayName: string; color: string; icon: string };
   formattedNetworth: string;
+  utilityScore: number;
 }
 export interface RankInfo {
   medal: number;
@@ -75,17 +76,16 @@ export type ItemList = {
 
 export interface HeroScoreBreakdown {
   heroId: number;
-  recentWinScore: number;    // 近期胜场得分
-  lifetimeWinScore: number;  // 生涯胜场得分 (对数缩放后)
-  impBonus: number;          // IMP 奖励分
+  recentWinScore: number; // 近期胜场得分
+  lifetimeWinScore: number; // 生涯胜场得分 (对数缩放后)
+  impBonus: number; // IMP 奖励分
 
-  isHotStreak: boolean;      // 是否处于手热状态
-  hotStreakBonus: number;    // 手热奖励带来的额外加分
+  isHotStreak: boolean; // 是否处于手热状态
+  hotStreakBonus: number; // 手热奖励带来的额外加分
 
-  baseScore: number;         // 基础总分 (手热奖励前)
-  totalScore: number;        // 最终总分
+  baseScore: number; // 基础总分 (手热奖励前)
+  totalScore: number; // 最终总分
 }
-
 
 export interface WeeklyHeroMeta {
   pos1: HeroMeta[];

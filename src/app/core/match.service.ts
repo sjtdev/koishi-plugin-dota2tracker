@@ -17,7 +17,7 @@ export class MatchService extends Service {
     const matchQuery = await this.getMatchData(matchId);
     if (matchQuery) {
       // 未解析 & 请求解析 & 存在 cron
-      if (!this.isMatchParsed(matchQuery) && requestParse && this.ctx.cron) {
+      if (!MatchService.isMatchParsed(matchQuery) && requestParse && this.ctx.cron) {
         return {
           status: "PENDING",
           matchId,
@@ -47,7 +47,7 @@ export class MatchService extends Service {
         this.ctx.dota2tracker.cache.setMatchCache(matchId, matchQuery, this.pluginVersion);
       } else {
         matchQuery = await this.ctx.dota2tracker.stratzAPI.queryMatchInfo(matchId);
-        if (this.isMatchParsed(matchQuery)) {
+        if (MatchService.isMatchParsed(matchQuery)) {
           this.ctx.dota2tracker.cache.setMatchCache(matchId, matchQuery, this.pluginVersion);
         }
       }
@@ -110,11 +110,12 @@ export class MatchService extends Service {
     //     return match;
     // ↓ 累加团队击杀数，并初始化团队[总对英雄造成伤害]与[总受到伤害]
     // 获取到的团队击杀数是每分钟击杀数的数组，需要累加计算，由radiantKills/direKills累加计算存为match.radiant.KillsCount/match.dire.KillsCount
+    const matchParsed = MatchService.isMatchParsed(matchQuery);
     ["radiant", "dire"].forEach((team) => {
       match[team] = { killsCount: match?.[team + "Kills"]?.reduce((acc: number, cva: number) => acc + cva, 0) ?? 0, damageReceived: 0, heroDamage: 0, networth: 0, experience: 0 };
     });
     // 未解析比赛时radiantKills/direKills为null，需要遍历玩家数组
-    if (!match.parsedDateTime) {
+    if (!matchParsed) {
       match.players.reduce((acc, player) => {
         if (player.isRadiant) {
           acc.radiant.killsCount += player.kills;
@@ -177,17 +178,6 @@ export class MatchService extends Service {
       // 团队经济经验累加（无有效API获取总经验，仅能通过每分钟经验数据推算）
       match[player.team].networth += player.networth;
       match[player.team].experience += Math.floor((player.experiencePerMinute / 60) * match.durationSeconds);
-      player.titles = []; // 添加空的称号数组
-      player.mvpScore = // 计算MVP分数
-        player.kills * 5 +
-        player.assists * 3 +
-        ((player.stats.heroDamageReport?.dealtTotal.stunDuration ?? 0) / 100) * 0.1 +
-        ((player.stats.heroDamageReport?.dealtTotal.disableDuration ?? 0) / 100) * 0.05 +
-        ((player.stats.heroDamageReport?.dealtTotal.slowDuration ?? 0) / 100) * 0.025 +
-        player.heroDamage * 0.001 +
-        player.towerDamage * 0.01 +
-        player.heroHealing * 0.002 +
-        player.imp * 0.25;
       // 直接储存pick顺序（从0开始）
       player.order = heroOrderList[player.hero.id];
       if (player.partyId != null) {
@@ -240,8 +230,15 @@ export class MatchService extends Service {
           break;
       }
 
-      const supportItemIds = [30, 40, 42, 43, 188];
-      const supportItemsCount: { [key: number]: number } = supportItemIds.reduce((obj, key) => {
+      player.utilityScore = (player.stats?.campStack?.at(-1) || 0) * 100; // 初始化为屯野数积分
+      const utilityItemIds = [
+        30, // 真视宝石
+        40, // 显影之尘
+        42, // 侦查守卫 (假眼)
+        43, // 岗哨守卫 (真眼)
+        188, // 诡计之雾
+      ];
+      const supportItemsCount: { [key: number]: number } = utilityItemIds.reduce((obj, key) => {
         obj[key] = 0;
         return obj;
       }, {});
@@ -250,20 +247,20 @@ export class MatchService extends Service {
       const purchaseTimesMap: { [key: number]: number[] } = {};
       if (player.stats?.itemPurchases) {
         for (const item of player.stats.itemPurchases) {
-          if (!supportItemIds.includes(item.itemId)) {
+          if (!utilityItemIds.includes(item.itemId)) {
             if (!purchaseTimesMap[item.itemId]) {
               purchaseTimesMap[item.itemId] = [];
             }
             purchaseTimesMap[item.itemId].push(item.time);
-          }
-          switch (item.itemId) {
-            case 30:
-            case 40:
-            case 42:
-            case 43:
-            case 188:
-              supportItemsCount[item.itemId]++;
-              break;
+          } else {
+            const itemName = dotaconstants.item_ids[item.itemId];
+            if (itemName) {
+              const itemDetails = dotaconstants.items[itemName];
+              if (itemDetails && itemDetails.cost) {
+                player.utilityScore += itemDetails.cost;
+              }
+            }
+            supportItemsCount[item.itemId]++;
           }
         }
       }
@@ -318,6 +315,19 @@ export class MatchService extends Service {
       player.formattedNetworth = formatNumber(player.networth);
 
       player.facet = facetData[player.steamAccountId];
+
+      player.titles = []; // 添加空的称号数组
+      player.mvpScore = // 计算MVP分数
+        player.kills * 5 +
+        player.assists * 3 +
+        ((player.stats.heroDamageReport?.dealtTotal.stunDuration ?? 0) / 100) * 0.1 +
+        ((player.stats.heroDamageReport?.dealtTotal.disableDuration ?? 0) / 100) * 0.05 +
+        ((player.stats.heroDamageReport?.dealtTotal.slowDuration ?? 0) / 100) * 0.025 +
+        player.heroDamage * 0.001 +
+        player.towerDamage * 0.01 +
+        player.heroHealing * 0.002 +
+        player.imp * 0.25 +
+        player.utilityScore * 0.005;
     });
     enum ComparisonMode {
       Max = "max",
@@ -350,7 +360,7 @@ export class MatchService extends Service {
     )?.titles.push("dota2tracker.template.titles.Soul");
     findMaxByProperty("networth")?.titles.push("dota2tracker.template.titles.Rich");
     findMaxByProperty("experiencePerMinute")?.titles.push("dota2tracker.template.titles.Wise");
-    if (match.parsedDateTime && match.players.every((player) => player?.stats?.heroDamageReport?.dealtTotal)) {
+    if (matchParsed) {
       (
         match.players.reduce((max, player) =>
           player.stats.heroDamageReport.dealtTotal.stunDuration + player.stats.heroDamageReport.dealtTotal.disableDuration / 2 + player.stats.heroDamageReport.dealtTotal.slowDuration / 4 >
@@ -371,6 +381,7 @@ export class MatchService extends Service {
     findMaxByProperty("heroDamage")?.titles.push("dota2tracker.template.titles.Nuker");
     findMaxByProperty("kills", "heroDamage")?.titles.push("dota2tracker.template.titles.Breaker");
     findMaxByProperty("deaths", "networth", undefined, undefined, ComparisonMode.Min)?.titles.push("dota2tracker.template.titles.Ghost");
+    if (matchParsed) findMaxByProperty("utilityScore", "networth", match.players, ComparisonMode.Max, ComparisonMode.Min)?.titles.push("dota2tracker.template.titles.Utility");
     findMaxByProperty("assists", "heroDamage")?.titles.push("dota2tracker.template.titles.Assister");
     findMaxByProperty("towerDamage", "heroDamage")?.titles.push("dota2tracker.template.titles.Demolisher");
     findMaxByProperty("heroHealing")?.titles.push("dota2tracker.template.titles.Healer");
@@ -402,7 +413,7 @@ export class MatchService extends Service {
     return match;
   }
 
-  isMatchParsed(match: graphql.MatchInfoQuery) {
+  private static isMatchParsed(match: graphql.MatchInfoQuery) {
     return match.match?.parsedDateTime && match.match.players.filter((player) => player?.stats?.heroDamageReport?.dealtTotal).length > 0;
   }
 }
