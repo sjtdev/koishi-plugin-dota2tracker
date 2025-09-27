@@ -6,8 +6,7 @@ on:
   push:
     tags:
       - 'v*'
-  
-  workflow_dispatch:
+  workflow_dispatch: # 保留手动触发器，方便调试
 
 jobs:
   release:
@@ -15,21 +14,28 @@ jobs:
     permissions:
       contents: write
     steps:
-      # 步骤1: 检出代码 (检出的是插件仓库的根目录)
+      # 步骤1: 检出代码
       - name: Checkout code
         uses: actions/checkout@v4
-
-      # 步骤2: 提取最新版本的发布说明
-      - name: Extract release notes
-        id: extract_release_notes
-        uses: tarampampam/extract-release-notes@v2
+        # 必须设置 fetch-depth: 0 才能获取到历史 tag，为手动调试做准备
         with:
-          # 【关键修正】路径是相对于仓库根目录的，所以直接写文件名
-          file: "changelog.md"
+          fetch-depth: 0
+
+      # 步骤2: 【全新】使用内置工具提取最新版本的发布说明
+      - name: Extract Release Notes
+        id: extract_release_notes
+        run: |
+          # 这个 awk 命令会智能地找到第一个版本号标题（如 ### [2.0.4]），
+          # 然后打印从该行之后、到下一个版本号标题之前的所有内容。
+          # 这是一个纯粹的文本处理，不依赖任何网络。
+          NOTES=$(awk '/^### \[/{i++;next}i==1' changelog.md)
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       # 步骤3: 创建 GitHub Release
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.extract_release_notes.outputs.notes }}
-          draft: true
+          draft: ${{ github.event_name == 'workflow_dispatch' }} # 手动运行时自动设为草稿
