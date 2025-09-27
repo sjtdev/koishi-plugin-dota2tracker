@@ -1,4 +1,25 @@
+# 更新日志
 
+
+### [2.0.4](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.0.3...v2.0.4) (2025-09-27)
+
+
+### 🚀 功能优化
+
+* 优化“今日英雄”消息zh-CN文本 ([94d9bfd](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/94d9bfd0539cc15e991e77d1dad5f806d910e9d3))
+* hero-of-the-day指令中添加对隐藏数据玩家的额外提示 ([fc5a643](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/fc5a64363d9c1efe7a2ecbf32e887cf3f0a604de))
+
+
+### 🐛 Bug 修复
+
+* **template:** 修复[hero_1, item, itemlist]模板未适配新架构的自定义字体传值，导致渲染失败的问题。 ([d736d9c](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/d736d9ce806cd6725e434422ffff5c696c2c5a2a))
+* **template:** 修复match2/match2+中命石文字意外变小的问题并适当缩小称号间距 ([b0d6ded](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/b0d6dede80bbac4e3a764e82cd07d580a3304231))
+
+
+### 📝 文档
+
+* 构建的文档用展示图片 ([77968fa](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/77968fa198e902f0c4d968319b5aaaf9fc803fea))
+* **changelog:** 对自动化的补充说明 ([52f7e8d](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/52f7e8da52d4b7bc9a27293d7dfebade047bab04))
 
 ### **v2.0.4开始使用更标准化的代码提交规范与流程，并由`standard-version`进行更新日志托管，后续更新日志基于commits自动生成。**
 **以下是2.0.4前的手写更新日志：**
