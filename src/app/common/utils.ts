@@ -7,62 +7,6 @@ export function sec2time(sec: number): string {
 export function formatNumber(num: number): string {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-/**
- * 计算字符串的视觉宽度，通过 Unicode 规范化处理半角假名等特殊字符。
- * @param str 要计算的字符串
- * @returns {number} 字符串的视觉宽度
- */
-export function getVisualWidth(str: string): number {
-  let width = 0;
-
-  str = str || "";
-
-  // 1. 先对字符串进行 NFKC 规范化，将半角假名等转换为全角形式
-  const normalizedStr = str.normalize("NFKC");
-
-  // 2. 使用正则表达式
-  const wideCharRegex = new RegExp(
-    [
-      "[\uff00-\uffef]", // Full-width forms
-      "[\u3000-\u303f]", // CJK Symbols and Punctuation
-      "\\p{Script=Han}", // Han script
-      "\\p{Script=Hiragana}", // Hiragana script
-      "\\p{Script=Katakana}", // Katakana script
-      "\\p{Script=Hangul}", // Hangul script
-    ].join("|"),
-    "u",
-  );
-
-  // 3. 遍历【规范化后】的字符串
-  for (const char of normalizedStr) {
-    if (wideCharRegex.test(char)) {
-      width += 2;
-    } else {
-      width += 1;
-    }
-  }
-  return width;
-}
-/**
- * 根据字符串和目标宽度，计算需要填充的 \t 数量。
- * @param str 原始字符串
- * @param targetTabStops 目标占用的制表位数量（例如，16个字符宽 = 4个制表位）
- * @param tabWidth 每个 \t 代表的宽度，通常为4
- * @returns {string} 需要补充的 \t 字符串
- */
-export function getTabPadding(str: string, targetTabStops: number = 4, tabWidth: number = 4): string {
-  const visualWidth = getVisualWidth(str);
-  // 计算当前字符串占用了多少个制表位
-  const occupiedTabStops = Math.floor(visualWidth / tabWidth);
-  // 计算需要补充的制表位数量
-  const tabsNeeded = targetTabStops - occupiedTabStops;
-  // 确保至少有1个\t作为分隔符，除非字符串本身就超长了
-  if (visualWidth > 0 && tabsNeeded <= 0) {
-    return "\t";
-  }
-
-  return "\t".repeat(Math.max(0, tabsNeeded));
-}
 /** 四舍五入小数
  * @param decimalPlaces 保留位数
  * @param number 进行四舍五入的数值
