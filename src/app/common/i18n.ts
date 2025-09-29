@@ -48,7 +48,7 @@ export class I18NService extends Service<Config> {
     return this.i18n.render.apply(this.i18n, args);
   }
 
-  $t(languageTag: string, key: string | string[], param?: string[] | Record<string, string> | string | object): string {
+  $t(languageTag: string, key: string | string[], param?: string[] | Record<string, string> | string | object, options?: { target?: "text" | "html" }): string {
     // 如果 key 是点分隔字符串，将其拆分为数组以支持常量词典
     const keys = Array.isArray(key) ? key : key.split(".");
     const params = Array.isArray(param) ? param : [param];
@@ -68,14 +68,25 @@ export class I18NService extends Service<Config> {
         // 替换命名占位符 {name}, {value}, ...
         return constantTranslation.replace(/\{(\w+)\}/g, (_, key) => params[key] || "");
       }
-      return constantTranslation;
+      let result = constantTranslation; // 假设已经处理好插值
+      const targetFormat = options?.target || "text";
+      if (targetFormat === "html") {
+        result = result.replace(/\n/g, "<br/>");
+      }
+      return result;
     }
     // 2. 如果常量词典未命中，直接将原始 key 传递给 ctx.i18n（保持原有格式）
     const originalKey = Array.isArray(key) ? key : [key];
     const elements = this.render([languageTag], originalKey, (param as any) ?? {});
 
     // 遍历消息元素数组，对每个元素实例调用它自己的 .toString() 方法
-    const result = elements.map((el) => el.toString()).join("");
+    let result = elements.map((el) => el.toString()).join("");
+    const targetFormat = options?.target || "text";
+
+    // 2. 如果目标是 'html'，则将所有 \n 替换为 <br/>
+    if (targetFormat === "html") {
+      result = result.replace(/\n/g, "<br/>");
+    }
     if (result == key) return;
     return result;
   }
