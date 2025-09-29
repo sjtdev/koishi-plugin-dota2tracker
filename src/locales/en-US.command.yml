@@ -1,25 +1,28 @@
 commands:
   dota2tracker:
+    description: A series of commands for Dota 2 Tracker. Use "dota2tracker -h" to see all available commands.
     subscribe:
-      description: After subscribing, players need to bind their Steam ID to this group.
+      description: Subscribes the current channel to Dota 2 match tracking.
       usage: >-
-        After subscribing, players need to bind their Steam ID to this group. BOT
-        will subscribe to the new game data of bound players in this group. After
-        the STRATZ game analysis is completed, the game data will be generated
-        into a picture battle report and published to this group.
+        After subscribing, players need to bind their Steam ID in this channel. The bot will then track new matches of bound players and post image-based reports upon completion of parsing by Stratz.
+      examples: |-
+        subscribe
       messages:
         subscribe_success: Subscription successful.
         subscribed: This Channel has been subscribed, no need to subscribe again.
     unsubscribe:
-      description: Unsubscribe from this group.
+      description: Unsubscribes the current channel from match tracking.
+      usage: Unsubscribes the current channel from match tracking.
+      examples: |-
+        unsubscribe
       messages:
         unsubscribe_success: Unsubscription successful.
         not_subscribed: >-
           This Channel has not been subscribed yet, so there is no need to
           unsubscribe.
     bind:
-      description: Bind your SteamID and optionally set a nickname.
-      usage: Bind your SteamID to your account. If the group is subscribed, your new match data will be posted in the group in real-time.
+      description: Binds your SteamID to your account in the current channel.
+      usage: Bind your SteamID to your account. If the channel is subscribed, your new match data will be posted automatically. Nicknames containing spaces must be enclosed in double quotes ("").
       examples: |-
         bind 123456789
         bind 123456789 John
@@ -45,12 +48,16 @@ commands:
           Please note: Your Steam player data is not public, and you will not be able to use the main functions of the BOT, such as "battle report tracking," "query-recent-match commands," etc.
           If you need to make data public, please set it to public in the DOTA2 game settings.
     unbind:
-      description: Unbind your personal information.
+      description: Unbinds your personal information in the current channel.
+      usage: Unbind your personal information in the current channel.
+      examples: |-
+        unbind
       messages:
         unbind_success: Unbinding successful.
         not_binded: Not bound, no need to unbind.
     rename:
-      description: Change the nickname set during binding.
+      description: Changes the nickname set during binding.
+      usage: Change the nickname set during binding. Nicknames containing spaces must be enclosed in double quotes ("").
       examples: |-
         rename John
         rename "John Doe"
@@ -61,7 +68,10 @@ commands:
         nick_name_too_long: Nickname is too long, please limit it to 20 characters.
         nick_name_same: The input content is the same as the original nickname and does not need to be renamed.
     query-members:
-      description: Query the players bound in this group.
+      description: Queries the players bound in this channel and generates an info image.
+      usage: Queries the players bound in this channel and generates an informational image.
+      examples: |-
+        query-members
       messages:
         title: "Guild DOTA 2 Roster (Total: {count})"
         table_headers:
@@ -72,6 +82,7 @@ commands:
         query_failed: Failed to query group members.
     query-match:
       description: Query the match data of the specified match ID and generate a picture.
+      usage: Query the match data of the specified match ID and generate a picture.
       options:
         parse: Whether to wait for match data parsing
       examples: |-
@@ -208,8 +219,22 @@ commands:
           Currently not in a group chat, you must provide the specified player's SteamID.
         invalid_input_include_steam_id: Invalid SteamID and the player was not found in this group by the given input.
     help:
-      description: "Get the link to the detailed online documentation for the plugin."
+      description: "Get detailed information for all commands and the link to the online documentation."
+      usage: |-
+        Get detailed information for all commands and the link to the online documentation.
+      examples: |-
+        help
       messages:
-        content: |-
-          For a detailed guide on DOTA2Tracker features, command usage, and algorithm explanations, please visit the online documentation:
+        header: |-
+          Below is the full list of plugin commands.
+          ※Note: <arg> is a required argument, and [arg] is an optional argument. Please see the 'Examples' column for specific usage.
+        footer: |-
+          For more information on plugin configuration, template showcases, and other details, please visit the online documentation:
           https://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/
+        table_headers:
+          command: "Command"
+          alias: "Alias"
+          arguments: "Arguments"
+          description: "Description"
+          options: "Options"
+          examples: "Examples"

@@ -4,17 +4,22 @@ commands:
     subscribe:
       description: "[订阅本群]"
       usage: 订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。
+      examples: |-
+        订阅本群
       messages:
         subscribed: 本群已订阅，无需重复订阅。
         subscribe_success: 订阅成功。
     unsubscribe:
       description: "[取消订阅] 取消订阅本群。"
+      usage: 取消订阅本群。
+      examples: |-
+        取消订阅
       messages:
         unsubscribe_success: 取消订阅成功。
         not_subscribed: 本群尚未订阅，无需取消订阅。
     bind:
       description: "[绑定] 绑定SteamID，并起一个别名（也可以不起）。"
-      usage: 将你的SteamID与你的账号绑定，若本群已订阅将会实时获取你的新比赛数据发布至群中。
+      usage: 将你的SteamID与你的账号绑定，若本群已订阅将会实时获取你的新比赛数据发布至群中。名称中含有空格时需要使用""引号包裹(英文半角引号)。
       examples: |-
         绑定 123456789
         绑定 123456789 张三
@@ -41,11 +46,15 @@ commands:
           如需公开数据，请在DOTA2游戏内设置中公开。
     unbind:
       description: "[取消绑定] 取消绑定你的个人信息。"
+      usage: 取消绑定你的个人信息。
+      examples: |-
+        取消绑定
       messages:
         unbind_success: 取消绑定成功。
         not_binded: 尚未绑定，无需取消绑定。
     rename:
       description: "[改名] 修改绑定时设定的别名。"
+      usage: 修改绑定时设定的别名。名称中含有空格时需要使用""引号包裹(英文半角引号)。
       examples: |-
         改名 李四
         改名 "李 四"
@@ -57,6 +66,9 @@ commands:
         nick_name_same: 目标别名与原始别名相同，无需改名。
     query-members:
       description: "[查询群友] 查询本群已绑定的玩家。"
+      usage: 查询本群已绑定的玩家，生成简单信息图片发布。
+      examples: |-
+        查询群友
       messages:
         title: "本群 DOTA2 玩家名册 (共 {count} 人)"
         table_headers:
@@ -67,6 +79,7 @@ commands:
         query_failed: 查询群友失败。
     query-match:
       description: "[查询比赛] 查询指定比赛ID的比赛数据，生成图片发布。"
+      usage: 查询指定MatchID的比赛数据，生成图片发布。
       options:
         parse: -p 是否等待解析比赛数据
       examples: |-
@@ -131,6 +144,7 @@ commands:
         查询英雄 15
         查询英雄 雷泽
         查询英雄 电魂
+        查询英雄 -r
       messages:
         not_found: 未找到输入的英雄，请确认后重新输入。
         querying_hero: 正在获取英雄数据，请稍后……
@@ -159,7 +173,7 @@ commands:
         获取近期比赛记录、生涯比赛记录，根据胜场、表现分、是否手热等参数计算推荐英雄。
         参数可输入该玩家的SteamID或已在本群绑定玩家的别名，无参数时尝试查询调用指令玩家的SteamID。
       options:
-        days: -d <number> 近期天数范围，默认值为30
+        days: -d <number> 近期数据的获取范围，单位为天数，默认值为30
       examples: |-
         今日英雄
         今日英雄 -d 60
@@ -199,8 +213,24 @@ commands:
           当前不属于群聊状态，必须提供指定玩家的SteamID。
         invalid_input_include_steam_id: SteamID无效并且未在本群根据输入信息找到玩家。
     help:
-      description: "[DOTA2指南] 获取插件的详细在线文档链接。"
+      description: "[DOTA2指南] 获取插件的全部指令详细信息与在线文档链接。"
+      usage: |-
+        获取插件的全部指令详细信息与在线文档链接。
+      examples: |-
+        DOTA2指南
+        DOTA2帮助
+        DOTA2说明
       messages:
-        content: |-
-          DOTA2Tracker 详细功能指南、指令用法、算法说明，请访问在线文档：
+        header: |-
+          以下是插件的全部指令。
+          ※注意 <arg> 是必须参数，[arg] 是可选参数，具体使用方法请看“用法示例”列。
+        footer: |-
+          插件配置、模板展示等更多信息请访问在线文档：
           https://sjtdev.github.io/koishi-plugin-dota2tracker/
+        table_headers:
+          command: "指令名"
+          alias: "指令中文"
+          arguments: "参数"
+          description: "说明"
+          options: "选项"
+          examples: "用法示例"

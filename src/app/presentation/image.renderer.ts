@@ -26,6 +26,9 @@ export class ImageRenderer extends Service<Config> {
     const html = await this.generateHTML(data, { source: "CODE", code: ejsCode }, languageTag);
     return this.ctx.puppeteer.render(html);
   }
+  async renderToImageByHTML(html: string): Promise<string> {
+    return this.ctx.puppeteer.render(html);
+  }
   private async generateHTML(data: object, template: { source: "FILE"; templateName: string; type: TemplateType } | { source: "CODE"; code: string }, languageTag: string) {
     const templateData = {
       data,

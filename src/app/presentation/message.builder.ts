@@ -9,6 +9,84 @@ export class MessageBuilder extends Service<Config> {
     super(ctx, "dota2tracker.message-builder", true);
     this.config = ctx.config;
   }
+  async buildHelpMessage(languageTag: string, pluginName: string) {
+    let message = "";
+    let html = "";
+    const $t_header = (key: string) => this.ctx.dota2tracker.i18n.$t(languageTag, `commands.dota2tracker.help.messages.table_headers.${key}`);
+    const header: TableCell[] = [
+      { content: $t_header("command") },
+      { content: $t_header("alias") },
+      { content: $t_header("arguments") },
+      { content: $t_header("description") },
+      { content: $t_header("options") },
+      { content: $t_header("examples") },
+    ];
+    const table: TableCell[][] = [header];
+    const rootCommand = this.ctx.$commander.get(pluginName);
+    const commandList = rootCommand?.children;
+    for (const command of commandList) {
+      const names = Object.keys(command._aliases);
+      const localeKey = "commands." + names.at(0);
+      const optionsFromCommand = command._options;
+      const localeData = this.ctx.i18n._data[languageTag];
+      const formattedOptions = [];
+      if (optionsFromCommand) {
+        // 遍历指令对象中定义的选项名 (key 就是 'parse', 'template' 等)
+        for (const optionKey in optionsFromCommand) {
+          // 1. 动态构造出我们需要的、完整的 i18n 键
+          const i18nKey = `commands.${command.name}.options.${optionKey}`;
+
+          // 2. 用这个精确的键，直接去扁平化的数据对象中取值
+          let description = localeData[i18nKey];
+          const optionInfo = optionsFromCommand[optionKey];
+
+          if (optionInfo && description) {
+            const syntax = optionInfo.syntax; // 例: '-p, --parse'
+
+            // 步骤 1: 从 syntax 中提取所有标志
+            const flagsRegex = /-{1,2}[a-zA-Z-]+/g;
+            const flags = syntax.match(flagsRegex); // 结果: ['-p', '--parse'] 或 null
+
+            // 步骤 2: 使用提取的标志去清理 description
+            if (flags) {
+              for (const flag of flags) {
+                // 检查 description 是否以 "标志 + 空格" 开头
+                if (description.startsWith(flag + " ")) {
+                  // 如果是，就截取掉这部分
+                  description = description.substring(flag.length + 1);
+                  // 通常找到第一个匹配的就可以退出了
+                  break;
+                }
+              }
+            }
+
+            // 步骤 3: 组合最终结果
+            formattedOptions.push({
+              // 现在 description 已经是被清理过的干净版本了
+              syntax: `[${syntax}]`,
+              description: description,
+            });
+          }
+        }
+      }
+
+      const row: TableCell[] = [
+        { content: command.name },
+        { content: names.slice(1).join("\n") },
+        { content: command._arguments["stripped"] },
+        { content: this.ctx.dota2tracker.i18n.$t(languageTag, localeKey + ".usage") },
+        { content: formattedOptions.map((option) => `${option.syntax} ${option.description}`).join("\n") },
+        { content: this.ctx.dota2tracker.i18n.$t(languageTag, localeKey + ".examples") },
+      ];
+      table.push(row);
+    }
+
+    html += this._createTableHTML(table, undefined, this.ctx.i18n._data[languageTag]["commands.dota2tracker.help.messages.header"]); // 这里由于直接使用$t会被错误转义，导致koishi会对<arg>错误地添加一个</arg>闭合标签，所以使用_data直接获取rawData
+    // message += await this.ctx.dota2tracker.image.renderToImageByHTML( html);
+    message += await this.ctx.dota2tracker.image.renderToImageByEJSCode(undefined, html, languageTag);
+    message += this.ctx.dota2tracker.i18n.$t(languageTag, "commands.dota2tracker.help.messages.footer");
+    return message;
+  }
 
   async buildHeroOfTheDayMessage(
     languageTag: string,
@@ -216,6 +294,47 @@ export class MessageBuilder extends Service<Config> {
       curr: { medal: this.ctx.dota2tracker.i18n.$t(languageTag, "dota2tracker.template.ranks." + currRank.medal), star: currRank.star },
     });
   }
+  private _createTableHTML(data: TableCell[][], totalAlign: "left" | "center" | "right" = "left", header?: string) {
+    const maxLength = data.reduce((max, row) => Math.max(max, row.length), 0);
+    let html = `<html><head><style>body{width:fit-content;height:fit-content;margin:0;padding:12px;font-family:${this.config.templateFonts};}.table div:not(.row){background-color: #fff;padding: 4px;}</style></head><body>`;
+    if (header) html += `<header>${escapeHtml(header)}</header>`;
+    html += `<div class="table" style="display:grid;grid-template-columns:repeat(${maxLength},auto);background-color:#000;gap:1px;border:#000 solid 1px;text-align:${totalAlign}">`;
+    for (const row of data) {
+      html += `<div class="row" style="display:contents;">`;
+      for (const cell of row) {
+        const style = {
+          ...(cell.align ? { "text-align": cell.align } : {}),
+          ...(cell.colSpan ? { "grid-column": "span " + cell.colSpan } : {}),
+          ...(cell.rowSpan ? { "grid-row": "span " + cell.rowSpan } : {}),
+        };
+        const styleStr = Object.entries(style)
+          .map(([key, value]) => `${key}:${value}`)
+          .join(";");
+        const styleAttribute = styleStr ? ` style="${styleStr}"` : "";
+        html += `<div${styleAttribute}>${escapeHtml(cell.content)}</div>`;
+      }
+      html += `</div>`;
+    }
+
+    html += `</div></body></html>`;
+    return html;
+    function escapeHtml(str: string): string {
+      return (
+        (str || "")
+          .replace(/[&<>"']/g, function (match) {
+            return {
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[match];
+          })
+          // 补充\n替换为<br/>的代码
+          .replace(/\n/g, "<br/>")
+      );
+    }
+  }
 }
 function customConvertArrayOfString(str: string): string[] {
   try {
@@ -224,3 +343,10 @@ function customConvertArrayOfString(str: string): string[] {
     throw error;
   }
 }
+
+type TableCell = {
+  content: string;
+  align?: "left" | "center" | "right";
+  colSpan?: number;
+  rowSpan?: number;
+};

@@ -1,5 +1,5 @@
 import { Context } from "koishi";
-import { } from "koishi-plugin-cron";
+import {} from "koishi-plugin-cron";
 import path from "path";
 import { I18NService } from "./app/common/i18n.ts";
 import { HeroService } from "./app/core/hero.service.ts";

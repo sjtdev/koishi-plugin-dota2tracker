@@ -7,6 +7,8 @@ export function registerHelpCommand(ctx: Context) {
     .alias("DOTA2帮助")
     .alias("DOTA2说明")
     .action(async ({ session }) => {
-      return session.text(".content");
+      const languageTag = await ctx.dota2tracker.i18n.getLanguageTag({ session });
+      const pluginName = "dota2tracker";
+      return ctx.dota2tracker.messageBuilder.buildHelpMessage(languageTag, pluginName);
     });
 }
