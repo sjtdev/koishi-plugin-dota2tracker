@@ -4,7 +4,7 @@ import { Config } from "../../config";
 
 export function registerQueryItemCommand(ctx: Context) {
   ctx
-    .command("dota2tracker.query-item")
+    .command("dota2tracker.query-item <input_data>")
     .alias("查询物品")
     .action(async ({ session }, input_data) => {
       // 1. 处理无输入的情况
