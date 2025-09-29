@@ -1,7 +1,14 @@
 # 更新日志
 
 
-## [2.1.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.0.4...v2.1.0) (2025-09-27)
+### [2.1.1](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.1.0...v2.1.1) (2025-09-29)
+
+
+### 🚀 功能优化
+
+* 优化`DOTA2指南`指令，由仅发送文档链接扩展为还会展示一张包含了全部指令信息以及使用方法的图片 ([#11](https://github.com/sjtdev/koishi-plugin-dota2tracker/issues/11)) ([172c36a](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/172c36aded4546b425df3e5e66dbcbaa886fa38b))
+
+### [2.1.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.0.4...v2.1.0) (2025-09-27)
 
 
 ### ✨ 新增功能
