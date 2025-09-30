@@ -109,13 +109,19 @@ export class ParsePollingTask extends Service<Config> {
       const pendingMatch = matches[this.pollingIndex];
       this.pollingIndex++;
       // 是否仍需等待
-      const timeout = DateTime.fromJSDate(pendingMatch.requestTime).plus({ minutes: this.config.dataParsingTimeoutMinutes });
+      const requestTime = DateTime.fromJSDate(pendingMatch.requestTime);
+      const timeout = requestTime.plus({ minutes: this.config.dataParsingTimeoutMinutes });
       const needToWait = DateTime.now() < timeout;
       // 得到比赛状态
       const result = await this.ctx.dota2tracker.match.getMatchResult({ matchId: pendingMatch.matchId, requestParse: needToWait });
       // 是否仍然处于等待中
       if (result.status === "PENDING") {
         // logger
+        const waitingTime = DateTime.now().diff(requestTime, "minutes");
+        const waitingTimeMinutes = Math.floor(waitingTime.minutes);
+        if (waitingTimeMinutes > 0 && waitingTimeMinutes % 5 === 0) {
+          this.logger.info(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.waiting_for_parse", { matchId: pendingMatch.matchId, time: waitingTimeMinutes }));
+        }
         return;
       }
       if (result.status === "READY") {

@@ -161,7 +161,7 @@ dota2tracker:
     parse_request_failed: The parsing request for match {matchId} failed to send.
     match_parsed: Match {matchId} has been parsed, an image was generated and published to {#each guilds as guild}{guild.platform}:{guild.guildId}{#if guild !== guilds[guilds.length - 1]}, {/if}{/each}.
     match_unparsed: Match {matchId} exceeded the waiting time [{timeout}] and remains unparsed, an image was generated and published to {#each guilds as guild}{guild.platform}:{guild.guildId}{#if guild !== guilds[guilds.length - 1]}, {/if}{/each}.
-    waiting_for_parse: Match {matchId} is still being parsed, continue waiting.
+    waiting_for_parse: Match {matchId} has not been parsed yet, has been waiting for {time} minutes.
     report_sent: Posted {title} on {platform}:{guildId}.
     rank_sent: Posted rank change information of {player.nickName} ({player.steamId}) on {platform}:{guildId}.
     ejs_error: "Error rendering EJS template: {error}"
