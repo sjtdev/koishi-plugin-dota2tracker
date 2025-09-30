@@ -144,7 +144,7 @@ dota2tracker:
     rank_changed: 群友 {name} 段位变动：{prev.medal}{prev.star} → {curr.medal}{curr.star}
   logger:
     fetch_guilds_failed: 获取群组信息失败，将继续后续步骤。
-    match_tracked: '追踪到来自{#each messageToLogger as item}群组 {item.platform}:{item.guildId} 的玩家 [{#each item.players as player}{player.nickname}({player.steamId}){#if player !== item.players[item.players.length - 1]}、{/if}{/each}]{#if item !== messageToLogger[messageToLogger.length - 1]}、{/if}{/each}的尚未播报过的最新比赛 {match.id}。'
+    match_tracked: '追踪到最新比赛 {match.id} 来自{#each messageToLogger as item}群组 {item.platform}:{item.guildId} 的玩家 [{#each item.players as player}{player.nickname}({player.steamId}){#if player !== item.players[item.players.length - 1]}、{/if}{/each}]{#if item !== messageToLogger[messageToLogger.length - 1]}、{/if}{/each}。'
     parse_request_sent: 比赛 {matchId} 解析请求已成功发送至STRATZ服务器。
     parse_request_failed: 比赛 {matchId} 解析请求发送失败。
     match_parsed: 比赛 {matchId} 已解析，生成图片并发布于{#each guilds as guild}{guild.platform}:{guild.guildId}{#if guild !== guilds[guilds.length - 1]}、{/if}{/each}。

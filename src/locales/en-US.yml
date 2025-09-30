@@ -156,7 +156,7 @@ dota2tracker:
     rank_changed: "Player {name} rank changed: {prev.medal} {prev.star} → {curr.medal} {curr.star}"
   logger:
     fetch_guilds_failed: Failed to fetch guild information.
-    match_tracked: "Tracked a new, unbroadcasted match {match.id} from {#each messageToLogger as item}users in guild {item.platform}:{item.guildId} [{#each item.players as player}{player.nickname}({player.steamId}){#if player !== item.players[item.players.length - 1]}, {/if}{/each}]{#if item !== messageToLogger[messageToLogger.length - 1]}, {/if}{/each}."
+    match_tracked: "Tracked new match {match.id} from {#each messageToLogger as item}users in guild {item.platform}:{item.guildId} [{#each item.players as player}{player.nickname}({player.steamId}){#if player !== item.players[item.players.length - 1]}, {/if}{/each}]{#if item !== messageToLogger[messageToLogger.length - 1]}, {/if}{/each}."
     parse_request_sent: The parsing request for match {matchId} has been successfully sent to the STRATZ server.
     parse_request_failed: The parsing request for match {matchId} failed to send.
     match_parsed: Match {matchId} has been parsed, an image was generated and published to {#each guilds as guild}{guild.platform}:{guild.guildId}{#if guild !== guilds[guilds.length - 1]}, {/if}{/each}.
