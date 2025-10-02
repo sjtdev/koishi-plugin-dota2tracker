@@ -35,6 +35,17 @@
 >     dota2tracker.player: 3
 > ```
 
+#### enableOpenDotaFallback: 
+- 开启后，使用 OpenDotaAPI 作为`战报追踪`与`查询比赛`的后备数据源，在轮询 stratz 比赛数据时同步请求 OpenDota 比赛数据。
+- 当前调用策略为每场比赛每分钟获取一次数据，每5分钟发送一次解析请求，解析请求占10次调用次数。
+> - OpenDotaAPI 免费限额每天2000次，且免费调用无APIKEY，推测可能使用IP限制。
+> - 基于以上推测，可能有一种极小概率事件，也就是插件的OpenDotaAPI调用次数远不足2000次时却被限制，很可能是因为公用IP环境中有其他的OpenDotaAPI调用者占用了次数。
+
+#### OPENDOTA_API_KEY
+- OpenDota 的订阅付费APIKEY，  
+- 可在 https://www.opendota.com/api-keys 查看详情。  
+- OpenDota 的免费用户此处请留空。
+
 ### 消息设置
 
 #### useHeroNicknames `boolean`

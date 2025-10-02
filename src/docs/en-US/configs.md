@@ -34,6 +34,17 @@
 >     dota2tracker.player: 3
 > ```
 
+#### enableOpenDotaFallback: 
+- When enabled, uses the OpenDota API as a fallback data source for `match tracking` and `query-match` features. It requests data from OpenDota in parallel while polling for Stratz data.
+- The current request strategy is to fetch data once per minute for each match and send a parse request every 5 minutes. A parse request counts as 10 API calls.
+> - The OpenDota API free tier is limited to 2000 calls per day and is likely rate-limited by IP address as it does not require an API key.
+> - Based on this, a rare situation may occur: the plugin could be rate-limited even when its own daily call count is low. This is likely because other users on a shared public IP (e.g., VPN, corporate/university network) have consumed the shared quota.
+
+#### OPENDOTA_API_KEY
+- Your paid subscription API key for OpenDota.
+- See https://www.opendota.com/api-keys for details.
+- Free users should leave this blank.
+
 ### Message Settings
 
 #### useHeroNicknames `boolean`

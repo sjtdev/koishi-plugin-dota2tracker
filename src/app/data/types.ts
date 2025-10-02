@@ -6,6 +6,7 @@ export interface MatchInfoEx extends NonNullable<graphql.MatchInfoQuery["match"]
   party: { [key: string]: string };
   players: PlayerInfoExInMatch[];
   durationTime: string;
+  odParsed?: boolean
 }
 interface MatchInfoExTeam {
   killsCount: number;

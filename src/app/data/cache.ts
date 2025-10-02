@@ -12,6 +12,7 @@ declare module "@koishijs/cache" {
     dt_previous_query_results: { data: graphql.MatchInfoQuery; pluginVersion: string };
     dt_sended_match_id: undefined;
     dt_weekly_metadata: WeeklyHeroMeta;
+    dt_opendota_api_request_log: { count: number; request: string };
   }
 }
 
@@ -25,6 +26,18 @@ export class CacheService extends Service {
     const endOfDay = now.endOf("day");
     const ttl = endOfDay.diff(now).toMillis();
     return ttl;
+  }
+
+  addOpendotaAPIRequestLog(request: string, count: number = 1) {
+    this.ctx.cache.set("dt_opendota_api_request_log", String(Date.now()), { count, request }, this.msUntilUTCEndOfDay);
+  }
+
+  async getTodayOpendotaAPIRequestCount() {
+    let count = 0;
+    for await (const value of this.ctx.cache.values("dt_opendota_api_request_log")) {
+      count += value.count;
+    }
+    return count;
   }
 
   setWweeklyMetaCache(key: string, value: WeeklyHeroMeta) {

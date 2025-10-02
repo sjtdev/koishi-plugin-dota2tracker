@@ -31,6 +31,7 @@ dota2tracker:
     lane_tie: Lane ==
     analysis_successful: Analysis successful
     analysis_incomplete: Analysis incomplete
+    analysis_by_opendota: Analysis by OpenDota
     kill: Kill
     kill_contribution_: "KC: {0}"
     position: Position

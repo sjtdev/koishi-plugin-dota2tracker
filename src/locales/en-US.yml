@@ -159,7 +159,7 @@ dota2tracker:
     match_tracked: "Tracked new match {match.id} from {#each messageToLogger as item}users in guild {item.platform}:{item.guildId} [{#each item.players as player}{player.nickname}({player.steamId}){#if player !== item.players[item.players.length - 1]}, {/if}{/each}]{#if item !== messageToLogger[messageToLogger.length - 1]}, {/if}{/each}."
     parse_request_sent: The parsing request for match {matchId} has been successfully sent to the STRATZ server.
     parse_request_failed: The parsing request for match {matchId} failed to send.
-    match_parsed: Match {matchId} has been parsed, an image was generated and published to {#each guilds as guild}{guild.platform}:{guild.guildId}{#if guild !== guilds[guilds.length - 1]}, {/if}{/each}.
+    match_parsed: Match {matchId} has been parsed{#if odParsed} by OpenDota{/if}, an image was generated and published to {#each guilds as guild}{guild.platform}:{guild.guildId}{#if guild !== guilds[guilds.length - 1]}, {/if}{/each}.
     match_unparsed: Match {matchId} exceeded the waiting time [{timeout}] and remains unparsed, an image was generated and published to {#each guilds as guild}{guild.platform}:{guild.guildId}{#if guild !== guilds[guilds.length - 1]}, {/if}{/each}.
     waiting_for_parse: Match {matchId} has not been parsed yet, has been waiting for {time} minutes.
     report_sent: Posted {title} on {platform}:{guildId}.
@@ -168,6 +168,9 @@ dota2tracker:
     cron_not_enabled: "Cron service is not enabled; match report tracking cannot run."
     stratz_token_banned: "Stratz API request denied (403). This usually means your token or IP has been temporarily restricted due to unusual activity. For details, see the documentation: http://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/api-403.html"
     stratz_api_query_error: "Stratz API returned partial data with errors: {cause}"
+    opendota_parse_request_on_later: "OpenDota fallback is enabled. A parse request will be sent to OpenDota every {timeout} minutes, and the status will be checked every minute."
+    opendota_parse_request_sent: "Parse request for match {matchId} has been sent to OpenDota servers successfully."
+    opendota_parse_request_failed: "Failed to send parse request for match {matchId} to OpenDota servers."
   time:
     years_months_ago: "{years} years and {months} months ago"
     years_ago: "{years} years ago"

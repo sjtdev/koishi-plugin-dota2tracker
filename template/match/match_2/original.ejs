@@ -30,7 +30,7 @@
 <nav>
     <div class="match_id">
         <p><%= $t("dota2tracker.template.match_id_").slice(0, -1) %> <%-match.id%></p>
-        <p class="<%-match.parsedDateTime?'success':'fail'%>"><!--伪类赋值：类名输入success时此处为※录像分析成功，fail为※分析结果不完整，同时自动应用字体颜色样式。--></p>
+        <p class="<%-match.odParsed?"opendota":(match.parsedDateTime?'success':'fail')%>"><!--伪类赋值：类名输入success时此处为※录像分析成功，fail为※分析结果不完整，同时自动应用字体颜色样式。--></p>
     </div>
     <div class="start_time">
         <p><%= $t("dota2tracker.template.start_time_").slice(0, -1) %></p>
@@ -48,7 +48,7 @@
         <p><%= $t("dota2tracker.template.game_mode_").slice(0, -1) %></p>
         <p><%-$t("dota2tracker.template.lobby_types."+match.lobbyType) || match.lobbyType%>/<%-$t("dota2tracker.template.game_modes."+match.gameMode) || match.gameMode%></p>
     </div>
-    <div class="rank">
+    <div class="rank"<%- match.odParsed && match.lobbyType !== "RANKED" ? ` style="filter:grayscale(1)"` : "" %>>
         <img src="<%-getImageUrl('medal_' + (match.rank?.toString().split('')[0] ?? '0'))%>" alt="" />
         <img style="z-index: 1;" src="<%-getImageUrl('star_' + (match.rank?.toString().split('')[1] ?? '0'))%>" alt="" />
     </div>

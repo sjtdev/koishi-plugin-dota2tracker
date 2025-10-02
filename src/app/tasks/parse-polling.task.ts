@@ -93,7 +93,12 @@ export class ParsePollingTask extends Service<Config> {
     this.pendingMatches.set(matchId, entry);
 
     if (isNewEntry) {
-      this.ctx.dota2tracker.stratzAPI.requestParseMatch(matchId).then((value) => this.logger.info(this.ctx.dota2tracker.i18n.gt(`dota2tracker.logger.parse_request_${value ? "sent" : "failed"}`, { matchId })));
+      this.ctx.dota2tracker.stratzAPI.requestParseMatch(matchId).then((value) => {
+        this.logger.info(this.ctx.dota2tracker.i18n.gt(`dota2tracker.logger.parse_request_${value ? "sent" : "failed"}`, { matchId }));
+        if (this.config.enableOpenDotaFallback) {
+          this.logger.info(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.opendota_parse_request_on_later", { timeout: 5 }));
+        }
+      });
     }
   }
 
@@ -113,14 +118,19 @@ export class ParsePollingTask extends Service<Config> {
       const timeout = requestTime.plus({ minutes: this.config.dataParsingTimeoutMinutes });
       const needToWait = DateTime.now() < timeout;
       // 得到比赛状态
-      const result = await this.ctx.dota2tracker.match.getMatchResult({ matchId: pendingMatch.matchId, requestParse: needToWait });
+      const result = await this.ctx.dota2tracker.match.getMatchResult({ matchId: pendingMatch.matchId, requestParse: needToWait, requsetOpenDota: this.config.enableOpenDotaFallback });
       // 是否仍然处于等待中
       if (result.status === "PENDING") {
-        // logger
+        // 该场比赛已等待时间
         const waitingTime = DateTime.now().diff(requestTime, "minutes");
         const waitingTimeMinutes = Math.floor(waitingTime.minutes);
+        // 大于0分钟且每5分钟一次
         if (waitingTimeMinutes > 0 && waitingTimeMinutes % 5 === 0) {
           this.logger.info(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.waiting_for_parse", { matchId: pendingMatch.matchId, time: waitingTimeMinutes }));
+          if (this.config.enableOpenDotaFallback)
+            this.ctx.dota2tracker.opendotaAPI
+              .requestParseMatch(pendingMatch.matchId)
+              .then((value) => this.logger.info(this.ctx.dota2tracker.i18n.gt(`dota2tracker.logger.opendota_parse_request_${value ? "sent" : "failed"}`, { matchId: pendingMatch.matchId })));
         }
         return;
       }
@@ -166,6 +176,7 @@ export class ParsePollingTask extends Service<Config> {
             matchId: result.matchData.match.id,
             timeout: this.config.dataParsingTimeoutMinutes,
             guilds: guildsToLogger,
+            odParsed: result.matchData.match["odParsed"],
           }),
         );
         // 在缓存中标记该比赛已发送

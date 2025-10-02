@@ -13,11 +13,28 @@ export class MatchService extends Service {
     super(ctx, "dota2tracker.match", true);
   }
 
-  public async getMatchResult({ matchId, requestParse }: { matchId: number; requestParse?: boolean }): Promise<{ status: "READY"; matchData: graphql.MatchInfoQuery } | { status: "PENDING"; matchId: number } | { status: "NOT_FOUND" }> {
+  public async getMatchResult({
+    matchId,
+    requestParse,
+    requsetOpenDota,
+  }: {
+    matchId: number;
+    requestParse?: boolean;
+    requsetOpenDota?: boolean;
+  }): Promise<{ status: "READY"; matchData: graphql.MatchInfoQuery } | { status: "PENDING"; matchId: number } | { status: "NOT_FOUND" }> {
     const matchQuery = await this.getMatchData(matchId);
     if (matchQuery) {
       // 未解析 & 请求解析 & 存在 cron
       if (!MatchService.isMatchParsed(matchQuery) && requestParse && this.ctx.cron) {
+        if (requsetOpenDota) {
+          const odMatchQuery = await this.getOpenDotaMatchData(matchId);
+          if (odMatchQuery) {
+            return {
+              status: "READY",
+              matchData: odMatchQuery,
+            };
+          }
+        }
         return {
           status: "PENDING",
           matchId,
@@ -58,18 +75,38 @@ export class MatchService extends Service {
     }
   }
 
+  private async getOpenDotaMatchData(matchId: number): Promise<graphql.MatchInfoQuery> {
+    const odMatch = await this.ctx.dota2tracker.opendotaAPI.queryMatchInfo(matchId);
+    if (odMatch?.od_data?.has_parsed) {
+      const odMatchQuery = { match: this.ctx.dota2tracker.opendotaAdapter.transform(odMatch) };
+      this.ctx.dota2tracker.cache.setMatchCache(matchId, odMatchQuery, this.pluginVersion);
+      return odMatchQuery;
+    }
+  }
+
   private async formatMatchData(matchQuery: graphql.MatchInfoQuery, languageTag: string): Promise<MatchInfoEx> {
     try {
       // Step 3: 检查Constants缓存
       let constantsQuery: graphql.ConstantsQuery = await this.ctx.dota2tracker.cache.getFacetConstantsCache(languageTag);
-      // 如果缓存不存在，或缓存的版本与当前版本不一致，则重新查询并更新缓存
-      if (
-        !constantsQuery || // 缓存中没有 constants
-        !matchQuery.constants.gameVersions?.[0]?.id || // 当前版本信息无效
-        !constantsQuery.constants.gameVersions?.[0]?.id || // 缓存版本信息无效
-        matchQuery.constants.gameVersions[0].id !== constantsQuery.constants.gameVersions[0].id // 当前版本与缓存版本不匹配
-      )
+      const isFromOpenDota = (matchQuery.match as any)?.odParsed === true;
+
+      // 定义一个变量来决定是否需要重新获取 constants
+      let needsRefetch = false;
+
+      if (!constantsQuery) {
+        // 1. 如果缓存本身就为空，则必须获取
+        needsRefetch = true;
+      } else if (!isFromOpenDota) {
+        // 2. 如果数据源是 Stratz，则进行版本校验
+        if (!matchQuery.constants?.gameVersions?.[0]?.id || !constantsQuery.constants?.gameVersions?.[0]?.id || matchQuery.constants.gameVersions[0].id !== constantsQuery.constants.gameVersions[0].id) {
+          needsRefetch = true;
+        }
+      }
+      // (如果数据源是 OpenDota，且缓存存在，则 needsRefetch 保持 false，直接使用缓存)
+
+      if (needsRefetch) {
         constantsQuery = await this.ctx.dota2tracker.stratzAPI.queryConstants(languageTag);
+      }
       const facetData = await MatchService.constantsInjectFacetData(constantsQuery, matchQuery, languageTag, this.ctx.dota2tracker.hero);
       this.ctx.dota2tracker.cache.setFacetConstantsCache(languageTag, constantsQuery);
       // Step 4: 扩展比赛数据
@@ -87,9 +124,9 @@ export class MatchService extends Service {
     for (let player of (matchQuery.match as MatchInfoEx).players) {
       // 命石处理
       if (player.variant != null) {
-        const constantsFacet = constantsQuery.constants.facets.find((facet) => facet.id == player.hero.facets[player.variant - 1]?.facetId);
+        const constantsFacet = constantsQuery.constants.facets.find((facet) => facet.id === player.hero.facets[player.variant - 1]?.facetId || facet.name === player.hero.facets[player.variant - 1]?.name);
 
-        let displayName = constantsFacet.language?.displayName;
+        let displayName = constantsFacet?.language?.displayName;
         if (!displayName && heroService) {
           const valveFacet = (await heroService.getHeroDetails(player.hero.id, languageTag)).facets.find((facet) => facet.index === player.variant - 1);
 
@@ -413,8 +450,8 @@ export class MatchService extends Service {
     return match;
   }
 
-  private static isMatchParsed(match: graphql.MatchInfoQuery) {
-    return match.match?.parsedDateTime && match.match.players.filter((player) => player?.stats?.heroDamageReport?.dealtTotal).length > 0;
+  private static isMatchParsed(matchQuery: graphql.MatchInfoQuery) {
+    return matchQuery?.match?.parsedDateTime && matchQuery?.match?.players.filter((player) => player?.stats?.heroDamageReport?.dealtTotal).length > 0;
   }
 }
 
