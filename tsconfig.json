@@ -3,7 +3,7 @@
     "rootDir": "src",
     "outDir": "lib",
     "target": "es2022",
-    "lib": ["es2022", "ES2023"],
+    "lib": ["es2022"],
     "module": "ESNext",
     "noEmit": true,
     "allowImportingTsExtensions": true,
