@@ -1,6 +1,6 @@
 import { Context, Service, Session } from "koishi";
 import * as graphql from "../../@types/graphql-generated";
-import { MatchInfoEx, PlayerTypeEx, PlayerInfoEx } from "../data/types";
+import { MatchInfoEx, PlayerInfoExInMatch, PlayerInfoEx } from "../data/types";
 import * as dotaconstants from "dotaconstants";
 import { sec2time, formatNumber } from "../common/utils";
 import { HeroService } from "./hero.service";
@@ -104,7 +104,7 @@ export class MatchService extends Service {
   }
 
   // 对比赛数据进行补充以供生成模板函数使用
-  public static extendMatchData(matchQuery: graphql.MatchInfoQuery, facetData: Record<string, PlayerTypeEx["facet"]>): MatchInfoEx {
+  public static extendMatchData(matchQuery: graphql.MatchInfoQuery, facetData: Record<string, PlayerInfoExInMatch["facet"]>): MatchInfoEx {
     const match = matchQuery.match as MatchInfoEx;
     // if (!match.parsedDateTime)
     //     return match;
@@ -157,7 +157,7 @@ export class MatchService extends Service {
     laneResult.bottom = processLaneOutcome(match.bottomLaneOutcome);
 
     // 遍历所有玩家，为需要的数据进行处理
-    match.players.forEach((player: PlayerTypeEx) => {
+    match.players.forEach((player: PlayerInfoExInMatch) => {
       // 储存玩家所属队伍（字符串类型非队伍对象）
       player.team = player.isRadiant ? "radiant" : "dire";
       // 储存玩家分段
@@ -338,15 +338,15 @@ export class MatchService extends Service {
         const primaryComparison = primaryMode === ComparisonMode.Max ? player[primaryProperty] > result[primaryProperty] : player[primaryProperty] < result[primaryProperty];
         const secondaryComparison = secondaryMode === ComparisonMode.Max ? player[secondaryProperty] > result[secondaryProperty] : player[secondaryProperty] < result[secondaryProperty];
         if (primaryComparison) {
-          return player as PlayerTypeEx; // 主属性决定返回哪个玩家
+          return player as PlayerInfoExInMatch; // 主属性决定返回哪个玩家
         } else if (player[primaryProperty] === result[primaryProperty] && secondaryProperty && secondaryComparison) {
           // 主属性相同，检查次属性
-          return player as PlayerTypeEx;
+          return player as PlayerInfoExInMatch;
         }
-        return result as PlayerTypeEx; // 保持当前结果
+        return result as PlayerInfoExInMatch; // 保持当前结果
       });
 
-      return (maxPlayer[primaryProperty] > 0 ? maxPlayer : null) as PlayerTypeEx; // 如果最大属性为0，则不返回玩家对象
+      return (maxPlayer[primaryProperty] > 0 ? maxPlayer : null) as PlayerInfoExInMatch; // 如果最大属性为0，则不返回玩家对象
     }
     findMaxByProperty(
       "mvpScore",
@@ -367,7 +367,7 @@ export class MatchService extends Service {
           max.stats.heroDamageReport.dealtTotal.stunDuration + max.stats.heroDamageReport.dealtTotal.disableDuration / 2 + max.stats.heroDamageReport.dealtTotal.slowDuration / 4
             ? player
             : max,
-        ) as PlayerTypeEx
+        ) as PlayerInfoExInMatch
       ).titles.push("dota2tracker.template.titles.Controller");
       (
         match.players.reduce((max, player) =>
@@ -375,7 +375,7 @@ export class MatchService extends Service {
           max.stats.heroDamageReport.receivedTotal.physicalDamage + max.stats.heroDamageReport.receivedTotal.magicalDamage + max.stats.heroDamageReport.receivedTotal.pureDamage
             ? player
             : max,
-        ) as PlayerTypeEx
+        ) as PlayerInfoExInMatch
       ).titles.push("dota2tracker.template.titles.Tank");
     }
     findMaxByProperty("heroDamage")?.titles.push("dota2tracker.template.titles.Nuker");
@@ -386,7 +386,7 @@ export class MatchService extends Service {
     findMaxByProperty("towerDamage", "heroDamage")?.titles.push("dota2tracker.template.titles.Demolisher");
     findMaxByProperty("heroHealing")?.titles.push("dota2tracker.template.titles.Healer");
     (
-      match.players.reduce((lowest: PlayerTypeEx, player: PlayerTypeEx) => {
+      match.players.reduce((lowest: PlayerInfoExInMatch, player: PlayerInfoExInMatch) => {
         const currentContribution = (player.kills + player.assists) / match[player.team].killsCount;
         const lowestContribution = (lowest.kills + lowest.assists) / match[lowest.team].killsCount;
 
@@ -405,7 +405,7 @@ export class MatchService extends Service {
           }
         }
         return lowest; // 保持当前最低的玩家
-      }) as PlayerTypeEx
+      }) as PlayerInfoExInMatch
     ).titles.push("dota2tracker.template.titles.Idle");
 
     match.durationTime = sec2time(match.durationSeconds);

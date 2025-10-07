@@ -4,7 +4,7 @@ export interface MatchInfoEx extends NonNullable<graphql.MatchInfoQuery["match"]
   radiant: MatchInfoExTeam;
   dire: MatchInfoExTeam;
   party: { [key: string]: string };
-  players: PlayerTypeEx[];
+  players: PlayerInfoExInMatch[];
   durationTime: string;
 }
 interface MatchInfoExTeam {
@@ -15,7 +15,7 @@ interface MatchInfoExTeam {
   experience: number;
 }
 type PlayerType = NonNullable<graphql.MatchInfoQuery["match"]["players"]>[number];
-export interface PlayerTypeEx extends PlayerType {
+export interface PlayerInfoExInMatch extends PlayerType {
   team: "radiant" | "dire";
   rank: RankInfo;
   killContribution: number;
@@ -38,6 +38,9 @@ export interface PlayerTypeEx extends PlayerType {
   facet: { id: number; name: string; displayName: string; color: string; icon: string };
   formattedNetworth: string;
   utilityScore: number;
+  hero: PlayerType["hero"] & {
+    facets?: (PlayerType["hero"]["facets"][number] & { name?: string })[];
+  };
 }
 export interface RankInfo {
   medal: number;
