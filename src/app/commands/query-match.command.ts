@@ -45,7 +45,7 @@ async function handleQueryMatchCommand(ctx: Context, config: Config, session: Se
   if (result.status === "PENDING") {
     const subscriber = ctx.dota2tracker.parsePolling.createSubscriberByCommand(session, languageTag, { templateName: options?.template });
     ctx.dota2tracker.parsePolling.add(result.matchId, [subscriber]);
-    return session.text(".waiting_for_parse");
+    return session.text("commands.dota2tracker.query-match.messages.waiting_for_parse");
   } else if (result.status === "NOT_FOUND") {
     return session.text(".query_failed");
   } else {
