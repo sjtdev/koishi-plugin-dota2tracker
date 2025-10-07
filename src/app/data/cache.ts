@@ -3,6 +3,7 @@ import * as graphql from "../../@types/graphql-generated";
 import { ItemList, WeeklyHeroMeta } from "./types";
 import { DAYS_30 } from "../common/constants";
 import { Context, Service } from "koishi";
+import { DateTime } from "luxon";
 
 declare module "@koishijs/cache" {
   interface Tables {
@@ -19,8 +20,15 @@ export class CacheService extends Service {
     super(ctx, "dota2tracker.cache", true);
   }
 
-  setWweeklyMetaCache(key: string, value: WeeklyHeroMeta, time: number) {
-    this.ctx.cache.set("dt_weekly_metadata", key, value, time);
+  private get msUntilUTCEndOfDay() {
+    const now = DateTime.utc();
+    const endOfDay = now.endOf("day");
+    const ttl = endOfDay.diff(now).toMillis();
+    return ttl;
+  }
+
+  setWweeklyMetaCache(key: string, value: WeeklyHeroMeta) {
+    this.ctx.cache.set("dt_weekly_metadata", key, value, this.msUntilUTCEndOfDay);
   }
 
   async getWeeklyMetaCache(key: string): Promise<WeeklyHeroMeta> {

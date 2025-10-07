@@ -49,10 +49,7 @@ export class HeroService extends Service {
         hero.winRate = hero.matchCount > 0 ? hero.winCount / hero.matchCount : 0;
       });
     }
-    const now = DateTime.utc();
-    const endOfDay = now.endOf("day");
-    const ttl = endOfDay.diff(now).toMillis();
-    this.ctx.dota2tracker.cache.setWweeklyMetaCache(cacheKey, weeklyHeroMeta, ttl);
+    this.ctx.dota2tracker.cache.setWweeklyMetaCache(cacheKey, weeklyHeroMeta);
     return weeklyHeroMeta;
   }
 
