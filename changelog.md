@@ -1,13 +1,10 @@
 # 更新日志
 
-
 ## [2.2.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.1.1...v2.2.0) (2025-10-08)
 
+### ✨ 新增功能
 
-### ⏪ 回滚
-
-* 回滚加入的"ES2023"库，并放弃使用"toSorted"函数，以满足koishi最低nodejs18+的版本要求。 ([3d26c86](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/3d26c864f80e5ed1ae9ae92f0575aa372b297543))
-
+* **opendota:** 新增`opendota`备用数据源，在配置页开启选项后，使用`战报追踪`、`查询比赛`的等待解析功能时在等待stratz数据时同步对opendota发送解析请求并获取比赛数据。 ([a0662ae](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/a0662ae2393b49577f5a0d40b02369482260a774))
 
 ### 🐛 Bug 修复
 
@@ -15,15 +12,13 @@
 * 修复`查询最近比赛`等待解析的消息提示不正确的问题。 ([a3b0a77](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/a3b0a77ffaf581f7cef0244a1f112438d1326f48))
 * 修复cron未加载时的日志输出提示的命名空间不正确的问题。 ([0c7fc97](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/0c7fc97f48c3f408fb5362818937594d5bcc723d))
 
-
 ### 📝 文档
 
 * 配置说明页补充stratzAPI页面链接 ([743e2ef](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/743e2ef1ba6d96bd0c66eca2b43be53ce1b568ab))
 
+### ⏪ 回滚
 
-### ✨ 新增功能
-
-* **opendota:** 新增`opendota`备用数据源，在配置页开启选项后，使用`战报追踪`、`查询比赛`的等待解析功能时在等待stratz数据时同步对opendota发送解析请求并获取比赛数据。 ([a0662ae](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/a0662ae2393b49577f5a0d40b02369482260a774))
+* 回滚加入的"ES2023"库，并放弃使用"toSorted"函数，以满足koishi最低nodejs18+的版本要求。 ([3d26c86](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/3d26c864f80e5ed1ae9ae92f0575aa372b297543))
 
 ### [2.1.1](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.1.0...v2.1.1) (2025-09-29)
 
@@ -688,4 +683,4 @@
 ***
 ### [1.1.0]
 **改进**：使用ejs重写模板相关代码使其模块化，使新增模板更方便  
-**新增**：为比赛信息添加了仿MAX+模板，效果可见[match_2](https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki/match_2)，可在插件配置中切换   
+**新增**：为比赛信息添加了仿MAX+模板，效果可见[match_2](https://github.com/sjtdev/koishi-plugin-dota2tracker/wiki/match_2)，可在插件配置中切换
