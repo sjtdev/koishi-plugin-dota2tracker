@@ -1,8 +1,8 @@
 # Configuration Instructions
 ### Basic Settings
 #### STRATZ_API_TOKEN `string`
-- The plugin relies on Stratz's API for data retrieval, so this must be configured to use it.
-- A Stratz API token can be easily obtained by logging in with a Steam account. It allows 10,000 calls per day, which is generally sufficient.
+- The plugin relies on Stratz API to fetch data, so this configuration is mandatory for the plugin to function.
+- The Stratz API is easy to obtain. Log in to the Stratz website with your Steam account, and you can get a basic version of the API Token on the [API page](https://stratz.com/api), which allows 10,000 calls per day. This is generally sufficient for basic usage.
 > [!TIP] Daily API Call Calculation: 1440×(P/5)+(1+W)+R
 > = minutes in a day × (number of bound and subscribed users ÷ 5) rounded up  
 >  \+ (one parse request + requests sent for parsing when waiting for reports)  

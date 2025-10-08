@@ -2,7 +2,7 @@
 ### 基础设置
 #### STRATZ_API_TOKEN `string`
 - 插件基于stratz的API获取数据，因此此项必须配置才可使用。
-- stratz API很好获得，使用Steam账号登录即可获得一个基本版的API Token，每日可调用10000次，一般来说基本够用。
+- stratz API很好获得，使用Steam账号登录stratz网站，在 [API页面](https://stratz.com/api) 可获得一个基本版的API Token，每日可调用10000次，一般来说基本够用。
 > [!TIP] 插件每日调用API情况计算：1440×(P/5)+(1+W)+R
 > = 每天分钟数 × (绑定且在已订阅群组中的人数 ÷ 5)向上取整  
 >  \+ (一次解析请求 + 战报等待解析时发送的请求次数)  
