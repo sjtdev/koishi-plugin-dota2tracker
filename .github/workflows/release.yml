@@ -21,24 +21,25 @@ jobs:
       - name: Extract Release Notes
         id: extract_release_notes
         run: |
-          # 原始标签, 例如: v2.1.1
+          echo "Full changelog for debugging:"
+          head -n 20 changelog.md
+          echo "--------------------"
+
           RAW_TAG=${{ github.ref_name }}
-          echo "Raw tag from GitHub: $RAW_TAG"
-
-          # 【关键修正】移除 'v' 前缀, 得到干净的版本号, 例如: 2.1.1
           CLEAN_TAG=${RAW_TAG#v}
-          echo "Cleaned version for search: $CLEAN_TAG"
+          echo "Searching for version tag: $CLEAN_TAG"
+          
+          # 【关键修正】使用一个更健壮的、单一的 awk 命令来提取内容
+          # awk 逻辑：
+          # 1. 找到包含版本号的起始行，设置一个 printing 标志为 1，然后跳到下一行。
+          # 2. 在找到起始行之后，如果又遇到一个版本号标题行，就立刻退出。
+          # 3. 只有在 printing 标志为 1 的时候，才打印当前行。
+          NOTES=$(awk 'BEGIN{printing=0} /^### \[/{if(printing==1){exit}} /^###.*'$CLEAN_TAG'/{printing=1;next} printing==1{print}' changelog.md)
 
-          # 使用新的 CLEAN_TAG 变量进行精确查找
-          # awk 的逻辑是：从找到 CLEAN_TAG 的行开始，到下一个版本标题行（/^### \[/）结束
-          NOTES=$(awk "/^###.*$CLEAN_TAG/,/^### \[/" changelog.md | sed '1d' | sed '$d')
+          echo "Extracted Notes:"
+          echo "$NOTES"
+          echo "--------------------"
 
-          # 备用方案，处理日志中只有一个版本（文件末尾）的情况
-          if [ -z "$NOTES" ]; then
-            NOTES=$(awk "/^###.*$CLEAN_TAG/,/./" changelog.md | sed '1d')
-          fi
-
-          # 将提取到的内容设置为输出
           echo "notes<<EOF" >> $GITHUB_OUTPUT
           echo "$NOTES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
