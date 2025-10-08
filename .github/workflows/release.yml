@@ -21,24 +21,12 @@ jobs:
       - name: Extract Release Notes
         id: extract_release_notes
         run: |
-          echo "Full changelog for debugging:"
-          head -n 20 changelog.md
-          echo "--------------------"
-
           RAW_TAG=${{ github.ref_name }}
           CLEAN_TAG=${RAW_TAG#v}
           echo "Searching for version tag: $CLEAN_TAG"
           
-          # 【关键修正】使用一个更健壮的、单一的 awk 命令来提取内容
-          # awk 逻辑：
-          # 1. 找到包含版本号的起始行，设置一个 printing 标志为 1，然后跳到下一行。
-          # 2. 在找到起始行之后，如果又遇到一个版本号标题行，就立刻退出。
-          # 3. 只有在 printing 标志为 1 的时候，才打印当前行。
-          NOTES=$(awk 'BEGIN{printing=0} /^### \[/{if(printing==1){exit}} /^###.*'$CLEAN_TAG'/{printing=1;next} printing==1{print}' changelog.md)
-
-          echo "Extracted Notes:"
-          echo "$NOTES"
-          echo "--------------------"
+          # 【关键修正】使用更通用的正则表达式 /^##+ \[/ 来匹配二级或三级标题
+          NOTES=$(awk 'BEGIN{printing=0} /^##+ \[/{if(printing==1){exit}} /^##+.*'$CLEAN_TAG'/{printing=1;next} printing==1{print}' changelog.md)
 
           echo "notes<<EOF" >> $GITHUB_OUTPUT
           echo "$NOTES" >> $GITHUB_OUTPUT
