@@ -27,6 +27,8 @@ import { registerQueryMatchCommand } from "./app/commands/query-match.command.ts
 import { registerQueryMembersCommand } from "./app/commands/query-members.command.ts";
 import { registerQueryPlayerCommand } from "./app/commands/query-player.command.ts";
 import { registerUserCommand } from "./app/commands/user.command.ts";
+import { OpenDotaAPI } from "./app/data/opendota.api.ts";
+import { OpenDotaAdapter } from "./app/core/opendota.adapter.ts";
 
 export const name = "dota2tracker";
 export let usage = "";
@@ -61,7 +63,7 @@ export async function apply(ctx: Context, config: Config) {
       await ctx.dota2tracker.parsePolling.polling();
     });
   } else {
-    ctx.logger.info(ctx.dota2tracker.i18n.gt("dota2tracker.logger.cron_not_enabled"));
+    ctx.logger("dota2tracker").info(ctx.dota2tracker.i18n.gt("dota2tracker.logger.cron_not_enabled"));
   }
   ctx.dota2tracker.hero = new HeroService(ctx);
   ctx.dota2tracker.item = new ItemService(ctx);
@@ -69,6 +71,10 @@ export async function apply(ctx: Context, config: Config) {
   ctx.dota2tracker.database = new DatabaseService(ctx);
   ctx.dota2tracker.valveAPI = new ValveAPI(ctx);
   ctx.dota2tracker.stratzAPI = new StratzAPI(ctx, pluginDir);
+  if (config.enableOpenDotaFallback) {
+    ctx.dota2tracker.opendotaAPI = new OpenDotaAPI(ctx);
+    ctx.dota2tracker.opendotaAdapter = new OpenDotaAdapter(ctx);
+  }
   ctx.dota2tracker = ctx.dota2tracker as DOTA2TrackerServices;
 
   // 注册配置页说明

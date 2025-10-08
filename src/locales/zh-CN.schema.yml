@@ -7,6 +7,11 @@ _config:
     suppressStratzNetworkErrors: |-
       开启后将stratz网络错误日志（如超时、网络不通等，但403 Forbidden除外）使用debug级别输出，默认不显示debug级日志。  
       若需要开启debug日志显示，请见 [📖 配置项#suppressstratznetworkerrors](http://sjtdev.github.io/koishi-plugin-dota2tracker/configs.html#suppressstratznetworkerrors-boolean)
+    enableOpenDotaFallback: 启用 OpenDota 作为战报追踪与查询比赛功能的备用数据源。
+    OPENDOTA_API_KEY: |-
+      OpenDota 的订阅付费APIKEY，  
+      可在 https://www.opendota.com/api-keys 查看详情。  
+      OpenDota 的免费用户此处请留空。
   message:
     $desc: 消息设置
     useHeroNicknames: 是否使用英雄别名。关闭后仅使用英雄正式名称。

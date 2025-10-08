@@ -9,8 +9,10 @@ export interface Config {
   dataParsingTimeoutMinutes: number;
   proxyAddress: string;
   suppressStratzNetworkErrors: boolean;
+  enableOpenDotaFallback: boolean;
+  OPENDOTA_API_KEY: string;
 
-  useHeroNicknames:boolean;
+  useHeroNicknames: boolean;
   urlInMessageType: Array<string>;
   maxSendItemCount: number;
   showItemListAtTooMuchItems: boolean;
@@ -35,12 +37,22 @@ export interface Config {
 }
 const pluginDir = path.resolve(__dirname, "..");
 export const Config: Schema = Schema.intersect([
-  Schema.object({
-    STRATZ_API_TOKEN: Schema.string().required().role("secret"),
-    dataParsingTimeoutMinutes: Schema.number().default(60).min(0).max(1440),
-    proxyAddress: Schema.string(),
-    suppressStratzNetworkErrors: Schema.boolean().default(false),
-  }).i18n(Object.keys(LanguageTags).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.base), acc), {})),
+  Schema.intersect([
+    Schema.object({
+      STRATZ_API_TOKEN: Schema.string().required().role("secret"),
+      dataParsingTimeoutMinutes: Schema.number().default(60).min(0).max(1440),
+      proxyAddress: Schema.string(),
+      suppressStratzNetworkErrors: Schema.boolean().default(false),
+      enableOpenDotaFallback: Schema.boolean().default(false),
+    }).i18n(Object.keys(LanguageTags).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.base), acc), {})),
+    Schema.union([
+      Schema.object({
+        enableOpenDotaFallback: Schema.const(true).required(),
+        OPENDOTA_API_KEY: Schema.string().role("secret"),
+      }),
+      Schema.object({}),
+    ]).i18n(Object.keys(LanguageTags).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.base), acc), {})),
+  ]),
   Schema.intersect([
     Schema.object({
       useHeroNicknames: Schema.boolean().default(true),

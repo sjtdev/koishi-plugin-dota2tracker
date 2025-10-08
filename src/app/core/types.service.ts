@@ -12,6 +12,8 @@ import { MatchWatcherTask } from "../tasks/match-watcher.task";
 import { PlayerService } from "./player.service";
 import { DatabaseService } from "../data/database";
 import { ReportTask } from "../tasks/report.task";
+import { OpenDotaAPI } from "../data/opendota.api";
+import { OpenDotaAdapter } from "./opendota.adapter";
 
 export interface DOTA2TrackerServices {
   // 工具层
@@ -27,11 +29,13 @@ export interface DOTA2TrackerServices {
   matchWatcher: MatchWatcherTask;
   parsePolling: ParsePollingTask;
   report: ReportTask;
+  opendotaAdapter: OpenDotaAdapter;
   // 数据层
   valveAPI: ValveAPI;
   stratzAPI: StratzAPI;
   database: DatabaseService;
   cache: CacheService;
+  opendotaAPI: OpenDotaAPI;
 }
 
 declare module "koishi" {

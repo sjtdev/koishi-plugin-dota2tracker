@@ -2,7 +2,7 @@
 ### 基础设置
 #### STRATZ_API_TOKEN `string`
 - 插件基于stratz的API获取数据，因此此项必须配置才可使用。
-- stratz API很好获得，使用Steam账号登录即可获得一个基本版的API Token，每日可调用10000次，一般来说基本够用。
+- stratz API很好获得，使用Steam账号登录stratz网站，在 [API页面](https://stratz.com/api) 可获得一个基本版的API Token，每日可调用10000次，一般来说基本够用。
 > [!TIP] 插件每日调用API情况计算：1440×(P/5)+(1+W)+R
 > = 每天分钟数 × (绑定且在已订阅群组中的人数 ÷ 5)向上取整  
 >  \+ (一次解析请求 + 战报等待解析时发送的请求次数)  
@@ -34,6 +34,17 @@
 >     dota2tracker.match: 3
 >     dota2tracker.player: 3
 > ```
+
+#### enableOpenDotaFallback: 
+- 开启后，使用 OpenDotaAPI 作为`战报追踪`与`查询比赛`的后备数据源，在轮询 stratz 比赛数据时同步请求 OpenDota 比赛数据。
+- 当前调用策略为每场比赛每分钟获取一次数据，每5分钟发送一次解析请求，解析请求占10次调用次数。
+> - OpenDotaAPI 免费限额每天2000次，且免费调用无APIKEY，推测可能使用IP限制。
+> - 基于以上推测，可能有一种极小概率事件，也就是插件的OpenDotaAPI调用次数远不足2000次时却被限制，很可能是因为公用IP环境中有其他的OpenDotaAPI调用者占用了次数。
+
+#### OPENDOTA_API_KEY
+- OpenDota 的订阅付费APIKEY，  
+- 可在 https://www.opendota.com/api-keys 查看详情。  
+- OpenDota 的免费用户此处请留空。
 
 ### 消息设置
 

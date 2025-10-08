@@ -15,8 +15,10 @@
       <span class="time text-sm"><%= match.durationTime %></span>
       <span class="score dire text-3xl"><%= match.dire.killsCount %></span>
     </p>
-    <img class="star absolute w-[64px] bottom-[10px] left-1/2 -translate-x-1/2" src="<%= getImageUrl('star_' + (match.rank ? match.rank.toString().split('')[1] : '')) %>">
-    <img class="medal absolute w-[64px] bottom-[10px] left-1/2 -translate-x-1/2" src="<%= getImageUrl('medal_' + (match.rank ? match.rank.toString().split('')[0] : '')) %>">
+    <div class="rank absolute w-[64px] h-[64px] bottom-[10px] left-1/2 -translate-x-1/2<%- match.odParsed && match.lobbyType !== "RANKED" ? ` grayscale` : "" %>">
+      <img class="star absolute w-full" src="<%= getImageUrl('star_' + (match.rank ? match.rank.toString().split('')[1] : '')) %>">
+      <img class="medal absolute w-full" src="<%= getImageUrl('medal_' + (match.rank ? match.rank.toString().split('')[0] : '')) %>">
+    </div>
   </div>
   <div class="flag w-[100px] h-full flex justify-center items-end bg-cover <%= match.didRadiantWin ? 'grayscale' : "" %>" style="background-image: url('<%= getImageUrl("flag_dire") %>')"><%= !match.didRadiantWin ? $t("dota2tracker.template.won") : "" %></div>
 </div>

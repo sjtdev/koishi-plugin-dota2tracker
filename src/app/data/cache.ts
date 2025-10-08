@@ -3,6 +3,7 @@ import * as graphql from "../../@types/graphql-generated";
 import { ItemList, WeeklyHeroMeta } from "./types";
 import { DAYS_30 } from "../common/constants";
 import { Context, Service } from "koishi";
+import { DateTime } from "luxon";
 
 declare module "@koishijs/cache" {
   interface Tables {
@@ -11,6 +12,7 @@ declare module "@koishijs/cache" {
     dt_previous_query_results: { data: graphql.MatchInfoQuery; pluginVersion: string };
     dt_sended_match_id: undefined;
     dt_weekly_metadata: WeeklyHeroMeta;
+    dt_opendota_api_request_log: { count: number; request: string };
   }
 }
 
@@ -19,8 +21,27 @@ export class CacheService extends Service {
     super(ctx, "dota2tracker.cache", true);
   }
 
-  setWweeklyMetaCache(key: string, value: WeeklyHeroMeta, time: number) {
-    this.ctx.cache.set("dt_weekly_metadata", key, value, time);
+  private get msUntilUTCEndOfDay() {
+    const now = DateTime.utc();
+    const endOfDay = now.endOf("day");
+    const ttl = endOfDay.diff(now).toMillis();
+    return ttl;
+  }
+
+  addOpendotaAPIRequestLog(request: string, count: number = 1) {
+    this.ctx.cache.set("dt_opendota_api_request_log", String(Date.now()), { count, request }, this.msUntilUTCEndOfDay);
+  }
+
+  async getTodayOpendotaAPIRequestCount() {
+    let count = 0;
+    for await (const value of this.ctx.cache.values("dt_opendota_api_request_log")) {
+      count += value.count;
+    }
+    return count;
+  }
+
+  setWweeklyMetaCache(key: string, value: WeeklyHeroMeta) {
+    this.ctx.cache.set("dt_weekly_metadata", key, value, this.msUntilUTCEndOfDay);
   }
 
   async getWeeklyMetaCache(key: string): Promise<WeeklyHeroMeta> {

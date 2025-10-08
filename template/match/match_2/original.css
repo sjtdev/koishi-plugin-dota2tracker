@@ -41,6 +41,10 @@ nav > div.match_id > p.fail::after {
   content: "※<%= $t('dota2tracker.template.analysis_incomplete') %>";
   color: #ffb400;
 }
+nav > div.match_id > p.opendota::after {
+  content: "※<%= $t('dota2tracker.template.analysis_by_opendota') %>";
+  color: #34a39a;
+}
 
 nav > .rank {
   width: 48px;

@@ -144,18 +144,21 @@ dota2tracker:
     rank_changed: 群友 {name} 段位变动：{prev.medal}{prev.star} → {curr.medal}{curr.star}
   logger:
     fetch_guilds_failed: 获取群组信息失败，将继续后续步骤。
-    match_tracked: '追踪到来自{#each messageToLogger as item}群组 {item.platform}:{item.guildId} 的玩家 [{#each item.players as player}{player.nickname}({player.steamId}){#if player !== item.players[item.players.length - 1]}、{/if}{/each}]{#if item !== messageToLogger[messageToLogger.length - 1]}、{/if}{/each}的尚未播报过的最新比赛 {match.id}。'
+    match_tracked: '追踪到最新比赛 {match.id} 来自{#each messageToLogger as item}群组 {item.platform}:{item.guildId} 的玩家 [{#each item.players as player}{player.nickname}({player.steamId}){#if player !== item.players[item.players.length - 1]}、{/if}{/each}]{#if item !== messageToLogger[messageToLogger.length - 1]}、{/if}{/each}。'
     parse_request_sent: 比赛 {matchId} 解析请求已成功发送至STRATZ服务器。
     parse_request_failed: 比赛 {matchId} 解析请求发送失败。
-    match_parsed: 比赛 {matchId} 已解析，生成图片并发布于{#each guilds as guild}{guild.platform}:{guild.guildId}{#if guild !== guilds[guilds.length - 1]}、{/if}{/each}。
+    match_parsed: 比赛 {matchId} 已{#if odParsed}由 OpenDota {/if}解析，生成图片并发布于{#each guilds as guild}{guild.platform}:{guild.guildId}{#if guild !== guilds[guilds.length - 1]}、{/if}{/each}。
     match_unparsed: 比赛 {matchId} 超过等待时间[{timeout}分钟]仍未解析，生成图片并发布于{#each guilds as guild}{guild.platform}:{guild.guildId}{#if guild !== guilds[guilds.length - 1]}、{/if}{/each}。
-    waiting_for_parse: 比赛 {matchId} 尚未解析完成，继续等待。
+    waiting_for_parse: 比赛 {matchId} 尚未解析完成，已等待{time}分钟。
     report_sent: 发布{title}于{platform}:{guildId}。
     rank_sent: 向{platform}:{guildId}发布{player.nickName}({player.steamId})的段位变动信息。
     ejs_error: EJS模板渲染错误：{error}
     cron_not_enabled: 未启用cron服务，无法运行战报追踪等定时任务。
     stratz_token_banned: "Stratz API 请求被拒绝(403)，若频繁发生很有可能意味着您的Token或IP因异常使用被临时限制访问。有关此报错请见文档：http://sjtdev.github.io/koishi-plugin-dota2tracker/api-403.html"
     stratz_api_query_error: "Stratz API 返回了有效数据，但报错: {cause}"
+    opendota_parse_request_on_later: "已启用 OpenDota 备用查询，将每{timeout}分钟发送一次 OpenDota 解析请求，并每分钟检测比赛是否已被 OpenDota 解析。"
+    opendota_parse_request_sent: "比赛 {matchId} 解析请求已成功发送至 OpenDota 服务器。"
+    opendota_parse_request_failed: "比赛 {matchId} 解析请求向 OpenDota 服务器发送失败。"
   time:
     years_months_ago: "{years}年{months}个月前"
     years_ago: "{years}年前"
