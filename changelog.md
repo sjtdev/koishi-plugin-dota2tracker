@@ -1,5 +1,16 @@
 # 更新日志
 
+### [2.2.1](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.2.0...v2.2.1) (2025-10-09)
+
+### 🐛 Bug 修复
+
+* **rank:** 修复`2.0.0`中将`rank_fun.ejs`内文本使用i18n方案重构后意外导致html代码 (如提前传入的头像img标签) 被转义的问题。 ([f76897f](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/f76897fc6fae53b78bfa6966863dbae0d18390e3))
+* **report:** 修复因`2.0.0`中因时间处理库依赖从`moment`切换至`luxon`导致日报周报 (report) 不可用的问题。 ([8c3cd39](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/8c3cd39a333b5822f897e9bcaa0ff617ac66d75d))
+
+### 📝 文档
+
+* 修正changelog顺序 ([af9c74d](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/af9c74d10271231b8d209a3f1aeeb1bcb5ebb460))
+
 ## [2.2.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.1.1...v2.2.0) (2025-10-08)
 
 ### ✨ 新增功能
