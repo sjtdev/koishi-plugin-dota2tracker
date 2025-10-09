@@ -81,8 +81,8 @@ dota2tracker:
     report_winrate: 胜率
     anonymous_player_1: 数据未公开
     anonymous_player_2: 背景仅供展示目的，不属于{player}的数据。
-    rank_fun_up_message: 热烈祝贺群友 {avatar}{name} 在天梯中再获进步，<br/>由 {prev} 升为 {curr}，再接再厉，再创辉煌！
-    rank_fun_down_message: "{avatar}<br/>寄"
+    rank_fun_up_message: 热烈祝贺群友 AVATAR_PLACEHOLDER{name} 在天梯中再获进步，<br/>由 PREV_PLACEHOLDER 升为 CURR_PLACEHOLDER，再接再厉，再创辉煌！
+    rank_fun_down_message: "AVATAR_PLACEHOLDER<br/>寄"
     titles:
       MVP: MVP-#FFA500
       Soul: 魂-#66CCFF

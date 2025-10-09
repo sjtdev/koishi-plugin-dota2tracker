@@ -81,8 +81,8 @@ dota2tracker:
     report_winrate: WR
     anonymous_player_1: This profile is private.
     anonymous_player_2: Background is for display purposes only. It is not {player}’s data.
-    rank_fun_down_message: "{avatar}<br/>Sad"
-    rank_fun_up_message: Hip hip hooray! Our awesome member {avatar}{name} has leveled up from {prev} to {curr}! #<br/>Keep crushing it and let's see what heights you'll reach next! 🎉
+    rank_fun_down_message: "AVATAR_PLACEHOLDER<br/>Sad"
+    rank_fun_up_message: Hip hip hooray! Our awesome member AVATAR_PLACEHOLDER{name} has leveled up from PREV_PLACEHOLDER to CURR_PLACEHOLDER! #<br/>Keep crushing it and let's see what heights you'll reach next! 🎉
     titles:
       MVP: MVP-#FFA500
       Soul: Soul-#66CCFF

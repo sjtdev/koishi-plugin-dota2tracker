@@ -90,30 +90,38 @@
     </head>
     <% const {name, avatar, isRising, prevRank, currRank, date} = data; %>
     <% const kind = isRising ? "xi" : "bei"; %>
-    <% const rankInfo = {
-      name,
-      avatar: `<img src="${avatar}" />`,
-      prev: `<span class="rank prev">${$t("dota2tracker.template.ranks."+prevRank.medal)}${prevRank.leader ?? prevRank.star}</span>`,
-      curr: `<span class="rank curr">${$t("dota2tracker.template.ranks."+currRank.medal)}${currRank.leader ?? currRank.star}</span>`,
-    } %>
+    <%
+      // 1. 准备好要注入的 HTML
+      const avatarHtml = `<img src="${avatar}" />`;
+      const prevHtml = `<span class="rank prev">${$t("dota2tracker.template.ranks."+prevRank.medal)}${prevRank.leader ?? prevRank.star}</span>`;
+      const currHtml = `<span class="rank curr">${$t("dota2tracker.template.ranks."+currRank.medal)}${currRank.leader ?? currRank.star}</span>`;
+
+      // 2. 先处理文本插值
+      const messageTemplate = isRising
+        ? $t("dota2tracker.template.rank_fun_up_message", { name: name })
+        : $t("dota2tracker.template.rank_fun_down_message", { name: name });
+
+      // 3. 手动将占位符替换为 HTML
+      const finalMessage = messageTemplate
+        .replace('AVATAR_PLACEHOLDER', avatarHtml)
+        .replace('PREV_PLACEHOLDER', prevHtml)
+        .replace('CURR_PLACEHOLDER', currHtml);
+    %>
     <body class="<%= kind %>" <%- `style="background-image: url( ${getImageUrl(kind, undefined, "jpg")} )"`%>>
         <div class="wrapper">
             <p class="<%= kind %>">
-              <%- kind == "xi" ?
-              $t("dota2tracker.template.rank_fun_up_message", rankInfo) :
-              $t("dota2tracker.template.rank_fun_down_message", rankInfo)
-              %>
+                <%- finalMessage %>
             </p>
             <p></p>
             <div class="ranks">
                 <div class="rank prev">
-                    <img src="<%= getImageUrl('medal_' +(prevRank.inTop100 ?? prevRank.medal)) %>" alt="" />
-                    <img src="<%= getImageUrl('star_' + prevRank.star) %>" alt="" />
+                    <img src="<%- getImageUrl('medal_' +(prevRank.inTop100 ?? prevRank.medal)) %>" alt="" />
+                    <img src="<%- getImageUrl('star_' + prevRank.star) %>" alt="" />
                     <p><%= prevRank.leader ?? "" %></p>
                 </div>
                 <div class="rank curr">
-                    <img src="<%= getImageUrl('medal_' +(currRank.inTop100 ?? currRank.medal)) %>" alt="" />
-                    <img src="<%= getImageUrl('star_' + currRank.star) %>" alt="" />
+                    <img src="<%- getImageUrl('medal_' +(currRank.inTop100 ?? currRank.medal)) %>" alt="" />
+                    <img src="<%- getImageUrl('star_' + currRank.star) %>" alt="" />
                     <p><%= currRank.leader ?? "" %></p>
                 </div>
             </div>
