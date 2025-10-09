@@ -17,7 +17,7 @@ export class ReportTask extends Service<Config> {
     if (this.config.dailyReportSwitch) {
       ctx.cron(`0 ${this.config.dailyReportHours} * * *`, async () => {
         try {
-          const oneDayAgo = DateTime.now().minus({ days: 1 }).toSeconds();
+          const oneDayAgo = Math.floor(DateTime.now().minus({ days: 1 }).toSeconds());
           await this.report(oneDayAgo, "dota2tracker.template.yesterdays_summary", this.config.dailyReportShowCombi);
         } catch (error) {
           handleError(error, this.logger, this.ctx.dota2tracker.i18n, this.config);
@@ -27,7 +27,7 @@ export class ReportTask extends Service<Config> {
     if (this.config.weeklyReportSwitch) {
       ctx.cron(`0 ${this.config.weeklyReportDayHours[1]} * * ${this.config.weeklyReportDayHours[0]}`, async () => {
         try {
-          const oneWeekAgo = DateTime.now().minus({ weeks: 1 }).toSeconds();
+          const oneWeekAgo = Math.floor(DateTime.now().minus({ weeks: 1 }).toSeconds());
           await this.report(oneWeekAgo, "dota2tracker.template.last_weeks_summary", this.config.weeklyReportShowCombi);
         } catch (error) {
           handleError(error, this.logger, this.ctx.dota2tracker.i18n, this.config);
