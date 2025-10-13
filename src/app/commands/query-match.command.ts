@@ -24,18 +24,14 @@ export function registerQueryMatchCommand(ctx: Context) {
     .option("parse", "-p")
     .option("template", "-t <value:string>")
     .action(async ({ session, options }, input_data) => {
-      if (session.guild || (!session.guild && input_data)) {
-        const steamId = await resolvePlayerAndHandleErrors(ctx, session, input_data);
-        if (steamId === null) return;
-        session.send(session.text(".querying_match"));
-        const lastMatchId = await ctx.dota2tracker.player.getLastMatchId(Number(steamId));
-        if (!lastMatchId?.matchId) return session.text(".query_failed");
-        if (lastMatchId.isAnonymous) return session.text(".is_anonymous");
+      const steamId = await resolvePlayerAndHandleErrors(ctx, session, input_data);
+      if (steamId === null) return;
+      session.send(session.text(".querying_match"));
+      const lastMatchId = await ctx.dota2tracker.player.getLastMatchId(Number(steamId));
+      if (!lastMatchId?.matchId) return session.text(".query_failed");
+      if (lastMatchId.isAnonymous) return session.text(".is_anonymous");
 
-        return await handleQueryMatchCommand(ctx, ctx.config, session, options, lastMatchId.matchId);
-      } else {
-        session.send(session.text(".user_not_in_group"));
-      }
+      return await handleQueryMatchCommand(ctx, ctx.config, session, options, lastMatchId.matchId);
     });
 }
 
