@@ -10,7 +10,7 @@
     { "type": "perf", "section": "⚡ 性能提升" },
     { "type": "revert", "section": "⏪ 回滚" },
     { "type": "docs", "section": "📝 文档" },
-    { "type": "style", "section": "💄 样式", "hidden": true },
+    { "type": "style", "section": "🎨 样式", "hidden": false },
     { "type": "refactor", "section": "♻️ 代码重构", "hidden": true },
     { "type": "test", "section": "✅ 测试", "hidden": true },
     { "type": "build", "section": "📦 构建系统", "hidden": true },
