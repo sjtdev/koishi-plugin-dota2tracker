@@ -220,6 +220,7 @@ export class MessageBuilder extends Service<Config> {
           body {
             padding: 16px;
             width: fit-content;
+            height: fit-content;
             background-color: #f7f7f7;
             font-family:<%-fontFamily%>;
           }
