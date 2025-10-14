@@ -27,6 +27,15 @@
 
     return darkenedHex;
 } %>
+<% function calcFacetNameFontSize(name) {
+  if (name) {
+    if (name.length <= 4) return "11px";
+    else if (name.length == 5) return "8px";
+    else if (name.length >= 6) return "7px";
+  }
+  return "10px"
+}
+%>
 <nav>
     <div class="match_id">
         <p><%= $t("dota2tracker.template.match_id_").slice(0, -1) %> <%-match.id%></p>
@@ -87,7 +96,7 @@
         <% if (player.facet) { %>
           <img src="<%- getImageUrl(player.facet.icon, ImageType.IconsFacets) %>">
         <% } %>
-        <span <%- `style="font-size: ${player.facet?.displayName?.length > 4 ? 8 : 11}px;"`%>>
+        <span <%- `style="font-size: ${calcFacetNameFontSize(player.facet?.displayName)};"`%>>
           <p><%= player.facet?.displayName ?? '?' %></p>
         </span>
       </div>
