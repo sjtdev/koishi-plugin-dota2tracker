@@ -45,6 +45,7 @@ export default defineConfig({
           { text: "更新日志", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
         ],
 
+        // locales.root.themeConfig.sidebar
         sidebar: [
           {
             text: "安装与使用",
@@ -80,9 +81,15 @@ export default defineConfig({
             ],
           },
           {
+            text: "疑难杂症",
+            items: [
+              { text: "关于 STRATZ API 403", link: "/api-403" },
+              { text: "OpenDota 请求失败", link: "/opendota-failed" },
+            ],
+          },
+          {
             text: "其他",
             items: [
-              { text: "关于 API 403", link: "/api-403" },
               { text: "更新日志", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
               { text: "鸣谢", link: "/thanks" },
             ],
@@ -105,6 +112,7 @@ export default defineConfig({
           { text: "Changelog", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
         ],
 
+        // locales["en-US"].themeConfig.sidebar
         sidebar: [
           {
             text: "Installation and Usage",
@@ -140,10 +148,16 @@ export default defineConfig({
             ],
           },
           {
+            text: "Troubleshooting",
+            items: [
+              { text: "About STRATZ API 403", link: "/en-US/api-403" },
+              { text: "OpenDota Request Failed", link: "/en-US/opendota-failed" },
+            ],
+          },
+          {
             text: "Others",
             items: [
-              { text: "About API 403", link: "/en-US/api-403" },
-              { text: "Changelog", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
+              { text: "Changelog (in Chinese)", link: "https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/changelog.md" },
               { text: "Acknowledgments", link: "/en-US/thanks" },
             ],
           },
