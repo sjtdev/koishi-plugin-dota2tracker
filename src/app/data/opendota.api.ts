@@ -45,13 +45,20 @@ export class OpenDotaAPI extends Service<Config> {
     }
 
     // 直接传递参数
-    switch (type) {
-      case "GET":
-        return await this.ctx.http.get(path, config);
-      case "POST":
-        return await this.ctx.http.post(path, data, config); // POST需要空数据占位
-      default:
-        throw new Error(`Unsupported HTTP method: ${type}`);
+    try {
+      switch (type) {
+        case "GET":
+          return await this.ctx.http.get(path, config);
+        case "POST":
+          return await this.ctx.http.post(path, data, config);
+        default:
+          throw new Error(`Unsupported HTTP method: ${type}`);
+      }
+    } catch (error) {
+      this.logger.error("Fetch failed inside fetchData. Detailed cause:");
+      this.logger.error(`Request URL: ${path}`);
+      this.logger.error(error.cause || error);
+      throw error;
     }
   }
 }
