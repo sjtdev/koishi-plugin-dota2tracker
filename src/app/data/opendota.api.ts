@@ -5,7 +5,7 @@ import { OpenDotaMatch } from "../../@types/opendota-generated";
 export class OpenDotaAPI extends Service<Config> {
   private readonly BASE_URL = "https://api.opendota.com/api";
   constructor(ctx: Context) {
-    super(ctx, "opendota-api", true);
+    super(ctx, "dota2tracker.opendota-api", true);
     this.config = ctx.config;
   }
 

@@ -5,7 +5,7 @@ import { LeaverStatusEnum, MatchInfoQuery, MatchLaneType, MatchPlayerPositionTyp
 
 export class OpenDotaAdapter extends Service {
   constructor(ctx: Context) {
-    super(ctx, "opendota-adapter", true);
+    super(ctx, "dota2tracker.opendota-adapter", true);
   }
 
   transform(_match: OpenDotaMatch): StrictMatchInfo {
