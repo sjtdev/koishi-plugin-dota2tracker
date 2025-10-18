@@ -54,8 +54,5 @@
       "zh-CN",
       "en-US"
     ]
-  },
-  "scripts": {
-    "prepare": "husky"
   }
 }
