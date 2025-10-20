@@ -12,6 +12,9 @@ _config:
       OpenDota 的订阅付费APIKEY，  
       可在 https://www.opendota.com/api-keys 查看详情。  
       OpenDota 的免费用户此处请留空。
+    OpenDotaIPStack: |-
+      若访问 OpenDota API 时频繁失败，可能是由于错误的 IPv6 环境导致的。  
+      设置此选项可在访问 OpenDota API 时强制使用 IPv4 尝试解决问题。
   message:
     $desc: 消息设置
     useHeroNicknames: 是否使用英雄别名。关闭后仅使用英雄正式名称。

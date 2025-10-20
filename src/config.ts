@@ -11,6 +11,7 @@ export interface Config {
   suppressStratzNetworkErrors: boolean;
   enableOpenDotaFallback: boolean;
   OPENDOTA_API_KEY: string;
+  OpenDotaIPStack: string;
 
   useHeroNicknames: boolean;
   urlInMessageType: Array<string>;
@@ -36,6 +37,8 @@ export interface Config {
   templateFonts: string[];
 }
 const pluginDir = path.resolve(__dirname, "..");
+// 读取 schema.yml 文件
+const allI18nConfigs = Object.fromEntries(Object.keys(LanguageTags).map((lang) => [lang, require(`./locales/${lang}.schema.yml`)._config]));
 export const Config: Schema = Schema.intersect([
   Schema.intersect([
     Schema.object({
@@ -44,14 +47,15 @@ export const Config: Schema = Schema.intersect([
       proxyAddress: Schema.string(),
       suppressStratzNetworkErrors: Schema.boolean().default(false),
       enableOpenDotaFallback: Schema.boolean().default(false),
-    }).i18n(Object.keys(LanguageTags).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.base), acc), {})),
+    }).i18n(getI18n("base")),
     Schema.union([
       Schema.object({
         enableOpenDotaFallback: Schema.const(true).required(),
         OPENDOTA_API_KEY: Schema.string().role("secret"),
+        OpenDotaIPStack: Schema.union(["auto", "ipv4"]).default("auto"),
       }),
       Schema.object({}),
-    ]).i18n(Object.keys(LanguageTags).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.base), acc), {})),
+    ]).i18n(getI18n("base")),
   ]),
   Schema.intersect([
     Schema.object({
@@ -68,7 +72,7 @@ export const Config: Schema = Schema.intersect([
         .default([])
         .role("table"),
       rankBroadSwitch: Schema.boolean().default(false),
-    }).i18n(Object.keys(LanguageTags).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.message), acc), {})),
+    }).i18n(getI18n("message")),
     Schema.union([
       Schema.object({
         rankBroadSwitch: Schema.const(true).required(),
@@ -77,12 +81,12 @@ export const Config: Schema = Schema.intersect([
         rankBroadFun: Schema.boolean().default(false),
       }),
       Schema.object({}),
-    ]).i18n(Object.keys(LanguageTags).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.message), acc), {})),
+    ]).i18n(getI18n("message")),
   ]),
   Schema.intersect([
     Schema.object({
       dailyReportSwitch: Schema.boolean().default(false),
-    }).i18n(Object.keys(LanguageTags).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {})),
+    }).i18n(getI18n("report")),
     Schema.union([
       Schema.object({
         dailyReportSwitch: Schema.const(true).required(),
@@ -90,11 +94,11 @@ export const Config: Schema = Schema.intersect([
         dailyReportShowCombi: Schema.boolean().default(true),
       }),
       Schema.object({}),
-    ]).i18n(Object.keys(LanguageTags).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {})),
+    ]).i18n(getI18n("report")),
     Schema.object({
       weeklyReportSwitch: Schema.boolean().default(false),
     })
-      .i18n(Object.keys(LanguageTags).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {}))
+      .i18n(getI18n("report"))
       .description(undefined),
     Schema.union([
       Schema.object({
@@ -103,7 +107,7 @@ export const Config: Schema = Schema.intersect([
         weeklyReportShowCombi: Schema.boolean().default(true),
       }),
       Schema.object({}),
-    ]).i18n(Object.keys(LanguageTags).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.report), acc), {})),
+    ]).i18n(getI18n("report")),
   ]),
   Schema.object({
     template_match: Schema.union([...readDirectoryFilesSync(path.join(pluginDir, "template", "match"))]).default("match_1"),
@@ -111,10 +115,25 @@ export const Config: Schema = Schema.intersect([
     template_hero: Schema.union([...readDirectoryFilesSync(path.join(pluginDir, "template", "hero"))]).default("hero_1"),
     playerRankEstimate: Schema.boolean().default(true),
     templateFonts: Schema.array(String).default([]).role("table"),
-  }).i18n(Object.keys(LanguageTags).reduce((acc, cur) => ((acc[cur] = require(`./locales/${cur}.schema.yml`)._config.template), acc), {})),
+  }).i18n(getI18n("template")),
 ]);
+
+/**
+ * 从预加载的数据中提取特定类别的 i18n 配置
+ * @param key - 要提取的类别 (例如 'base', 'message', 'report')
+ * @returns 供 Schema.i18n() 使用的对象
+ */
+function getI18n(key: "base" | "message" | "report" | "template") {
+  return Object.fromEntries(
+    Object.entries(allI18nConfigs).map(([lang, config]) => [
+      lang,
+      config[key], // 提取对应语言的对应类别
+    ]),
+  );
+}
+
 /** 读取目录下所有 .ejs 文件名并去除后缀名后返回文件名数组。 */
-export function readDirectoryFilesSync(directoryPath: string): string[] {
+function readDirectoryFilesSync(directoryPath: string): string[] {
   try {
     // 同步读取目录下的所有文件名
     const files = fs.readdirSync(directoryPath);

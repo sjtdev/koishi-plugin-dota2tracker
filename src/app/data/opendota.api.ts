@@ -1,6 +1,7 @@
 import { Context, HTTP, Service } from "koishi";
 import { Config } from "../../config";
 import { OpenDotaMatch } from "../../@types/opendota-generated";
+import { lookup } from "dns/promises";
 
 export class OpenDotaAPI extends Service<Config> {
   private readonly BASE_URL = "https://api.opendota.com/api";
@@ -31,11 +32,23 @@ export class OpenDotaAPI extends Service<Config> {
 
   private async fetchData(type: "GET" | "POST", path: string, data?: any) {
     // 创建独立的配置对象
-    const config: HTTP.RequestConfig = {
+    const config: HTTP.RequestConfig & { lookup?: any } = {
       responseType: "json",
       proxyAgent: this.config.proxyAddress || undefined,
     };
-
+    // 尝试使用 IPv4 解决无法访问的问题。
+    if (this.config.OpenDotaIPStack === "ipv4") {
+      // 只有在用户明确选择 'ipv4' 时，才定义并附加 customLookup
+      const customLookup = async (hostname, options, callback) => {
+        try {
+          const { address, family } = await lookup(hostname, { family: 4 });
+          callback(null, address, family);
+        } catch (err) {
+          callback(err, null, 0);
+        }
+      };
+      config.lookup = customLookup;
+    }
     // 如果用户填写了OPENDOTA APIKEY，添加认证
     if (this.config.OPENDOTA_API_KEY) {
       config.headers = {
@@ -43,22 +56,13 @@ export class OpenDotaAPI extends Service<Config> {
         Authorization: `Bearer ${this.config.OPENDOTA_API_KEY}`,
       };
     }
-
-    // 直接传递参数
-    try {
-      switch (type) {
-        case "GET":
-          return await this.ctx.http.get(path, config);
-        case "POST":
-          return await this.ctx.http.post(path, data, config);
-        default:
-          throw new Error(`Unsupported HTTP method: ${type}`);
-      }
-    } catch (error) {
-      this.logger.error("Fetch failed inside fetchData. Detailed cause:");
-      this.logger.error(`Request URL: ${path}`);
-      this.logger.error(error.cause || error);
-      throw error;
+    switch (type) {
+      case "GET":
+        return await this.ctx.http.get(path, config);
+      case "POST":
+        return await this.ctx.http.post(path, data, config);
+      default:
+        throw new Error(`Unsupported HTTP method: ${type}`);
     }
   }
 }

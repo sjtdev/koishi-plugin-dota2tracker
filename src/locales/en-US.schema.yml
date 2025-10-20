@@ -7,9 +7,12 @@ _config:
     suppressStratzNetworkErrors: "When enabled, downgrades Stratz network errors (e.g. timeouts) to lower-priority output. Debug-level logs are hidden by default. To enable debug logging, see [📖 Documentation: Configuration](http://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/configs.html#suppressstratznetworkerrors-boolean)"
     enableOpenDotaFallback: Enable OpenDota as a fallback data source for match tracking and query-match features.
     OPENDOTA_API_KEY: |-
-      Your paid subscription API key for OpenDota.
-      See https://www.opendota.com/api-keys for details.
+      Your paid subscription API key for OpenDota.  
+      See https://www.opendota.com/api-keys for details.  
       Free users should leave this blank.
+    OpenDotaIPStack: |-
+      If you experience frequent failures when accessing the OpenDota API, it might be caused by a faulty IPv6 environment.  
+      Setting this option will force the use of IPv4 when accessing the OpenDota API to try and resolve the issue.
   message:
     $desc: Message Settings
     useHeroNicknames: When disabled, only the official hero names will be used.
