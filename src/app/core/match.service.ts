@@ -121,7 +121,7 @@ export class MatchService extends Service {
 
   public static async constantsInjectFacetData(constantsQuery: graphql.ConstantsQuery, matchQuery: graphql.MatchInfoQuery, languageTag: string, heroService?: HeroService) {
     const facetData = {};
-    for (let player of (matchQuery.match as MatchInfoEx).players) {
+    for (let player of (matchQuery.match as MatchInfoEx)?.players) {
       // 命石处理
       if (player.variant != null) {
         const constantsFacet = constantsQuery.constants.facets.find((facet) => facet.id === player.hero.facets[player.variant - 1]?.facetId || facet.name === player.hero.facets[player.variant - 1]?.name);
