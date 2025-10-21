@@ -290,43 +290,104 @@ function convertGameMode(openDotaGameModeId: number): GameModeEnumType {
   }
 }
 
+/**
+ * 为一个5人团队分配 1, 3, 4, 5 号位（假设 2 号位已被移除）
+ */
+function assignSideLanePositions(sideLanePlayers: PlayerWithPosition[]) {
+  // 确保按补刀降序排序
+  sideLanePlayers.sort((a, b) => b.last_hits - a.last_hits);
+
+  // Step.1: 确定核心
+  const pos1 = sideLanePlayers[0];
+  const pos3 = sideLanePlayers[1];
+  pos1.calculatedPosition = 1;
+  pos3.calculatedPosition = 3;
+
+  // Step.2: 确定辅助
+  const supA = sideLanePlayers[2];
+  const supB = sideLanePlayers[3];
+
+  // 默认分配：补刀高的辅助是4，低的5
+  let pos4 = supA;
+  let pos5 = supB;
+
+  // 修正：如果补刀高的辅助（supA）和1号位同路，那他才是5号位
+  if (supA.lane === pos1.lane) {
+    pos5 = supA;
+    pos4 = supB;
+  }
+  // (如果补刀低的 supB 和 1 号位同路，那默认分配就是对的，无需改变)
+
+  pos4.calculatedPosition = 4;
+  pos5.calculatedPosition = 5;
+}
+
+/**
+ * 健壮的1-5号位推断函数
+ */
 function determinePlayerPositions(match: OpenDotaMatch) {
   const players = match.players as PlayerWithPosition[];
-  // Locating Players Position
-  // Step.1 单独锁定中单
-  players
-    .filter((p) => p.lane === 2)
-    .forEach((p) => {
-      p.calculatedPosition = 2;
-    });
-  // Step.2 对边路分组
-  const sideLanePlayers = players.filter((p) => p.lane !== 2);
-  const radiant = sideLanePlayers.filter((p) => p.isRadiant).sort((a, b) => b.last_hits - a.last_hits);
-  const dire = sideLanePlayers.filter((p) => !p.isRadiant).sort((a, b) => b.last_hits - a.last_hits);
-  // Step.3 区分核心与辅助 + Step.4 结合分路与角色确定Position
-  for (const team of [radiant, dire]) {
-    // 确定核心
-    team[0].calculatedPosition = 1; // Pos 1
-    team[1].calculatedPosition = 3; // Pos 3
 
-    // 确定辅助
-    const supA = team[2];
-    const supB = team[3];
-    const pos1 = team[0];
+  // 1. 按团队分组
+  const radiantTeam = players.filter((p) => p.isRadiant);
+  const direTeam = players.filter((p) => !p.isRadiant);
 
-    // 默认分配：补刀高的辅助是4，低的5
-    let pos4 = supA;
-    let pos5 = supB;
-
-    // 修正：如果补刀高的辅助（supA）和1号位同路，那他才是5号位
-    if (supA.lane === pos1.lane) {
-      pos5 = supA;
-      pos4 = supB;
+  // 2. 遍历两个团队
+  for (const team of [radiantTeam, direTeam]) {
+    // 确保团队有5名玩家，否则跳过（防止奇怪的比赛数据）
+    if (team.length !== 5) {
+      continue;
     }
-    // (如果补刀低的 supB 和 1 号位同路，那默认分配就是对的，无需改变)
 
-    pos4.calculatedPosition = 4;
-    pos5.calculatedPosition = 5;
+    // 3. 锁定真正的 2 号位
+    const midPlayers = team
+      .filter((p) => p.lane === 2)
+      .sort((a, b) => b.last_hits - a.last_hits);
+
+    let pos2Player: PlayerWithPosition | undefined = undefined;
+
+    if (midPlayers.length > 0) {
+      // 无论有多少人中路，补刀最高的是 2 号位
+      pos2Player = midPlayers[0];
+      pos2Player.calculatedPosition = 2;
+    }
+
+    // 4. 获取剩余的 4 名（或 5 名，如果没有中单）“边路”玩家
+    //    p !== pos2Player 会处理 pos2Player 是 undefined 的情况 (即没有中单)
+    const sideLanePlayers = team.filter((p) => p !== pos2Player);
+
+    // 5. 分配 1, 3, 4, 5
+    if (sideLanePlayers.length === 4) {
+      // 正常情况：1 个中单 + 4 个边路
+      assignSideLanePositions(sideLanePlayers);
+    } else if (sideLanePlayers.length === 5) {
+      // 特殊情况：没有中单（例如 5 人刚三或 5 人优势路）
+      // 我们需要从这 5 人中推断出 1, 2, 3, 4, 5
+
+      // 按经济排序
+      sideLanePlayers.sort((a, b) => b.net_worth - a.net_worth);
+
+      // 补刀前 3 是核心，后 2 是辅助
+      const pos1 = sideLanePlayers[0];
+      const pos2 = sideLanePlayers[1]; // 补刀第2的推断为 2 号位
+      const pos3 = sideLanePlayers[2];
+      const supA = sideLanePlayers[3];
+      const supB = sideLanePlayers[4];
+
+      pos1.calculatedPosition = 1;
+      pos2.calculatedPosition = 2;
+      pos3.calculatedPosition = 3;
+
+      // 辅助的 4/5 号位判断逻辑依然复用
+      let pos4 = supA;
+      let pos5 = supB;
+      if (supA.lane === pos1.lane) {
+        pos5 = supA;
+        pos4 = supB;
+      }
+      pos4.calculatedPosition = 4;
+      pos5.calculatedPosition = 5;
+    }
   }
 }
 function determineLaneOutcome(match: OpenDotaMatch) {
