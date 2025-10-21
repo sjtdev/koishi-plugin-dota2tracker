@@ -137,7 +137,7 @@ export class OpenDotaAdapter extends Service {
       radiantExperienceLeads: _match.radiant_xp_adv,
       winRates: null,
       players,
-      pickBans: _match.picks_bans.map((pb) => ({ isPick: pb.is_pick, ...(pb.is_pick ? { heroId: pb.hero_id, bannedHeroId: null } : { bannedHeroId: pb.hero_id, heroId: null }), order: pb.order })),
+      pickBans: _match.picks_bans?.map((pb) => ({ isPick: pb.is_pick, ...(pb.is_pick ? { heroId: pb.hero_id, bannedHeroId: null } : { bannedHeroId: pb.hero_id, heroId: null }), order: pb.order })),
       odParsed: true,
     };
 
