@@ -95,9 +95,6 @@ export class ParsePollingTask extends Service<Config> {
     if (isNewEntry) {
       this.ctx.dota2tracker.stratzAPI.requestParseMatch(matchId).then((value) => {
         this.logger.info(this.ctx.dota2tracker.i18n.gt(`dota2tracker.logger.parse_request_${value ? "sent" : "failed"}`, { matchId }));
-        if (this.config.enableOpenDotaFallback) {
-          this.logger.info(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.opendota_parse_request_on_later", { timeout: 5 }));
-        }
       });
     }
   }

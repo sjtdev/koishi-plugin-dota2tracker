@@ -168,7 +168,6 @@ dota2tracker:
     cron_not_enabled: "Cron service is not enabled; match report tracking cannot run."
     stratz_token_banned: "Stratz API request denied (403). This usually means your token or IP has been temporarily restricted due to unusual activity. For details, see the documentation: http://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/api-403.html"
     stratz_api_query_error: "Stratz API returned partial data with errors: {cause}"
-    opendota_parse_request_on_later: "OpenDota fallback is enabled. A parse request will be sent to OpenDota every {timeout} minutes, and the status will be checked every minute."
     opendota_parse_request_sent: "Parse request for match {matchId} has been sent to OpenDota servers successfully."
     opendota_parse_request_failed: "Failed to send parse request for match {matchId} to OpenDota servers."
   time:
