@@ -36,3 +36,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.extract_release_notes.outputs.notes }}
+          prerelease: true
