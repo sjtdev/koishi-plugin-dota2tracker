@@ -1,13 +1,25 @@
-import { Context, HTTP, Service } from "koishi";
+import { Context, Service } from "koishi";
 import { Config } from "../../config";
 import { OpenDotaMatch } from "../../@types/opendota-generated";
-import { lookup } from "dns/promises";
+import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { HttpsProxyAgent } from "https-proxy-agent";
+import { Agent as HttpAgent } from "http";
+import { Agent as HttpsAgent } from "https";
 
 export class OpenDotaAPI extends Service<Config> {
   private readonly BASE_URL = "https://api.opendota.com/api";
+  private readonly http: AxiosInstance;
+  private readonly abortController = new AbortController();
   constructor(ctx: Context) {
     super(ctx, "dota2tracker.opendota-api", true);
     this.config = ctx.config;
+
+    this.http = axios.create({ timeout: 10000, signal: this.abortController.signal });
+    ctx.on("dispose", this.dispose.bind(this));
+  }
+
+  dispose() {
+    this.abortController.abort();
   }
 
   async queryMatchInfo(matchId: number): Promise<OpenDotaMatch> {
@@ -31,38 +43,48 @@ export class OpenDotaAPI extends Service<Config> {
   }
 
   private async fetchData(type: "GET" | "POST", path: string, data?: any) {
-    // 创建独立的配置对象
-    const config: HTTP.RequestConfig & { lookup?: any } = {
-      responseType: "json",
-      proxyAgent: this.config.proxyAddress || undefined,
+    const config: AxiosRequestConfig = {
+      headers: {},
+      httpAgent: undefined,
+      httpsAgent: undefined,
     };
-    // 尝试使用 IPv4 解决无法访问的问题。
-    if (this.config.OpenDotaIPStack === "ipv4") {
-      // 只有在用户明确选择 'ipv4' 时，才定义并附加 customLookup
-      const customLookup = async (hostname, options, callback) => {
-        try {
-          const { address, family } = await lookup(hostname, { family: 4 });
-          callback(null, address, family);
-        } catch (err) {
-          callback(err, null, 0);
-        }
-      };
-      config.lookup = customLookup;
+
+    // 优先处理代理
+    if (this.config.proxyAddress) {
+      config.httpsAgent = new HttpsProxyAgent(this.config.proxyAddress);
+      config.httpAgent = new HttpsProxyAgent(this.config.proxyAddress);
     }
-    // 如果用户填写了OPENDOTA APIKEY，添加认证
+    // 仅在 *没有* 代理时，才应用 IPv4 强制策略
+    else if (this.config.OpenDotaIPStack === "ipv4") {
+      // 强制 axios 使用 family: 4
+      config.httpAgent = new HttpAgent({ family: 4 });
+      config.httpsAgent = new HttpsAgent({ family: 4 });
+    }
+
     if (this.config.OPENDOTA_API_KEY) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${this.config.OPENDOTA_API_KEY}`,
-      };
+      config.headers["Authorization"] = `Bearer ${this.config.OPENDOTA_API_KEY}`;
     }
-    switch (type) {
-      case "GET":
-        return await this.ctx.http.get(path, config);
-      case "POST":
-        return await this.ctx.http.post(path, data, config);
-      default:
-        throw new Error(`Unsupported HTTP method: ${type}`);
+
+    try {
+      let response;
+      if (type === "GET") {
+        response = await this.http.get(path, config);
+      } else {
+        response = await this.http.post(path, data, config);
+      }
+      return response.data;
+    } catch (error) {
+      this.logger.error("Fetch failed inside fetchData (axios). Detailed cause:");
+      this.logger.error(`Request URL: ${path}`);
+      if (axios.isAxiosError(error)) {
+        this.logger.error(`Axios Error: ${error.message}`);
+        this.logger.error(error.response?.data || error.code);
+        if (axios.isCancel(error)) {
+          this.logger.warn("Request was cancelled by plugin dispose.");
+        }
+      } else {
+        this.logger.error(error.cause || error);
+      }
     }
   }
 }

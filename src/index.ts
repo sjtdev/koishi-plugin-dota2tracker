@@ -34,7 +34,7 @@ export const name = "dota2tracker";
 export let usage = "";
 // export const inject = ["http", "database", "cron", "puppeteer", "cache"]; // 声明依赖
 export const inject = {
-  required: ["http", "database", "puppeteer", "cache"],
+  required: ["database", "puppeteer", "cache"],
   optional: ["cron"],
 };
 
