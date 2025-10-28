@@ -60,13 +60,24 @@ function generateLevelCircle(xp) {
 
 function generateDetails(rivals) {
   const svgHeight = 32;
-
   rivals.sort((a, b) => b.isRadiant - a.isRadiant);
+
   const gold = { radiant: rivals[0].stats.networthPerMinute.at(Math.min(10, rivals[0].stats.networthPerMinute.length - 1)), dire: rivals[1].stats.networthPerMinute.at(Math.min(10, rivals[1].stats.networthPerMinute.length - 1)) };
-  const kills = { radiant: rivals[0].stats.killEvents?.filter(e => e.time <= 600).length || 0, dire: rivals[1].stats.killEvents?.filter(e => e.time <= 600).length || 0 }
-  const deaths = { radiant: rivals[0].stats.deathEvents?.filter(e => e.time <= 600).length || 0, dire: rivals[1].stats.deathEvents?.filter(e => e.time <= 600).length || 0 }
-  const assists = { radiant: rivals[0].stats.assistEvents?.filter(e => e.time <= 600).length || 0, dire: rivals[1].stats.assistEvents?.filter(e => e.time <= 600).length || 0 }
-  const goldSplit = gold.radiant / (gold.radiant + gold.dire);
+  let kills = { radiant: 0, dire: 0 };
+  let deaths = { radiant: 0, dire: 0 };
+  let assists = { radiant: 0, dire: 0 };
+  let xp = { radiant: 0, dire: 0 };
+  const totalGold = gold.radiant + gold.dire;
+  const goldSplit = gold.radiant / (totalGold || 1);
+  if (match.odParsed) {
+    kills = { radiant: "-", dire: "-" };
+    deaths = { radiant: "-", dire: "-" };
+    assists = { radiant: "-", dire: "-" };
+  } else {
+    kills = { radiant: rivals[0].stats.killEvents?.filter(e => e.time <= 600).length || 0, dire: rivals[1].stats.killEvents?.filter(e => e.time <= 600).length || 0 }
+    deaths = { radiant: rivals[0].stats.deathEvents?.filter(e => e.time <= 600).length || 0, dire: rivals[1].stats.deathEvents?.filter(e => e.time <= 600).length || 0 }
+    assists = { radiant: rivals[0].stats.assistEvents?.filter(e => e.time <= 600).length || 0, dire: rivals[1].stats.assistEvents?.filter(e => e.time <= 600).length || 0 }
+  }
   return `
 <div class="details">
 <img src="${getImageUrl(rivals[0].hero.shortName, ImageType.HeroIcons)}" class="hero radiant" />
@@ -87,14 +98,14 @@ ${generateLevelCircle(rivals[0].stats.experiencePerMinute.slice(0, Math.min(11, 
       dominant-baseline="middle"
           fill="#fff"
           font-size="10"
-          text-anchor="start">${gold.radiant}</text>
+          text-anchor="start">${match.odParsed ? "~" : ""}${gold.radiant}</text>
 
       <!-- 右侧数值（夜魇） -->
       <text x="175" y="50%"
       dominant-baseline="middle"
           fill="#fff"
           font-size="10"
-          text-anchor="end">${gold.dire}</text>
+          text-anchor="end">${match.odParsed ? "~" : ""}${gold.dire}</text>
 
       <!-- 差值（上方） -->
       <text x="${180 * goldSplit}"
@@ -115,6 +126,9 @@ ${generateLevelCircle(rivals[1].stats.experiencePerMinute.slice(0, Math.min(11, 
 %>
 <div class="lane_outcome">
   <h4 class="title"><%= $t("dota2tracker.template.lane") %></h4>
+  <% if (match.odParsed) { %>
+  <p class="subtitle"><%= $t("dota2tracker.template.opendota.lane_outcome_tip") %></p>
+  <% } %>
   <div class="panel">
     <div class="lane">
       <div class="title">

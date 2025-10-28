@@ -111,3 +111,8 @@ dota2tracker:
     lane_mid: Mid
     lane_bottom: Bottom
     empty_extra_info: "No extra info"
+    opendota:
+      networth_unavailable: Net Worth Chart Unavailable
+      networth_unavailable_reason: Data source OpenDota does not provide per-minute net worth data.
+      lane_outcome_tip: (Based on gold earned, not net worth; ref only.)
+      gold_t: Gold Earned

@@ -140,8 +140,11 @@
               fill="none"
               stroke="rgba(100, 100, 100, 0.3)"
               stroke-width="1"/>
-
+        <% if (match.odParsed) { %>
+        <text x="30" y="7" fill="#ccc" font-size="12"><%= $t("dota2tracker.template.opendota.gold_t") %></text>
+        <% } else { %>
         <text x="30" y="7" font-size="12"><%= $t("dota2tracker.template.networth") %></text>
+        <% } %>
       </g>
 
       <!-- 经验（折线2） -->
@@ -179,9 +182,27 @@
   yScale = (svgHeight - padding * 2) / maxNetworth;
   %>
   <!-- 新增的经济图表 -->
-  <svg width="<%= svgWidth %>" height="<%= svgHeight %>" xmlns="http://www.w3.org/2000/svg">
-    <text x="50%" y="30" text-anchor="middle" font-size="16" font-weight="bold"><%= $t("dota2tracker.template.networth") %></text>
-    <!-- 横轴线与标签 -->
+<svg width="<%= svgWidth %>" height="<%= svgHeight %>" xmlns="http://www.w3.org/2000/svg">
+  <%# 检查数据源是否为 OpenDota %>
+  <% if (match.odParsed) { %>
+    <%# OpenDota 分支：显示灰色标题和居中提示 %>
+    <text x="50%" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#ccc">
+      <%# 标题：保持原始位置，修改文本和颜色 %>
+      <%= $t("dota2tracker.template.opendota.networth_unavailable") %>
+    </text>
+    <text x="50%" y="<%= svgHeight / 2 + 10 %>" text-anchor="middle" font-size="12" fill="#ccc">
+      <%# 提示：水平居中，大致垂直居中，灰色 %>
+      <%= $t("dota2tracker.template.opendota.networth_unavailable_reason") %>
+    </text>
+
+  <% } else { %>
+
+    <%# 非 OpenDota 分支（例如 Stratz）：渲染完整的图表 %>
+    <text x="50%" y="30" text-anchor="middle" font-size="16" font-weight="bold">
+      <%= $t("dota2tracker.template.networth") %> <%# 原始标题 %>
+    </text>
+
+    <%# --- 你现有的图表绘制代码开始 --- %>
     <% for (let i = 0; i < 5; i++) { %>
       <% const y = padding + i * ((svgHeight - padding * 2) / 4) %>
       <line x1="<%= padding %>" y1="<%= y %>" x2="<%= svgWidth - padding %>" y2="<%= y %>" stroke="gray" stroke-width="1" />
@@ -233,5 +254,8 @@
         />
       <% }) %>
     </g>
-  </svg>
+    <%# --- 你现有的图表绘制代码结束 --- %>
+
+  <% } %>
+</svg>
 </div>

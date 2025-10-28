@@ -52,6 +52,7 @@ body {
 }
 
 .lane_outcome {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 386px;
@@ -85,11 +86,11 @@ body {
   height: 32px;
 }
 
-.lane_outcome .panel .lane > .title > p:nth-child(1){
+.lane_outcome .panel .lane > .title > p:nth-child(1) {
   font-size: 12px;
 }
 
-.lane_outcome .panel .lane > .title > p:nth-child(2){
+.lane_outcome .panel .lane > .title > p:nth-child(2) {
   font-size: 14px;
 }
 
@@ -104,7 +105,7 @@ body {
   align-items: center;
 }
 
-.lane_outcome .panel .lane img.hero{
+.lane_outcome .panel .lane img.hero {
   width: 24px;
   height: 24px;
 }
@@ -128,4 +129,15 @@ body {
 .graph text {
   dominant-baseline: middle; /* 垂直居中 */
   white-space: nowrap; /* 防止换行 */
+}
+
+.lane_outcome .subtitle {
+  position: absolute;
+  inset: 0;
+  top: 36px;
+  text-align: center;
+  color: #ccc;
+  font-size: 12px;
+  margin: 0;
+  z-index: 1;
 }
