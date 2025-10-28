@@ -2,6 +2,7 @@ import { Context, Service } from "koishi";
 import { Benchmarks, OpenDotaMatch } from "../../@types/opendota-generated";
 import * as dotaconstants from "dotaconstants";
 import { LeaverStatusEnum, MatchInfoQuery, MatchLaneType, MatchPlayerPositionType, LaneOutcomeEnums, LobbyTypeEnum, GameModeEnumType } from "../../@types/graphql-generated";
+import { clamp } from "../common/utils";
 
 export class OpenDotaAdapter extends Service {
   constructor(ctx: Context) {
@@ -61,8 +62,8 @@ export class OpenDotaAdapter extends Service {
         },
         dotaPlus: null,
         stats: {
-          networthPerMinute: _player.gold_t,
-          experiencePerMinute: _player.xp_t,
+          networthPerMinute: _player.gold_t.map((g) => g + 600), // OpenDota一大缺陷，没有networth per minute类似的字段，只能通过gold_t累计获取金币曲线+600初始金币模拟，并且因为缺少扣除部分，随着时间延长偏差会逐渐增大。
+          experiencePerMinute: _player.xp_t.slice(1).map((x, i, arr) => x - (arr?.[i - 1] || 0)), // OpenDota: xp_t为累计获取经验曲线，赋值给stratz的每分钟经验增量需要转换。
           campStack: [_player.camps_stacked],
           matchPlayerBuffEvent: [],
           killEvents: [],
@@ -123,7 +124,10 @@ export class OpenDotaAdapter extends Service {
       parsedDateTime: _match.start_time + _match.duration,
       startDateTime: _match.start_time,
       endDateTime: _match.start_time + _match.duration,
-      rank: (({ sum, count }) => (count ? sum / count : 0))(_match.players.reduce((acc, player) => (player.rank_tier != null ? { sum: acc.sum + player.rank_tier, count: acc.count + 1 } : acc), { sum: 0, count: 0 })),
+      rank: ((avg) => {
+        const num = Math.round(avg);
+        return clamp(Math.floor(num / 10), 0, 8) * 10 + clamp(num % 10, 0, 5);
+      })((({ sum, count }) => (count ? sum / count : 0))(_match.players.reduce((acc, player) => (player.rank_tier != null ? { sum: acc.sum + player.rank_tier, count: acc.count + 1 } : acc), { sum: 0, count: 0 }))),
       actualRank: 0,
       averageRank: 0,
       durationSeconds: _match.duration,
@@ -133,8 +137,8 @@ export class OpenDotaAdapter extends Service {
       ...determineLaneOutcome(_match),
       radiantKills: [_match.radiant_score],
       direKills: [_match.dire_score],
-      radiantNetworthLeads: _match.radiant_gold_adv,
-      radiantExperienceLeads: _match.radiant_xp_adv,
+      radiantNetworthLeads: [0, ..._match.radiant_gold_adv], // 同样，此处的radiant_gold_adv也是基于累计获取金币的差值而非经济差。
+      radiantExperienceLeads: [0, ..._match.radiant_xp_adv], // opendota两组数据都需要补充-1分钟时的数据对齐stratz格式。
       winRates: null,
       players,
       pickBans: _match.picks_bans?.map((pb) => ({ isPick: pb.is_pick, ...(pb.is_pick ? { heroId: pb.hero_id, bannedHeroId: null } : { bannedHeroId: pb.hero_id, heroId: null }), order: pb.order })),
@@ -340,9 +344,7 @@ function determinePlayerPositions(match: OpenDotaMatch) {
     }
 
     // 3. 锁定真正的 2 号位
-    const midPlayers = team
-      .filter((p) => p.lane === 2)
-      .sort((a, b) => b.last_hits - a.last_hits);
+    const midPlayers = team.filter((p) => p.lane === 2).sort((a, b) => b.last_hits - a.last_hits);
 
     let pos2Player: PlayerWithPosition | undefined = undefined;
 
