@@ -111,8 +111,8 @@ export interface OpenDotaMatchPlayer {
     sen_log?:                   ObsLeftLogElement[];
     obs_left_log?:              ObsLeftLogElement[];
     sen_left_log?:              ObsLeftLogElement[];
-    purchase_log?:              KillsLogElement[];
-    kills_log?:                 KillsLogElement[];
+    purchase_log?:              logElement[];
+    kills_log?:                 logElement[];
     buyback_log?:               Chat[];
     runes_log?:                 RunesLog[];
     connection_log?:            any[];
@@ -277,7 +277,7 @@ export type ItemRarity = "mythical" | "immortal" | "arcana" | "legendary" | "unc
 
 export type Prefab = "wearable" | "ward" | "courier" | "taunt" | "tool" | "streak_effect";
 
-export interface KillsLogElement {
+export interface logElement {
     time?: number;
     key?:  string;
 }
