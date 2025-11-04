@@ -5,7 +5,7 @@
   "packageFiles": ["package.json"],
   "types": [
     { "type": "feat", "section": "✨ 新增功能" },
-    { "type": "refine", "section": "🚀 功能优化", "hidden": false },
+    { "type": "improve", "section": "🚀 功能优化", "hidden": false },
     { "type": "fix", "section": "🐛 Bug 修复" },
     { "type": "perf", "section": "⚡ 性能提升" },
     { "type": "revert", "section": "⏪ 回滚" },

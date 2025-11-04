@@ -8,7 +8,7 @@ module.exports = {
       [
         // 在这里继承默认规则，并加入你自己的类型
         'build', 'chore', 'ci', 'docs', 'feat', 'fix', 'perf', 'refactor', 'revert', 'style', 'test',
-        'refine' // <-- 在这里加入我们自定义的类型
+        'improve' // <-- 在这里加入我们自定义的类型
       ]
     ]
   }
