@@ -9,7 +9,6 @@ import yaml from "js-yaml";
 import puppeteer, { Browser } from "puppeteer";
 import http from "http";
 import https from "https";
-import url from "url";
 import { DateTime, Settings } from "luxon";
 
 import { Random } from "koishi";
@@ -19,6 +18,8 @@ import { PlayerService } from "../src/app/core/player.service";
 import { HeroService } from "../src/app/core/hero.service";
 import { ItemService } from "../src/app/core/item.service";
 import { MatchInfoEx } from "../src/app/data/types";
+
+import { createHash } from "crypto";
 
 enum GraphqlLanguageEnum {
   "en-US" = "ENGLISH",
@@ -68,7 +69,7 @@ Settings.defaultZone = "utc";
   try {
     const templatesPath = path.join(ROOT_PATH, "template");
     const dataPath = path.join(ROOT_PATH, "src", "docs", ".vitepress", "data");
-    for (const languageTag of Object.keys(GraphqlLanguageEnum)) {
+    for (const languageTag of Object.keys(GraphqlLanguageEnum) as Array<keyof typeof GraphqlLanguageEnum>) {
       for (const templateType of fs.readdirSync(templatesPath)) {
         for (const template of fs.readdirSync(path.join(templatesPath, templateType))) {
           if (template.endsWith(".ejs") && ["match", "player", "hero", "rank", "daily", "item"].some((targets) => template.startsWith(targets))) {
@@ -89,7 +90,7 @@ Settings.defaultZone = "utc";
               const miniPlayerExtraData = Object.assign({}, playerExtraQuery);
               miniPlayerData.player.matches = miniPlayerData.player.matches.slice(0, 10);
               miniPlayerExtraData.player.heroesPerformance = miniPlayerExtraData.player.heroesPerformance.slice(0, 5);
-              miniPlayerExtraData.player.dotaPlus = miniPlayerExtraData.player.dotaPlus.sort((a, b) => (a.level < b.level ? 1 : -1)).slice(0, 3);
+              miniPlayerExtraData.player.dotaPlus = (miniPlayerExtraData.player.dotaPlus as any[]).sort((a, b) => (a.level < b.level ? 1 : -1)).slice(0, 3);
               await renderImage({ data: PlayerService.extendPlayerData({ playerQuery: miniPlayerData, playerExtraQuery: miniPlayerExtraData }), languageTag, templateFile, template, browser, suffix: "mini" });
               const anonymousPlayerData = Object.assign({}, playerQuery);
               anonymousPlayerData.player.steamAccount.isAnonymous = true;
@@ -168,7 +169,7 @@ async function renderImage(params: { data: object; languageTag: string; template
   try {
     page.setDefaultNavigationTimeout(60000); // 60秒超时
     await page.setContent(html, { waitUntil: "networkidle0" });
-    await page.waitForSelector('body', { timeout: 10000 });
+    await page.waitForSelector("body", { timeout: 10000 });
     await Promise.all([
       page.waitForNetworkIdle({
         idleTime: 500, // 500ms内没有网络请求
@@ -194,27 +195,32 @@ async function renderImage(params: { data: object; languageTag: string; template
       height: dimensions.height,
     });
 
-    const buffer = await page.screenshot({ type: "png", fullPage: true });
+    const buffer = await page.screenshot({ type: "png" });
     // fs.writeFileSync(path.join(__dirname, "..", "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.html`), html);
     fs.writeFileSync(path.join(ROOT_PATH, "src", "docs", "public", (languageTag == "zh-CN" ? "" : languageTag) as string, "generated", `${imageFileName}.png`), buffer);
     console.log(languageTag, imageFileName);
   } catch (error) {
-    throw error;
+    // 明确地打印出“真正的”错误
+    console.error(`[renderImage Error] Failed to render ${imageFileName}:`, error);
+    throw error; // 仍然抛出，让脚本停止
   } finally {
-    await page.close();
+    // 增加一个健壮性检查
+    if (page && !page.isClosed()) {
+      await page.close();
+    }
   }
 }
 enum valveLanguageTag {
   "zh-CN" = "schinese",
   "en-US" = "english",
 }
-async function queryHeroDetailsFromValve(heroId: number, languageTag = "zh-CN") {
+async function queryHeroDetailsFromValve(heroId: number, languageTag: keyof typeof valveLanguageTag = "zh-CN") {
   return JSON.parse(await httpGet(`https://www.dota2.com/datafeed/herodata?language=${valveLanguageTag[languageTag]}&hero_id=${heroId}`)).result.data.heroes[0];
 }
-async function queryItemListFromValve(languageTag = "zh-CN"): Promise<any[]> {
+async function queryItemListFromValve(languageTag: keyof typeof valveLanguageTag = "zh-CN"): Promise<any[]> {
   return JSON.parse(await httpGet(`https://www.dota2.com/datafeed/itemlist?language=${valveLanguageTag[languageTag]}`)).result.data.itemabilities;
 }
-async function queryItemDetailsFromValve(itemId: number, languageTag = "zh-CN") {
+async function queryItemDetailsFromValve(itemId: number, languageTag: keyof typeof valveLanguageTag = "zh-CN") {
   return JSON.parse(await httpGet(`https://www.dota2.com/datafeed/itemdata?language=${valveLanguageTag[languageTag]}&item_id=${itemId}`)).result.data.items[0];
 }
 async function queryLastPatchNumber(): Promise<string> {
@@ -223,7 +229,7 @@ async function queryLastPatchNumber(): Promise<string> {
 
 function httpGet(urlString: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    const parsedUrl = url.parse(urlString);
+    const parsedUrl = new URL(urlString);
     const protocol = parsedUrl.protocol === "https:" ? https : http;
 
     protocol
