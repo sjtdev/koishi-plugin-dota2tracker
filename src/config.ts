@@ -9,6 +9,7 @@ export interface Config {
   dataParsingTimeoutMinutes: number;
   proxyAddress: string;
   suppressStratzNetworkErrors: boolean;
+  suppressApiNetworkErrors: boolean;
   enableOpenDotaFallback: boolean;
   OPENDOTA_API_KEY: string;
   OpenDotaIPStack: string;
@@ -45,7 +46,8 @@ export const Config: Schema = Schema.intersect([
       STRATZ_API_TOKEN: Schema.string().required().role("secret"),
       dataParsingTimeoutMinutes: Schema.number().default(60).min(0).max(1440),
       proxyAddress: Schema.string(),
-      suppressStratzNetworkErrors: Schema.boolean().default(false),
+      suppressStratzNetworkErrors: Schema.boolean().default(false).deprecated(),
+      suppressApiNetworkErrors: Schema.boolean().default(false),
       enableOpenDotaFallback: Schema.boolean().default(false),
     }).i18n(getI18n("base")),
     Schema.union([

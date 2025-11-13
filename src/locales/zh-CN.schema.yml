@@ -3,10 +3,17 @@ _config:
     $desc: 基础设置
     STRATZ_API_TOKEN: ※必须。stratz.com的API TOKEN，可在 https://stratz.com/api 获取。
     dataParsingTimeoutMinutes: 等待比赛数据解析的时间（单位：分钟）。如果数据解析时间超过等待时间，将直接生成战报而不再等待解析完成。
-    proxyAddress: 代理地址，留空时不使用代理
-    suppressStratzNetworkErrors: |-
-      开启后将stratz网络错误日志（如超时、网络不通等，但403 Forbidden除外）使用debug级别输出，默认不显示debug级日志。  
-      若需要开启debug日志显示，请见 [📖 配置项#suppressstratznetworkerrors](http://sjtdev.github.io/koishi-plugin-dota2tracker/configs.html#suppressstratznetworkerrors-boolean)
+    proxyAddress: |-
+      代理地址，不使用代理请留空。  
+      ※无法使用`proxy-agent`插件配置的全局代理地址，欲使用代理必须设置此项。
+    suppressStratzNetworkErrors: |-  
+      **请使用下方通用于 stratz 与 opendota 的配置项`suppressApiNetworkErrors`。  
+      此配置项仍然生效，当与`suppressApiNetworkErrors`任一启用时将会使 stratz/opendota 日志降级到debug输出。  
+      此配置项将于下版本被移除。**
+    suppressApiNetworkErrors: |-
+      开启后将 stratz/opendota 网络错误日志使用debug级别输出。  
+      (如超时、网络不通等，但403 Forbidden除外)  
+      koishi默认不显示debug级日志，若需要开启debug日志显示，请见 [📖 配置项#suppressapinetworkerrors](http://sjtdev.github.io/koishi-plugin-dota2tracker/configs.html#suppressapinetworkerrors-boolean)
     enableOpenDotaFallback: 启用 OpenDota 作为战报追踪与查询比赛功能的备用数据源。
     OPENDOTA_API_KEY: |-
       OpenDota 的订阅付费APIKEY，  

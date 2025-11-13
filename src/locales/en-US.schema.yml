@@ -3,8 +3,17 @@ _config:
     $desc: Basic Settings
     STRATZ_API_TOKEN: Required. API TOKEN from stratz.com, available at https://stratz.com/api.
     dataParsingTimeoutMinutes: Time to wait for match data parsing (in minutes). If the data parsing time exceeds the waiting time, the report will be generated directly without waiting for the parsing to complete.
-    proxyAddress: Proxy address. Leave blank to disable the proxy.
-    suppressStratzNetworkErrors: "When enabled, downgrades Stratz network errors (e.g. timeouts) to lower-priority output. Debug-level logs are hidden by default. To enable debug logging, see [📖 Documentation: Configuration](http://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/configs.html#suppressstratznetworkerrors-boolean)"
+    proxyAddress: |-
+       Proxy address. Leave blank if not using a proxy.  
+       ※Cannot use the global proxy address configured by the `proxy-agent` plugin. This option must be set if you want to use a proxy.
+    suppressStratzNetworkErrors: |- 
+       **Please use the `suppressApiNetworkErrors` option below, which applies to both Stratz and OpenDota.  
+       This option is still effective. If either this or `suppressApiNetworkErrors` is enabled, Stratz/OpenDota logs will be downgraded to debug output.  
+       This option will be removed in a future version.**
+    suppressApiNetworkErrors: |-
+       When enabled, Stratz/OpenDota network error logs will be output at the debug level.  
+       (e.g., timeouts, network connection issues, but excludes 403 Forbidden)  
+       Koishi does not display debug-level logs by default. To enable debug log display, please see [📖 Configs#suppressapinetworkerrors](http://sjtdev.github.io/koishi-plugin-dota2tracker/configs.html#suppressapinetworkerrors-boolean)
     enableOpenDotaFallback: Enable OpenDota as a fallback data source for match tracking and query-match features.
     OPENDOTA_API_KEY: |-
       Your paid subscription API key for OpenDota.  
