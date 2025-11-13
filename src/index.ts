@@ -46,6 +46,7 @@ const pluginVersion = require(path.join(pluginDir, "package.json")).version as s
 export async function apply(ctx: Context, config: Config) {
   // write your plugin here
 
+  const logger = ctx.logger("dota2tracker");
   // 注册模块为自定义服务
   ctx.dota2tracker = {} as any;
   ctx.dota2tracker.i18n = new I18NService(ctx);
@@ -63,7 +64,7 @@ export async function apply(ctx: Context, config: Config) {
       await ctx.dota2tracker.parsePolling.polling();
     });
   } else {
-    ctx.logger("dota2tracker").info(ctx.dota2tracker.i18n.gt("dota2tracker.logger.cron_not_enabled"));
+    logger.info(ctx.dota2tracker.i18n.gt("dota2tracker.logger.cron_not_enabled"));
   }
   ctx.dota2tracker.hero = new HeroService(ctx);
   ctx.dota2tracker.item = new ItemService(ctx);
