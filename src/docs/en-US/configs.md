@@ -17,7 +17,9 @@
 - After the match ends, if the wait time exceeds this configured value, incomplete match reports will be published.
 
 #### proxyAddress `string`
-- Proxy address. Leave blank to disable the proxy.
+- Proxy address. If left blank, no proxy will be used.
+> [!WARNING] Note
+> The plugin's network request dependency has been switched from the `http` service to the `axios` package starting from version `2.2.2`. Therefore, the plugin cannot use the global proxy configured by the `proxy-agent` plugin and only supports the proxy address set via this option.
 
 #### suppressApiNetworkErrors `boolean`
 > Due to the instability of the Stratz server and varying network conditions, a large number of network errors (e.g., timeouts) can occur during data polling. This option is available to suppress these errors and prevent them from flooding your logs.  

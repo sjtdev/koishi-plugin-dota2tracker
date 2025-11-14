@@ -19,6 +19,8 @@
 
 #### proxyAddress `string`
 - 代理地址，留空时不使用代理。
+> [!WARNING] 注意
+> 从`2.2.2`版本起插件的网络请求依赖由`http`服务切换至`axios`包，因而插件无法使用`proxy-agent`插件配置的全局代理，仅支持使用此配置项设置的代理地址。
 
 #### suppressApiNetworkErrors `boolean`
 > 因为stratz服务器不稳，叠加网络环境错综复杂的原因，导致在某些情况某些时段下轮询数据时报出大量网络错误，所以推出该选项以隐藏这些错误。  
