@@ -72,7 +72,7 @@ jobs:
         run: |
           npm install -D typescript @types/node @types/ejs @types/js-yaml @types/i18next
           # npm install -D tsx puppeteer ejs @types/puppeteer
-          npm install dotaconstants moment i18next js-yaml vitepress@2.0.0-alpha.8
+          npm install dotaconstants moment i18next js-yaml vitepress@2.0.0-alpha.12
           npm install @cordisjs/vitepress viewerjs
           npm install
 
