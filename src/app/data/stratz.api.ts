@@ -1,9 +1,11 @@
 import fs from "fs";
-import { Context, HTTP, Service } from "koishi";
+import { Context, Service } from "koishi";
 import path from "path";
 import * as graphql from "../../@types/graphql-generated";
 import { Config } from "../../config";
 import { GraphQLQueryError, processFetchError } from "../common/error";
+import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { HttpsProxyAgent } from "https-proxy-agent";
 
 interface QueryFormat {
   query: string;
@@ -17,6 +19,8 @@ interface QueryResult {
 export class StratzAPI extends Service<Config> {
   private readonly BASE_URL = "https://api.stratz.com/graphql";
   private readonly queue: MiniQueue;
+  private readonly http: AxiosInstance;
+  private readonly abortController = new AbortController();
   constructor(
     ctx: Context,
     private pluginDir: string,
@@ -24,10 +28,14 @@ export class StratzAPI extends Service<Config> {
     super(ctx, "dota2tracker.stratz-api", true);
     this.config = ctx.config;
     this.queue = new MiniQueue(ctx, { interval: 200 });
+    this.http = axios.create({ timeout: 10000, signal: this.abortController.signal });
+    ctx.on("dispose", () => this.dispose());
   }
   dispose() {
     // 当 StratzAPI 服务被销毁时，自动销毁队列
     this.queue.dispose();
+    // 终止 axios 请求
+    this.abortController.abort();
   }
 
   public async queryGetWeeklyMetaByPosition({ bracketIds }: graphql.GetWeeklyMetaByPositionQueryVariables) {
@@ -125,7 +133,7 @@ export class StratzAPI extends Service<Config> {
         const query_str = this.loadGraphqlFile(queryName); // 如果有额外的参数，保持传递下去
 
         // 等待请求之间加入延迟 ---- 使用p-queue已无需手动加入延迟
-        const result: QueryResult["data"] = await this.fetchData({ query: query_str, variables }, isValid);
+        const result: QueryResult["data"] = await this.fetchData({ query: query_str, variables }, isValid, queryName);
 
         // 确保每次请求返回的是{ data: { players: [...] } }格式
         if (result && result.players) {
@@ -138,24 +146,27 @@ export class StratzAPI extends Service<Config> {
     } else {
       // 如果不需要分批，直接进行查询
       const query_str = this.loadGraphqlFile(queryName);
-      const result = await this.fetchData({ query: query_str, variables }, isValid);
+      const result = await this.fetchData({ query: query_str, variables }, isValid, queryName);
       return result as TData;
     }
   }
 
-  private async fetchData<TData>(query: QueryFormat, isValid): Promise<void | TData> {
+  private async fetchData<TData>(query: QueryFormat, isValid: Function, queryName: string): Promise<void | TData> {
     // 使用 queue.add() 来包装真正的请求逻辑
     return this.queue.add(async () => {
       try {
-        const result = await this.ctx.http.post(this.BASE_URL, JSON.stringify(query), {
+        const config: AxiosRequestConfig = {
           responseType: "json",
-          headers: {
-            "User-Agent": "STRATZ_API",
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${this.config.STRATZ_API_TOKEN}`,
-          },
-          proxyAgent: this.config.proxyAddress || undefined,
-        });
+          headers: { "User-Agent": "STRATZ_API", "Content-Type": "application/json", Authorization: `Bearer ${this.config.STRATZ_API_TOKEN}` },
+          httpAgent: undefined,
+          httpsAgent: undefined,
+        };
+
+        if (this.config.proxyAddress) {
+          config.httpsAgent = new HttpsProxyAgent(this.config.proxyAddress);
+          config.httpAgent = new HttpsProxyAgent(this.config.proxyAddress);
+        }
+        const result = (await this.http.post(this.BASE_URL, JSON.stringify(query), config)).data;
 
         // 现在，我们使用调用者提供的 isValid 函数来判断数据是否有效
         const isDataValid = isValid(result.data);

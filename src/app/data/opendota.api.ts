@@ -15,8 +15,8 @@ export class OpenDotaAPI extends Service<Config> {
     super(ctx, "dota2tracker.opendota-api", true);
     this.config = ctx.config;
 
-    this.http = axios.create({ timeout: 10000, signal: this.abortController.signal });
-    ctx.on("dispose", this.dispose.bind(this));
+    this.http = axios.create({ timeout: 10000, signal: this.abortController.signal, baseURL: this.BASE_URL });
+    ctx.on("dispose", () => this.dispose());
   }
 
   dispose() {
@@ -25,7 +25,7 @@ export class OpenDotaAPI extends Service<Config> {
 
   async queryMatchInfo(matchId: number): Promise<OpenDotaMatch> {
     // 创建查询比赛请求路径
-    const path = `${this.BASE_URL}/matches/${matchId}`;
+    const path = `/matches/${matchId}`;
     // 发送请求并返回比赛数据
     const data = await this.fetchData("GET", path);
     // 记录请求到今日缓存
@@ -35,7 +35,7 @@ export class OpenDotaAPI extends Service<Config> {
 
   async requestParseMatch(matchId: number) {
     // 创建解析请求路径
-    const path = `${this.BASE_URL}/request/${matchId}`;
+    const path = `/request/${matchId}`;
     // 发送解析请求并返回解析job
     const job = await this.fetchData("POST", path);
     // 记录请求到今日缓存，并记录次数
