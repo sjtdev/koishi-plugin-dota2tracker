@@ -155,7 +155,8 @@ dota2tracker:
     ejs_error: EJS模板渲染错误：{error}
     cron_not_enabled: 未启用cron服务，无法运行战报追踪等定时任务。
     stratz_token_banned: "Stratz API 请求被拒绝(403)，若频繁发生很有可能意味着您的Token或IP因异常使用被临时限制访问。有关此报错请见文档：http://sjtdev.github.io/koishi-plugin-dota2tracker/api-403.html"
-    stratz_api_query_error: "Stratz API 返回了有效数据，但报错: {cause}"
+    opendota_token_banned: "OpenDota API 请求被拒绝(403)，请注意访问次数是否超限。"
+    stratz_api_query_error: "Stratz API 返回了有效数据，但同时也返回了查询报错。错误信息: {cause}"
     opendota_parse_request_sent: "比赛 {matchId} 解析请求已成功发送至 OpenDota 服务器。"
     opendota_parse_request_failed: "比赛 {matchId} 解析请求向 OpenDota 服务器发送失败。"
   time:

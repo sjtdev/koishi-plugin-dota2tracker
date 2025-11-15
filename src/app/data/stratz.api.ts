@@ -3,8 +3,7 @@ import { Context, HTTP, Service } from "koishi";
 import path from "path";
 import * as graphql from "../../@types/graphql-generated";
 import { Config } from "../../config";
-import { ForbiddenError, NetworkError } from "../common/error";
-import {} from "@koishijs/plugin-proxy-agent";
+import { GraphQLQueryError, processFetchError } from "../common/error";
 
 interface QueryFormat {
   query: string;
@@ -162,36 +161,22 @@ export class StratzAPI extends Service<Config> {
         const isDataValid = isValid(result.data);
 
         if (result.errors) {
-          const error = result.errors.map((e) => e.message).join("\n");
+          const errors = result.errors.map((e) => e.message);
+          const details = errors.join("\n");
           if (isDataValid) {
             // 情况1：部分成功 (有错误，但数据仍然有效)
-            this.logger.warn(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.stratz_api_query_error", { cause: error }));
+            this.logger.warn(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.stratz_api_query_error", { cause: details }));
             return result.data as TData;
           } else {
             // 情况2：完全失败 (有错误，且数据无效)
-            throw new Error("Stratz API Error", { cause: error });
+            throw new GraphQLQueryError("Stratz API query failed and returned invalid data", errors);
           }
         }
 
         // 情况3：完全成功
         return result.data as TData;
       } catch (error) {
-        // 1. 优先检查 HTTP 状态码错误
-        if (error.response) {
-          if (error.response.status === 403) {
-            throw new ForbiddenError("Stratz API Forbidden", { cause: error });
-          }
-          // 其他所有 4xx, 5xx 错误都归为 NetworkError
-          throw new NetworkError("Stratz API HTTP Error", { cause: error });
-        }
-        // 2. 检查是否有 code 属性，这通常意味着是底层连接错误
-        else if (error.code) {
-          throw new NetworkError("Stratz API Connection Error", { cause: error });
-        }
-        // 3. 其他所有错误（比如 GraphQL 返回的 result.errors）
-        else {
-          throw error;
-        }
+        processFetchError(error, "Stratz", queryName);
       }
     });
   }

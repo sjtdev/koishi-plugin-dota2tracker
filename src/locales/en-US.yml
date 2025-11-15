@@ -166,7 +166,8 @@ dota2tracker:
     rank_sent: Posted rank change information of {player.nickName} ({player.steamId}) on {platform}:{guildId}.
     ejs_error: "Error rendering EJS template: {error}"
     cron_not_enabled: "Cron service is not enabled; match report tracking cannot run."
-    stratz_token_banned: "Stratz API request denied (403). This usually means your token or IP has been temporarily restricted due to unusual activity. For details, see the documentation: http://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/api-403.html"
+    stratz_token_banned: "Stratz API request rejected (403). This usually means your token or IP has been temporarily restricted due to unusual activity. For details, see the documentation: http://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/api-403.html"
+    opendota_token_banned: "OpenDota API request rejected (403). Please check if the access limit has been exceeded."
     stratz_api_query_error: "Stratz API returned partial data with errors: {cause}"
     opendota_parse_request_sent: "Parse request for match {matchId} has been sent to OpenDota servers successfully."
     opendota_parse_request_failed: "Failed to send parse request for match {matchId} to OpenDota servers."

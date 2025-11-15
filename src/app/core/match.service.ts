@@ -1,9 +1,10 @@
-import { Context, Service, Session } from "koishi";
+import { Context, Service } from "koishi";
 import * as graphql from "../../@types/graphql-generated";
-import { MatchInfoEx, PlayerInfoExInMatch, PlayerInfoEx } from "../data/types";
+import { MatchInfoEx, PlayerInfoExInMatch } from "../data/types";
 import * as dotaconstants from "dotaconstants";
 import { sec2time, formatNumber } from "../common/utils";
 import { HeroService } from "./hero.service";
+import { FetchMatchDataFailError, handleError } from "../common/error";
 
 export class MatchService extends Service {
   constructor(
@@ -15,40 +16,96 @@ export class MatchService extends Service {
 
   public async getMatchResult({
     matchId,
-    requestParse,
-    requsetOpenDota,
+    waitForParse,
+    allowFallback,
   }: {
     matchId: number;
-    requestParse?: boolean;
-    requsetOpenDota?: boolean;
-  }): Promise<{ status: "READY"; matchData: graphql.MatchInfoQuery } | { status: "PENDING"; matchId: number } | { status: "NOT_FOUND" }> {
-    const matchQuery = await this.getMatchData(matchId);
-    if (matchQuery) {
-      // 未解析 & 请求解析 & 存在 cron
-      if (!MatchService.isMatchParsed(matchQuery) && requestParse && this.ctx.cron) {
-        if (requsetOpenDota) {
-          const odMatchQuery = await this.getOpenDotaMatchData(matchId);
-          if (odMatchQuery) {
-            return {
-              status: "READY",
-              matchData: odMatchQuery,
-            };
-          }
-        }
-        return {
-          status: "PENDING",
-          matchId,
-        };
+    waitForParse: boolean; // 对应你的 requestParse
+    allowFallback: boolean; // 对应你的 requsetOpenDota
+  }): Promise<{ status: "READY"; matchData: any } | { status: "PENDING"; matchId: number } | { status: "NOT_FOUND" }> {
+    let stratzData: graphql.MatchInfoQuery | undefined = undefined;
+    let stratzError: unknown;
+
+    // --- 1. 尝试 Stratz API ---
+    try {
+      stratzData = await this.getMatchData(matchId);
+    } catch (error) {
+      // 捕获 Stratz 的所有错误 (NetworkError, ForbiddenError, GraphQLQueryError)
+      stratzError = error;
+    }
+
+    // --- 2. 评估 Stratz 结果 ---
+    if (stratzData) {
+      const isParsed = MatchService.isMatchParsed(stratzData);
+
+      if (isParsed) {
+        // 2a. 最佳情况：Stratz 成功且已解析
+        return { status: "READY", matchData: stratzData };
       }
 
-      return {
-        status: "READY",
-        matchData: matchQuery,
-      };
+      if (!waitForParse) {
+        // 2b. Stratz 成功（未解析），但调用者不关心解析 -> 立即返回
+        return { status: "READY", matchData: stratzData };
+      }
+
+      // 2c. Stratz 成功（未解析），调用者关心解析 -> 必须尝试 Fallback
+      if (!allowFallback) {
+        // ...但 Fallback 不允许 -> 只能 PENDING
+        return { status: "PENDING", matchId };
+      }
+      // ...否则（allowFallback: true），继续执行到步骤 3
+    } else if (stratzError) {
+      // 2d. Stratz API 失败
+      if (!allowFallback) {
+        // ...且 Fallback 不允许 -> 这是致命错误，抛出
+        throw stratzError;
+      }
+    } else {
+      // 2e. Stratz 成功返回，但数据为 null/undefined (即 NOT_FOUND)
+      if (!allowFallback) {
+        return { status: "NOT_FOUND" };
+      }
+      // ...否则（allowFallback: true），继续执行到步骤 3
     }
-    return {
-      status: "NOT_FOUND",
-    };
+
+    // --- 3. 尝试 OpenDota API (Fallback) ---
+    // (只有在 allowFallback 为 true，并且 Stratz 未能提供“READY”数据时，才会执行到这里)
+
+    let opendotaData: graphql.MatchInfoQuery | undefined = undefined;
+    let opendotaError: unknown;
+
+    try {
+      opendotaData = await this.getOpenDotaMatchData(matchId);
+    } catch (error) {
+      opendotaError = error; // 捕获 OpenDota 的所有错误
+    }
+
+    // --- 4. 评估 OpenDota 结果 ---
+    if (opendotaData) {
+      // 4a. OpenDota 成功（它总是“已解析”）
+      // 如果 stratz 失败，则打印 stratz 错误
+      if (stratzError) {
+        handleError(stratzError, this.logger, this.ctx.dota2tracker.i18n, this.ctx.config);
+      }
+      // 返回 OpenDota 数据
+      return { status: "READY", matchData: opendotaData };
+    }
+
+    // --- 5. 最终失败处理 ---
+    // (执行到这里，意味着 Stratz 和 OpenDota 都没能提供 READY 数据)
+
+    if (stratzError || opendotaError) {
+      // 5a. 如果在 *任何* 步骤中捕获到了 API 错误 -> 抛出复合错误
+      throw new FetchMatchDataFailError("Failed to fetch match data from all sources", { stratzError, opendotaError });
+    }
+
+    if (waitForParse) {
+      // 5b. 没有 API 错误，但两个源的数据都是“未解析”
+      return { status: "PENDING", matchId };
+    }
+
+    // 5c. 没有 API 错误，调用者也不关心解析，但两个源都返回了 "NOT_FOUND"
+    return { status: "NOT_FOUND" };
   }
 
   public async generateMatchData(rawMatchData: graphql.MatchInfoQuery, languageTag: string) {

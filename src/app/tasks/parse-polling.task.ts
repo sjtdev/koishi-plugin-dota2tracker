@@ -3,6 +3,7 @@ import { Config } from "../../config";
 import { TemplateType } from "../common/types";
 import { DateTime } from "luxon";
 import { handleError } from "../common/error";
+import { MatchService } from "../core/match.service";
 
 interface PendingMatchEntry {
   /** 比赛 ID */
@@ -115,23 +116,14 @@ export class ParsePollingTask extends Service<Config> {
       const timeout = requestTime.plus({ minutes: this.config.dataParsingTimeoutMinutes });
       const needToWait = DateTime.now() < timeout;
       // 得到比赛状态
-      const result = await this.ctx.dota2tracker.match.getMatchResult({ matchId: pendingMatch.matchId, requestParse: needToWait, requsetOpenDota: this.config.enableOpenDotaFallback });
-      // 是否仍然处于等待中
-      if (result.status === "PENDING") {
-        // 该场比赛已等待时间
-        const waitingTime = DateTime.now().diff(requestTime, "minutes");
-        const waitingTimeMinutes = Math.floor(waitingTime.minutes);
-        // 大于0分钟且每5分钟一次
-        if (waitingTimeMinutes > 0 && waitingTimeMinutes % 5 === 0) {
-          this.logger.info(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.waiting_for_parse", { matchId: pendingMatch.matchId, time: waitingTimeMinutes }));
-          if (this.config.enableOpenDotaFallback)
-            this.ctx.dota2tracker.opendotaAPI
-              .requestParseMatch(pendingMatch.matchId)
-              .then((value) => this.logger.info(this.ctx.dota2tracker.i18n.gt(`dota2tracker.logger.opendota_parse_request_${value ? "sent" : "failed"}`, { matchId: pendingMatch.matchId })));
-        }
-        return;
+      let result: Awaited<ReturnType<MatchService["getMatchResult"]>> | undefined;
+      try {
+        result = await this.ctx.dota2tracker.match.getMatchResult({ matchId: pendingMatch.matchId, waitForParse: needToWait, allowFallback: this.config.enableOpenDotaFallback });
+      } catch (error) {
+        handleError(error, this.logger, this.ctx.dota2tracker.i18n, this.ctx.config);
       }
-      if (result.status === "READY") {
+      // 战报已就绪
+      if (result && result.status === "READY") {
         // 将订阅按语言进行分组，以便后续按语言生成战报图片
         const subscribersByLang = new Map<string, PendingMatchSubscriber[]>();
         for (const subscriber of pendingMatch.subscribers) {
@@ -179,6 +171,22 @@ export class ParsePollingTask extends Service<Config> {
         // 在缓存中标记该比赛已发送
         this.ctx.dota2tracker.cache.markMatchAsSended(pendingMatch.matchId);
         this.pendingMatches.delete(pendingMatch.matchId);
+        return;
+      }
+      // 是否仍然处于等待中
+      if (!result || result.status === "PENDING") {
+        // 该场比赛已等待时间
+        const waitingTime = DateTime.now().diff(requestTime, "minutes");
+        const waitingTimeMinutes = Math.floor(waitingTime.minutes);
+        // 大于0分钟且每5分钟一次
+        if (waitingTimeMinutes > 0 && waitingTimeMinutes % 5 === 0) {
+          this.logger.info(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.waiting_for_parse", { matchId: pendingMatch.matchId, time: waitingTimeMinutes }));
+          if (this.config.enableOpenDotaFallback)
+            this.ctx.dota2tracker.opendotaAPI
+              .requestParseMatch(pendingMatch.matchId)
+              .then((value) => this.logger.info(this.ctx.dota2tracker.i18n.gt(`dota2tracker.logger.opendota_parse_request_${value ? "sent" : "failed"}`, { matchId: pendingMatch.matchId })));
+        }
+        return;
       }
     } catch (error) {
       handleError(error, this.logger, this.ctx.dota2tracker.i18n, this.ctx.config);

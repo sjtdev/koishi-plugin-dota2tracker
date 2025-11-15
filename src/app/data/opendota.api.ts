@@ -5,6 +5,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import { Agent as HttpAgent } from "http";
 import { Agent as HttpsAgent } from "https";
+import { processFetchError } from "../common/error";
 
 export class OpenDotaAPI extends Service<Config> {
   private readonly BASE_URL = "https://api.opendota.com/api";
@@ -74,17 +75,7 @@ export class OpenDotaAPI extends Service<Config> {
       }
       return response.data;
     } catch (error) {
-      this.logger.error("Fetch failed inside fetchData (axios). Detailed cause:");
-      this.logger.error(`Request URL: ${path}`);
-      if (axios.isAxiosError(error)) {
-        this.logger.error(`Axios Error: ${error.message}`);
-        this.logger.error(error.response?.data || error.code);
-        if (axios.isCancel(error)) {
-          this.logger.warn("Request was cancelled by plugin dispose.");
-        }
-      } else {
-        this.logger.error(error.cause || error);
-      }
+      processFetchError(error, "OpenDota", path);
     }
   }
 }
