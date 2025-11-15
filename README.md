@@ -3,7 +3,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/sjtdev/koishi-plugin-dota2tracker?color=blue)](https://github.com/sjtdev/koishi-plugin-dota2tracker/releases/latest)
 [![npm downloads](https://img.shields.io/npm/dm/@sjtdev/koishi-plugin-dota2tracker.svg?style=flat-square)](https://www.npmjs.com/package/@sjtdev/koishi-plugin-dota2tracker)
 
-中文 | [English](README_en.md)
+中文 | [English](README_EN.md)
 
 **一个 Koishi DOTA2 插件，提供自动对局追踪、数据查询和图片战报生成等功能。**
 
