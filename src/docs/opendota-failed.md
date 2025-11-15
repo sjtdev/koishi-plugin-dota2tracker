@@ -26,4 +26,4 @@
 
 为了绕过 `ctx.http` 的这个限制，本插件（从 `v2.2.2` 开始）切换到了 `axios` 库来处理所有 API 请求。`axios` 允许通过 `new HttpsAgent({ family: 4 })` 来精确控制网络协议栈。
 
-当插件在配置中读取到 [`OpenDotaIPStack`](./configs.md#opendotaipstack-autoipv4) 设为 `ipv4` 时，插件将启用此方案，强制使用 IPv4 建立连接，从而解决了这个网络问题。
+当插件在配置中读取到 [`OpenDotaIPStack`](./configs.md#opendotaipstack-auto-ipv4) 设为 `ipv4` 时，插件将启用此方案，强制使用 IPv4 建立连接，从而解决了这个网络问题。

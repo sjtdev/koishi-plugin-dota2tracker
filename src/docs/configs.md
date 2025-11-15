@@ -25,7 +25,7 @@
 #### suppressApiNetworkErrors `boolean`
 > 因为stratz服务器不稳，叠加网络环境错综复杂的原因，导致在某些情况某些时段下轮询数据时报出大量网络错误，所以推出该选项以隐藏这些错误。  
 > 此选项也对opendota的网络请求相关报错生效。
-- 开启此选项后将stratz网络错误（如超时等信息）降为`debug`级输出日志。
+- 开启此选项后将API请求造成的网络错误（如超时等信息）降为`debug`级输出日志。
 > [!TIP] koishi 的 debug 日志显示方式
 > koishi 默认不显示 debug 日志。若需要开启显示需要到 **koishi webui** 中 `资源管理器 > koishi.yml` 文件底部添加以下内容并保存后重启 koishi
 > ```yaml

@@ -21,4 +21,4 @@ The standard method to resolve this is to force the request to use only IPv4 (`f
 
 To bypass this limitation of `ctx.http`, the plugin (since `v2.2.2`) has switched to using the `axios` library for all API requests. `axios` allows precise control over the network stack via `new HttpsAgent({ family: 4 })`.
 
-When the plugin reads in the configuration that [`OpenDotaIPStack`](./en-US/configs.md#opendotaipstack-autoipv4) has been set to `ipv4`, it will activate this solution, forcing the connection to be established using IPv4 and thus resolving this network issue.
+When the plugin reads in the configuration that [`OpenDotaIPStack`](./configs.md#opendotaipstack-auto-ipv4) has been set to `ipv4`, it will activate this solution, forcing the connection to be established using IPv4 and thus resolving this network issue.
