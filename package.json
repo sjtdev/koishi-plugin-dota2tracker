@@ -33,6 +33,9 @@
     "https-proxy-agent": "^7.0.6",
     "luxon": "^3.8.0-alpha.1"
   },
+  "devDependencies": {
+    "@koishijs/client": "^5.11.0"
+  },
   "peerDependencies": {
     "koishi": "^4.18.9"
   },
