@@ -1,5 +1,36 @@
 # 更新日志
 
+### [2.2.2](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.2.1...v2.2.2) (2025-11-19)
+
+### ✨ 新增功能
+
+* **console:** 提供一个控制台页面作为**实验性**功能添加，通过`enableConsole`配置项启用。当前仅简单显示OpenDotaAPI访问次数。 ([4ff3725](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/4ff3725e16f35c33caeb3e815f5867142d5bfff2))
+
+### 🚀 功能优化
+
+* `suppressStratzNetworkErrors`更名为`suppressApiNetworkErrors` ([d2c17a9](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/d2c17a95434167c695990823841e8fc50c7cea6e))
+* 各部分错误处理方式优化 ([5d3a227](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/5d3a22781625048d8d0fbb63ef223f31a3a0267a))
+
+### 🎨 样式
+
+* 使`查询群友`返回图片的高度更适配内容 ([e1b2b17](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/e1b2b1714ffbaf3ebf37048c63f8fb740974663f))
+* **match_2/match_2+:** 优化命石名称显示效果 ([7739499](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/7739499dd3e3ddead9b19aeb419b1801ef1ce309))
+
+### 🐛 Bug 修复
+
+* 修复`查询最近比赛`指令在私聊且不提供steamId参数时，返回提示错误的问题。 ([4337840](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/43378402449e9e5a3a09313b2d50f5308f3b24f8))
+* **opendota-api:** 采用代码方式修复访问opendota-api失败问题，并添加对应的配置选项。 ([418bd3d](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/418bd3dc0127aad9ca7da2e55f48480b6fbf4589))
+* **opendota:** 弃用koishi提供的`http`服务，网络请求切换到`axios`依赖，以此解决某些无ipv6环境无法访问`opendota`服务器的问题。 ([0458298](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/04582982979d97b1b954d767e851d3faacae378b))
+* **opendota:** 修复 一些极端的分路情况导致位置推测函数报错的问题。 ([47a1795](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/47a17955f9d80348070f8f4f90914b695aff5e70))
+* **opendota:** 修复数据中可能没有`pick_bans`数据时会导致opendota-adapter报错的问题。 ([8d40343](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/8d40343ae7a8bc39b5841632941279c688f1b2aa))
+* **opendota:** 修复opendota-adapter的一些数据转换错误。 ([9212fb2](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/9212fb208863ae3e69f2061f3aaa8772827f42e1))
+
+### 📝 文档
+
+* 补充不再支持`proxy-agent`插件设置的代理的说明 ([7d93c8e](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/7d93c8ee90808640d7ab496ac3fa789b09d865e3))
+* 添加对opendota访问失败问题的说明 ([5fe129d](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/5fe129da605864868d6211b814184a93bc95e87a))
+* 优化过时的`readme`并添加英文版`readme_en` ([04c0a0d](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/04c0a0de9a0864f03552d055fad65686e28bd4ee))
+
 ### [2.2.1](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.2.0...v2.2.1) (2025-10-09)
 
 ### 🐛 Bug 修复
