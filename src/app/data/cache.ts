@@ -4,6 +4,7 @@ import { ItemList, WeeklyHeroMeta } from "./types";
 import { DAYS_30 } from "../common/constants";
 import { Context, Service } from "koishi";
 import { DateTime } from "luxon";
+import { Config } from "../../config";
 
 declare module "@koishijs/cache" {
   interface Tables {
@@ -16,7 +17,7 @@ declare module "@koishijs/cache" {
   }
 }
 
-export class CacheService extends Service {
+export class CacheService extends Service<Config> {
   constructor(ctx: Context) {
     super(ctx, "dota2tracker.cache", true);
   }
@@ -30,6 +31,7 @@ export class CacheService extends Service {
 
   addOpendotaAPIRequestLog(request: string, count: number = 1) {
     this.ctx.cache.set("dt_opendota_api_request_log", String(Date.now()), { count, request }, this.msUntilUTCEndOfDay);
+    if (this.config.enableConsole) this.ctx.console.services["apiCount"].refresh();
   }
 
   async getTodayOpendotaAPIRequestCount() {
