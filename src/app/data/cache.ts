@@ -20,6 +20,7 @@ declare module "@koishijs/cache" {
 export class CacheService extends Service<Config> {
   constructor(ctx: Context) {
     super(ctx, "dota2tracker.cache", true);
+    this.config = ctx.config;
   }
 
   private get msUntilUTCEndOfDay() {
