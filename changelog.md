@@ -1,5 +1,15 @@
 # 更新日志
 
+### [2.2.3](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.2.2...v2.2.3) (2025-11-20)
+
+### 🎨 样式
+
+* **console:** 为`OpenDotaAPI访问次数`添加“今日”使其描述更准确。 ([a77ced6](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/a77ced6619ea07612e2afbf762f0a4fa1e7a0e9a))
+
+### 🐛 Bug 修复
+
+* **opendota:** 修复`cache`调用配置项失败导致`opendota`访问缓存失败的问题。 ([30fdb90](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/30fdb90a69d231590d665235f92c7f8287995278))
+
 ### [2.2.2](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.2.1...v2.2.2) (2025-11-19)
 
 ### ✨ 新增功能
