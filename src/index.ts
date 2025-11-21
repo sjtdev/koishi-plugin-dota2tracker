@@ -42,17 +42,16 @@ export const inject = {
 
 export { Config } from "./config.ts";
 
-const pluginDir = path.resolve(__dirname, "..");
-const pluginVersion = require(path.join(pluginDir, "package.json")).version as string;
-
 export async function apply(ctx: Context, config: Config) {
   // write your plugin here
 
   const logger = ctx.logger("dota2tracker");
+  const currentDir = path.resolve(__dirname);
+  const pluginVersion = require(path.join(currentDir,"..", "package.json")).version as string;
   // 注册模块为自定义服务
   ctx.dota2tracker = {} as any;
   ctx.dota2tracker.i18n = new I18NService(ctx);
-  ctx.dota2tracker.image = new ImageRenderer(ctx, pluginDir);
+  ctx.dota2tracker.image = new ImageRenderer(ctx, currentDir);
   ctx.dota2tracker.messageBuilder = new MessageBuilder(ctx);
   ctx.dota2tracker.match = new MatchService(ctx, pluginVersion);
   ctx.dota2tracker.player = new PlayerService(ctx);
@@ -73,7 +72,7 @@ export async function apply(ctx: Context, config: Config) {
   ctx.dota2tracker.cache = new CacheService(ctx);
   ctx.dota2tracker.database = new DatabaseService(ctx);
   ctx.dota2tracker.valveAPI = new ValveAPI(ctx);
-  ctx.dota2tracker.stratzAPI = new StratzAPI(ctx, pluginDir);
+  ctx.dota2tracker.stratzAPI = new StratzAPI(ctx, currentDir);
   if (config.enableOpenDotaFallback) {
     ctx.dota2tracker.opendotaAPI = new OpenDotaAPI(ctx);
     ctx.dota2tracker.opendotaAdapter = new OpenDotaAdapter(ctx);
@@ -94,5 +93,5 @@ export async function apply(ctx: Context, config: Config) {
   registerQueryItemCommand(ctx);
   registerHeroOfTheDayCommand(ctx);
 
-  if (config.enableConsole) registerConsolePage(ctx);
+  if (ctx.console && config.enableConsole) registerConsolePage(ctx);
 }

@@ -11,12 +11,11 @@ import { ImageFormat, ImageType } from "../common/types";
 import { DateTime } from "luxon";
 
 export class ImageRenderer extends Service<Config> {
-  constructor(
-    ctx: Context,
-    private pluginDir: string,
-  ) {
+  private readonly templateDir: string;
+  constructor(ctx: Context, currentDir: string) {
     super(ctx, "dota2tracker.image", true);
     this.config = ctx.config;
+    this.templateDir = path.join(currentDir, "templates");
   }
   async renderToImageByFile(data: object, templateName: string, type: TemplateType, languageTag: string): Promise<string> {
     const html = await this.generateHTML(data, { source: "FILE", templateName, type }, languageTag);
@@ -39,13 +38,13 @@ export class ImageRenderer extends Service<Config> {
       $t: (key: string, params?: any) => this.ctx.dota2tracker.i18n.$t(languageTag, key, params),
       languageTag,
       Random,
-      fontFamily: this.config.templateFonts.map(f => `${f}`).join(", "),
+      fontFamily: this.config.templateFonts.map((f) => `${f}`).join(", "),
       getImageUrl: this.getImageUrl.bind(this),
     };
     try {
       let html: string;
       if (template.source === "FILE") {
-        const templatePath = path.join(this.pluginDir, "template", template.type, `${template.templateName}.ejs`);
+        const templatePath = path.join(this.templateDir, template.type, `${template.templateName}.ejs`);
         html = await ejs.renderFile(templatePath, templateData, {
           strict: false,
         });
@@ -55,7 +54,7 @@ export class ImageRenderer extends Service<Config> {
           async: true,
         });
       }
-      if (process.env.NODE_ENV === "development") fs.writeFileSync(path.join(this.pluginDir, "temp.html"), html);
+      if (process.env.NODE_ENV === "development") fs.writeFileSync(path.resolve(process.cwd(), "temp.html"), html);
       return html;
     } catch (error) {
       this.logger.error(error);
@@ -65,8 +64,8 @@ export class ImageRenderer extends Service<Config> {
   private getImageUrl(image: string, type: ImageType = ImageType.Local, format: ImageFormat = ImageFormat.png) {
     if (type === ImageType.Local) {
       try {
-        if (format === ImageFormat.svg) return fs.readFileSync(path.join(this.pluginDir, "template", "images", `${image}.svg`));
-        const imageData = fs.readFileSync(path.join(this.pluginDir, "template", "images", `${image}.${format}`));
+        if (format === ImageFormat.svg) return fs.readFileSync(path.join(this.templateDir, "images", `${image}.svg`));
+        const imageData = fs.readFileSync(path.join(this.templateDir, "images", `${image}.${format}`));
         const base64Data = imageData.toString("base64");
         return `data:image/png;base64,${base64Data}`;
       } catch (error) {

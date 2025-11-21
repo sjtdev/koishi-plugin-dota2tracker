@@ -21,12 +21,11 @@ export class StratzAPI extends Service<Config> {
   private readonly queue: MiniQueue;
   private readonly http: AxiosInstance;
   private readonly abortController = new AbortController();
-  constructor(
-    ctx: Context,
-    private pluginDir: string,
-  ) {
+  private readonly graphqlQueriesDir: string;
+  constructor(ctx: Context, currentDir: string) {
     super(ctx, "dota2tracker.stratz-api", true);
     this.config = ctx.config;
+    this.graphqlQueriesDir = path.join(currentDir, "queries");
     this.queue = new MiniQueue(ctx, { interval: 200 });
     this.http = axios.create({ timeout: 10000, signal: this.abortController.signal });
     ctx.on("dispose", () => this.dispose());
@@ -193,7 +192,7 @@ export class StratzAPI extends Service<Config> {
   }
 
   private loadGraphqlFile(queryName: string): string {
-    return fs.readFileSync(path.join(this.pluginDir, "queries", `${queryName}.graphql`), { encoding: "utf-8" }).replace(/[\r\n]+/g, " ");
+    return fs.readFileSync(path.join(this.graphqlQueriesDir, `${queryName}.graphql`), { encoding: "utf-8" }).replace(/[\r\n]+/g, " ");
   }
 }
 

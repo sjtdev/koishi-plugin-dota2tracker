@@ -38,7 +38,7 @@ export interface Config {
   playerRankEstimate: boolean;
   templateFonts: string[];
 }
-const pluginDir = path.resolve(__dirname, "..");
+const templateDir = path.join(__dirname, "templates");
 // 读取 schema.yml 文件
 const allI18nConfigs = Object.fromEntries(Object.keys(LanguageTags).map((lang) => [lang, require(`./locales/${lang}.schema.yml`)._config]));
 export const Config: Schema = Schema.intersect([
@@ -114,9 +114,9 @@ export const Config: Schema = Schema.intersect([
     ]).i18n(getI18n("report")),
   ]),
   Schema.object({
-    template_match: Schema.union([...readDirectoryFilesSync(path.join(pluginDir, "template", "match"))]).default("match_1"),
-    template_player: Schema.union([...readDirectoryFilesSync(path.join(pluginDir, "template", "player"))]).default("player_1"),
-    template_hero: Schema.union([...readDirectoryFilesSync(path.join(pluginDir, "template", "hero"))]).default("hero_1"),
+    template_match: Schema.union([...readDirectoryFilesSync(path.join(templateDir, "match"))]).default("match_1"),
+    template_player: Schema.union([...readDirectoryFilesSync(path.join(templateDir, "player"))]).default("player_1"),
+    template_hero: Schema.union([...readDirectoryFilesSync(path.join(templateDir, "hero"))]).default("hero_1"),
     playerRankEstimate: Schema.boolean().default(true),
     templateFonts: Schema.array(String).default([]).role("table"),
   }).i18n(getI18n("template")),
