@@ -8,7 +8,7 @@ export function registerQueryHeroCommand(ctx: Context): void {
     .option("random", "-r")
     .alias("查询英雄")
     .action(async ({ session, options }, input_data) => {
-      if (input_data) {
+      if (input_data || options.random) {
         await session.send(session.text(".querying_hero"));
         const languageTag = await ctx.dota2tracker.i18n.getLanguageTag({ session });
         const heroData = await ctx.dota2tracker.hero.getHeroDetails(input_data, languageTag, options.random);
