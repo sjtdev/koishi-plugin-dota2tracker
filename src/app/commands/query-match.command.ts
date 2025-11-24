@@ -37,7 +37,7 @@ export function registerQueryMatchCommand(ctx: Context) {
 
 async function handleQueryMatchCommand(ctx: Context, config: Config, session: Session, options: { parse?: boolean; template?: string }, matchId: string | number) {
   const languageTag = await ctx.dota2tracker.i18n.getLanguageTag({ session });
-  const result = await ctx.dota2tracker.match.getMatchResult({ matchId: Number(matchId), requestParse: options.parse });
+  const result = await ctx.dota2tracker.match.getMatchResult({ matchId: Number(matchId), waitForParse: options.parse, allowFallback: config.enableOpenDotaFallback });
   if (result.status === "PENDING") {
     const subscriber = ctx.dota2tracker.parsePolling.createSubscriberByCommand(session, languageTag, { templateName: options?.template });
     ctx.dota2tracker.parsePolling.add(result.matchId, [subscriber]);
