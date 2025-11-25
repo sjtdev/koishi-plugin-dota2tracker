@@ -13,7 +13,7 @@ export class ValveAPI extends Service<Config> {
     super(ctx, "dota2tracker.valve-api", true);
     // 6. 实例化 config
     this.config = ctx.config;
-    this.http = axios.create({ timeout: 10000, signal: this.abortController.signal, baseURL: this.baseURL });
+    this.http = axios.create({ timeout: 15000, signal: this.abortController.signal, baseURL: this.baseURL });
     ctx.on("dispose", () => this.dispose());
   }
 

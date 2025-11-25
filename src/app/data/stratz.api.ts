@@ -27,7 +27,7 @@ export class StratzAPI extends Service<Config> {
     this.config = ctx.config;
     this.graphqlQueriesDir = path.join(currentDir, "queries");
     this.queue = new MiniQueue(ctx, { interval: 200 });
-    this.http = axios.create({ timeout: 10000, signal: this.abortController.signal });
+    this.http = axios.create({ timeout: 15000, signal: this.abortController.signal });
     ctx.on("dispose", () => this.dispose());
   }
   dispose() {

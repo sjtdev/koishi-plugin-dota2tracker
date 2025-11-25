@@ -15,7 +15,7 @@ export class OpenDotaAPI extends Service<Config> {
     super(ctx, "dota2tracker.opendota-api", true);
     this.config = ctx.config;
 
-    this.http = axios.create({ timeout: 10000, signal: this.abortController.signal, baseURL: this.BASE_URL });
+    this.http = axios.create({ timeout: 15000, signal: this.abortController.signal, baseURL: this.BASE_URL });
     ctx.on("dispose", () => this.dispose());
   }
 
