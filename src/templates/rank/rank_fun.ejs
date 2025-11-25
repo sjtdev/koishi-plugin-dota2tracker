@@ -1,131 +1,63 @@
+<%# --- ViewModel 数据准备 --- %>
+<% const { name, avatar, isRising, prevRank, currRank, date } = data; %>
+<% const kind = isRising ? "xi" : "bei"; %>
+
+<%# --- 构造富文本消息 --- %>
+<%# 通过替换占位符来生成包含 HTML 的国际化字符串 %>
+<% const avatarHtml = `<img src="${avatar}" />`; %>
+<% const prevHtml = `<span class="rank prev">${$t("dota2tracker.template.ranks." + prevRank.medal)}${prevRank.leader ?? prevRank.star}</span>`; %>
+<% const currHtml = `<span class="rank curr">${$t("dota2tracker.template.ranks." + currRank.medal)}${currRank.leader ?? currRank.star}</span>`; %>
+<% const msgKey = isRising ? "rank_fun_up_message" : "rank_fun_down_message"; %>
+<% const rawMsg = $t("dota2tracker.template." + msgKey, { name: name }); %>
+<% const finalMessage = rawMsg.replace('AVATAR_PLACEHOLDER', avatarHtml).replace('PREV_PLACEHOLDER', prevHtml).replace('CURR_PLACEHOLDER', currHtml); %>
+
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-            }
-            html {
-                width: 1024px;
-                height: 768px;
-            }
-            body {
-                background: no-repeat center center / cover;
-            }
-            .wrapper {
-                padding: 80px;
-                padding-top: 180px;
-            }
-            .wrapper > p {
-                font-size: 32px;
-                line-height: 48px;
-                height: 48px;
-                text-align: center;
-            }
-            body.xi p.bei,
-            body.bei p.xi {
-                display: none;
-            }
-            .wrapper > p > span {
-                margin: 0 10px;
-            }
-            .wrapper > p > span.prev {
-                color: gray;
-            }
-            .wrapper > p > span.curr {
-                font-weight: bold;
-                color: red;
-            }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rank Change</title>
 
-            .wrapper > p > img {
-                width: 48px;
-                height: 48px;
-                vertical-align: middle;
-                line-height: 48px;
-            }
+    <%- `<style>` %>
+      * { margin: 0; padding: 0; }
+      html { width: 1024px; height: 768px; }
+      body { background: no-repeat center center / cover; }
+      .wrapper { padding: 80px; padding-top: 180px; }
+      .wrapper > p { font-size: 32px; line-height: 48px; height: 48px; text-align: center; }
+      body.xi p.bei, body.bei p.xi { display: none; }
+      .wrapper > p > span { margin: 0 10px; }
+      .wrapper > p > span.prev { color: gray; }
+      .wrapper > p > span.curr { font-weight: bold; color: red; }
+      .wrapper > p > img { width: 48px; height: 48px; vertical-align: middle; line-height: 48px; }
+      .ranks { margin-top: 40px; display: flex; width: 100%; height: 256px; justify-content: space-evenly; }
+      div.rank { position: relative; width: 256px; height: 256px; }
+      div.rank > img { position: absolute; }
+      div.rank.prev { filter: grayscale(1); }
+      div.rank.curr { transform: scale(1.25); }
+      div.rank p { font-size: 36px; bottom: 20px; width: 100%; text-align: center; color: #fff; position: absolute; }
 
-            .ranks {
-                margin-top: 40px;
-                display: flex;
-                width: 100%;
-                height: 256px;
-                justify-content: space-evenly;
-            }
-
-            div.rank {
-                position: relative;
-                width: 256px;
-                height: 256px;
-            }
-
-            div.rank > img {
-                position: absolute;
-            }
-
-            div.rank.prev {
-                filter: grayscale(1);
-            }
-            div.rank.curr {
-                transform: scale(1.25);
-            }
-            div.rank p {
-                font-size: 36px;
-                bottom: 20px;
-                width: 100%;
-                text-align: center;
-                color: #fff;
-                position: absolute;
-            }
-        </style>
-
-        <% if (fontFamily) { %>
-        <%- "<style>" %>
-        <%- `body { font-family: ${fontFamily}; }` %>
-        <%- "</style>" %>
-        <% } %>
-    </head>
-    <% const {name, avatar, isRising, prevRank, currRank, date} = data; %>
-    <% const kind = isRising ? "xi" : "bei"; %>
-    <%
-      // 1. 准备好要注入的 HTML
-      const avatarHtml = `<img src="${avatar}" />`;
-      const prevHtml = `<span class="rank prev">${$t("dota2tracker.template.ranks."+prevRank.medal)}${prevRank.leader ?? prevRank.star}</span>`;
-      const currHtml = `<span class="rank curr">${$t("dota2tracker.template.ranks."+currRank.medal)}${currRank.leader ?? currRank.star}</span>`;
-
-      // 2. 先处理文本插值
-      const messageTemplate = isRising
-        ? $t("dota2tracker.template.rank_fun_up_message", { name: name })
-        : $t("dota2tracker.template.rank_fun_down_message", { name: name });
-
-      // 3. 手动将占位符替换为 HTML
-      const finalMessage = messageTemplate
-        .replace('AVATAR_PLACEHOLDER', avatarHtml)
-        .replace('PREV_PLACEHOLDER', prevHtml)
-        .replace('CURR_PLACEHOLDER', currHtml);
-    %>
-    <body class="<%= kind %>" <%- `style="background-image: url( ${getImageUrl(kind, undefined, "jpg")} )"`%>>
-        <div class="wrapper">
-            <p class="<%= kind %>">
-                <%- finalMessage %>
-            </p>
-            <p></p>
-            <div class="ranks">
-                <div class="rank prev">
-                    <img src="<%- getImageUrl('medal_' +(prevRank.inTop100 ?? prevRank.medal)) %>" alt="" />
-                    <img src="<%- getImageUrl('star_' + prevRank.star) %>" alt="" />
-                    <p><%= prevRank.leader ?? "" %></p>
-                </div>
-                <div class="rank curr">
-                    <img src="<%- getImageUrl('medal_' +(currRank.inTop100 ?? currRank.medal)) %>" alt="" />
-                    <img src="<%- getImageUrl('star_' + currRank.star) %>" alt="" />
-                    <p><%= currRank.leader ?? "" %></p>
-                </div>
-            </div>
-            <p style="text-align: right; margin-top: 40px;">—— <%= date %></p>
+      <% if (fontFamily) { %><%- `body { font-family: ${fontFamily}; }` %><% } %>
+    <%- `</style>` %>
+  </head>
+  <body class="<%= kind %>" <%- `style="background-image: url(${getImageUrl(kind, undefined, "jpg")})"` %>>
+    <div class="wrapper">
+      <p class="<%= kind %>">
+        <%- finalMessage %>
+      </p>
+      <p></p>
+      <div class="ranks">
+        <div class="rank prev">
+          <img src="<%- getImageUrl('medal_' + (prevRank.inTop100 ?? prevRank.medal)) %>" alt="" />
+          <img src="<%- getImageUrl('star_' + prevRank.star) %>" alt="" />
+          <p><%= prevRank.leader ?? "" %></p>
         </div>
-    </body>
+        <div class="rank curr">
+          <img src="<%- getImageUrl('medal_' + (currRank.inTop100 ?? currRank.medal)) %>" alt="" />
+          <img src="<%- getImageUrl('star_' + currRank.star) %>" alt="" />
+          <p><%= currRank.leader ?? "" %></p>
+        </div>
+      </div>
+      <p style="text-align: right; margin-top: 40px;">—— <%= date %></p>
+    </div>
+  </body>
 </html>

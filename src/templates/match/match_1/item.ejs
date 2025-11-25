@@ -1,11 +1,24 @@
-<% const isRecipe = item?.isRecipe ? ` style="background-image: url('${getImageUrl("recipe", ImageType.Items)}');"` : ''; %>
-<div class="relative <%= style %>"<%- isRecipe %>>
+<%# 传入参数: item (Object|Number), style (String), isNeutral (Boolean) %>
+<% const isRecipe = item && !isNeutral && item.isRecipe; %>
+<% const recipeBgStyle = isRecipe ? `background-image: url('${getImageUrl("recipe", ImageType.Items)}');` : ''; %>
+
+<%# 如果 item 是 neutral id (数字)，需要转换一下逻辑 %>
+<% let imgSrc = ""; %>
 <% if (item) { %>
-  <% if (!isNeutral) { %>
-    <img class="w-full h-full object-cover aspect-[11/8] <%= item.isRecipe ? "opacity-75 scale-[0.6] origin-top-right" : '' %>" src="<%= getImageUrl(item.name, ImageType.Items) %>">
-    <p class="absolute w-full text-[#ccc] text-center bottom-0 leading-[1] text-xs bg-stone-700/50"><%= item.time %></p>
+  <% if (isNeutral) { %>
+    <% imgSrc = getImageUrl(dotaconstants.item_ids[item], ImageType.Items); %>
   <% } else { %>
-    <img class="w-full h-full object-contain" src="<%= getImageUrl(dotaconstants.item_ids[player.neutral0Id], ImageType.Items) %>">
+    <% imgSrc = getImageUrl(item.name, ImageType.Items); %>
   <% } %>
 <% } %>
+
+<div class="relative <%= style %>" <%-`style="${recipeBgStyle}"`%>>
+  <% if (item) { %>
+    <% if (!isNeutral) { %>
+      <img class="w-full h-full object-cover aspect-[11/8] <%= isRecipe ? "opacity-75 scale-[0.6] origin-top-right" : '' %>" src="<%= imgSrc %>">
+      <p class="absolute w-full text-[#ccc] text-center bottom-0 leading-[1] text-xs bg-stone-700/50"><%= item.time %></p>
+    <% } else { %>
+      <img class="w-full h-full object-contain" src="<%= imgSrc %>">
+    <% } %>
+  <% } %>
 </div>

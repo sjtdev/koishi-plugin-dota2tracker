@@ -1,0 +1,26 @@
+html, body { background-color: black; color: white; width: 600px; font-size: 14px; }
+body > * { width: 100%; border: 1px #fff solid; border-radius: 5px; box-sizing: border-box; }
+img { vertical-align: middle; }
+span { min-width: 0; white-space: nowrap; }
+.title { margin: 0; }
+.players { display: grid; }
+.player { display: grid; grid-template-columns: 24px 120px 128px 88px 160px; grid-template-rows: 1fr; width: 100%; height: 24px; align-items: center; justify-items: center; justify-content: space-between; }
+.avatar { width: 24px; height: 24px; border-radius: 50%; border: #fff 1px solid; box-sizing: border-box; }
+.player > .name { display: block; width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; }
+.player > .count { display: grid; grid-template-columns: 1fr 1fr 1.8fr; width: 100%; }
+.player > .count > span { text-align: left; }
+.player > .count > span:last-child { text-align: right; }
+.player > .performance { display: flex; align-items: center; }
+.player > .performance > .score_bar { display: flex; align-items: center; justify-content: center; height: 10px; width: 51px; border-radius: 1px; background-color: #333; }
+.player > .performance > .score_bar > * { height: 100%; }
+.player > .performance > .score_bar.neg.over { justify-content: flex-start; }
+.player > .performance > .score_bar.pos.over { justify-content: flex-end; }
+.player > .performance > .score_bar.neg > .left { background: linear-gradient(to right, #777, #888, #888, #777); }
+.player > .performance > .score_bar.pos > .right { background: linear-gradient(to right, #6cf, #7df, #6cf); }
+.player > .performance > .score_bar > .pipe { height: 12px; width: 1px; background-color: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5); position: relative; }
+.player > .performance > .score_value { display: block; margin-left: 4px; width: 28px; text-align: center; }
+.combinations { display: grid; grid-template-columns: repeat(4, auto); justify-content: start; align-items: center; }
+.combinations > .players { display: flex; }
+.combinations span:not(:first-child) { margin-left: 4px; }
+span.win { color: #007A00; }
+span.lose { color: #B30000; }

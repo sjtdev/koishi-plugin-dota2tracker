@@ -1,191 +1,95 @@
+<%# --- 基础数据 --- %>
+<% const { title, players, combinations, showCombi } = data; %>
+
+<%# --- 工具: 计算 IMP 条样式 --- %>
+<% const getImpInfo = (impVal) => {
+     const abs = Math.abs(impVal);
+     const isPos = impVal > 0;
+     const isOver = abs > 25;
+
+     // 宽度计算：如果溢出(>25)，则填满单侧(25px)；否则按比例
+     // 原逻辑中 .score_bar 宽 51px (中心各 25px?)。
+     // 原逻辑：
+     // if (abs > 25) { right = abs (if pos), left = abs (if neg) }
+     // 这里的逻辑有点奇怪，如果 abs=30，width=30px，父容器只有25px空间？
+     // 让我们严格遵循原逻辑：
+     // width 赋值直接是 absValue。CSS里父容器 overflow 没写 hidden，可能靠 flex 布局撑开？
+     // 无论如何，保持原值逻辑：
+     let left = 0, right = 0;
+     if (isOver) {
+       if (isPos) right = abs;
+       else left = abs;
+     } else {
+       left = right = abs;
+     }
+
+     return {
+       valStr: (isPos ? "+" : "") + impVal,
+       barClass: `score_bar ${isPos ? "pos" : "neg"}${isOver ? " over" : ""}`,
+       leftStyle: `width: ${left}px`,
+       rightStyle: `width: ${right}px`
+     };
+   };
+%>
+
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
-        <title>Document</title>
-        <style>
-            html,
-            body {
-                background-color: black;
-                color: white;
-                width: 600px;
-                font-size: 14px;
-            }
-            body > * {
-                width: 100%;
-                border: 1px #fff solid;
-                border-radius: 5px;
-                box-sizing: border-box;
-            }
-            img {
-                vertical-align: middle;
-            }
-            span {
-                min-width: 0;
-                white-space: nowrap; /* 不换行 */
-            }
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Report</title>
 
-            .title {
-                margin: 0;
-            }
-            .players {
-                display: grid;
-            }
-            .player {
-                display: grid;
-                grid-template-columns: 24px 120px 128px 88px 160px;
-                grid-template-rows: 1fr;
-                width: 100%;
-                height: 24px;
-                align-items: center;
-                justify-items: center;
-                justify-content: space-between;
-            }
-            .avatar {
-                width: 24px;
-                height: 24px;
-                border-radius: 50%;
-                border: #fff 1px solid;
-                box-sizing: border-box;
-            }
+    <%- `<style>` %>
+      <%- include("../common/styles/normalize.min.css") %>
+      <%- include("./daily/base.css") %>
+      <% if (fontFamily) { %><%- `body { font-family: ${fontFamily}; }` %><% } %>
+    <%- `</style>` %>
+</head>
+<body>
+    <h3 class="title"><%= title %></h3>
 
-            .player > .name {
-                display: block;
-                width: 100%;
-                text-align: center;
-                overflow: hidden; /* 超出部分隐藏 */
-                text-overflow: ellipsis; /* 省略号 */
-            }
-            .player > .count {
-                display: grid;
-                grid-template-columns: 1fr 1fr 1.8fr;
-                width: 100%;
-            }
+    <%# --- 玩家列表 --- %>
+    <div class="players">
+        <% players.forEach(p => { %>
+        <% const winRate = Math.round((p.winCount / p.matches.length) * 100); %>
+        <% const imp = getImpInfo(p.avgImp); %>
 
-            .player > .count > span {
-                text-align: left;
-            }
-            .player > .count > span:last-child {
-                text-align: right;
-            }
-            .player > .performance {
-                display: flex;
-                align-items: center;
-            }
-            .player > .performance > .score_bar {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 10px;
-                width: 51px;
-                border-radius: 1px;
-                background-color: #333;
-            }
-            .player > .performance > .score_bar > * {
-                height: 100%;
-            }
-            .player > .performance > .score_bar.neg.over {
-                justify-content: flex-start;
-            }
-            .player > .performance > .score_bar.pos.over {
-                justify-content: flex-end;
-            }
-            .player > .performance > .score_bar.neg > .left {
-                background: linear-gradient(to right, #777, #888, #888, #777);
-            }
-            .player > .performance > .score_bar.pos > .right {
-                background: linear-gradient(to right, #6cf, #7df, #6cf);
-            }
-            .player > .performance > .score_bar > .pipe {
-                height: 12px;
-                width: 1px;
-                background-color: #fff;
-                box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
-                position: relative;
-            }
-
-            .player > .performance > .score_value {
-                display: block;
-                margin-left: 4px;
-                width: 28px;
-                text-align: center;
-            }
-
-            .combinations {
-                display: grid;
-                grid-template-columns: repeat(4, auto);
-                justify-content: start;
-                align-items: center;
-            }
-
-            .combinations > .players {
-                display: flex;
-            }
-
-            .combinations span:not(:first-child) {
-                margin-left: 4px;
-            }
-            span.win {
-                color: #007A00;
-            }
-            span.lose {
-                color: #B30000;
-            }
-        </style>
-
-        <% if (fontFamily) { %>
-        <%- "<style>" %>
-        <%- `body { font-family: ${fontFamily}; }` %>
-        <%- "</style>" %>
-        <% } %>
-    </head>
-    <body>
-        <% const { title, players, combinations, showCombi } = data; %>
-        <h3 class="title"><%= title %></h3>
-        <div class="players">
-            <% for( let index = 0; index < players.length; index++ ) { const player = players[index]; %>
-            <div class="player">
-                <img src="<%= player.steamAccount.avatar %>" class="avatar" />
-                <span class="name"><%= player.name %></span>
-                <span class="count">
-                    <span class="win"><%- $t("dota2tracker.template.report_won") %><%= player.winCount %></span>
-                    <span class="lose"><%- $t("dota2tracker.template.report_lost") %><%= player.loseCount %></span>
-                    <span><%- $t("dota2tracker.template.report_winrate") %> <%= Math.round((player.winCount / player.matches.length) * 100) %>%</span>
-                </span>
-                <div class="performance">
-                    <% const imp = {sign : "", left : 0, right : 0, absValue : Math.abs(player.avgImp)} %>
-                    <% if (player.avgImp > 0) imp.sign = "+"; %>
-                    <% if (player.avgImp < 0) imp.sign = "-"; %>
-                    <% if (imp.absValue > 25) { %>
-                        <% imp.isOver = true; %>
-                        <% if (player.avgImp > 0) imp.right = imp.absValue; %>
-                        <% if (player.avgImp < 0) imp.left = imp.absValue; %>
-                    <% } else imp.left = imp.right = imp.absValue; %>
-                    <div class="score_bar<%= player.avgImp > 0 ? " pos" : " neg" %><%= Math.abs(player.avgImp) > 25 ? " over" : "" %>">
-                        <div class="left" <%- `style="width: ${imp.left}px"` %>></div>
-                        <div class="pipe"></div>
-                        <div class="right" <%- `style="width: ${imp.right}px"` %>></div>
-                    </div>
-                    <span class="score_value"><%= `${player.avgImp > 0 ? imp.sign : ""}${player.avgImp}` %></span>
+        <div class="player">
+            <img src="<%= p.steamAccount.avatar %>" class="avatar" />
+            <span class="name"><%= p.name %></span>
+            <span class="count">
+                <span class="win"><%= $t("dota2tracker.template.report_won") %><%= p.winCount %></span>
+                <span class="lose"><%= $t("dota2tracker.template.report_lost") %><%= p.loseCount %></span>
+                <span><%= $t("dota2tracker.template.report_winrate") %> <%= winRate %>%</span>
+            </span>
+            <div class="performance">
+                <div class="<%= imp.barClass %>">
+                    <div class="left" <%- `style="${imp.leftStyle}"` %>></div>
+                    <div class="pipe"></div>
+                    <div class="right" <%- `style="${imp.rightStyle}"` %>></div>
                 </div>
-                <span class="kda"><%= `${player.avgKills}/${player.avgDeaths}/${player.avgAssists} (${player.avgKDA})` %></span>
+                <span class="score_value"><%= imp.valStr %></span>
             </div>
-            <% } %>
+            <span class="kda"><%= p.avgKills %>/<%= p.avgDeaths %>/<%= p.avgAssists %> (<%= p.avgKDA %>)</span>
         </div>
-        <div class="combinations"<%- !showCombi ? ` style="display:none;"` : "" %>>
-            <span style="grid-column: 1/-1"><%- $t("dota2tracker.template.combined_win_loss_summary") %></span>
-            <% combinations.forEach((combi) => {%>
-                <div class="players">
-                <% combi.players.forEach(player => {%>
-                    <img src="<%= player.steamAccount.avatar %>" class="avatar" />
-                <% }); %>
-                </div>
-            <span class="win"><%- $t("dota2tracker.template.report_won") %><%= combi.winCount %></span>
-            <span class="lose"><%- $t("dota2tracker.template.report_lost") %><%= combi.matches.length - combi.winCount %></span>
-            <span><%- $t("dota2tracker.template.report_winrate") %> <%= Math.round((combi.winCount / combi.matches.length) * 100) %>%</span>
+        <% }); %>
+    </div>
+
+    <%# --- 组合列表 (开黑统计) --- %>
+    <div class="combinations" <%- !showCombi ? `style="display:none;"` : "" %>>
+        <span style="grid-column: 1/-1"><%= $t("dota2tracker.template.combined_win_loss_summary") %></span>
+        <% combinations.forEach(combi => { %>
+        <% const combiRate = Math.round((combi.winCount / combi.matches.length) * 100); %>
+
+        <div class="players">
+            <% combi.players.forEach(p => { %>
+            <img src="<%= p.steamAccount.avatar %>" class="avatar" />
             <% }); %>
         </div>
-    </body>
+        <span class="win"><%= $t("dota2tracker.template.report_won") %><%= combi.winCount %></span>
+        <span class="lose"><%= $t("dota2tracker.template.report_lost") %><%= combi.matches.length - combi.winCount %></span>
+        <span><%= $t("dota2tracker.template.report_winrate") %> <%= combiRate %>%</span>
+        <% }); %>
+    </div>
+</body>
 </html>

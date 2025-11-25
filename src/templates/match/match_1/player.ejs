@@ -1,154 +1,218 @@
-<div class="box h-[320px] flex flex-col gap-[4px] rounded-[5px]" <%- `style="grid-column: ${!player.isRadiant+1};grid-row: ${player.position?.slice(-1)%5}" ` %>>
+<%# --- 基础变量 --- %>
+<% const p = player; %>
+<% const isLD = p.hero.id == 80; %>
+
+<%# --- Grid 布局计算 --- %>
+<% const gridCol = !p.isRadiant + 1; %>
+<% const gridRow = (p.position ? parseInt(p.position.slice(-1)) : 0) % 5; %>
+<% const gridStyle = `grid-column: ${gridCol}; grid-row: ${gridRow}`; %>
+
+<%# --- 队伍颜色与样式 --- %>
+<% const pColor = partyColor[p.partyId]; %>
+<% const partyLineStyle = `background-color: ${pColor};`; %>
+<% const partyMarkStyle = `color: ${pColor};`; %>
+
+<%# --- 选人顺序颜色 --- %>
+<% const orderColors = ['red', 'yellow', 'green']; %>
+<% const orderColor = orderColors[Math.floor(p.order / 4)] || 'white'; %>
+
+<%# --- KDA 颜色计算 --- %>
+<% const kcVal = Math.floor(p.killContribution * 100); %>
+<% const dcVal = Math.floor(p.deathContribution * 100); %>
+<% const kcStyle = `color: ${utils.kc(kcVal)}`; %>
+<% const dcStyle = `color: ${utils.dc(dcVal)}`; %>
+
+<%# --- Facet 信息 --- %>
+<% const facetGradient = facetColor[p.facet?.color ?? 'Black']; %>
+<% const facetIcon = p.facet?.icon; %>
+<% const facetName = p.facet?.displayName ?? "?"; %>
+
+<%# --- 伤害与控制统计 --- %>
+<% const damageReport = p.stats?.heroDamageReport?.receivedTotal || {}; %>
+<% const dealtReport = p.stats?.heroDamageReport?.dealtTotal || {}; %>
+<% const damageReceived = (damageReport.physicalDamage || 0) + (damageReport.magicalDamage || 0) + (damageReport.pureDamage || 0); %>
+<% const ccStun = ((dealtReport.stunDuration || 0) / 100).toFixed(2); %>
+<% const ccSlow = ((dealtReport.slowDuration || 0) / 100).toFixed(2); %>
+<% const ccDisable = ((dealtReport.disableDuration || 0) / 100).toFixed(2); %>
+
+<%# --- 主容器：使用字符串插值输出 style 属性 --- %>
+<div class="box h-[320px] flex flex-col gap-[4px] rounded-[5px]" <%- `style="${gridStyle}"` %>>
+  <%# --- 顶部区域：头像、KDA、分路 --- %>
   <section class="grid grid-cols-[112px_1fr_100px] grid-rows-[63px_24px]">
+
+    <%# 1. 头像列 %>
     <div class="avatar relative h-full relative row-1 col-1 text-[10px] text-shadow-[-1px_1px_2px_#000,1px_-1px_2px_#000,-1px_1px_2px_#000,1px_1px_2px_#000]">
-      <% if (player.leaverStatus != "NONE" && player.leaverStatus != "DISCONNECTED") { %>
+      <% if (p.leaverStatus != "NONE" && p.leaverStatus != "DISCONNECTED") { %>
       <img class="leaver absolute w-full h-full object-contain" src="<%= getImageUrl("disconnected") %>" />
       <% } %>
+
       <div class="party contents">
-        <i class="party_line absolute w-full h-[2px]" <%- `style="background-color:${partyColor[player.partyId]};"` %>></i>
-        <b class="party_mark absolute leading-[1.5] w-[16px] top-[3px] left-[2px] bg-black/80 text-center" <%- `style="color:${partyColor[player.partyId]};"` %>><%= match.party[player.partyId] %></b>
+        <%# 使用字符串插值避免 CSS 校验报错 %>
+        <i class="party_line absolute w-full h-[2px]" <%- `style="${partyLineStyle}"` %>></i>
+        <b class="party_mark absolute leading-[1.5] w-[16px] top-[3px] left-[2px] bg-black/80 text-center" <%- `style="${partyMarkStyle}"` %>>
+          <%= match.party[p.partyId] %>
+        </b>
       </div>
+
       <div class="hero_info absolute top-[3px] right-0 text-right leading-[1.25]">
-        <p class="order" <%- `style="color: ${['red', 'yellow', 'green'][Math.floor(player.order / 4)]};"` %>><%- player.isRandom ? $t("dota2tracker.template.random") : $t("dota2tracker.template.pick_order",[`${player.order == null ? "?" : player.order + 1}`]) %></p>
-        <p class="position"><%= $t("dota2tracker.template.position_" + player.position?.slice(-1))??'' %></p>
+        <%# 颜色属性同样处理 %>
+        <p class="order" <%- `style="color: ${orderColor};"` %>>
+          <%= p.isRandom ? $t("dota2tracker.template.random") : $t("dota2tracker.template.pick_order", [`${p.order == null ? "?" : p.order + 1}`]) %>
+        </p>
+        <p class="position"><%= $t("dota2tracker.template.position_" + p.position?.slice(-1)) ?? '' %></p>
       </div>
-      <p class="level absolute bottom-0 right-0 text-xs px-[2px]"><%= player.level %></p>
-      <img class="h-full" src="<%= getImageUrl(player.hero.shortName, ImageType.Heroes) %>" />
+
+      <p class="level absolute bottom-0 right-0 text-xs px-[2px]"><%= p.level %></p>
+      <img class="h-full" src="<%= getImageUrl(p.hero.shortName, ImageType.Heroes) %>" />
     </div>
+
+    <%# 2. 个人数据列 %>
     <div class="player_profile mx-[10px] row-1 col-2 w-auto h-full overflow-hidden text-center flex flex-col justify-around leading-[1]">
-      <p class="player_name truncate max-w-full"><%= player.steamAccount.name %></p>
+      <p class="player_name truncate max-w-full"><%= p.steamAccount.name %></p>
       <p class="flex gap-[12px] justify-center">
-        <span class="kda"><%= player.kills %>/<%= player.deaths %>/<%= player.assists %></span>
-        <span class="kc" <%- `style="color:${kcndcStyle.kc(player.killContribution * 100)}"` %>><%= Math.floor(player.killContribution * 100) %>%</span>
-        <span class="dc" <%- `style="color:${kcndcStyle.dc(player.deathContribution * 100)}"` %>><%= Math.floor(player.deathContribution * 100) %>%</span>
+        <span class="kda"><%= p.kills %>/<%= p.deaths %>/<%= p.assists %></span>
+        <%# KC/DC 颜色样式处理 %>
+        <span class="kc" <%- `style="${kcStyle}"` %>><%= kcVal %>%</span>
+        <span class="dc" <%- `style="${dcStyle}"` %>><%= dcVal %>%</span>
       </p>
       <p class="flex gap-[16px] justify-center">
-        <span class="networth text-[rgb(203,176,42)]"><%= player.networth %></span>
-        <span class="score"><%= (player.heroDamage / player.networth)?.toFixed(2) %></span>
+        <span class="networth text-[rgb(203,176,42)]"><%= p.networth %></span>
+        <span class="score"><%= (p.heroDamage / p.networth)?.toFixed(2) %></span>
       </p>
     </div>
+
+    <%# 3. 分路与段位列 %>
     <div class="lane_rank row-1 col-3 flex w-full h-full justify-between">
       <div class="lane w-[44px] h-full">
-        <p class="text-[10px] text-center"><%= $t("dota2tracker.template.lane_" + player.laneResult) %></p>
-        <div class="h-[44px] w-[44px]"><%- laneSVG[player.laneResult] %></div>
+        <p class="text-[10px] text-center"><%= $t("dota2tracker.template.lane_" + p.laneResult) %></p>
+        <div class="h-[44px] w-[44px]"><%- utils.laneSVG[p.laneResult] %></div>
       </div>
       <div class="rank_plus w-[36px] h-full relative text-[10px] leading-[1.15] text-shadow-[-1px_1px_0_#000,1px_-1px_0_#000,-1px_1px_0_#000,1px_1px_0_#000]">
         <div class="rank absolute top-0 size-[36px] z-2">
-          <img class="medal absolute inset-0" src="<%= getImageUrl('medal_' + (player.rank.inTop100 ?? player.rank.medal)) %>"/>
-          <img class="stars absolute inset-0" src="<%= getImageUrl('star_' + player.rank.star) %>" />
-          <p class="leader absolute bottom-0 text-center w-full"><%= player.steamAccount?.seasonLeaderboardRank ?? "" %></p>
+          <img class="medal absolute inset-0" src="<%= getImageUrl('medal_' + (p.rank.inTop100 ?? p.rank.medal)) %>"/>
+          <img class="stars absolute inset-0" src="<%= getImageUrl('star_' + p.rank.star) %>" />
+          <p class="leader absolute bottom-0 text-center w-full"><%= p.steamAccount?.seasonLeaderboardRank ?? "" %></p>
         </div>
-        <% if (player.dotaPlus) { %>
+        <% if (p.dotaPlus) { %>
         <div class="plus absolute bottom-0 size-[36px] z-1">
-          <img class="" src="<%= getImageUrl("hero_badge_" + (player.dotaPlus ? Math.ceil((player.dotaPlus?.level + 1) / 6) : 1)) %>">
-          <p class="level absolute bottom-0 text-center w-full"><%= player.dotaPlus?.level %></p>
+          <img class="" src="<%= getImageUrl("hero_badge_" + (p.dotaPlus ? Math.ceil((p.dotaPlus?.level + 1) / 6) : 1)) %>">
+          <p class="level absolute bottom-0 text-center w-full"><%= p.dotaPlus?.level %></p>
         </div>
         <% } %>
       </div>
     </div>
-    <div class="facet row-2 col-1 w-full h-full grid grid-cols-[24px_1fr] grid-rows-1 bg-linear-to-r
-    <%- facetColor[player.facet?.color ?? 'Black'] %>">
-      <% if (player.facet) { %>
+
+    <%# 4. Facet (命石) %>
+    <div class="facet row-2 col-1 w-full h-full grid grid-cols-[24px_1fr] grid-rows-1 bg-linear-to-r <%- facetGradient %>">
+      <% if (p.facet) { %>
       <div class="w-[24px] h-[24px] flex items-center justify-center bg-[#4444]">
-        <img class="h-[18px]" src="<%= getImageUrl(player.facet?.icon, ImageType.IconsFacets) %>" />
+        <img class="h-[18px]" src="<%= getImageUrl(facetIcon, ImageType.IconsFacets) %>" />
       </div>
       <% } %>
-      <div class="facet_name w-full truncate grow px-[4px] text-sm flex justify-center items-center"><span class="w-full truncate text-center"><%= player.facet?.displayName ?? "?" %></span></div>
+      <div class="facet_name w-full truncate grow px-[4px] text-sm flex justify-center items-center">
+        <span class="w-full truncate text-center"><%= facetName %></span>
+      </div>
     </div>
+
+    <%# 5. 称号 (Titles) %>
     <div class="titles row-2 col-start-2 col-end-3 w-full flex items-center pl-[12px] gap-[6px]">
-    <% for (let item of player.titles) { %>
-      <% const [title, color] = $t(item).split("-"); %>
-      <span <%- `style="color:${color};"` %>><%= title %></span>
-    <% } %>
+      <% p.titles.forEach(item => { %>
+        <% const [title, color] = $t(item).split("-"); %>
+        <span <%- `style="color: ${color};"` %>><%= title %></span>
+      <% }); %>
     </div>
   </section>
-  <% if (player.hero.id != 80) { %>
+
+  <%# --- 物品区域 --- %>
+  <% if (!isLD) { %>
   <section class="items w-full grid grid-cols-[repeat(3,3fr)_2fr_3fr] grid-rows-2">
     <div class="items_main contents">
-      <% for( let i = 0; i < 6; i++ ) { %>
-      <%- include("./item.ejs", {item: player.items[i], style: `col-${i%3+1}`, isNeutral: false}) %>
+      <% for(let i = 0; i < 6; i++) { %>
+        <%- include("./item.ejs", {item: p.items[i], style: `col-${i%3+1}`, isNeutral: false}) %>
       <% } %>
     </div>
     <div class="items_backpack grayscale col-4 row-start-1 row-span-2 flex flex-col">
-      <% for( let i = 0; i < 3; i++ ) { %>
-      <%- include("./item.ejs", {item: player.backpacks[i], style: "", isNeutral: false}) %>
+      <% for(let i = 0; i < 3; i++) { %>
+        <%- include("./item.ejs", {item: p.backpacks[i], style: "", isNeutral: false}) %>
       <% } %>
     </div>
-    <div class="items_neutral contents"><%- include("./item.ejs", {item: player.neutral0Id, style: "row-start-1 row-span-2 col-5 flex items-center h-full", isNeutral: true}) %></div>
+    <div class="items_neutral contents">
+      <%- include("./item.ejs", {item: p.neutral0Id, style: "row-start-1 row-span-2 col-5 flex items-center h-full", isNeutral: true}) %>
+    </div>
   </section>
   <% } else { %>
   <section class="items w-full grid grid-cols-[repeat(6,3fr)_10fr] grid-rows-4">
     <div class="items_hero contents">
       <div class="items_main contents">
-        <% for( let i = 0; i < 6; i++ ) { %>
-        <%- include("./item.ejs", {item: player.items[i], style: `row-1 col-${i+1}`, isNeutral: false}) %>
+        <% for(let i = 0; i < 6; i++) { %>
+          <%- include("./item.ejs", {item: p.items[i], style: `row-1 col-${i+1}`, isNeutral: false}) %>
         <% } %>
       </div>
       <div class="items_backpack grayscale contents">
-        <% for( let i = 0; i < 3; i++ ) { %>
-        <%- include("./item.ejs", {item: player.backpacks[i], style: `row-2 col-${i+1}`, isNeutral: false}) %>
+        <% for(let i = 0; i < 3; i++) { %>
+          <%- include("./item.ejs", {item: p.backpacks[i], style: `row-2 col-${i+1}`, isNeutral: false}) %>
         <% } %>
       </div>
       <div class="items_neutral contents">
-        <%- include("./item.ejs", {item: player.neutral0Id, style: "row-2 col-6", isNeutral: true}) %>
+        <%- include("./item.ejs", {item: p.neutral0Id, style: "row-2 col-6", isNeutral: true}) %>
       </div>
     </div>
+
     <div class="items_unit contents">
       <div class="items_main contents">
-        <% for( let i = 0; i < 6; i++ ) { %>
-        <%- include("./item.ejs", {item: player.unitItems[i], style: `row-3 col-${i+1}`, isNeutral: false}) %>
+        <% for(let i = 0; i < 6; i++) { %>
+          <%- include("./item.ejs", {item: p.unitItems[i], style: `row-3 col-${i+1}`, isNeutral: false}) %>
         <% } %>
       </div>
       <div class="items_backpack grayscale contents">
-        <% for( let i = 0; i < 3; i++ ) { %>
-        <%- include("./item.ejs", {item: player.unitBackpacks[i], style: `row-4 col-${i+1}`, isNeutral: false}) %>
+        <% for(let i = 0; i < 3; i++) { %>
+          <%- include("./item.ejs", {item: p.unitBackpacks[i], style: `row-4 col-${i+1}`, isNeutral: false}) %>
         <% } %>
       </div>
       <div class="items_neutral contents">
-        <%- include("./item.ejs", {item: player.additionalUnit.neutral0Id, style: "row-4 col-6", isNeutral: true}) %>
+        <%- include("./item.ejs", {item: p.additionalUnit.neutral0Id, style: "row-4 col-6", isNeutral: true}) %>
       </div>
     </div>
   </section>
   <% } %>
+
+  <%# --- Buffs 与 辅助物品 --- %>
   <section class="buffs_supports w-full h-[24px] flex justify-between">
     <div class="buffs flex h-[24px]">
-      <% for (const buff of player.buffs) { %>
+      <% p.buffs.forEach(buff => { %>
       <div class="relative">
         <img class="w-[33px] h-[24px]" src="<%= getImageUrl(dotaconstants[`${buff.type}_ids`][buff.id], ImageType[buff.type === "ability" ? "Abilities" : "Items"]) %>" />
         <p class="count absolute w-full bottom-0 leading-[1] text-center bg-stone-700/50 text-[10px]"><%= buff.stackCount || "" %></p>
       </div>
-      <% } %>
+      <% }); %>
     </div>
     <div class="supports flex h-[24px]">
-      <% for (const supportItem of player.supportItemsCount){ %>
+      <% p.supportItemsCount.forEach(supportItem => { %>
       <div class="relative">
         <img class="w-[33px] h-[24px]" src="<%= getImageUrl(supportItem.name, ImageType.Items) %>" />
         <p class="count absolute w-full bottom-0 leading-[1] text-center bg-stone-700/50 text-[10px]"><%= supportItem.count || "" %></p>
       </div>
-      <% } %>
+      <% }); %>
     </div>
   </section>
+
+  <%# --- 底部统计数据 --- %>
   <section class="player-stat h-full flex flex-col justify-around text-[13px] leading-[24px] whitespace-nowrap">
     <p class="w-full flex justify-around">
-      <span><%= $t("dota2tracker.template.hero_damage_") %><span class="hero_damage"><%= player.heroDamage %></span></span>
-      <span><%= $t("dota2tracker.template.building_damage_") %><span class="building_damage"><%= player.towerDamage %></span></span>
-      <span><%= $t("dota2tracker.template.damage_received_") %><span class="tak">
-        <%= (player.stats?.heroDamageReport?.receivedTotal.physicalDamage || 0) +
-        (player.stats?.heroDamageReport?.receivedTotal.magicalDamage || 0) +
-        (player.stats?.heroDamageReport?.receivedTotal.pureDamage || 0) %>
-      </span>
-      </span>
+      <span><%= $t("dota2tracker.template.hero_damage_") %><span class="hero_damage"><%= p.heroDamage %></span></span>
+      <span><%= $t("dota2tracker.template.building_damage_") %><span class="building_damage"><%= p.towerDamage %></span></span>
+      <span><%= $t("dota2tracker.template.damage_received_") %><span class="tak"><%= damageReceived %></span></span>
     </p>
     <p class="w-full flex justify-around">
-      <span><%= $t("dota2tracker.template.lasthit_") %><span class="lh"><%= player.numLastHits %></span>/<span class="dn"><%= player.numDenies %></span></span>
-      <span><%= $t("dota2tracker.template.GPM/XPM_") %><span class="gpm"><%= player.goldPerMinute %></span>/<span class="xpm"><%= player.experiencePerMinute %></span></span>
-      <span><%= $t("dota2tracker.template.heal_") %><span class="heal"><%= player.heroHealing %></span></span>
+      <span><%= $t("dota2tracker.template.lasthit_") %><span class="lh"><%= p.numLastHits %></span>/<span class="dn"><%= p.numDenies %></span></span>
+      <span><%= $t("dota2tracker.template.GPM/XPM_") %><span class="gpm"><%= p.goldPerMinute %></span>/<span class="xpm"><%= p.experiencePerMinute %></span></span>
+      <span><%= $t("dota2tracker.template.heal_") %><span class="heal"><%= p.heroHealing %></span></span>
     </p>
     <p class="w-full flex justify-center">
       <span><%= $t("dota2tracker.template.crowd_control_duration_") %></span>
-      <span><%= ((player.stats?.heroDamageReport?.dealtTotal.stunDuration || 0) / 100).toFixed(2) + "/" %></span>
-      <span><%= ((player.stats?.heroDamageReport?.dealtTotal.slowDuration || 0) / 100).toFixed(2) + "/" %></span>
-      <span><%= ((player.stats?.heroDamageReport?.dealtTotal.disableDuration || 0) / 100).toFixed(2) %></span>s
+      <span><%= ccStun + "/" %></span>
+      <span><%= ccSlow + "/" %></span>
+      <span><%= ccDisable %></span>s
     </p>
   </section>
 </div>

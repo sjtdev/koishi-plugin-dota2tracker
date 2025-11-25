@@ -632,241 +632,391 @@
         <% const primary_attrs = { "3": "hero_universal", "0": "hero_strength", "1": "hero_agility", "2": "hero_intelligence" }; %>
         <% const hero_dc = dotaconstants.heroes[hero.id]; %>
         <div class="wrapper">
-            <%- `
-            <div class="hero" id="${hero.id}">
-                <img src="${getImageUrl(hero["name"].match(/^npc_dota_hero_(.+)$/)[1], ImageType.Heroes)}"/>
-                <img class="pri_attr" src="${getImageUrl(primary_attrs[hero.primary_attr], ImageType.Icons)}"/>
-                <div class="info">
-                    <p class="name">${hero.name_loc}</p>
-                    <p class="roles">
-                        ${hero.role_levels.map((item, index) => item>0?`<span class="role level${item}">${$t("dota2tracker.template.roles."+index)}</span>`:"").join("")}
-                    </p>
-                    <p class="attrs">
-                        <span class="str">${hero.str_base} <span class="gain">+${hero.str_gain.toFixed(1)}</span></span>
-                        <span class="agi">${hero.agi_base} <span class="gain">+${hero.agi_gain.toFixed(1)}</span></span>
-                        <span class="int">${hero.int_base} <span class="gain">+${hero.int_gain.toFixed(1)}</span></span>
-                    </p>
-                </div>
+          <div class="hero" id="<%= hero.id %>">
+            <img src="<%= getImageUrl(hero["name"].match(/^npc_dota_hero_(.+)$/)[1], ImageType.Heroes) %>"/>
+            <img class="pri_attr" src="<%= getImageUrl(primary_attrs[hero.primary_attr], ImageType.Icons) %>"/>
+            <div class="info">
+                <p class="name"><%= hero.name_loc %></p>
+                <p class="roles">
+                    <% hero.role_levels.forEach((item, index) => { %>
+                        <% if (item > 0) { %>
+                            <span class="role level<%= item %>"><%= $t("dota2tracker.template.roles."+index) %></span>
+                        <% } %>
+                    <% }); %>
+                </p>
+                <p class="attrs">
+                    <span class="str"><%= hero.str_base %> <span class="gain">+<%= hero.str_gain.toFixed(1) %></span></span>
+                    <span class="agi"><%= hero.agi_base %> <span class="gain">+<%= hero.agi_gain.toFixed(1) %></span></span>
+                    <span class="int"><%= hero.int_base %> <span class="gain">+<%= hero.int_gain.toFixed(1) %></span></span>
+                </p>
             </div>
+          </div>
             <div class="hype">
-                <p class="npe">${hero.npe_desc_loc}</p>
-                ${hero.hype_loc}
+              <p class="npe"><%= hero.npe_desc_loc %></p>
+              <%- hero.hype_loc %>
             </div>
             <div class="details">
-                <div class="talents">
-                    <div class="talent">
-                        <div class="left">${hero.talents[7].name_loc}</div>
-                        <div class="level">25</div>
-                        <div class="right">${hero.talents[6].name_loc}</div>
-                    </div>
-                    <div class="talent">
-                        <div class="left">${hero.talents[5].name_loc}</div>
-                        <div class="level">20</div>
-                        <div class="right">${hero.talents[4].name_loc}</div>
-                    </div>
-                    <div class="talent">
-                        <div class="left">${hero.talents[3].name_loc}</div>
-                        <div class="level">15</div>
-                        <div class="right">${hero.talents[2].name_loc}</div>
-                    </div>
-                    <div class="talent">
-                        <div class="left">${hero.talents[1].name_loc}</div>
-                        <div class="level">10</div>
-                        <div class="right">${hero.talents[0].name_loc}</div>
-                    </div>
+              <div class="talents">
+                <div class="talent">
+                  <div class="left"><%= hero.talents[7].name_loc %></div>
+                  <div class="level">25</div>
+                  <div class="right"><%= hero.talents[6].name_loc %></div>
                 </div>
-                <div class="list">
-                    <div class="bars">
-                        <div class="health"><span class="number">${hero.max_health}</span><span class="suffix">+${hero.health_regen.toFixed(1)}</span></div>
-                        <div class="mana${!hero.max_mana?" zero":""}"><span class="number">${hero.max_mana}</span><span class="suffix">+${hero.mana_regen.toFixed(1)}</span></div>
-                    </div>
-                    <div class="stats">
-                        <div class="column">
-                            <p>${$t("dota2tracker.template.attack")}</p>
-                            <div class="stat">
-                                <img src="${getImageUrl("icon_damage", ImageType.HeroStats)}"/>
-                                <span>${hero.damage_min}~${hero.damage_max}</span>
-                            </div>
-                            <div class="stat">
-                                <img src="${getImageUrl("icon_attack_time", ImageType.HeroStats)}"/>
-                                <span>${hero.attack_rate.toFixed(1)}</span>
-                            </div>
-                            <div class="stat">
-                                <img src="${getImageUrl("icon_attack_range", ImageType.HeroStats)}"/>
-                                <span>${hero.attack_range}</span>
-                            </div>
-                            <div class="stat${hero_dc.attack_type=="Melee"?" hide":""}">
-                                <img src="${getImageUrl("icon_projectile_speed", ImageType.HeroStats)}"/>
-                                <span>${hero.projectile_speed}</span>
-                            </div>
-                        </div>
-                        <div class="column">
-                            <p>${$t("dota2tracker.template.defense")}</p>
-                            <div class="stat">
-                                <img src="${getImageUrl("icon_armor", ImageType.HeroStats)}"/>
-                                <span>${hero.armor.toFixed(1)}</span>
-                            </div>
-                            <div class="stat">
-                                <img src="${getImageUrl("icon_magic_resist", ImageType.HeroStats)}"/>
-                                <span>${hero.magic_resistance}%</span>
-                            </div>
-                        </div>
-                        <div class="column">
-                            <p>${$t("dota2tracker.template.mobility")}</p>
-                            <div class="stat">
-                                <img src="${getImageUrl("icon_movement_speed", ImageType.HeroStats)}"/>
-                                <span>${hero.movement_speed}</span>
-                            </div>
-                            <div class="stat">
-                                <img src="${getImageUrl("icon_turn_rate", ImageType.HeroStats)}"/>
-                                <span>${hero.turn_rate.toFixed(1)}</span>
-                            </div>
-                            <div class="stat">
-                                <img src="${getImageUrl("icon_vision", ImageType.HeroStats)}"/>
-                                <span>${hero.sight_range_day} / ${hero.sight_range_night}</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="talent">
+                  <div class="left"><%= hero.talents[5].name_loc %></div>
+                  <div class="level">20</div>
+                  <div class="right"><%= hero.talents[4].name_loc %></div>
                 </div>
+                <div class="talent">
+                  <div class="left"><%= hero.talents[3].name_loc %></div>
+                  <div class="level">15</div>
+                  <div class="right"><%= hero.talents[2].name_loc %></div>
+                </div>
+                <div class="talent">
+                  <div class="left"><%= hero.talents[1].name_loc %></div>
+                  <div class="level">10</div>
+                  <div class="right"><%= hero.talents[0].name_loc %></div>
+                </div>
+              </div>
+              <div class="list">
+                <div class="bars">
+                  <div class="health">
+                    <span class="number"><%= hero.max_health %></span>
+                    <span class="suffix">+<%= hero.health_regen.toFixed(1) %></span>
+                  </div>
+                  <div class="mana<%= !hero.max_mana ? ' zero' : '' %>">
+                    <span class="number"><%= hero.max_mana %></span>
+                    <span class="suffix">+<%= hero.mana_regen.toFixed(1) %></span>
+                  </div>
+                </div>
+                <div class="stats">
+                  <%# --- 攻击属性列 --- %>
+                  <div class="column">
+                    <p><%= $t("dota2tracker.template.attack") %></p>
+                    <div class="stat">
+                      <img src="<%= getImageUrl("icon_damage", ImageType.HeroStats) %>"/>
+                      <span><%= hero.damage_min %>~<%= hero.damage_max %></span>
+                    </div>
+                    <div class="stat">
+                      <img src="<%= getImageUrl("icon_attack_time", ImageType.HeroStats) %>"/>
+                      <span><%= hero.attack_rate.toFixed(1) %></span>
+                    </div>
+                    <div class="stat">
+                      <img src="<%= getImageUrl("icon_attack_range", ImageType.HeroStats) %>"/>
+                      <span><%= hero.attack_range %></span>
+                    </div>
+                    <%# 只有非近战英雄才显示弹道速度 %>
+                    <% if (hero_dc.attack_type !== "Melee") { %>
+                    <div class="stat">
+                      <img src="<%= getImageUrl("icon_projectile_speed", ImageType.HeroStats) %>"/>
+                      <span><%= hero.projectile_speed %></span>
+                    </div>
+                    <% } %>
+                  </div>
+
+                  <%# --- 防御属性列 --- %>
+                  <div class="column">
+                    <p><%= $t("dota2tracker.template.defense") %></p>
+                    <div class="stat">
+                      <img src="<%= getImageUrl("icon_armor", ImageType.HeroStats) %>"/>
+                      <span><%= hero.armor.toFixed(1) %></span>
+                    </div>
+                    <div class="stat">
+                      <img src="<%= getImageUrl("icon_magic_resist", ImageType.HeroStats) %>"/>
+                      <span><%= hero.magic_resistance %>%</span>
+                    </div>
+                  </div>
+
+                  <%# --- 机动与视野列 --- %>
+                  <div class="column">
+                    <p><%= $t("dota2tracker.template.mobility") %></p>
+                    <div class="stat">
+                      <img src="<%= getImageUrl("icon_movement_speed", ImageType.HeroStats) %>"/>
+                      <span><%= hero.movement_speed %></span>
+                    </div>
+                    <div class="stat">
+                      <img src="<%= getImageUrl("icon_turn_rate", ImageType.HeroStats) %>"/>
+                      <span><%= hero.turn_rate.toFixed(1) %></span>
+                    </div>
+                    <div class="stat">
+                      <img src="<%= getImageUrl("icon_vision", ImageType.HeroStats) %>"/>
+                      <span><%= hero.sight_range_day %> / <%= hero.sight_range_night %></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="facets">
-                ${hero.facets.map(facet=>`
-                <div class="facet">
-                    <div class="name_back type_${facet.color}"></div>
-                    <div class="name_line type_${facet.color}"></div>
-                    <p class="name">
-                        <img src="${getImageUrl(facet.icon, ImageType.IconsFacets)}"/>
-                        <span>${facet.title_loc}</span>
-                    </p>
-                    <div class="content">
-                        ${facet.description_loc && !facet.abilities?.some(ability => ability.description_ability_loc === facet.description_loc) ?`<p class="description">${facet.description_loc}</p>`:""}
-                        ${facet.abilities?facet.abilities.map(ability=>
-                        `<div class="ability">
-                            <div class="name">
-                                <img src="${getImageUrl(ability.name, ImageType.Abilities)}" onerror="this.onerror=null; this.src='${getImageUrl(`innate_icon`,ImageType.Icons)}';"/>
-                                <span>${ability.name_loc}</span>
-                            </div>
-                            ${ability.description_ability_loc?`<div class="description">${ability.description_ability_loc}</div>`:""}
-                            ${ability.attributes&&ability.attributes?.length ? ability.attributes.map(attr=>
-                            `<div class="attributes">
-                                <p><span class="item">${attr.heading_loc}</span><span class="values">${attr.values.map(value => value + (attr.is_percentage ? "%" : "")).join(" / ")}</span></p>
-                            </div>`).join(""):""}
-                        </div>`).join("")
-                        :""}
+            <% hero.facets.forEach(facet => { %>
+              <div class="facet">
+                <div class="name_back type_<%= facet.color %>"></div>
+                <div class="name_line type_<%= facet.color %>"></div>
+                <p class="name">
+                  <img src="<%= getImageUrl(facet.icon, ImageType.IconsFacets) %>"/>
+                  <span><%- facet.title_loc %></span>
+                </p>
+                <div class="content">
+                  <% if (facet.description_loc && !facet.abilities?.some(ability => ability.description_ability_loc === facet.description_loc)) { %>
+                  <p class="description"><%- facet.description_loc %></p>
+                  <% } %>
+
+                  <% if (facet.abilities) { %>
+                  <% facet.abilities.forEach(ability => { %>
+                  <div class="ability">
+                    <div class="name">
+                      <img src="<%= getImageUrl(ability.name, ImageType.Abilities) %>" onerror="this.onerror=null; this.src='<%= getImageUrl(`innate_icon`, ImageType.Icons) %>';"/>
+                      <span><%- ability.name_loc %></span>
                     </div>
+                    <% if (ability.description_ability_loc) { %>
+                    <div class="description"><%- ability.description_ability_loc %></div>
+                    <% } %>
+
+                    <% if (ability.attributes && ability.attributes.length) { %>
+                    <% ability.attributes.forEach(attr => { %>
+                    <div class="attributes">
+                      <p>
+                        <span class="item"><%- attr.heading_loc %></span>
+                        <span class="values"><%- attr.values.map(value => value + (attr.is_percentage ? "%" : "")).join(" / ") %></span>
+                      </p>
+                    </div>
+                    <% }); %>
+                    <% } %>
+                  </div>
+                  <% }); %>
+                  <% } %>
                 </div>
-                `).join("")}
+              </div>
+              <% }); %>
             </div>
             <div class="skills">
-                ${hero.abilities//.filter((item) => dotaconstants.abilities[item.name]?.behavior != "Hidden")
-                .map((item) => {const ability_dc = dotaconstants.abilities[item.name]; return `
-                <div class="skill${item.facet?' facet':''}" data-innate="${item.ability_is_innate&&!item.ability_is_facet}">
-                    <p class="title${item.facet?(' name_back type_' + item.facet?.color):''}">
-                        ${item.facet?`<img src="${getImageUrl(item.facet?.icon, ImageType.IconsFacets)}">`:""}
-                        <span class="name">${item.name_loc}</span>
-                        ${item.ability_is_innate&&!item.ability_is_facet?`<span class="is_innate">${$t("dota2tracker.template.innate")}</span>`:""}
-                        ${item.ability_is_granted_by_scepter ?`<img src="${getImageUrl("scepter")}" class="scepter">`:""}
-                        ${item.ability_is_granted_by_shard ?`<img src="${getImageUrl("shard")}" class="shard">`:""}
+              <%# --- 遍历技能列表 --- %>
+              <% hero.abilities.forEach((item) => {
+                  const ability_dc = dotaconstants.abilities[item.name];
+
+                  // 预先查找冷却和耗蓝数据，避免在HTML中反复find
+                  const cdStats = item.special_values.find(sv => sv.name == "AbilityCooldown");
+                  const manaStats = item.special_values.find(sv => sv.name == "AbilityManaCost");
+
+                  // 预先计算是否需要显示冷却/耗蓝 (非空 且 不全为0)
+                  const hasCd = cdStats?.values_float.length && !(cdStats.values_float.length === 1 && cdStats.values_float[0] === 0);
+                  const hasMana = manaStats?.values_float.length && !(manaStats.values_float.length === 1 && manaStats.values_float[0] === 0);
+              %>
+              <div class="skill<%= item.facet ? ' facet' : '' %>" data-innate="<%= item.ability_is_innate && !item.ability_is_facet %>">
+
+                <%# --- 技能标题行 --- %>
+                <p class="title<%= item.facet ? (' name_back type_' + item.facet?.color) : '' %>">
+                  <% if (item.facet) { %>
+                    <img src="<%= getImageUrl(item.facet?.icon, ImageType.IconsFacets) %>">
+                  <% } %>
+                  <span class="name"><%= item.name_loc %></span>
+
+                  <% if (item.ability_is_innate && !item.ability_is_facet) { %>
+                    <span class="is_innate"><%= $t("dota2tracker.template.innate") %></span>
+                  <% } %>
+                  <% if (item.ability_is_granted_by_scepter) { %>
+                    <img src="<%= getImageUrl("scepter") %>" class="scepter">
+                  <% } %>
+                  <% if (item.ability_is_granted_by_shard) { %>
+                    <img src="<%= getImageUrl("shard") %>" class="shard">
+                  <% } %>
+                </p>
+
+                <%# --- 技能图片与行为标签 --- %>
+                <div class="img_stats">
+                  <%# 原逻辑中的 onerror 处理保留，注意 EJS 里的引号转义 %>
+                  <img src="<%= getImageUrl(item.name, ImageType.Abilities) %>" onerror="this.onerror=null; this.src='<%= getImageUrl(`innate_icon`, ImageType.Icons) %>';"/>
+
+                  <div class="stats">
+                    <p class="behavior">
+                      <%= $t("dota2tracker.template.ability") %>
+                      <%= [].concat(ability_dc?.behavior)
+                          .filter((beh) => beh !== "Hidden" || !(item.ability_is_granted_by_shard || item.ability_is_granted_by_scepter))
+                          .map((beh) => $t("dota2tracker.template.behavior." + beh)).join("/") %>
                     </p>
-                    <div class="img_stats">
-                        <img src="${getImageUrl(item.name, ImageType.Abilities)}" onerror="this.onerror=null; this.src='${getImageUrl(`innate_icon`,ImageType.Icons)}';"/>
-                        <div class="stats">
-                            <p class="behavior">${$t("dota2tracker.template.ability")}${[].concat(ability_dc?.behavior)
-                                .filter((beh) => beh !== "Hidden" || !(item.ability_is_granted_by_shard || item.ability_is_granted_by_scepter))
-                                .map((beh) => $t("dota2tracker.template.behavior."+beh)).join("/")}
-                            </p>
-                            ${ability_dc?.target_team ?
-                            `<p class="target_team">${$t("dota2tracker.template.affects")}${[].concat(ability_dc?.target_team)
-                                .map((tt) => $t("dota2tracker.template.target_team."+tt)).join("/")}
-                            </p>` : ""}
-                            ${!Array.isArray(ability_dc?.dmg_type) && ability_dc?.dmg_type ?
-                            `<p class="dmg_type ${ability_dc?.dmg_type}">${$t("dota2tracker.template.damage_type")}<span>${$t("dota2tracker.template.damage_type_"+ability_dc?.dmg_type)}</span></p>` : ""}
-                            ${ability_dc?.dispellable ?
-                            `<p class="dispellable ${ability_dc?.dispellable == "Strong Dispels Only" ? "Strong" : ability_dc?.dispellable}">${$t("dota2tracker.template.dispellable")}<span>${$t("dota2tracker.template."+(ability_dc?.dispellable == "Strong Dispels Only" ? "dispellable_Strong" : ability_dc?.dispellable))}</span></p>` : ""}
-                            ${!Array.isArray(ability_dc?.bkbpierce) && ability_dc?.bkbpierce ?
-                            `<p class="bkbpierce ${ability_dc?.bkbpierce}"> ${$t("dota2tracker.template.bkbpierce")}<span>${$t("dota2tracker.template."+ability_dc?.bkbpierce)}</span></p>` : ""}
-                        </div>
-                    </div>
-                    <p class="description">${item.desc_loc}</p>
-                    ${item.facets_loc
-                        .reduce((acc, facet_loc, index) => {
-                            index = index + (hero.facets.length - item.facets_loc.length);
-                            if (index >= 0) acc.push(facet_loc);
-                            return acc;},[])
-                        .map((facet_loc,index)=>(facet_loc!=""?`
-                    <div class="facet">
-                        <div class="name_back type_${hero.facets[index].color}"></div>
-                        <div class="name_line type_${hero.facets[index].color}"></div>
-                        <p class="name">
-                            <img src="${getImageUrl(hero.facets[index].icon, ImageType.IconsFacets)}" />
-                            <span>${hero.facets[index].title_loc}</span>
-                        </p>
-                        <div class="content">
-                            <div class="ability">
-                                <div class="description">${hero.facets[index].abilities.find(ab=>ab.id==item.id)?.description_ability_loc}</div>
-                            </div>
-                        </div>
-                    </div>
-                    `:"")).join("")}
-                    ${item.ability_has_scepter&&!item.ability_is_granted_by_scepter&&item.scepter_loc
-                    ? `<p class="aghanim_description">
-                        <span class="title"><img src="${getImageUrl("scepter")}"class="scepter">${$t("dota2tracker.template.scepter")}</span>
-                        <span class="desc">${item.scepter_loc}</span>
-                    </p>` : ""}
-                    ${item.ability_has_shard&&!item.ability_is_granted_by_shard&&item.shard_loc
-                    ? `<p class="aghanim_description">
-                        <span class="title"><img src="${getImageUrl("shard")}"class="shard">${$t("dota2tracker.template.shard")}</span>
-                        <span class="desc">${item.shard_loc}</span>
-                    </p>` : ""}
-                    <div class="notes"${!item.notes_loc.length ? ` style="display:none;"` : ""}>
-                        ${item.notes_loc.map((note) => `<p>${note}</p>`).join("")}
-                    </div>
-                    <div class="attributes">
-                    ${item.special_values
-                        .filter(sv => sv.heading_loc)
-                        .map((sv) =>
-                        `<p>
-                            <span class="heading">${sv.heading_loc}</span>
-                            <span class="values">
-                                ${!(sv.values_float?.every(value => value === 0) || sv.values_float.length == 0) ?
-                                `<span class="primary${(sv.values_float.every(value => value === 0) || sv.values_float.length == 0)?" empty":""}">
-                                    ${(!((sv.values_float.every(value => value === 0) || sv.values_float.length == 0) && (sv.values_scepter.length || sv.values_shard.length || sv.facet_bonus.name))
-                                        ? (sv.values_float.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")) : "")}
-                                </span>` : "" }
-                                ${sv.values_scepter && sv.values_scepter.length ?
-                                `<span class="alternative scepter">
-                                    <img src="${getImageUrl("scepter")}"/>${sv.values_scepter.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}
-                                </span>`  : "" }
-                                ${sv.values_shard && sv.values_shard.length ?
-                                `<span class="alternative shard">
-                                    <img src="${getImageUrl("shard")}"/>${sv.values_shard.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ")}
-                                </span>`  : "" }
-                                ${sv.facet_bonus.name && hero.facets.some(facet=>facet.name==sv.facet_bonus.name) ?
-                                `<span class="alternative facet">
-                                    <span class="facet"><span class="name_back type_${hero.facets.find(facet=>facet.name==sv.facet_bonus.name).color}"><img src="${getImageUrl(hero.facets.find(facet=>facet.name==sv.facet_bonus.name).icon, ImageType.IconsFacets)}" />${sv.facet_bonus.values.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ")}</span></span>
-                                </span>` : "" }
-                                ${sv.bonuses.length ?
-                                `<span class="alternative talent">
-                                    ${sv.bonuses.map(bonus=>` <img src="${getImageUrl("talents","icons","svg")}"/>${(bonus.value>0?'<span class="plus">+</span>':"")+bonus.value+(sv.is_percentage?"%":"")}`).join(" ")}
-                                </span>` : "" }
-                            </span>
-                        </p>`)
-                        .join("")}
-                    </div>
-                    <p>
-                        ${item.special_values.find(sv=>sv.name=="AbilityCooldown")?.values_float.length && !(item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float.length === 1 && item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float[0] === 0) ?
-                        `<span class="cooldown"> ${item.special_values.find(sv=>sv.name=="AbilityCooldown").values_float.join(" / ")}
-                        </span>` : ""}
-                        ${item.special_values.find(sv=>sv.name=="AbilityManaCost")?.values_float.length && !(item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float.length === 1 && item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float[0] === 0) ?
-                        `<span class="mana_cost"> ${item.special_values.find(sv=>sv.name=="AbilityManaCost").values_float.join(" / ")}
-                        </span>` : ""}
+
+                    <% if (ability_dc?.target_team) { %>
+                    <p class="target_team">
+                      <%= $t("dota2tracker.template.affects") %>
+                      <%= [].concat(ability_dc?.target_team).map((tt) => $t("dota2tracker.template.target_team." + tt)).join("/") %>
                     </p>
-                    <p class="lore"${!item.lore_loc ? ` style="display:none;"` : ""}>${item.lore_loc}</p>
-                </div>`}).join("")}
+                    <% } %>
+
+                    <% if (!Array.isArray(ability_dc?.dmg_type) && ability_dc?.dmg_type) { %>
+                    <p class="dmg_type <%= ability_dc?.dmg_type %>">
+                      <%= $t("dota2tracker.template.damage_type") %>
+                      <span><%= $t("dota2tracker.template.damage_type_" + ability_dc?.dmg_type) %></span>
+                    </p>
+                    <% } %>
+
+                    <% if (ability_dc?.dispellable) { %>
+                    <p class="dispellable <%= ability_dc?.dispellable == 'Strong Dispels Only' ? 'Strong' : ability_dc?.dispellable %>">
+                      <%= $t("dota2tracker.template.dispellable") %>
+                      <span><%= $t("dota2tracker.template." + (ability_dc?.dispellable == "Strong Dispels Only" ? "dispellable_Strong" : ability_dc?.dispellable)) %></span>
+                    </p>
+                    <% } %>
+
+                    <% if (!Array.isArray(ability_dc?.bkbpierce) && ability_dc?.bkbpierce) { %>
+                    <p class="bkbpierce <%= ability_dc?.bkbpierce %>">
+                      <%= $t("dota2tracker.template.bkbpierce") %>
+                      <span><%= $t("dota2tracker.template." + ability_dc?.bkbpierce) %></span>
+                    </p>
+                    <% } %>
+                  </div>
+                </div>
+
+                <p class="description"><%- item.desc_loc %></p>
+
+                <%# --- Facet 描述渲染逻辑 --- %>
+                <%# 将原来的 reduce 逻辑解构为清晰的计算 %>
+                <%
+                  const facetStartIndex = hero.facets.length - item.facets_loc.length;
+                  item.facets_loc.forEach((facet_loc, i) => {
+                    const realIndex = i + facetStartIndex;
+                    if (realIndex >= 0 && facet_loc !== "") {
+                      const currentFacet = hero.facets[realIndex];
+                %>
+                <div class="facet">
+                  <div class="name_back type_<%= currentFacet.color %>"></div>
+                  <div class="name_line type_<%= currentFacet.color %>"></div>
+                  <p class="name">
+                    <img src="<%= getImageUrl(currentFacet.icon, ImageType.IconsFacets) %>" />
+                    <span><%- currentFacet.title_loc %></span>
+                  </p>
+                  <div class="content">
+                    <div class="ability">
+                      <div class="description"><%- currentFacet.abilities.find(ab => ab.id == item.id)?.description_ability_loc %></div>
+                    </div>
+                  </div>
+                </div>
+                <%
+                    }
+                  });
+                %>
+
+                <%# --- A杖/魔晶描述 --- %>
+                <% if (item.ability_has_scepter && !item.ability_is_granted_by_scepter && item.scepter_loc) { %>
+                <p class="aghanim_description">
+                  <span class="title"><img src="<%= getImageUrl("scepter") %>" class="scepter"><%= $t("dota2tracker.template.scepter") %></span>
+                  <span class="desc"><%- item.scepter_loc %></span>
+                </p>
+                <% } %>
+
+                <% if (item.ability_has_shard && !item.ability_is_granted_by_shard && item.shard_loc) { %>
+                <p class="aghanim_description">
+                  <span class="title"><img src="<%= getImageUrl("shard") %>" class="shard"><%= $t("dota2tracker.template.shard") %></span>
+                  <span class="desc"><%- item.shard_loc %></span>
+                </p>
+                <% } %>
+
+                <%# --- 备注 --- %>
+                <% if (item.notes_loc && item.notes_loc.length > 0) { %>
+                <div class="notes">
+                  <% item.notes_loc.forEach((note) => { %>
+                    <p><%- note %></p>
+                  <% }); %>
+                </div>
+                <% } %>
+
+                <%# --- 技能数值 (最复杂的部分) --- %>
+                <div class="attributes">
+                  <%
+                    item.special_values.filter(sv => sv.heading_loc).forEach((sv) => {
+                      // 预计算条件，简化模板逻辑
+                      const isAllZero = sv.values_float?.every(value => value === 0) || sv.values_float.length == 0;
+                      const hasScepterVal = sv.values_scepter && sv.values_scepter.length;
+                      const hasShardVal = sv.values_shard && sv.values_shard.length;
+                      const hasFacetVal = sv.facet_bonus.name && hero.facets.some(facet => facet.name == sv.facet_bonus.name);
+                      const hasTalentVal = sv.bonuses.length > 0;
+
+                      // 如果基础值全为0，且没有任何额外加成(A杖/魔晶/命石)，则该条目其实没意义，但在原逻辑里似乎是作为空 primary 渲染？
+                      // 原逻辑：如果 (全0) 且 (有任意额外加成) -> 显示空 primary。
+                      // 如果 (全0) 且 (无额外加成) -> 这条根本不会显示？不，原逻辑里 primary 即使全0也会渲染 span，只是加了 empty class。
+
+                      // 让我们遵循原逻辑：
+                      // Primary 部分：除非 (全0 且 有额外加成)，否则渲染数值。
+                      // 如果 (全0 且 有额外加成) -> 渲染内容为空字符串。
+                  %>
+                  <p>
+                    <span class="heading"><%= sv.heading_loc %></span>
+                    <span class="values">
+                      <%# --- 主数值 --- %>
+                      <% if (!isAllZero || (isAllZero && (hasScepterVal || hasShardVal || hasFacetVal))) { %>
+                      <span class="primary<%= isAllZero ? ' empty' : '' %>">
+                        <% if (!isAllZero) { %>
+                          <%= sv.values_float.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ") %>
+                        <% } %>
+                      </span>
+                      <% } %>
+
+                      <%# --- A杖数值 --- %>
+                      <% if (hasScepterVal) { %>
+                      <span class="alternative scepter">
+                        <img src="<%= getImageUrl("scepter") %>"/>
+                        <%- sv.values_scepter.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ") %>
+                      </span>
+                      <% } %>
+
+                      <%# --- 魔晶数值 --- %>
+                      <% if (hasShardVal) { %>
+                      <span class="alternative shard">
+                        <img src="<%= getImageUrl("shard") %>"/>
+                        <%- sv.values_shard.map(value => (value > 0 ? '<span class="plus">+</span>' : "") + value + (sv.is_percentage ? "%" : "")).join(" / ") %>
+                      </span>
+                      <% } %>
+
+                      <%# --- 命石数值 --- %>
+                      <% if (hasFacetVal) {
+                          const facet = hero.facets.find(f => f.name == sv.facet_bonus.name);
+                      %>
+                      <span class="alternative facet">
+                        <span class="facet">
+                          <span class="name_back type_<%= facet.color %>">
+                            <img src="<%= getImageUrl(facet.icon, ImageType.IconsFacets) %>" />
+                            <%= sv.facet_bonus.values.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ") %>
+                          </span>
+                        </span>
+                      </span>
+                      <% } %>
+
+                      <%# --- 天赋数值 --- %>
+                      <% if (hasTalentVal) { %>
+                      <span class="alternative talent">
+                        <% sv.bonuses.forEach(bonus => { %>
+                          <img src="<%= getImageUrl("talents", "icons", "svg") %>"/>
+                          <%- (bonus.value > 0 ? '<span class="plus">+</span>' : "") + bonus.value + (sv.is_percentage ? "%" : "") %>
+                        <% }); %>
+                      </span>
+                      <% } %>
+                    </span>
+                  </p>
+                  <% }); %>
+                </div>
+
+                <%# --- 冷却与蓝耗底部栏 --- %>
+                <p>
+                  <% if (hasCd) { %>
+                  <span class="cooldown">
+                    <%= cdStats.values_float.join(" / ") %>
+                  </span>
+                  <% } %>
+
+                  <% if (hasMana) { %>
+                  <span class="mana_cost">
+                    <%= manaStats.values_float.join(" / ") %>
+                  </span>
+                  <% } %>
+                </p>
+
+                <% if (item.lore_loc) { %>
+                <p class="lore"><%= item.lore_loc %></p>
+                <% } %>
+
+              </div>
+              <% }); %>
             </div>
             <div class="lore">
-                ${hero.bio_loc}
-            </div>` %>
+              <%- hero.bio_loc %>
+            </div>
         </div>
     </body>
     <script>

@@ -1,261 +1,167 @@
+<%# --- 基础配置 --- %>
+<% const match = data; %>
+<% const svgWidth = 400; %>
+<% const svgHeight = 200; %>
+<% const padding = 50; %>
+<% const chartH = svgHeight - padding * 2; %>
+<% const chartW = svgWidth - padding * 2; %>
+
+<%# --- 数据准备 --- %>
+<% const mainData = match.radiantNetworthLeads ?? []; %>
+<% const secData = match.radiantExperienceLeads ?? []; %>
+<% const maxVal = Math.max(...mainData.map(Math.abs), ...secData.map(Math.abs)); %>
+<% const duration = match.durationSeconds; %>
+
+<%# --- 比例尺计算 --- %>
+<% const xScale = chartW / (duration - 1); %>
+<% const yScale = chartH / (maxVal * 2); %>
+<% const formatNum = n => Math.floor(n).toLocaleString(); %>
+
+<%# --- 坐标计算工具 --- %>
+<% const getX = i => padding + (i * 60 > duration ? ((((i - 1) * 60) + (duration % 60)) * xScale) : (i * xScale * 60)); %>
+<% const getY = (val, scale) => svgHeight / 2 - val * scale; %>
+
+<%# --- 点位生成: 次要数据 (经验) --- %>
+<% const secPoints = secData.map((v, i) => `${getX(i)},${getY(v, yScale)}`).join(' '); %>
+<% const secPoly = `${secPoints} ${svgWidth - padding},${svgHeight / 2} ${padding},${svgHeight / 2}`; %>
+
+<%# --- 点位生成: 主要数据 (经济) & 区域填充 --- %>
+<% const mainPointsRaw = mainData.map((v, i) => ({ val: v, x: getX(i), y: getY(v, yScale) })); %>
+<% const mainPolyPoints = mainPointsRaw.map(p => `${p.x},${p.y}`).join(' '); %>
+
+<%# --- 正负区域多边形计算 --- %>
+<% let upperPts = [], lowerPts = []; %>
+<% for (let i = 0; i < mainPointsRaw.length; i++) { %>
+  <% const curr = mainPointsRaw[i], next = mainPointsRaw[i + 1]; %>
+  <% if (curr.val >= 0) upperPts.push(`${curr.x},${curr.y}`); else lowerPts.push(`${curr.x},${curr.y}`); %>
+  <% if (next && ((curr.val >= 0 && next.val < 0) || (curr.val < 0 && next.val >= 0))) { %>
+    <% const t = Math.abs(curr.val) / (Math.abs(curr.val) + Math.abs(next.val)); %>
+    <% const crossX = curr.x + t * (next.x - curr.x); %>
+    <% const crossY = svgHeight / 2; %>
+    <% upperPts.push(`${crossX},${crossY}`); lowerPts.push(`${crossX},${crossY}`); %>
+  <% } %>
+<% } %>
+<% upperPts.push(`${svgWidth - padding},${svgHeight / 2}`, `${padding},${svgHeight / 2}`); %>
+<% lowerPts.push(`${svgWidth - padding},${svgHeight / 2}`, `${padding},${svgHeight / 2}`); %>
+
+<%# --- 胜率折线 --- %>
+<% const wrPoints = match.winRates ? [match.winRates[0]].concat(match.winRates).map((v, i) => `${getX(i)},${svgHeight - padding - v * chartH}`).join(' ') : ''; %>
+
+<%# --- 轴标签数据 --- %>
+<% const timeLabels = []; %>
+<% for (let i = 0; i < mainData.length - 1; i += 10) timeLabels.push({ x: getX(i), text: `${i.toString().padStart(2, '0')}:00` }); %>
+<% const valLabels = [maxVal, maxVal / 2, 0, -maxVal / 2, -maxVal]; %>
+
+<%# --- 玩家经济折线 (Player Networth) --- %>
+<% const pNwData = match.players.map(p => p.stats.networthPerMinute.concat(p.networth)); %>
+<% const maxNw = Math.max(...pNwData.flat().map(Math.abs)); %>
+<% const nwYScale = chartH / maxNw; %>
+<% const nwLabels = [maxNw, maxNw * 0.75, maxNw * 0.5, maxNw * 0.25, 0]; %>
+<% const pColors = dotaconstants.player_colors; %>
+
+
 <div id="charts">
-  <% const match = data; %>
-  <%
-  const mainData = match.radiantNetworthLeads ?? [];
-
-  const secondaryData = match.radiantExperienceLeads ?? [];
-
-  const maxValue = Math.max(...mainData.map(Math.abs), ...secondaryData.map(Math.abs));
-  const minValue = Math.min(...mainData);
-
-  const svgWidth = 400;
-  const svgHeight = 200;
-  const padding = 50;
-
-  // 以秒为步进单位，下方调用时需要×60，并且需要判断不满整数分钟时对durationSeconds取余补齐长度，
-  // 即padding + (index * 60 > match.durationSeconds ? ((((index - 1) * 60) + (match.durationSeconds % 60)) * xScale) : (index * xScale * 60))
-  const xScale = (svgWidth - padding * 2) / (match.durationSeconds - 1);
-  let yScale = (svgHeight - padding * 2) / (maxValue * 2);
-
-  // 格式化数字为千分位
-  const formatNumber = (num) => Math.floor(num).toLocaleString();
-
-  // 生成时间标签
-  const generateTimeLabels = (length) => {
-    const labels = [];
-    for (let i = 0; i < length; i += 10) {
-      labels.push(`${i.toString().padStart(2, '0')}:00`);
-    }
-    return labels;
-  };
-
-  const timeLabels = generateTimeLabels(mainData.length - 1).slice(0,Math.floor(match.durationSeconds / 60) % 10 > 5 ? undefined : -1);
-  const valueLabels = [maxValue, maxValue / 2, 0, maxValue / 2 * -1, maxValue * -1];
-  %>
-  <%
-  // 处理主数据点，分割正负区域
-  const mainPoints = mainData.map((value, index) => ({
-    value,
-    test: index * 60,
-    x: padding + (index * 60 > match.durationSeconds ? ((((index - 1) * 60) + (match.durationSeconds % 60)) * xScale) : (index * xScale * 60)),
-    y: svgHeight / 2 - value * yScale
-  }));
-
-  let upperPoints = [];
-  let lowerPoints = [];
-
-  for (let i = 0; i < mainPoints.length; i++) {
-    const current = mainPoints[i];
-    const next = mainPoints[i + 1];
-
-    // 处理当前点
-    if (current.value >= 0) {
-      upperPoints.push(`${current.x},${current.y}`);
-    } else {
-      lowerPoints.push(`${current.x},${current.y}`);
-    }
-
-    // 处理跨零点的线段
-    if (next) {
-      if ((current.value >= 0 && next.value < 0) || (current.value < 0 && next.value >= 0)) {
-        // 计算线段与零轴的交点
-        const t = Math.abs(current.value) / (Math.abs(current.value) + Math.abs(next.value));
-        const x = current.x + t * (next.x - current.x);
-        const y = svgHeight / 2;
-        upperPoints.push(`${x},${y}`);
-        lowerPoints.push(`${x},${y}`);
-      }
-    }
-  }
-  // 闭合多边形路径
-  upperPoints.push(`${svgWidth - padding},${svgHeight / 2}`, `${padding},${svgHeight / 2}`);
-  lowerPoints.push(`${svgWidth - padding},${svgHeight / 2}`, `${padding},${svgHeight / 2}`);
-
-  // 添加胜率数据处理
-  const winRateMax = 1;
-  const winRateMin = 0;
-  const winRateScale = (svgHeight - padding * 2) / (winRateMax - winRateMin);
-  // 计算胜率折线的坐标
-  const winRatePoints = match.winRates ? [match.winRates[0]].concat(match.winRates).map((value, index) => ({
-    value,
-    x: padding + (index * 60 > match.durationSeconds ? ((((index - 1) * 60) + (match.durationSeconds % 60)) * xScale) : (index * xScale * 60)),
-    y: svgHeight - padding - value * winRateScale
-  })) : undefined;
-  %>
+  <%# --- 图表 1: 局势图 (经济差/经验差/胜率) --- %>
   <svg width="<%= svgWidth %>" height="<%= svgHeight %>" xmlns="http://www.w3.org/2000/svg">
     <text x="50%" y="30" text-anchor="middle" font-size="16" font-weight="bold"><%= $t("dota2tracker.template.situation") %></text>
     <image x="<%= padding %>" y="<%= padding %>" width="20" height="20" href="<%= getImageUrl("logo_radiant") %>"/>
     <image x="<%= padding %>" y="<%= svgHeight - padding * 1.4 %>" width="20" height="20" href="<%= getImageUrl("logo_dire") %>"/>
     <text x="<%= padding + 20 %>" y="<%= padding + 10 %>" dominant-baseline="middle" fill="#3c9028"><%= $t("dota2tracker.template.radiant") %></text>
-    <text x="<%= padding + 20 %>" y="<%= svgHeight - padding * 1.4  + 10 %>" dominant-baseline="middle" fill="#9c3628"><%= $t("dota2tracker.template.dire") %></text>
-    <!-- 横轴线与标签 -->
+    <text x="<%= padding + 20 %>" y="<%= svgHeight - padding * 1.4 + 10 %>" dominant-baseline="middle" fill="#9c3628"><%= $t("dota2tracker.template.dire") %></text>
+
+    <%# 横轴线与数值标签 %>
     <% for (let i = 0; i < 5; i++) { %>
-      <% const y = padding + i * ((svgHeight - padding * 2) / 4) %>
+      <% const y = padding + i * (chartH / 4); %>
       <line x1="<%= padding %>" y1="<%= y %>" x2="<%= svgWidth - padding %>" y2="<%= y %>" stroke="gray" stroke-width="1" />
-      <text x="<%= padding - 2 %>" y="<%= y %>" text-anchor="end" dominant-baseline="middle" fill="#333a"><%= formatNumber(valueLabels[i]) %></text>
+      <text x="<%= padding - 2 %>" y="<%= y %>" text-anchor="end" dominant-baseline="middle" fill="#333a"><%= formatNum(valLabels[i]) %></text>
     <% } %>
 
-    <!-- 纵轴线与标签 -->
-    <% for (let i = 0; i < mainData.length - 1; i += 10) { %>
-      <% const x = padding + i * xScale * 60 %>
-      <line x1="<%= x %>" y1="<%= padding %>" x2="<%= x %>" y2="<%= svgHeight - padding %>" stroke="lightgray" stroke-width="1" />
-      <text x="<%= x %>" y="<%= svgHeight - padding + 15 %>" text-anchor="middle" fill="#333a"><%= timeLabels[i / 10] %></text>
-    <% } %>
-    <!-- 额外添加最后一个纵轴线与横轴时间标签 -->
+    <%# 纵轴线与时间标签 %>
+    <% timeLabels.forEach(lbl => { %>
+      <line x1="<%= lbl.x %>" y1="<%= padding %>" x2="<%= lbl.x %>" y2="<%= svgHeight - padding %>" stroke="lightgray" stroke-width="1" />
+      <text x="<%= lbl.x %>" y="<%= svgHeight - padding + 15 %>" text-anchor="middle" fill="#333a"><%= lbl.text %></text>
+    <% }); %>
+
+    <%# 结束时间轴 %>
     <line x1="<%= svgWidth - padding %>" y1="<%= padding %>" x2="<%= svgWidth - padding %>" y2="<%= svgHeight - padding %>" stroke="lightgray" stroke-width="1" />
-    <text x="<%= svgWidth - padding %>" y="<%= svgHeight - padding + 15 %>" text-anchor="middle" fill="#333a"><%= `${Math.floor(match.durationSeconds / 60)}:${(match.durationSeconds % 60).toString().padStart(2, '0')}` %></text>
+    <text x="<%= svgWidth - padding %>" y="<%= svgHeight - padding + 15 %>" text-anchor="middle" fill="#333a"><%= `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}` %></text>
 
-    <!-- 胜率折线 -->
-    <% if (match.winRates) { %>
-      <polyline points="<%= winRatePoints.map(point => `${point.x},${point.y}`).join(' ') %>" fill="none" stroke="lightgreen" stroke-width="3" />
+    <%# 胜率折线 %>
+    <% if (wrPoints) { %>
+      <polyline points="<%= wrPoints %>" fill="none" stroke="lightgreen" stroke-width="3" />
     <% } %>
 
-    <!-- 次要数据 -->
-    <polyline points="<%= secondaryData.map((value, index) => `${padding + (index * 60 > match.durationSeconds ? ((((index - 1) * 60) + (match.durationSeconds % 60)) * xScale) : (index * xScale * 60))},${svgHeight / 2 - value * yScale}`).join(' ') %>" fill="none" stroke="gray" stroke-width="1" />
-    <polygon points="<%= secondaryData.map((value, index) => `${padding + (index * 60 > match.durationSeconds ? ((((index - 1) * 60) + (match.durationSeconds % 60)) * xScale) : (index * xScale * 60))},${svgHeight / 2 - value * yScale}`).join(' ') %> <%= svgWidth - padding %>,<%= svgHeight / 2 %> <%= padding %>,<%= svgHeight / 2 %>" fill="rgba(128, 128, 128, 0.3)" />
+    <%# 经验差 (灰色) %>
+    <polyline points="<%= secPoints %>" fill="none" stroke="gray" stroke-width="1" />
+    <polygon points="<%= secPoly %>" fill="rgba(128, 128, 128, 0.3)" />
 
-    <!-- 主要数据 -->
-    <polyline points="<%= mainData.map((value, index) => `${padding + (index * 60 > match.durationSeconds ? ((((index - 1) * 60) + (match.durationSeconds % 60)) * xScale) : (index * xScale * 60))},${svgHeight / 2 - value * yScale}`).join(' ') %>" fill="none" stroke="rgba(100, 100, 100, 0.3)" stroke-width="2" />
+    <%# 经济差 (红绿填充) %>
+    <polyline points="<%= mainPolyPoints %>" fill="none" stroke="rgba(100, 100, 100, 0.3)" stroke-width="2" />
+    <polygon points="<%= upperPts.join(' ') %>" fill="rgba(0, 255, 0, 0.3)" />
+    <polygon points="<%= lowerPts.join(' ') %>" fill="rgba(255, 0, 0, 0.3)" />
 
-    <!-- 正区域填充 -->
-    <polygon points="<%= upperPoints.join(' ') %>" fill="rgba(0, 255, 0, 0.3)" />
-
-    <!-- 负区域填充 -->
-    <polygon points="<%= lowerPoints.join(' ') %>" fill="rgba(255, 0, 0, 0.3)" />
-
-    <!-- 图例 -->
+    <%# 图例 %>
     <g transform="translate(<%= padding %>, <%= svgHeight - 20 %>)">
-      <!-- 财产总和（折线1） -->
+      <%# 财产 %>
       <g transform="translate(0, 0)">
-        <!-- 左半段（浅绿色） -->
-        <path d="M0,5 Q5,0 10,5 Z"
-              fill="rgba(0, 255, 0, 0.5)"/>
-
-        <!-- 右半段（浅红色） -->
-        <path d="M10,5 Q15,10 20,5 Z"
-              fill="rgba(255, 0, 0, 0.5)"/>
-
-        <!-- 灰色描边 -->
-        <path d="M0,5 Q5,0 10,5 T20,5"
-              fill="none"
-              stroke="rgba(100, 100, 100, 0.3)"
-              stroke-width="1"/>
-        <% if (match.odParsed) { %>
-        <text x="30" y="7" fill="#ccc" font-size="12"><%= $t("dota2tracker.template.opendota.gold_t") %></text>
-        <% } else { %>
-        <text x="30" y="7" font-size="12"><%= $t("dota2tracker.template.networth") %></text>
-        <% } %>
+        <path d="M0,5 Q5,0 10,5 Z" fill="rgba(0, 255, 0, 0.5)"/>
+        <path d="M10,5 Q15,10 20,5 Z" fill="rgba(255, 0, 0, 0.5)"/>
+        <path d="M0,5 Q5,0 10,5 T20,5" fill="none" stroke="rgba(100, 100, 100, 0.3)" stroke-width="1"/>
+        <text x="30" y="7" font-size="12" <%- match.odParsed ? 'fill="#ccc"' : '' %>>
+          <%= match.odParsed ? $t("dota2tracker.template.opendota.gold_t") : $t("dota2tracker.template.networth") %>
+        </text>
       </g>
-
-      <!-- 经验（折线2） -->
+      <%# 经验 %>
       <g transform="translate(120, 0)">
-        <path d="M0,5 Q5,0 10,5 T20,5"
-              fill="none"
-              stroke="gray"
-              stroke-width="1"/>
+        <path d="M0,5 Q5,0 10,5 T20,5" fill="none" stroke="gray" stroke-width="1"/>
         <text x="30" y="7" font-size="12"><%= $t("dota2tracker.template.experience") %></text>
       </g>
-
-      <!-- 胜率（折线3） -->
+      <%# 胜率 %>
       <g transform="translate(220, 0)">
-        <path d="M0,5 Q5,0 10,5 T20,5"
-              fill="none"
-              stroke="lightgreen"
-              stroke-width="3"/>
+        <path d="M0,5 Q5,0 10,5 T20,5" fill="none" stroke="lightgreen" stroke-width="3"/>
         <text x="30" y="7" font-size="12"><%= $t("dota2tracker.template.winrate") %></text>
       </g>
     </g>
   </svg>
-  <%
-  // 计算每个玩家的财产总和数据
-  const playerNetworthData = match.players.map(player => player.stats.networthPerMinute.concat(player.networth));
 
-  // 找到所有玩家中财产总和的最大值
-  const maxNetworth = Math.max(...playerNetworthData.flat().map(Math.abs));
+  <%# --- 图表 2: 玩家个人经济走势 --- %>
+  <svg width="<%= svgWidth %>" height="<%= svgHeight %>" xmlns="http://www.w3.org/2000/svg">
+    <% if (match.odParsed) { %>
+      <text x="50%" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#ccc"><%= $t("dota2tracker.template.opendota.networth_unavailable") %></text>
+      <text x="50%" y="<%= svgHeight / 2 + 10 %>" text-anchor="middle" font-size="12" fill="#ccc"><%= $t("dota2tracker.template.opendota.networth_unavailable_reason") %></text>
+    <% } else { %>
+      <text x="50%" y="30" text-anchor="middle" font-size="16" font-weight="bold"><%= $t("dota2tracker.template.networth") %></text>
 
-  // 计算纵坐标轴的刻度
-  const networthValueLabels = [maxNetworth, maxNetworth * 0.75, maxNetworth * 0.5, maxNetworth * 0.25, 0];
+      <%# 坐标轴与标签 (同上，简化写法) %>
+      <% for (let i = 0; i < 5; i++) { %>
+        <% const y = padding + i * (chartH / 4); %>
+        <line x1="<%= padding %>" y1="<%= y %>" x2="<%= svgWidth - padding %>" y2="<%= y %>" stroke="gray" stroke-width="1" />
+        <text x="<%= padding - 2 %>" y="<%= y %>" text-anchor="end" dominant-baseline="middle" fill="#333a"><%= formatNum(nwLabels[i]) %></text>
+      <% } %>
 
-  // 获取颜色数据
-  const playerColors = dotaconstants.player_colors;
+      <%# 时间轴 %>
+      <% timeLabels.forEach(lbl => { %>
+        <line x1="<%= lbl.x %>" y1="<%= padding %>" x2="<%= lbl.x %>" y2="<%= svgHeight - padding %>" stroke="lightgray" stroke-width="1" />
+        <text x="<%= lbl.x %>" y="<%= svgHeight - padding + 15 %>" text-anchor="middle" fill="#333a"><%= lbl.text %></text>
+      <% }); %>
+      <line x1="<%= svgWidth - padding %>" y1="<%= padding %>" x2="<%= svgWidth - padding %>" y2="<%= svgHeight - padding %>" stroke="lightgray" stroke-width="1" />
+      <text x="<%= svgWidth - padding %>" y="<%= svgHeight - padding + 15 %>" text-anchor="middle" fill="#333a"><%= `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}` %></text>
 
-  yScale = (svgHeight - padding * 2) / maxNetworth;
-  %>
-  <!-- 新增的经济图表 -->
-<svg width="<%= svgWidth %>" height="<%= svgHeight %>" xmlns="http://www.w3.org/2000/svg">
-  <%# 检查数据源是否为 OpenDota %>
-  <% if (match.odParsed) { %>
-    <%# OpenDota 分支：显示灰色标题和居中提示 %>
-    <text x="50%" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#ccc">
-      <%# 标题：保持原始位置，修改文本和颜色 %>
-      <%= $t("dota2tracker.template.opendota.networth_unavailable") %>
-    </text>
-    <text x="50%" y="<%= svgHeight / 2 + 10 %>" text-anchor="middle" font-size="12" fill="#ccc">
-      <%# 提示：水平居中，大致垂直居中，灰色 %>
-      <%= $t("dota2tracker.template.opendota.networth_unavailable_reason") %>
-    </text>
+      <%# 玩家折线 %>
+      <% pNwData.forEach((data, i) => { %>
+        <% const color = pColors[match.players[i].playerSlot] || '#000'; %>
+        <% const pts = data.map((v, idx) => `${getX(idx)},${svgHeight - padding - v * nwYScale}`).join(' '); %>
+        <polyline points="<%= pts %>" fill="none" stroke="<%= color %>" stroke-width="2" />
+      <% }); %>
 
-  <% } else { %>
-
-    <%# 非 OpenDota 分支（例如 Stratz）：渲染完整的图表 %>
-    <text x="50%" y="30" text-anchor="middle" font-size="16" font-weight="bold">
-      <%= $t("dota2tracker.template.networth") %> <%# 原始标题 %>
-    </text>
-
-    <%# --- 你现有的图表绘制代码开始 --- %>
-    <% for (let i = 0; i < 5; i++) { %>
-      <% const y = padding + i * ((svgHeight - padding * 2) / 4) %>
-      <line x1="<%= padding %>" y1="<%= y %>" x2="<%= svgWidth - padding %>" y2="<%= y %>" stroke="gray" stroke-width="1" />
-      <text x="<%= padding - 2 %>" y="<%= y %>" text-anchor="end" dominant-baseline="middle" fill="#333a"><%= formatNumber(networthValueLabels[i]) %></text>
+      <%# 底部图例 (玩家头像) %>
+      <g transform="translate(<%= (svgWidth - (match.players.length * 30)) / 2 %>, <%= svgHeight - 27 %>)">
+        <% [...match.players].sort((a, b) => a.networth - b.networth).forEach((p, i) => { %>
+          <% const color = pColors[p.playerSlot] || '#000'; %>
+          <rect x="<%= i * 30 %>" y="0" width="24" height="24" rx="6" ry="6" fill="#f0f0f0" stroke="<%= color %>" stroke-width="3" />
+          <image x="<%= i * 30 %>" y="0" width="24" height="24" href="<%= getImageUrl(p.hero.shortName, ImageType.HeroIcons) %>" clip-path="inset(0 round 6)" />
+        <% }); %>
+      </g>
     <% } %>
-
-    <!-- 纵轴线与标签 -->
-    <% for (let i = 0; i < mainData.length - 1; i += 10) { %>
-      <% const x = padding + i * xScale * 60 %>
-      <line x1="<%= x %>" y1="<%= padding %>" x2="<%= x %>" y2="<%= svgHeight - padding %>" stroke="lightgray" stroke-width="1" />
-      <text x="<%= x %>" y="<%= svgHeight - padding + 15 %>" text-anchor="middle" fill="#333a"><%= timeLabels[i / 10] %></text>
-    <% } %>
-    <!-- 额外添加最后一个纵轴线与横轴时间标签 -->
-    <line x1="<%= svgWidth - padding %>" y1="<%= padding %>" x2="<%= svgWidth - padding %>" y2="<%= svgHeight - padding %>" stroke="lightgray" stroke-width="1" />
-    <text x="<%= svgWidth - padding %>" y="<%= svgHeight - padding + 15 %>" text-anchor="middle" fill="#333a"><%= `${Math.floor(match.durationSeconds / 60)}:${(match.durationSeconds % 60).toString().padStart(2, '0')}` %></text>
-
-    <!-- 绘制每个玩家的财产总和折线 -->
-    <% playerNetworthData.forEach((playerData, index) => { %>
-      <% const playerSlot = match.players[index].playerSlot; %>
-      <% const color = playerColors[playerSlot] || '#000000'; %>
-      <% const points = playerData.map((value, i) => `${padding + (i * 60 > match.durationSeconds ? ((((i - 1) * 60) + (match.durationSeconds % 60)) * xScale) : (i * xScale * 60))},${svgHeight - padding - value * yScale}`); %>
-      <polyline points="<%= points.join(' ') %>" fill="none" stroke="<%= color %>" stroke-width="2" />
-    <% }) %>
-
-    <!-- 在第二个svg的最后添加以下图例代码 -->
-    <g transform="translate(<%= (svgWidth - (match.players.length * 30)) / 2 %>, <%= svgHeight - 27 %>)">
-      <% match.players.sort((a, b) => a.networth - b.networth).forEach((player, index) => { %>
-        <% const playerSlot = player.playerSlot; %>
-        <% const color = playerColors[playerSlot] || '#000000'; %>
-        <!-- 头像框 -->
-        <rect
-          x="<%= index * 30 %>"
-          y="0"
-          width="24"
-          height="24"
-          rx="6"
-          ry="6"
-          fill="#f0f0f0"
-          stroke="<%= color %>"
-          stroke-width="3"
-        />
-        <image
-          x="<%= index * 30 %>"
-          y="0"
-          width="24"
-          height="24"
-          href="<%= getImageUrl(player.hero.shortName, ImageType.HeroIcons) %>"
-          clip-path="inset(0 round 6)"
-        />
-      <% }) %>
-    </g>
-    <%# --- 你现有的图表绘制代码结束 --- %>
-
-  <% } %>
-</svg>
+  </svg>
 </div>

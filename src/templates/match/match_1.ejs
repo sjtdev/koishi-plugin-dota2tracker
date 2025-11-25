@@ -1,27 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <%- `<style>` %>
-    <%- include(`./match_1/style.css`) %>
-    <% if (fontFamily) { %>
-    <%- `body { font-family: ${fontFamily}; }` %>
-    <% } %>
-    <%- "</style>" %>
-    <style>
-      .box {
-        border-radius: 5px;
-        border: 2px solid rgba(255, 255, 255, 0.25);
-        overflow: hidden;
-      }
-    </style>
-  </head>
-  <% const match = data; %>
-  <%
-  const partyColor = ["#caffe5","#ffe484","#e19be2","#ccdaf4"]
-  const facetColor = {
+<% const match = data; %>
+<%# --- 颜色配置 --- %>
+<% const partyColor = ["#caffe5","#ffe484","#e19be2","#ccdaf4"]; %>
+<% const facetColor = {
     Red: "from-[#9f3c3c] to-[#4a2026]",
     Yellow: "from-[#c8a45c] to-[#6f3d21]",
     Green: "from-[#a2b23e] to-[#2d5a18]",
@@ -29,28 +9,39 @@
     Purple: "from-[#675cae] to-[#261c44]",
     Gray: "from-[#adb6be] to-[#4e5557]",
     Black: "from-[#2d2d2d] to-[#000000]"
-  }
-  let kcndcStyle = {
-    kc: function (num) {
-      let red = (255 - (num * 255) / 100).toFixed(2);
-      return `rgb(255,${red},${red})`;
-    },
-    dc: function (num) {
-      let gray = ((50 - Math.min(num, 50)) * (255 / 50)).toFixed(2);
-      return `rgb(${gray},${gray},${gray})`;
-    },
-  };
-  // 对线结果的图标（来自免费SVG素材网）
-  const laneSVG = {
+   };
+%>
+
+<%# --- 工具函数：击杀贡献率颜色 (红色渐变) --- %>
+<% const kc = (num) => { let red = (255 - (num * 255) / 100).toFixed(2); return `rgb(255,${red},${red})`; }; %>
+
+<%# --- 工具函数：死亡贡献率颜色 (灰色渐变) --- %>
+<% const dc = (num) => { let gray = ((50 - Math.min(num, 50)) * (255 / 50)).toFixed(2); return `rgb(${gray},${gray},${gray})`; }; %>
+
+<%# --- SVG 图标字典 --- %>
+<% const laneSVG = {
     stomp: getImageUrl("lane_stomp", undefined, ImageFormat.svg),
     advantage: getImageUrl("lane_victory", undefined, ImageFormat.svg),
     disadvantage: getImageUrl("lane_fail", undefined, ImageFormat.svg),
     stomped: getImageUrl("lane_stomped", undefined, ImageFormat.svg),
     tie: getImageUrl("lane_tie", undefined, ImageFormat.svg),
     jungle: getImageUrl("lane_jungle", undefined, ImageFormat.svg),
-  };
-  %>
+   };
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Match</title>
+    <%- `<style>` %>
+    <%- include(`./match_1/base.css`) %>
+    <%- include(`./match_1/style.css`) %>
+    <% if (fontFamily) { %><%- `body { font-family: ${fontFamily}; }` %><% } %>
+    <%- `</style>` %>
+  </head>
   <body class="bg-black w-[800px] text-white">
-    <%- include(`./match_1/main.ejs`, { match, partyColor, facetColor, kcndcStyle, laneSVG }) %>
+    <%- include(`./match_1/main.ejs`, { match, partyColor, facetColor, kc, dc, laneSVG }) %>
   </body>
 </html>

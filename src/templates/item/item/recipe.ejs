@@ -1,51 +1,69 @@
 <% const item = data; %>
+<%# 遍历合成配方，如果没有配方则使用 [undefined] 来执行一次只显示 builds_into 的逻辑 %>
 <% (item.recipes.length ? item.recipes : [undefined]).forEach(recipe => { %>
 <div class="recipes">
+
+  <%# --- 向上合成 (Builds Into) --- %>
   <% if (item.builds_into.length) { %>
-  <% const multiple = item.builds_into.length > 1 ? " multiple" : ""; %>
-  <div class="upper<%= multiple %>">
-    <% item.builds_into.forEach(item => { %>
+  <% const multipleClass = item.builds_into.length > 1 ? " multiple" : ""; %>
+
+  <div class="upper<%= multipleClass %>">
+    <% item.builds_into.forEach(targetItem => { %>
     <div class="item">
-      <img src="<%= getImageUrl(item.name.startsWith("recipe_") ? "recipe" : item.name, ImageType.Items) %>">
-      <p><%= item.name_loc %></p>
+      <img src="<%= getImageUrl(targetItem.name.startsWith("recipe_") ? "recipe" : targetItem.name, ImageType.Items) %>">
+      <p><%= targetItem.name_loc %></p>
     </div>
     <% }) %>
   </div>
 
-  <div class="vline<%= multiple %>">
-    <% for( let index = 0; index < item.builds_into.length; index++ ) { %>
+  <div class="vline<%= multipleClass %>">
+    <% for(let i = 0; i < item.builds_into.length; i++) { %>
     <div class="item line"></div>
     <% } %>
   </div>
-  <div class="hline<%= multiple %>"></div>
-  <div class="vline<%= multiple ? " direct" : "" %>"><div class="item line"></div></div>
+
+  <div class="hline<%= multipleClass %>"></div>
+  <div class="vline<%= multipleClass ? " direct" : "" %>"><div class="item line"></div></div>
   <% } %>
+
+  <%# --- 当前物品 --- %>
   <div class="middle">
     <div class="item">
       <img src="<%= getImageUrl(item.name.startsWith("recipe_") ? "recipe" : item.name, ImageType.Items) %>">
       <p><%= item.name_loc %></p>
     </div>
   </div>
-  <% if (item.recipes.length) { %>
-  <% if (dotaconstants.items["recipe_"+item.name]) {
-    recipe.items = recipe.items.concat([{name:"recipe",name_loc:$t("dota2tracker.template.recipe")}])
-  } %>
-  <% const multiple = recipe.items.length > 1 ? " multiple" : ""; %>
-  <div class="vline<%= multiple ? " direct" : "" %>"><div class="item line"></div></div>
-  <div class="hline<%= multiple %>"></div>
-  <div class="vline<%= multiple %>">
-    <% for( let index = 0; index < recipe.items.length; index++ ) { %>
+
+  <%# --- 向下合成 (Ingredients / Recipe) --- %>
+  <% if (item.recipes.length && recipe) { %>
+  <%
+    // 检查是否需要显式添加“卷轴”到合成列表
+    // 注意：这里避免直接修改原 recipe.items 对象，创建一个新数组
+    let ingredients = [...recipe.items];
+    if (dotaconstants.items["recipe_" + item.name]) {
+      ingredients.push({ name: "recipe", name_loc: $t("dota2tracker.template.recipe") });
+    }
+    const multipleClass = ingredients.length > 1 ? " multiple" : "";
+  %>
+
+  <div class="vline<%= multipleClass ? " direct" : "" %>"><div class="item line"></div></div>
+  <div class="hline<%= multipleClass %>"></div>
+
+  <div class="vline<%= multipleClass %>">
+    <% for(let i = 0; i < ingredients.length; i++) { %>
     <div class="item line"></div>
     <% } %>
   </div>
-  <div class="lower<%= multiple %>">
-    <% recipe.items.forEach(item => { %>
+
+  <div class="lower<%= multipleClass %>">
+    <% ingredients.forEach(ingredient => { %>
     <div class="item">
-      <img src="<%= getImageUrl(item.name.startsWith("recipe_") ? "recipe" : item.name, ImageType.Items) %>">
-      <p><%= item.name_loc %></p>
+      <img src="<%= getImageUrl(ingredient.name.startsWith("recipe_") ? "recipe" : ingredient.name, ImageType.Items) %>">
+      <p><%= ingredient.name_loc %></p>
     </div>
     <% }) %>
   </div>
   <% } %>
+
 </div>
 <% }) %>

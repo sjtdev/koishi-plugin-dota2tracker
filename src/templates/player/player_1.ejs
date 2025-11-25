@@ -1,654 +1,289 @@
+<%# --- 基础数据与工具函数 --- %>
+<% const p = data; %>
+<% const isAnon = p.steamAccount.isAnonymous; %>
+
+<%# --- 工具: 颜色计算 --- %>
+<% const getWinRateColor = (val) => {
+     val = Math.max(0, Math.min(100, val * 100));
+     let r, g, b;
+     if (val <= 50) {
+       const s = Math.round(255 * (val / 50));
+       r = 255; g = s; b = s;
+     } else {
+       const s = Math.round(255 * ((val - 50) / 50));
+       r = 255 - s; g = 255; b = 255 - s;
+     }
+     const hex = c => c.toString(16).padStart(2, "0").toUpperCase();
+     return `#${hex(r)}${hex(g)}${hex(b)}`;
+   };
+%>
+
+<%# --- 工具: 公会等级 --- %>
+<% const getGuildClass = pct => pct <= 25 ? "Copper" : pct <= 50 ? "Silver" : pct <= 75 ? "Gold" : "Diamond"; %>
+
+<%# --- 核心逻辑: 比赛数据预处理 (Streak, Lane, NearWin) --- %>
+<% const outcomes = { victory: 0, stomp: 0, fail: 0, stomped: 0, tie: 0 }; %>
+<% const laneMap = { RADIANT_VICTORY:['victory','fail'], RADIANT_STOMP:['stomp','stomped'], DIRE_VICTORY:['fail','victory'], DIRE_STOMP:['stomped','stomp'] }; %>
+<% let nearWin = 0, streak = 0; %>
+<% const nearCount = 25; %>
+
+<%# --- 遍历比赛，计算连胜与分路 --- %>
+<% const matchesData = p.matches.map(m => {
+     const inner = m.players.find(ip => p.steamAccount.id == ip.steamAccount.id);
+     const isRad = inner.isRadiant;
+     const didWin = m.didRadiantWin === isRad;
+
+     // 连胜计算
+     if (!p.streak) {
+       if (streak !== 0) {
+         if (didWin && streak > 0) streak++;
+         else if (!didWin && streak < 0) streak--;
+         else p.streak = streak;
+       } else streak = didWin ? 1 : -1;
+     }
+
+     // 近期胜率
+     nearWin += didWin ? 1 : 0;
+
+     // 分路结果处理
+     const resRaw = laneMap[m.topLaneOutcome] || ['tie','tie'];
+     // 这里简化分路判定逻辑，只关注 outcome 计数，具体每局的 laneResult 下面处理
+     let laneRes = "tie";
+     if (inner.lane === "JUNGLE") laneRes = "jungle";
+     else {
+       const laneKey = inner.lane === "MID_LANE" ? "mid" : (inner.lane === "SAFE_LANE" ? (isRad?"bottom":"top") : (isRad?"top":"bottom"));
+       // 注意：原逻辑 processLaneOutcome 对三路都做了处理，这里为了性能只取玩家所在路
+       const outcomeKey = laneKey === 'mid' ? m.midLaneOutcome : (laneKey === 'top' ? m.topLaneOutcome : m.bottomLaneOutcome);
+       const pair = laneMap[outcomeKey] || ['tie', 'tie'];
+       laneRes = pair[isRad ? 0 : 1];
+     }
+     if (outcomes[laneRes] !== undefined) outcomes[laneRes]++;
+
+     // 击杀参与率 KDA
+     const teamKills = m.parsedDateTime
+       ? (m[(isRad ? "radiant" : "dire") + "Kills"]?.reduce((a, b) => a + b, 0) ?? 0)
+       : m.players.filter(pl => pl.isRadiant === isRad).reduce((a, pl) => a + pl.kills, 0);
+     const kp = ((inner.kills + inner.assists) / (teamKills || 1) * 100).toFixed(0);
+     const kda = ((inner.kills + inner.assists) / Math.max(1, inner.deaths)).toFixed(2);
+
+     return {
+       ...m,
+       inner,
+       laneRes,
+       didWin,
+       kda,
+       kp,
+       timeStr: DateTime.fromSeconds(m.startDateTime ?? 0).toFormat("yyyy-MM-dd HH:mm:ss").slice(2)
+     };
+   });
+%>
+
+<%# --- 英雄列表与位置数据预计算 --- %>
+<%# 计算进度条比例因子 %>
+<% const getScale = (list, isNear) => {
+     if (!list || list.length === 0) return 0;
+     const maxWin = Math.max(...list.map(i => i.winCount));
+     const maxLose = Math.max(...list.map(i => i.matchCount - i.winCount));
+     // 800 - (5 * 40) = 600px available
+     const totalW = 600;
+     const baseScale = totalW / (maxWin + maxLose || 1);
+     // 近期数据需要调整因子
+     return isNear ? baseScale * Math.min(maxWin/(maxWin+maxLose), maxLose/(maxWin+maxLose)) : baseScale;
+   };
+%>
+<% const heroList = p.genHero ? p.heroesPerformanceTop10 : (p.heroesPerformance?.filter(h => h.matchCount > 1) || []); %>
+<% const heroScale = getScale(heroList, !p.genHero); %>
+
+<%# 位置数据处理 %>
+<% const posIcons = ["damage","nuke","armor","speed","healing"]; %>
+<% p.positionPerformance = []; %>
+<% for (let i = 0; i < 5; i++) {
+     const posMatches = p.matches.filter(m => m.players.find(ip => ip.steamAccount.id == p.steamAccount.id).position == ("POSITION_" + (i + 1)));
+     const wins = posMatches.filter(m => m.didRadiantWin == m.players.find(ip => ip.steamAccount.id == p.steamAccount.id).isRadiant).length;
+     const impAvg = posMatches.length > 0 ? Math.round(posMatches.reduce((acc, m) => acc + m.players.find(ip => ip.steamAccount.id == p.steamAccount.id).imp, 0) / posMatches.length) : "-";
+     p.positionPerformance.push({ pos: i + 1, icon: posIcons[i], matchCount: posMatches.length, winCount: wins, imp: impAvg });
+   }
+%>
+<% const posScale = getScale(p.positionPerformance.filter(pos => pos.matchCount > 1), true); %>
+
+
 <!DOCTYPE html>
 <html lang="<%= languageTag %>">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
-        <style>
-          html,
-          body {
-            background-color: black;
-            color: white;
-            width: 800px;
-          }
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Player</title>
 
-          .wrapper > * {
-            margin: 5px;
-            box-shadow: 0 0 5px #fff;
-            width: 790px;
-            border-radius: 5px;
-            overflow: hidden;
-            position: relative;
-          }
-
-          img {
-            width: auto;
-            vertical-align: middle;
-          }
-
-          p {
-            margin: 0;
-          }
-
-          .player {
-            display: flex;
-            position: relative;
-            height: 128px;
-          }
-
-          .player .avatar {
-            width: 128px;
-            height: 128px;
-            position: absolute;
-          }
-
-          .player .avatar img {
-            width: 100%;
-            border-radius: 5px;
-          }
-
-          .player .name {
-            font-size: 24px;
-          }
-          .player .name .guild::before {
-            content: "[";
-            color: #fff;
-          }
-          .player .name .guild::after {
-            content: "]";
-            color: #fff;
-          }
-          .player .name .hero_name::before {
-            content: ">";
-            color: #fff;
-          }
-          .player .name .hero_name::after {
-            content: "<";
-            color: #fff;
-          }
-
-          .player .info {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* line-height: 2; */
-            justify-content: space-around;
-          }
-
-          .player .info .guild.Copper {
-            color: #b4775f;
-          }
-          .player .info .guild.Silver {
-            color: #9a9593;
-          }
-          .player .info .guild.Gold {
-            color: #bda97f;
-          }
-          .player .info .guild.Diamond {
-            color: #a5cbcf;
-          }
-
-          .player .info .matches span.win {
-            color: #007a00;
-          }
-          .player .info .matches span.lose {
-            color: #b30000;
-          }
-
-          .player .info .matches span.victory {
-            color: lightgreen;
-          }
-          .player .info .matches span.stomp {
-            color: green;
-            /* font-size: 8px; */
-          }
-          .player .info .matches span.fail {
-            color: #ff6961;
-          }
-          .player .info .matches span.stomped {
-            color: red;
-            /* font-size: 8px; */
-          }
-          .player .info .matches.blur {
-            filter: blur(10px);
-          }
-
-          .player .rank {
-            width: 64px;
-            height: 64px;
-            flex-grow: 1;
-            position: absolute;
-            top: 0;
-            right: 0;
-          }
-
-          .player .rank.estimated {
-            filter: grayscale(100%);
-          }
-
-          .player .rank .medal {
-            z-index: 1;
-          }
-
-          .player .rank .star {
-            z-index: 2;
-          }
-
-          .player .rank p {
-            z-index: 4;
-          }
-
-          .player .rank div {
-            height: 100%;
-            width: 100%;
-            top: 0;
-            right: 0;
-            position: absolute;
-          }
-
-          .player .rank img {
-            top: 0;
-            right: 0;
-            position: absolute;
-            height: 64px;
-          }
-
-          .player .rank p {
-            font-size: 12px;
-            line-height: 1;
-            position: absolute;
-            text-align: center;
-            width: 64px;
-            bottom: 4px;
-            right: 0;
-            /* background-color: #222; */
-            /* border: black 1px solid; */
-            box-sizing: border-box;
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; /* 描边效果 */
-          }
-
-          .hero_winrate > *:not(:last-child) {
-            /* margin-bottom: 10px; */
-          }
-
-          .hero_winrate {
-          }
-
-          .hero_winrate .heroes {
-            display: grid;
-            /* line-height: 2; */
-            grid-template-columns: 32px auto auto auto auto auto;
-            /* grid-template-rows: repeat(auto-fill, 1fr); */
-            justify-content: start;
-            align-items: center;
-          }
-
-          .hero_winrate .heroes .hero {
-            width: 100%;
-            display: flex;
-            align-items: center;
-          }
-
-          .hero_winrate .heroes img {
-            width: 100%;
-            /* height: 32px; */
-            border-radius: 6px;
-            overflow: hidden;
-          }
-
-          .hero_winrate .heroes span.imp {
-            margin: 0 4px;
-          }
-
-          .hero_winrate .heroes span {
-            text-align: center;
-          }
-
-          .hero_winrate .heroes .tip.row {
-            grid-column: 1/-1;
-          }
-
-          .hero_winrate .heroes .win {
-            /* color: #000; */
-            text-align: right;
-            padding-right: 8px;
-            background-color: #006400;
-            border-radius: 16px 0 0 16px;
-            height: 16px;
-            justify-self: end;
-          }
-          .hero_winrate .heroes .lose {
-            /* color: #000; */
-            text-align: left;
-            padding-left: 8px;
-            background-color: #8b0000;
-            border-radius: 0 16px 16px 0;
-            height: 16px;
-            justify-self: start;
-          }
-
-          table.matches {
-            table-layout: fixed;
-            width: 100%;
-          }
-
-          .matches .match.win {
-            background-color: #006400;
-          }
-          .matches .match.lose {
-            background-color: #8b0000;
-          }
-
-          .matches .match td {
-            text-align: center;
-            /* line-height: 40px; */
-            height: 40px;
-            overflow: hidden;
-          }
-
-          .matches .match .player_lane {
-            width: 100%;
-            height: 100%;
-            justify-content: center; /* 水平居中 */
-            align-items: center; /* 垂直居中 */
-            display: flex;
-          }
-
-          .matches .match .player_lane:not(.tie) {
-            /* background-color: #000; */
-          }
-
-          .matches .match .player_lane svg {
-            width: 36px;
-            height: 36px;
-          }
-          .player_lane.victory svg path {
-            fill: lightgreen;
-          }
-
-          .player_lane.stomp svg path {
-            fill: green;
-          }
-
-          .player_lane.stomped svg path {
-            fill: red;
-          }
-
-          .plus {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-          }
-
-          .plus .hero {
-            width: 190px;
-            height: 190px;
-            border-radius: 5px;
-            position: relative;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: 118.75px auto;
-            justify-items: center;
-            align-items: center;
-          }
-          .plus .hero img {
-            width: 100%;
-            grid-column: 1/-1;
-          }
-
-          .plus .level {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            left: calc(50% - 25px);
-            top: calc(118.75px - 25px);
-          }
-
-          .plus .level span {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            left: 0;
-            bottom: 18px;
-            font-size: 14px;
-            text-shadow: -1px -1px 1px #000, 1px -1px 1px #000, -1px 1px 1px #000, 1px 1px 1px #000;
-          }
-
-          .blur-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #00000050;
-            backdrop-filter: blur(10px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-          }
-
-          .lock-icon {
-            font-size: 24px;
-            margin-bottom: 10px;
-          }
-
-          .lock-text {
-            font-size: 18px;
-            font-weight: bold;
-          }
-          .lock-sub {
-            line-height: 3;
-            font-size: 14px;
-            color: #aaa;
-          }
-        </style>
-
-        <% if (fontFamily) { %>
-        <%- "<style>" %>
-        <%- `body { font-family: ${fontFamily}; }` %>
-        <%- "</style>" %>
-        <% } %>
-    </head>
-    <body>
-    <%  const player = data;
-        const guildLevel = (percent) => {
-            if (percent <= 25) {
-                return "Copper";
-            } else if (percent <= 50) {
-                return "Silver";
-            } else if (percent <= 75) {
-                return "Gold";
-            } else {
-                return "Diamond";
-            }
-        };
-        const laneSVG = {
-            stomp: getImageUrl("lane_stomp", undefined, ImageFormat.svg),
-            victory: getImageUrl("lane_victory", undefined, ImageFormat.svg),
-            fail: getImageUrl("lane_fail", undefined, ImageFormat.svg),
-            stomped: getImageUrl("lane_stomped", undefined, ImageFormat.svg),
-            tie: getImageUrl("lane_tie", undefined, ImageFormat.svg),
-            jungle: getImageUrl("lane_jungle", undefined, ImageFormat.svg),
-        };
-        const outcomeCounts = {
-            victory: 0,
-            stomp: 0,
-            fail: 0,
-            stomped: 0,
-            tie: 0,
-        };
-        const processLaneOutcome = (outcome) => {
-            switch (outcome) {
-                case "RADIANT_VICTORY":
-                    return { radiant: "victory", dire: "fail" };
-                case "RADIANT_STOMP":
-                    return { radiant: "stomp", dire: "stomped" };
-                case "DIRE_VICTORY":
-                    return { radiant: "fail", dire: "victory" };
-                case "DIRE_STOMP":
-                    return { radiant: "stomped", dire: "stomp" };
-                default:
-                    return { radiant: "tie", dire: "tie" };
-            }
-        };
-        let nearMatchCount = 25,
-            nearWinCount = 0,
-            streak = 0;
-        player.matches.forEach((match) => {
-            const innerPlayer = match.players.find(innerPlayer=>player.steamAccount.id==innerPlayer.steamAccount.id);
-            nearWinCount += match.didRadiantWin == innerPlayer.isRadiant ? 1 : 0;
-            const didWin = match.didRadiantWin === innerPlayer.isRadiant;
-            if (!player.streak) {
-                if (streak != 0) {
-                    if (didWin && streak > 0) streak++;
-                    else if (!didWin && streak < 0) streak--;
-                    else player.streak = streak;
-                } else streak = didWin ? 1 : -1;
-            }
-
-            const laneResult = {
-                top: processLaneOutcome(match.topLaneOutcome),
-                mid: processLaneOutcome(match.midLaneOutcome),
-                bottom: processLaneOutcome(match.bottomLaneOutcome),
-            };
-
-            let laneKey = "mid"; // 默认中路
-            if (innerPlayer.lane === "SAFE_LANE") laneKey = innerPlayer.isRadiant ? "bottom" : "top";
-            else if (innerPlayer.lane === "OFF_LANE") laneKey = innerPlayer.isRadiant ? "top" : "bottom";
-            if (innerPlayer.lane === "JUNGLE") match.laneResult = "jungle";
-            else match.laneResult = laneResult[laneKey][innerPlayer.isRadiant ? "radiant" : "dire"];
-
-            if (match.laneResult in outcomeCounts) {
-                outcomeCounts[match.laneResult]++;
-            }
-        });
-        // 无法动态获取tip元素个数
-        // const heroesCountPixels = 800 - ($(".tip:not(.row):not(.win_count):not(.lose_count)").length + 1) * 40;
-        const heroesCountPixels = 800 - (4+1) * 40;
-        const highestCountsTotal = {
-            winCount: Math.max(...player.heroesPerformanceTop10.map((hero) => hero.winCount)),
-            loseCount: Math.max(...player.heroesPerformanceTop10.map((hero) => hero.matchCount - hero.winCount)),
-        };
-        const pixelOfPerMatchInTotal = heroesCountPixels / (highestCountsTotal.winCount + highestCountsTotal.loseCount);
-        const highestCountsNear = {
-            winCount: Math.max(...player.heroesPerformance?.filter((hero) => hero.matchCount > 1)?.map((hero) => hero.winCount)),
-            loseCount: Math.max(...player.heroesPerformance?.filter((hero) => hero.matchCount > 1)?.map((hero) => hero.matchCount - hero.winCount)),
-        };
-        const nearAdjustmentFactor = Math.min(highestCountsTotal.winCount / (highestCountsTotal.winCount + highestCountsTotal.loseCount), highestCountsTotal.loseCount / (highestCountsTotal.winCount + highestCountsTotal.loseCount));
-
-        const pixelOfPerMatchInNear = (heroesCountPixels / (highestCountsNear?.winCount + highestCountsNear?.loseCount ?? 1)) * nearAdjustmentFactor;
-
-        player.positionPerformance=[];
-        const positionIcons = ["damage","nuke","armor","speed","healing"];
-        for (let index = 0; index < 5; index++) {
-            let currentPositionMatches = player.matches.filter(match=>match.players.find(innerPlayer=>player.steamAccount.id==innerPlayer.steamAccount.id).position == ("POSITION_"+(index+1)))
-            let winCount = currentPositionMatches.filter(match=>match.didRadiantWin == match.players.find(innerPlayer=>player.steamAccount.id==innerPlayer.steamAccount.id).isRadiant).length;
-            player.positionPerformance.push({
-                position : (index + 1),
-                icon : positionIcons[index],
-                matchCount : currentPositionMatches.length,
-                winCount : winCount,
-                loseCount : currentPositionMatches.length - winCount,
-                imp : currentPositionMatches.length>0? Math.round(currentPositionMatches.reduce((acc,match)=>acc+match.players.find(innerPlayer=>player.steamAccount.id==innerPlayer.steamAccount.id).imp,0)/currentPositionMatches.length):"-"
-            })
-        }
-        const highestCountsPosition = {
-            winCount: Math.max(...player.positionPerformance.filter((position) => position.matchCount > 1)?.map((position) => position.winCount)),
-            loseCount: Math.max(...player.positionPerformance.filter((position) => position.matchCount > 1)?.map((position) => position.matchCount - position.winCount)),
-        };
-        const pixelOfPerMatchInPosition = (heroesCountPixels / (highestCountsPosition.winCount + highestCountsPosition.loseCount ?? 1)) * nearAdjustmentFactor;
-        %>
-        <% function winRateColor(value) {
-          value = value * 100;
-          value = Math.max(0, Math.min(100, value));
-
-          let red, green, blue;
-
-          if (value <= 50) {
-            // 从纯红到纯白
-            let scale = Math.round(255 * (value / 50)); // Scale of 0 to 255
-            red = 255;
-            green = scale;
-            blue = scale;
-          } else {
-            // 从纯白到纯绿
-            let scale = Math.round(255 * ((value - 50) / 50)); // Scale of 0 to 255
-            red = 255 - scale;
-            green = 255;
-            blue = 255 - scale;
-          }
-
-          // 将RGB值转换为两位十六进制代码
-          const toHex = (color) => color.toString(16).padStart(2, "0").toUpperCase();
-
-          return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
-        }
-        %>
-
-        <div class="wrapper">
-            <div class="player">
-                <div class="avatar"><img src="<%= player.steamAccount?.avatar %>" alt="" /></div>
-                <div class="info">
-                    <p class="name">
-                        <%= player.steamAccount.name %>
-                        <%- player.guildMember ? ` <span class="guild ${guildLevel(player.guildMember.guild.currentPercentile)}">${player.guildMember.guild.tag}</span>` : "" %>
-                        <%- player.genHero ? `<span class="hero_name">${player.genHero.name}</span>` : "" %>
-                    </p>
-                    <p class="matches">
-                        <%=$t("dota2tracker.template.match_count_")%><%=player.matchCount%> (<span class="win"><%=player.winCount%></span>/<span class="lose"><%=player.matchCount - player.winCount%></span>) &nbsp;&nbsp;
-                        <%=$t("dota2tracker.template.winrate_")%><span <%-`style="color:${winRateColor(player.winCount / player.matchCount)};"`%>><%=((player.winCount / player.matchCount) * 100).toFixed(2)%>%</span>
-                    </p>
-                    <p class="matches<%- player.steamAccount.isAnonymous ? " blur" : "" %>">
-                        <span><%-$t("dota2tracker.template.last25matches_")%>
-                            <span class="win"><%-nearWinCount%></span>/
-                            <span class="lose"><%-nearMatchCount - nearWinCount%></span>
-                        </span>&nbsp;
-                        <span><%-$t("dota2tracker.template.winrate_")%>
-                            <span <%-`style="color:${winRateColor(nearWinCount / nearMatchCount)};"`%>><%-((nearWinCount / nearMatchCount) * 100).toFixed(2)%>%</span>
-                        </span>&nbsp;
-                        <span><%-$t("dota2tracker.template.imp_")%><%-player.steamAccount.isAnonymous?"?":((player.performance?.imp > 0 ? "+" : "") + player.performance?.imp)%></span>
-                    </p>
-                    <p class="matches<%- player.steamAccount.isAnonymous ? " blur" : "" %>">
-                        <span><%-$t("dota2tracker.template.lane")%>
-                            <span class="victory"><%-outcomeCounts.victory + outcomeCounts.stomp%>(<span class="stomp"><%-outcomeCounts.stomp%></span>)</span>-<span class="tie"><%-outcomeCounts.tie%></span>-<span class="fail"><%-outcomeCounts.fail + outcomeCounts.stomped%>(<span class="stomped"><%-outcomeCounts.stomped%></span>)</span>
-                        </span>&nbsp;&nbsp;
-                        <span><%-$t("dota2tracker.template.lane_advantage_rate_")%>
-                            <span <%-`style="color:${winRateColor((outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.tie / 2) / (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.tie + outcomeCounts.fail + outcomeCounts.stomped))};"`%>><%-player.steamAccount.isAnonymous?"?":(((outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.tie / 2) / (outcomeCounts.victory + outcomeCounts.stomp + outcomeCounts.tie + outcomeCounts.fail + outcomeCounts.stomped)) * 100).toFixed(2)%>%</span>
-                        </span>
-                    </p>
-                </div>
-                <div class="rank<%= player.isEstimatedRank ? " estimated" : "" %>">
-                    <img class="medal" src="<%-getImageUrl('medal_' +(player.rank.inTop100??player.rank.medal))%>" alt="" />
-                    <img class="star" src="<%-getImageUrl('star_' + player.rank.star)%>" alt="" />
-                    <p><%-player.steamAccount.seasonLeaderboardRank ?? ""%></p>
-                </div>
+    <%- `<style>` %>
+      <%- include("../common/styles/normalize.min.css") %>
+      <%- include(`./player_1/base.css`) %>
+      <% if (fontFamily) { %><%- `body { font-family: ${fontFamily}; }` %><% } %>
+    <%- `</style>` %>
+</head>
+<body>
+    <div class="wrapper">
+        <%# --- 玩家头部信息 --- %>
+        <div class="player">
+            <div class="avatar"><img src="<%= p.steamAccount?.avatar %>" alt="" /></div>
+            <div class="info">
+                <p class="name">
+                    <%= p.steamAccount.name %>
+                    <% if (p.guildMember) { %>
+                    <span class="guild <%= getGuildClass(p.guildMember.guild.currentPercentile) %>"><%= p.guildMember.guild.tag %></span>
+                    <% } %>
+                    <% if (p.genHero) { %>
+                    <span class="hero_name"><%= p.genHero.name %></span>
+                    <% } %>
+                </p>
+                <p class="matches">
+                    <%= $t("dota2tracker.template.match_count_") %><%= p.matchCount %>
+                    (<span class="win"><%= p.winCount %></span>/<span class="lose"><%= p.matchCount - p.winCount %></span>) &nbsp;&nbsp;
+                    <%= $t("dota2tracker.template.winrate_") %>
+                    <span <%- `style="color:${getWinRateColor(p.winCount / p.matchCount)};"` %>><%= ((p.winCount / p.matchCount) * 100).toFixed(2) %>%</span>
+                </p>
+                <p class="matches<%= isAnon ? " blur" : "" %>">
+                    <span><%= $t("dota2tracker.template.last25matches_") %>
+                        <span class="win"><%= nearWin %></span>/<span class="lose"><%= nearCount - nearWin %></span>
+                    </span>&nbsp;
+                    <span><%= $t("dota2tracker.template.winrate_") %>
+                        <span <%- `style="color:${getWinRateColor(nearWin / nearCount)};"` %>><%= ((nearWin / nearCount) * 100).toFixed(2) %>%</span>
+                    </span>&nbsp;
+                    <span><%= $t("dota2tracker.template.imp_") %><%= isAnon ? "?" : ((p.performance?.imp > 0 ? "+" : "") + p.performance?.imp) %></span>
+                </p>
+                <p class="matches<%= isAnon ? " blur" : "" %>">
+                    <span><%= $t("dota2tracker.template.lane") %>
+                        <span class="victory"><%= outcomes.victory + outcomes.stomp %>(<span class="stomp"><%= outcomes.stomp %></span>)</span>-<span class="tie"><%= outcomes.tie %></span>-<span class="fail"><%= outcomes.fail + outcomes.stomped %>(<span class="stomped"><%= outcomes.stomped %></span>)</span>
+                    </span>&nbsp;&nbsp;
+                    <% const laneTotal = outcomes.victory + outcomes.stomp + outcomes.tie + outcomes.fail + outcomes.stomped; %>
+                    <% const laneScore = (outcomes.victory + outcomes.stomp + outcomes.tie / 2) / laneTotal; %>
+                    <span><%= $t("dota2tracker.template.lane_advantage_rate_") %>
+                        <span <%- `style="color:${getWinRateColor(laneScore)};"` %>><%= isAnon ? "?" : (laneScore * 100).toFixed(2) %>%</span>
+                    </span>
+                </p>
             </div>
-            <div class="hero_winrate">
-                <div class="heroes">
-                    <p class="tip row total"><%- player.genHero ? $t("dota2tracker.template.all_matches_") : $t("dota2tracker.template.top10_") %></p>
-                    <span class="tip"><%= $t("dota2tracker.template.hero") %></span>
-                    <span class="tip" style="margin: 0 4px"><%= $t("dota2tracker.template.match_count") %></span>
-                    <span class="tip" style="margin: 0 4px"><%= $t("dota2tracker.template.winrate") %></span>
-                    <span class="tip" style="margin: 0 4px"><%= $t("dota2tracker.template.imp") %></span>
-                    <span class="tip win_count" style="justify-self: end; margin-right: 2px"><%= $t("dota2tracker.template.win_count") %></span>
-                    <span class="tip lose_count" style="justify-self: start; margin-left: 2px"><%= $t("dota2tracker.template.lose_count") %></span>
-                    <%- player.heroesPerformanceTop10
-                    .map((hero) => `
-                    <span><img alt="" src="${getImageUrl(hero.hero.shortName, ImageType.HeroIcons)}" /></span>
-                    <span class="count">${hero.matchCount}</span>
-                    <span class="win_rate">${((hero.winCount / hero.matchCount) * 100).toFixed(0)}%</span>
-                    <span class="imp">${(hero.imp > 0 ? "+" : "") + hero.imp}</span>
-                    <span class="win" style="${hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${hero.winCount * pixelOfPerMatchInTotal}px">${hero.winCount}</span>
-                    <span class="lose" style="${hero.matchCount - hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${(hero.matchCount - hero.winCount) * pixelOfPerMatchInTotal}px">${hero.matchCount - hero.winCount}</span>`).join("") %>
-                    <%- !player.genHero ?
-                    `<p class="tip row near">${$t("dota2tracker.template.recently_heroes")}</p>`:
-                    `<p class="tip row total">${$t("dota2tracker.template.last25matches_")}</p>`
-                    %>
-                    <%- player.heroesPerformance
-                    .filter((hero) => hero.matchCount > 1)
-                    .map((hero, index) => `
-                    <span><img alt="" src="${getImageUrl(hero.hero.shortName, ImageType.HeroIcons)}" /></span>
-                    <span class="count">${hero.matchCount}</span>
-                    <span class="win_rate">${((hero.winCount / hero.matchCount) * 100).toFixed(0)}%</span>
-                    <span class="imp">${(hero.imp > 0 ? "+" : "") + hero.imp}</span>
-                    <span class="win" style="${hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${hero.winCount * pixelOfPerMatchInNear}px">${hero.winCount}</span>
-                    <span class="lose" style="${hero.matchCount - hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${(hero.matchCount - hero.winCount) * pixelOfPerMatchInNear}px">${hero.matchCount - hero.winCount}</span>`).join("") %>
-                    <p class="tip row near"><%= $t("dota2tracker.template.recently_positions") %></p>
-                    <span class="tip"><%= $t("dota2tracker.template.position") %></span>
-                    <span class="tip" style="margin: 0 4px"><%= $t("dota2tracker.template.match_count") %></span>
-                    <span class="tip" style="margin: 0 4px"><%= $t("dota2tracker.template.winrate") %></span>
-                    <span class="tip" style="margin: 0 4px"><%= $t("dota2tracker.template.imp") %></span>
-                    <span class="tip win_count" style="justify-self: end; margin-right: 2px"><%= $t("dota2tracker.template.win_count") %></span>
-                    <span class="tip lose_count" style="justify-self: start; margin-left: 2px"><%= $t("dota2tracker.template.lose_count") %></span>
-                    <%- player.positionPerformance
-                    .map((position) => `
-                    <span><img src="${getImageUrl(position.icon,ImageType.IconsFacets)}"></span>
-                    <span class="count">${position.matchCount}</span>
-                    <span class="win_rate">${position.matchCount>0?(((position.winCount / position.matchCount) * 100).toFixed(0)):"-"}%</span>
-                    <span class="imp">${(position.imp > 0 ? "+" : "") + position.imp}</span>
-                    <span class="win" style="${position.winCount == 0 ? "visibility:hidden;" : ""}width: ${position.winCount * pixelOfPerMatchInPosition}px">${position.winCount}</span>
-                    <span class="lose" style="${position.matchCount - position.winCount == 0 ? "visibility:hidden;" : ""}width: ${(position.matchCount - position.winCount) * pixelOfPerMatchInPosition}px">${position.matchCount - position.winCount}</span>`).join("") %>
-                </div>
-                <% if (player.steamAccount.isAnonymous) { %>
-                  <%- include("player_1/private", {$t, player}) %>
-                <% } %>
-            </div>
-            <%- Math.abs(player.streak) > 1 && !player.steamAccount.isAnonymous ?
-            `<div class="streak" style="box-shadow:none;color:${winRateColor((player.streak + 10) / 20)};">${Math.abs(player.streak) + (player.streak > 0 ? $t("dota2tracker.template.winning_streak") : $t("dota2tracker.template.losing_streak"))}</div>`:"" %>
-            <div>
-                <table class="matches">
-                    <colgroup>
-                        <col style="width: auto" />
-                        <col style="width: auto" />
-                        <col style="width: 40px" />
-                        <col style="width: auto" />
-                        <col style="width: 40px" />
-                        <col style="width: auto" />
-                        <col style="width: auto" />
-                        <col style="width: auto" />
-                        <col style="width: 40px" />
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th><%= $t("dota2tracker.template.id") %></th>
-                            <th><%= $t("dota2tracker.template.mode") %></th>
-                            <th><%= $t("dota2tracker.template.hero") %></th>
-                            <th><%= $t("dota2tracker.template.kda_kc") %></th>
-                            <th><%= $t("dota2tracker.template.lane") %></th>
-                            <th><%= $t("dota2tracker.template.time") %></th>
-                            <th><%= $t("dota2tracker.template.duration") %></th>
-                            <th><%= $t("dota2tracker.template.imp") %></th>
-                            <th><%= $t("dota2tracker.template.rank") %></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <%- player.matches.map((match) => {
-                            const innerPlayer = match.players.find(innerPlayer => player.steamAccount.id == innerPlayer.steamAccount.id);
-                            innerPlayer.teamKillsCount = match.parsedDateTime ?
-                                (match[(innerPlayer.isRadiant ? "radiant" : "dire") + "Kills"]?.reduce((acc, cva) => acc + cva, 0) ?? 0) :
-                                match.players
-                                    .filter(p => p.isRadiant === innerPlayer.isRadiant)
-                                    .reduce((k, p) => k + p.kills, 0);
-                            return `
-                        <tr class="match ${match.didRadiantWin == innerPlayer.isRadiant ? "win" : "lose"}">
-                            <td>${match.parsedDateTime ? match.id : `<p>${match.id}</p><p>${$t("dota2tracker.template.un_parsed")}</p>`}</td>
-                            <td>
-                                <p>${$t("dota2tracker.template.lobby_types."+match.lobbyType) || match.lobbyType}</p>
-                                <p>${$t("dota2tracker.template.game_modes."+match.gameMode) || match.gameMode}</p>
-                            </td>
-                            <td><img alt="" src="${getImageUrl(innerPlayer.hero.shortName, ImageType.HeroIcons)}" /></td>
-                            <td style="line-height: 20px">
-                                <p>${((innerPlayer.kills + innerPlayer.assists) / Math.max(1, innerPlayer.deaths)).toFixed(2)} (${(match.parsedDateTime?"":"≈")+((((innerPlayer.kills + innerPlayer.assists) /
-                                innerPlayer.teamKillsCount) * 100)?.toFixed(0))}%)</p>
-                                <p>${innerPlayer.kills}/${innerPlayer.deaths}/${innerPlayer.assists}</p>
-                            </td>
-                            <td><div class="player_lane ${match.laneResult}">${laneSVG[match.laneResult]}</div></td>
-                            <td style="line-height: 20px">${DateTime.fromSeconds(match.startDateTime ?? 0).toFormat("yyyy-MM-dd HH:mm:ss").slice(2)}</td>
-                            <td>${match.durationTime}</td>
-                            <td>${innerPlayer.imp != null ? ((innerPlayer.imp >= 0 ? "+" : "") + innerPlayer.imp) : "?"}</td>
-                            <td><img class="medal" src="${getImageUrl("medal_" + match.rank?.toString().split("")[0])}" style="width: 100%" /></td>
-                        </tr>`}).join("")%>
-                    </tbody>
-                </table>
-                <% if (player.steamAccount.isAnonymous) { %>
-                  <%- include("player_1/private", {$t, player}) %>
-                <% } %>
-            </div>
-            <div class="plus">
-                <%- player.dotaPlus.map((hero) => `
-                <div class="hero">
-                    <img src="${getImageUrl(hero.shortName, ImageType.Heroes)}" alt="" />
-                    <div class="level"><img src="${getImageUrl("hero_badge_" + Math.ceil((hero.level + 1) / 6))}" alt="" /><span>${hero.level}</span></div>
-                    <span>${((hero.winCount / hero.matchCount) * 100).toFixed(2)}%</span>
-                    <span>${hero.matchCount}</span>
-                </div>`).join("") %>
-                <% if (player.steamAccount.isAnonymous) { %>
-                  <%- include("player_1/private", {$t, player}) %>
-                <% } %>
+            <div class="rank<%= p.isEstimatedRank ? " estimated" : "" %>">
+                <img class="medal" src="<%= getImageUrl('medal_' + (p.rank.inTop100 ?? p.rank.medal)) %>" alt="" />
+                <img class="star" src="<%= getImageUrl('star_' + p.rank.star) %>" alt="" />
+                <p><%= p.steamAccount.seasonLeaderboardRank ?? "" %></p>
             </div>
         </div>
-    </body>
+
+        <%# --- 英雄与位置表现 --- %>
+        <div class="hero_winrate">
+            <div class="heroes">
+                <p class="tip row total"><%= p.genHero ? $t("dota2tracker.template.all_matches_") : $t("dota2tracker.template.top10_") %></p>
+                <span class="tip"><%= $t("dota2tracker.template.hero") %></span>
+                <span class="tip" style="margin: 0 4px"><%= $t("dota2tracker.template.match_count") %></span>
+                <span class="tip" style="margin: 0 4px"><%= $t("dota2tracker.template.winrate") %></span>
+                <span class="tip" style="margin: 0 4px"><%= $t("dota2tracker.template.imp") %></span>
+                <span class="tip win_count" style="justify-self: end; margin-right: 2px"><%= $t("dota2tracker.template.win_count") %></span>
+                <span class="tip lose_count" style="justify-self: start; margin-left: 2px"><%= $t("dota2tracker.template.lose_count") %></span>
+
+                <%# 英雄列表循环 %>
+                <% heroList.forEach(hero => { %>
+                <span><img alt="" src="<%= getImageUrl(hero.hero.shortName, ImageType.HeroIcons) %>" /></span>
+                <span class="count"><%= hero.matchCount %></span>
+                <span class="win_rate"><%= ((hero.winCount / hero.matchCount) * 100).toFixed(0) %>%</span>
+                <span class="imp"><%= (hero.imp > 0 ? "+" : "") + hero.imp %></span>
+                <span class="win" <%- `style="${hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${hero.winCount * heroScale}px"` %>><%= hero.winCount %></span>
+                <span class="lose" <%- `style="${hero.matchCount - hero.winCount == 0 ? "visibility:hidden;" : ""}width: ${(hero.matchCount - hero.winCount) * heroScale}px"` %>><%= hero.matchCount - hero.winCount %></span>
+                <% }); %>
+
+                <p class="tip row near"><%= $t("dota2tracker.template.recently_positions") %></p>
+                <span class="tip"><%= $t("dota2tracker.template.position") %></span>
+                <span class="tip" style="margin: 0 4px"><%= $t("dota2tracker.template.match_count") %></span>
+                <span class="tip" style="margin: 0 4px"><%= $t("dota2tracker.template.winrate") %></span>
+                <span class="tip" style="margin: 0 4px"><%= $t("dota2tracker.template.imp") %></span>
+                <span class="tip win_count" style="justify-self: end; margin-right: 2px"><%= $t("dota2tracker.template.win_count") %></span>
+                <span class="tip lose_count" style="justify-self: start; margin-left: 2px"><%= $t("dota2tracker.template.lose_count") %></span>
+
+                <%# 位置列表循环 %>
+                <% p.positionPerformance.forEach(pos => { %>
+                <span><img src="<%= getImageUrl(pos.icon, ImageType.IconsFacets) %>"></span>
+                <span class="count"><%= pos.matchCount %></span>
+                <span class="win_rate"><%= pos.matchCount > 0 ? ((pos.winCount / pos.matchCount) * 100).toFixed(0) : "-" %>%</span>
+                <span class="imp"><%= (pos.imp > 0 ? "+" : "") + pos.imp %></span>
+                <span class="win" <%- `style="${pos.winCount == 0 ? "visibility:hidden;" : ""}width: ${pos.winCount * posScale}px"` %>><%= pos.winCount %></span>
+                <span class="lose" <%- `style="${pos.matchCount - pos.winCount == 0 ? "visibility:hidden;" : ""}width: ${(pos.matchCount - pos.winCount) * posScale}px"` %>><%= pos.matchCount - pos.winCount %></span>
+                <% }); %>
+            </div>
+
+            <% if (isAnon) { %>
+            <%- include("player_1/private", {$t, player: p}) %>
+            <% } %>
+        </div>
+
+        <%# --- 连胜/连败提示 --- %>
+        <% if (Math.abs(p.streak) > 1 && !isAnon) { %>
+        <div class="streak" <%- `style="box-shadow:none;color:${getWinRateColor((p.streak + 10) / 20)};"` %>>
+            <%= Math.abs(p.streak) + (p.streak > 0 ? $t("dota2tracker.template.winning_streak") : $t("dota2tracker.template.losing_streak")) %>
+        </div>
+        <% } %>
+
+        <%# --- 比赛记录列表 --- %>
+        <div>
+            <table class="matches">
+                <colgroup>
+                    <col style="width: auto" /><col style="width: auto" /><col style="width: 40px" />
+                    <col style="width: auto" /><col style="width: 40px" /><col style="width: auto" />
+                    <col style="width: auto" /><col style="width: auto" /><col style="width: 40px" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th><%= $t("dota2tracker.template.id") %></th>
+                        <th><%= $t("dota2tracker.template.mode") %></th>
+                        <th><%= $t("dota2tracker.template.hero") %></th>
+                        <th><%= $t("dota2tracker.template.kda_kc") %></th>
+                        <th><%= $t("dota2tracker.template.lane") %></th>
+                        <th><%= $t("dota2tracker.template.time") %></th>
+                        <th><%= $t("dota2tracker.template.duration") %></th>
+                        <th><%= $t("dota2tracker.template.imp") %></th>
+                        <th><%= $t("dota2tracker.template.rank") %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% matchesData.forEach(m => { %>
+                    <tr class="match <%= m.didWin ? "win" : "lose" %>">
+                        <td><%- m.parsedDateTime ? m.id : `<p>${m.id}</p><p>${$t("dota2tracker.template.un_parsed")}</p>` %></td>
+                        <td>
+                            <p><%= $t("dota2tracker.template.lobby_types." + m.lobbyType) || m.lobbyType %></p>
+                            <p><%= $t("dota2tracker.template.game_modes." + m.gameMode) || m.gameMode %></p>
+                        </td>
+                        <td><img alt="" src="<%= getImageUrl(m.inner.hero.shortName, ImageType.HeroIcons) %>" /></td>
+                        <td style="line-height: 20px">
+                            <p><%= m.kda %> (<%= (m.parsedDateTime ? "" : "≈") + m.kp %>%)</p>
+                            <p><%= m.inner.kills %>/<%= m.inner.deaths %>/<%= m.inner.assists %></p>
+                        </td>
+                        <td><div class="player_lane <%= m.laneRes %>"><%- getImageUrl("lane_" + m.laneRes, undefined, ImageFormat.svg) %></div></td>
+                        <td style="line-height: 20px"><%= m.timeStr %></td>
+                        <td><%= m.durationTime %></td>
+                        <td><%= m.inner.imp != null ? ((m.inner.imp >= 0 ? "+" : "") + m.inner.imp) : "?" %></td>
+                        <td><img class="medal" src="<%= getImageUrl("medal_" + m.rank?.toString().split("")[0]) %>" style="width: 100%" /></td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+
+            <% if (isAnon) { %>
+            <%- include("player_1/private", {$t, player: p}) %>
+            <% } %>
+        </div>
+
+        <%# --- Dota Plus 英雄 --- %>
+        <div class="plus">
+            <% p.dotaPlus.forEach(hero => { %>
+            <div class="hero">
+                <img src="<%= getImageUrl(hero.shortName, ImageType.Heroes) %>" alt="" />
+                <div class="level"><img src="<%= getImageUrl("hero_badge_" + Math.ceil((hero.level + 1) / 6)) %>" alt="" /><span><%= hero.level %></span></div>
+                <span><%= ((hero.winCount / hero.matchCount) * 100).toFixed(2) %>%</span>
+                <span><%= hero.matchCount %></span>
+            </div>
+            <% }); %>
+
+            <% if (isAnon) { %>
+            <%- include("player_1/private", {$t, player: p}) %>
+            <% } %>
+        </div>
+    </div>
+</body>
 </html>
