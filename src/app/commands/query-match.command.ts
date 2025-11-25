@@ -48,7 +48,6 @@ async function handleQueryMatchCommand(ctx: Context, config: Config, session: Se
     const formattedMatchData = await ctx.dota2tracker.match.generateMatchData(result.matchData, languageTag);
     const message = ctx.dota2tracker.messageBuilder.buildMatchMessage(languageTag, formattedMatchData, []);
     const image = await ctx.dota2tracker.image.renderToImageByFile(formattedMatchData, options.template || config.template_match, TemplateType.Match, languageTag);
-    await ctx.dota2tracker.image.renderToImageByFile(formattedMatchData, options.template || config.template_match, TemplateType.Match, languageTag);
     return message + image;
   }
 }
