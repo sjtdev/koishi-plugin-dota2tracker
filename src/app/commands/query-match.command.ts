@@ -27,11 +27,11 @@ export function registerQueryMatchCommand(ctx: Context) {
       const steamId = await resolvePlayerAndHandleErrors(ctx, session, input_data);
       if (steamId === null) return;
       session.send(session.text(".querying_match"));
-      const lastMatchId = await ctx.dota2tracker.player.getLastMatchId(Number(steamId));
-      if (!lastMatchId?.matchId) return session.text(".query_failed");
-      if (lastMatchId.isAnonymous) return session.text(".is_anonymous");
+      const lastMatch = await ctx.dota2tracker.player.getLastMatchId(Number(steamId));
+      if (!lastMatch?.id) return session.text(".query_failed");
+      if (lastMatch.isAnonymous) return session.text(".is_anonymous");
 
-      return await handleQueryMatchCommand(ctx, ctx.config, session, options, lastMatchId.matchId);
+      return await handleQueryMatchCommand(ctx, ctx.config, session, options, lastMatch.id);
     });
 }
 

@@ -136,19 +136,19 @@ export class PlayerService extends Service {
     return { success: false, reason: "NOT_BINDED" };
   }
 
-  async getLastMatchId(steamId: number): Promise<{ matchId: number; isAnonymous?: boolean }> {
+  async getLastMatchId(steamId: number): Promise<{ id: number; isAnonymous?: boolean }> {
     let lastMatchId = 0;
     try {
       const lastMatchQuery = await this.ctx.dota2tracker.stratzAPI.queryPlayersLastMatchRankInfo({
         steamAccountIds: [steamId],
       });
-      if (lastMatchQuery.players[0].steamAccount.isAnonymous) return { matchId: 0, isAnonymous: true };
+      if (lastMatchQuery.players[0].steamAccount.isAnonymous) return { id: 0, isAnonymous: true };
 
       lastMatchId = lastMatchQuery.players[0].matches[0]?.id;
     } catch (error) {
       this.logger.error(error);
     }
-    return { matchId: lastMatchId };
+    return { id: lastMatchId };
   }
 
   async getFormattedPlayerData(steamId: number, heroId: number | undefined, languageTag: string): Promise<PlayerInfoEx> {
