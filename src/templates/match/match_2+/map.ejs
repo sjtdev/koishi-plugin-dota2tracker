@@ -1,0 +1,199 @@
+<% const match = data; %>
+<%
+const BUILDINGS = [
+  // ================= 天辉 Radiant (左下) =================
+  // 上路
+  { id: 16, name: 'Rad Top T1',  type: 'tower', lane: "top", bit: 0, team: 'radiant', x: 25, y: 93 },
+  { id: 19, name: 'Rad Top T2',  type: 'tower', lane: "top", bit: 1, team: 'radiant', x: 23, y: 135 },
+  { id: 22, name: 'Rad Top T3',  type: 'tower', lane: "top", bit: 2, team: 'radiant', x: 21, y: 174 },
+  { id: 38, name: 'Rad Top Melee', type: 'rax', lane: "top", bit: 0, team: 'radiant', x: 18, y: 181 },
+  { id: 41, name: 'Rad Top Range', type: 'rax', lane: "top", bit: 1, team: 'radiant', x: 26, y: 181 },
+  { id: 38, name: 'Rad Top HG Time', type: 'rax_time', lane: "top", bit: 0, team: 'radiant', x: 27, y: 184 },
+
+  // 中路
+  { id: 17, name: 'Rad Mid T1',  type: 'tower', lane: "mid", bit: 3, team: 'radiant', x: 98, y: 143 },
+  { id: 20, name: 'Rad Mid T2',  type: 'tower', lane: "mid", bit: 4, team: 'radiant', x: 73, y: 166 },
+  { id: 23, name: 'Rad Mid T3',  type: 'tower', lane: "mid", bit: 5, team: 'radiant', x: 51, y: 185 },
+  { id: 39, name: 'Rad Mid Melee', type: 'rax', lane: "mid", bit: 2, team: 'radiant', x: 46, y: 187 },
+  { id: 42, name: 'Rad Mid Range', type: 'rax', lane: "mid", bit: 3, team: 'radiant', x: 52, y: 193 },
+  { id: 39, name: 'Rad Mid HG Time', type: 'rax_time', lane: "mid", bit: 2, team: 'radiant', x: 54, y: 194 },
+
+  // 下路
+  { id: 18, name: 'Rad Bot T1',  type: 'tower', lane: "bot", bit: 6, team: 'radiant', x: 197, y: 217 },
+  { id: 21, name: 'Rad Bot T2',  type: 'tower', lane: "bot", bit: 7, team: 'radiant', x: 116, y: 218 },
+  { id: 24, name: 'Rad Bot T3',  type: 'tower', lane: "bot", bit: 8, team: 'radiant', x: 61, y: 215 },
+  { id: 40, name: 'Rad Bot Melee', type: 'rax', lane: "bot", bit: 4, team: 'radiant', x: 58, y: 220 },
+  { id: 43, name: 'Rad Bot Range', type: 'rax', lane: "bot", bit: 5, team: 'radiant', x: 58, y: 212 },
+  { id: 40, name: 'Rad Bot HG Time', type: 'rax_time', lane: "bot", bit: 4, team: 'radiant', x: 61, y: 220 },
+
+  // 门牙 & 基地
+  { id: 25, name: 'Rad T4 Left',  type: 'tower', lane: "mid", bit: 9, team: 'radiant', x: 34, y: 197 },
+  { id: 25, name: 'Rad T4 Right', type: 'tower', lane: "mid", bit: 10, team: 'radiant', x: 39, y: 201 },
+  { id: 25, name: 'Rad T4 Time',  type: 't4_time', lane: "mid", bit: [9,10], team: 'radiant', x: 43, y: 204 },
+  { id: 50, name: 'Rad Ancient',  type: 'fort', lane: "", bit: -1, team: 'radiant', x: 29, y: 202 },
+  { id: 50, name: 'Rad Ancient Time', type: 'fort_time', lane: "", bit: -1, team: 'radiant', x: 35, y: 213 },
+
+  // ================= 夜魔 Dire (右上) =================
+  // 上路
+  { id: 26, name: 'Dire Top T1',  type: 'tower', lane: "top", bit: 0, team: 'dire', x: 41, y: 32 },
+  { id: 29, name: 'Dire Top T2',  type: 'tower', lane: "top", bit: 1, team: 'dire', x: 120, y: 31 },
+  { id: 32, name: 'Dire Top T3',  type: 'tower', lane: "top", bit: 2, team: 'dire', x: 176, y: 34 },
+  { id: 44, name: 'Dire Top Melee', type: 'rax', lane: "top", bit: 0, team: 'dire', x: 182, y: 40 },
+  { id: 47, name: 'Dire Top Range', type: 'rax', lane: "top", bit: 1, team: 'dire', x: 182, y: 32 },
+  { id: 44, name: 'Dire Top HG Time', type: 'rax_time', lane: "top", bit: 0, team: 'dire', x: 185, y: 40 },
+
+  // 中路
+  { id: 27, name: 'Dire Mid T1',  type: 'tower', lane: "mid", bit: 3, team: 'dire', x: 130, y: 112 },
+  { id: 30, name: 'Dire Mid T2',  type: 'tower', lane: "mid", bit: 4, team: 'dire', x: 160, y: 90 },
+  { id: 33, name: 'Dire Mid T3',  type: 'tower', lane: "mid", bit: 5, team: 'dire', x: 187, y: 65 },
+  { id: 45, name: 'Dire Mid Melee', type: 'rax', lane: "mid", bit: 2, team: 'dire', x: 189, y: 60 },
+  { id: 48, name: 'Dire Mid Range', type: 'rax', lane: "mid", bit: 3, team: 'dire', x: 195, y: 64 },
+  { id: 45, name: 'Dire Mid HG Time', type: 'rax_time', lane: "mid", bit: 2, team: 'dire', x: 196, y: 68 },
+
+  // 下路
+  { id: 28, name: 'Dire Bot T1',  type: 'tower', lane: "bot", bit: 6, team: 'dire', x: 218, y: 157 },
+  { id: 31, name: 'Dire Bot T2',  type: 'tower', lane: "bot", bit: 7, team: 'dire', x: 220, y: 117 },
+  { id: 34, name: 'Dire Bot T3',  type: 'tower', lane: "bot", bit: 8, team: 'dire', x: 219, y: 76 },
+  { id: 46, name: 'Dire Bot Melee', type: 'rax', lane: "bot", bit: 4, team: 'dire', x: 224, y: 72 },
+  { id: 49, name: 'Dire Bot Range', type: 'rax', lane: "bot", bit: 5, team: 'dire', x: 216, y: 72 },
+  { id: 46, name: 'Dire Bot HG Time', type: 'rax_time', lane: "bot", bit: 4, team: 'dire', x: 225, y: 78 },
+
+  // 门牙 & 基地
+  { id: 35, name: 'Dire T4 Left',  type: 'tower', lane: "mid", bit: 9, team: 'dire', x: 197, y: 49 },
+  { id: 35, name: 'Dire T4 Right', type: 'tower', lane: "mid", bit: 10, team: 'dire', x: 203, y: 54 },
+  { id: 35, name: 'Dire T4 Time', type: 't4_time', lane: "mid", bit: 10, team: 'dire', x: 207, y: 57 },
+  { id: 51, name: 'Dire Ancient',  type: 'fort', lane: "", bit: -1, team: 'dire', x: 204, y: 44 },
+  { id: 51, name: 'Dire Ancient Time',  type: 'fort_time', lane: "", bit: -1, team: 'dire', x: 215, y: 48 },
+];
+%>
+<%
+  // 1. 算法：提取摧毁时间 (Last Event Algorithm)
+  const destructionTimes = {};
+  if (match.playbackData && match.playbackData.buildingEvents) {
+    match.playbackData.buildingEvents.forEach(evt => {
+      if (evt.time > 0) {
+        destructionTimes[evt.npcId] = evt.time;
+      }
+    });
+  }
+
+  // 2. 存活判定 (逻辑保持不变，确保正确引用 mask)
+  const checkAlive = (b) => {
+    let mask = 0;
+    if (b.team === 'radiant') {
+      mask = b.type.includes('tower') ? match.towerStatusRadiant : match.barracksStatusRadiant;
+    } else {
+      mask = b.type.includes('tower') ? match.towerStatusDire : match.barracksStatusDire;
+    }
+
+    // T4 时间锚点 (只要有一个活着，整体就算活)
+    if (b.type === 't4_time') {
+      const t1Alive = (mask & (1 << b.bit[0])) !== 0;
+      const t2Alive = (mask & (1 << b.bit[1])) !== 0;
+      return t1Alive || t2Alive;
+    }
+
+    // 基地 (胜负即生死)
+    // 逻辑：如果是天辉建筑，天辉赢了=活；如果是夜魇建筑，天辉赢了=死(即 !match.didRadiantWin)
+    if (b.type === 'fort_time' || b.type === 'fort') {
+      return b.team === 'radiant' ? match.didRadiantWin : !match.didRadiantWin;
+    }
+
+    // 常规单位
+    return (mask & (1 << b.bit)) !== 0;
+  };
+
+  // 3. 辅助：时间格式化
+  const fmtTime = (s) => {
+    const absS = Math.abs(s ?? 0);
+    const m = Math.floor(absS / 60);
+    const ss = (absS % 60).toString().padStart(2, '0');
+    // 如果原数据确实是负数（极少数情况），手动加上符号
+    return (s < 0 ? "-" : "") + `${m}:${ss}`;
+  };
+
+  // 4. 定义图标尺寸与权重
+  const buildingProps = {
+    rax: { size: 10, z: 1 },
+    tower: { size: 12, z: 2 },
+    fort: { size: 16, z: 3 },
+    // 时间层级最高，确保覆盖在死掉的图标上
+    rax_time: { size: 0, z: 10 },
+    t4_time: { size: 0, z: 10 },
+    fort_time: { size: 0, z: 10 },
+    tower_time: { size: 0, z: 10 },
+    _default: { size: 12, z: 0 }
+  };
+
+  const getProps = (type) => buildingProps[type] || buildingProps._default;
+%>
+
+<% const images = { minimapBase: "7.38_simple_minimap" } %>
+
+<section class="map">
+  <%- include("../../common/components/building_icons") %>
+  <svg id="map" viewBox="0 0 255 255" width="250" height="250">
+    <rect x="0" y="0" width="255" height="255" fill="#f5f5f5" rx="12" ry="12" />
+    <image href="<%= getImageUrl(images.minimapBase) %>" width="255" height="255"/>
+<%
+  [...BUILDINGS].sort((a, b) => {
+      return getProps(a.type).z - getProps(b.type).z;
+  }).forEach(b => {
+    const isAlive = checkAlive(b);
+    const deathTime = destructionTimes[b.id];
+
+    // 基础参数
+    const props = getProps(b.type);
+    const size = props.size;
+
+    // 中心校准 (用于文字渲染)
+    const centerX = b.x + (size / 2);
+    const centerY = b.y + (size / 2);
+
+    const rotation = b.lane === "mid" ? "_angle" : "";
+    const iconRef = "#" + b.type + rotation;
+    const statusClass = isAlive ? b.team : "dead";
+
+    // ================= 极简白名单逻辑 =================
+
+    // 1. 自渲染时间的塔：只有 T1 和 T2
+    // 逻辑：类型是 tower, 且名字里不含 T3, 不含 T4
+    const isOuterTower = b.type === 'tower' &&
+                         !b.name.includes('T3') &&
+                         !b.name.includes('T4');
+
+    // 2. 虚拟时间锚点：数据表里留下的所有 _time 对象
+    const isTimeAnchor = b.type.endsWith('_time');
+
+    // 3. 最终开关
+    const shouldRenderTime = (isOuterTower || isTimeAnchor) && !isAlive && deathTime;
+
+%>
+
+  <% /* 1. 图标渲染 (排除 _time 类型的纯虚拟点) */ %>
+  <% if (!b.type.endsWith('_time')) { %>
+    <use
+      href="<%= iconRef %>"
+      class="<%= statusClass %>"
+      x="<%= b.x %>" y="<%= b.y %>"
+      width="<%= size %>" height="<%= size %>"
+    />
+  <% } %>
+
+  <% /* 2. 时间文字渲染 (无旋转，自然居中) */ %>
+  <% if (shouldRenderTime) { %>
+     <text
+       x="<%= centerX %>"
+       y="<%= centerY %>"
+       fill="#ccc"
+       font-weight="bold"
+       text-anchor="middle"
+       dominant-baseline="middle"
+     >
+       <%= fmtTime(deathTime) %>
+     </text>
+  <% } %>
+
+<% }) %>
+  </svg>
+</section>

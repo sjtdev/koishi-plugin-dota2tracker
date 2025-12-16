@@ -1,3 +1,4 @@
+<%# data.odParsed = true; %>
 <!DOCTYPE html>
 <html lang="<%= languageTag %>">
   <head>
@@ -14,11 +15,15 @@
     <%- "</style>" %>
   </head>
   <body>
+      <%# data.parsedDateTime=null %>
     <section id="regular"><%- include('./match_2/original') %></section>
     <section id="extra">
       <% if (data.parsedDateTime && data.radiantNetworthLeads && data.radiantExperienceLeads) { %>
         <%- include('./match_2+/charts') %>
-        <%- include('./match_2+/lane_outcome') %>
+        <div class="container">
+          <%- include('./match_2+/map') %>
+          <%- include('./match_2+/lane_outcome') %>
+        </div>
       <% } else { %>
         <div class="tip"><%= $t("dota2tracker.template.empty_extra_info") %></div>
       <% } %>

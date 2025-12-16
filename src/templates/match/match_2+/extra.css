@@ -14,130 +14,138 @@ body {
 }
 
 #extra {
-  display: flex;
-  width: 800px;
-  flex-direction: row;
-}
-
-#charts {
-  display: flex;
-  flex-direction: column;
-  width: 50%;
-}
-
-#charts > svg {
   font-size: 10px;
-}
-
-#charts > .title {
   width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
+  & > .tip {
+    width: 100%;
+    line-height: 4;
+    text-align: center;
+    color: #ccc;
+  }
+  #charts {
+    display: flex;
+    & > * {
+      width: 50%;
+    }
+  }
+  .container {
+    height: 300px;
+    display: flex;
 
-#charts > .title > .logo {
-  display: flex;
-  padding: 0 25px;
-}
+    .lane_outcome {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: 500px;
+      margin-right: 20px;
 
-#charts > .title > .logo > img {
-  width: 20px;
-}
+      & > .title {
+        width: 100%;
+        text-align: center;
+        padding: 0;
+        margin: 0;
+        line-height: 50px;
+      }
 
-#extra > .tip {
-  width: 100%;
-  line-height: 4;
-  text-align: center;
-  color: #ccc;
-}
+      .panel {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: space-evenly;
 
-.lane_outcome {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 386px;
-  margin-right: 14px;
-}
+        .lane {
+          display: flex;
+          flex-direction: column;
+          /* width: 100%; */
+          border-radius: 10px;
+          border: #ccc solid 1px;
+          padding: 2px;
 
-.lane_outcome > .title {
-  width: 100%;
-  text-align: center;
-  padding: 0;
-  margin: 0;
-  line-height: 50px;
-}
+          & > .title {
+            width: 100%;
+            text-align: center;
+            height: 32px;
 
-.lane_outcome .panel {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  justify-content: space-evenly;
-}
+            & > p:nth-child(1) {
+              font-size: 12px;
+            }
+            & > p:nth-child(2) {
+              font-size: 14px;
+            }
+          }
 
-.lane_outcome .panel .lane {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
+          img.hero {
+            width: 24px;
+            height: 24px;
+          }
 
-.lane_outcome .panel .lane > .title {
-  width: 100%;
-  text-align: center;
-  height: 32px;
-}
+          .kda {
+            height: 100%;
+            line-height: 32px;
+            text-align: center;
+            font-size: 10px;
+          }
 
-.lane_outcome .panel .lane > .title > p:nth-child(1) {
-  font-size: 12px;
-}
+          .graph {
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-.lane_outcome .panel .lane > .title > p:nth-child(2) {
-  font-size: 14px;
-}
+            svg {
+              shape-rendering: crispEdges;
+            }
 
-.lane_outcome .panel .details {
-  display: grid;
-  grid-template-columns: 24px 32px 44px auto 44px 32px 24px;
-  grid-template-rows: 1fr;
-  gap: 1px;
-  font-size: 12px;
-  height: 32px;
-  line-height: 32px;
-  align-items: center;
-}
+            text {
+              dominant-baseline: middle; /* 垂直居中 */
+              white-space: nowrap; /* 防止换行 */
+            }
+          }
+        }
 
-.lane_outcome .panel .lane img.hero {
-  width: 24px;
-  height: 24px;
-}
+        .details {
+          display: grid;
+          grid-template-columns: 24px 32px 44px auto 44px 32px 24px;
+          grid-template-rows: 1fr;
+          gap: 1px;
+          font-size: 12px;
+          height: 32px;
+          line-height: 32px;
+          align-items: center;
+        }
+      }
 
-.lane_outcome .panel .lane .kda {
-  height: 100%;
-  line-height: 32px;
-  text-align: center;
-  font-size: 10px;
-}
+      .subtitle {
+        position: absolute;
+        inset: 0;
+        top: 36px;
+        text-align: center;
+        color: #ccc;
+        font-size: 12px;
+        margin: 0;
+        z-index: 1;
+      }
+    }
 
-.lane_outcome .panel .lane .graph {
-  height: 32px;
-  display: flex;
-  align-items: center;
-}
+    .map {
+      box-sizing: border-box;
+      width: 300px;
+      padding: 25px;
+      font-size: 8px;
+      pointer-events: none;
+      text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.8);
 
-.graph svg {
-  shape-rendering: crispEdges;
-}
-.graph text {
-  dominant-baseline: middle; /* 垂直居中 */
-  white-space: nowrap; /* 防止换行 */
-}
-
-.lane_outcome .subtitle {
-  position: absolute;
-  inset: 0;
-  top: 36px;
-  text-align: center;
-  color: #ccc;
-  font-size: 12px;
-  margin: 0;
-  z-index: 1;
+      use {
+        &.radiant {
+          color: #95cc4b;
+        }
+        &.dire {
+          color: #ca4633;
+        }
+        &.dead {
+          color: #555;
+        }
+      }
+    }
+  }
 }

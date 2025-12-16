@@ -1,7 +1,7 @@
 <%# --- 基础配置 --- %>
 <% const match = data; %>
 <% const svgWidth = 400; %>
-<% const svgHeight = 200; %>
+<% const svgHeight = 225; %>
 <% const padding = 50; %>
 <% const chartH = svgHeight - padding * 2; %>
 <% const chartW = svgWidth - padding * 2; %>
@@ -47,9 +47,13 @@
 <%# --- 胜率折线 --- %>
 <% const wrPoints = match.winRates ? [match.winRates[0]].concat(match.winRates).map((v, i) => `${getX(i)},${svgHeight - padding - v * chartH}`).join(' ') : ''; %>
 
-<%# --- 轴标签数据 --- %>
+<%# --- 轴标签数据 (保留线，仅标记隐藏文字) --- %>
 <% const timeLabels = []; %>
-<% for (let i = 0; i < mainData.length - 1; i += 10) timeLabels.push({ x: getX(i), text: `${i.toString().padStart(2, '0')}:00` }); %>
+<% for (let i = 0; i < mainData.length - 1; i += 10) { %>
+  <%# 如果当前刻度距离结束时间小于5分钟，则标记不显示文字，但保留数据用于画线 %>
+  <% timeLabels.push({ x: getX(i), text: `${i.toString().padStart(2, '0')}:00`, showText: ((duration / 60) - i) >= 5 }); %>
+<% } %>
+
 <% const valLabels = [maxVal, maxVal / 2, 0, -maxVal / 2, -maxVal]; %>
 
 <%# --- 玩家经济折线 (Player Networth) --- %>
@@ -78,8 +82,12 @@
 
     <%# 纵轴线与时间标签 %>
     <% timeLabels.forEach(lbl => { %>
+      <%# 始终绘制网格线 %>
       <line x1="<%= lbl.x %>" y1="<%= padding %>" x2="<%= lbl.x %>" y2="<%= svgHeight - padding %>" stroke="lightgray" stroke-width="1" />
+      <%# 仅在不重叠时绘制文字 %>
+      <% if (lbl.showText) { %>
       <text x="<%= lbl.x %>" y="<%= svgHeight - padding + 15 %>" text-anchor="middle" fill="#333a"><%= lbl.text %></text>
+      <% } %>
     <% }); %>
 
     <%# 结束时间轴 %>
@@ -132,7 +140,7 @@
     <% } else { %>
       <text x="50%" y="30" text-anchor="middle" font-size="16" font-weight="bold"><%= $t("dota2tracker.template.networth") %></text>
 
-      <%# 坐标轴与标签 (同上，简化写法) %>
+      <%# 坐标轴与标签 %>
       <% for (let i = 0; i < 5; i++) { %>
         <% const y = padding + i * (chartH / 4); %>
         <line x1="<%= padding %>" y1="<%= y %>" x2="<%= svgWidth - padding %>" y2="<%= y %>" stroke="gray" stroke-width="1" />
@@ -141,8 +149,12 @@
 
       <%# 时间轴 %>
       <% timeLabels.forEach(lbl => { %>
+        <%# 始终绘制网格线 %>
         <line x1="<%= lbl.x %>" y1="<%= padding %>" x2="<%= lbl.x %>" y2="<%= svgHeight - padding %>" stroke="lightgray" stroke-width="1" />
+        <%# 仅在不重叠时绘制文字 %>
+        <% if (lbl.showText) { %>
         <text x="<%= lbl.x %>" y="<%= svgHeight - padding + 15 %>" text-anchor="middle" fill="#333a"><%= lbl.text %></text>
+        <% } %>
       <% }); %>
       <line x1="<%= svgWidth - padding %>" y1="<%= padding %>" x2="<%= svgWidth - padding %>" y2="<%= svgHeight - padding %>" stroke="lightgray" stroke-width="1" />
       <text x="<%= svgWidth - padding %>" y="<%= svgHeight - padding + 15 %>" text-anchor="middle" fill="#333a"><%= `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}` %></text>
@@ -154,7 +166,7 @@
         <polyline points="<%= pts %>" fill="none" stroke="<%= color %>" stroke-width="2" />
       <% }); %>
 
-      <%# 底部图例 (玩家头像) %>
+      <%# 底部图例 (使用浅拷贝排序) %>
       <g transform="translate(<%= (svgWidth - (match.players.length * 30)) / 2 %>, <%= svgHeight - 27 %>)">
         <% [...match.players].sort((a, b) => a.networth - b.networth).forEach((p, i) => { %>
           <% const color = pColors[p.playerSlot] || '#000'; %>

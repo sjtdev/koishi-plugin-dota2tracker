@@ -1,0 +1,132 @@
+<svg style="display: none">
+  <defs>
+    <symbol id="tower" viewBox="0 0 64 64">
+      <rect x="8" y="8" width="48" height="48" fill="#000" />
+
+      <rect x="14" y="14" width="36" height="36" fill="currentColor" />
+
+      <rect x="14" y="36" width="36" height="14" fill="#000" fill-opacity="0.2" />
+    </symbol>
+
+    <symbol id="tower_angle" viewBox="0 0 64 64">
+      <path d="M32,4 L8,22 L8,40 L32,58 L56,40 L56,22 Z" stroke="#000" stroke-width="10" stroke-linejoin="round" />
+
+      <path d="M32,4 L8,22 L8,40 L32,58 L56,40 L56,22 Z" fill="currentColor" />
+
+      <path d="M8,22 L32,40 L32,58 L8,40 Z" fill="#000" fill-opacity="0.2" />
+
+      <path d="M56,22 L32,40 L32,58 L56,40 Z" fill="#000" fill-opacity="0.4" />
+    </symbol>
+
+    <symbol id="rax" viewBox="0 0 64 64">
+      <rect x="8" y="8" width="48" height="48" fill="#000" />
+
+      <rect x="14" y="14" width="36" height="36" fill="currentColor" />
+
+      <path d="M 14 14 L 14 39 L 19 34 L 19 16 Z" fill="#000" fill-opacity="0.05" />
+
+      <path d="M 14 14 L 50 14 L 45 16 L 19 16 Z" fill="#000" fill-opacity="0.5" />
+
+      <path d="M 45 16 L 50 14 L 50 39 L 45 34 Z" fill="#000" fill-opacity="0.25" />
+
+      <path d="M 14 39 L 19 34 L 45 34 L 50 39 Z" fill="#000" fill-opacity="0.15" />
+
+      <rect x="14" y="39" width="36" height="11" fill="#000" fill-opacity="0.25" />
+
+      <rect x="19" y="8" width="26" height="26" fill="#000" />
+
+      <rect x="20" y="9" width="24" height="24" fill="currentColor" />
+
+      <path d="M 20 9 L 32 13 L 20 25 Z" fill="#000" fill-opacity="0.05" />
+
+      <path d="M 20 9 L 32 13 L 44 9 Z" fill="#000" fill-opacity="0.5" />
+
+      <path d="M 44 9 L 32 13 L 44 25 Z" fill="#000" fill-opacity="0.25" />
+
+      <path d="M 20 25 L 32 13 L 44 25 Z" fill="#000" fill-opacity="0.15" />
+
+      <rect x="20" y="25" width="24" height="8" fill="#000" fill-opacity="0.25" />
+    </symbol>
+
+    <symbol id="rax_angle" viewBox="0 0 48 48">
+      <!-- 屋顶外描边 -->
+      <path d="M14 12 L24 4 L34 12 L34 18 L24 26 L14 18 Z" fill="#000" stroke="#000" stroke-width="8" stroke-linejoin="round" />
+      <!-- 底座外描边 -->
+      <path d="M6 22 L24 6 L42 22 L42 30 L24 44 L6 30 Z" fill="#000" stroke="#000" stroke-width="8" stroke-linejoin="round" />
+      <!-- 底座主体 -->
+      <path d="M6 22 L24 6 L42 22 L42 30 L24 44 L6 30 Z" fill="currentColor" />
+
+      <!-- 底座下方左阴影面 -->
+      <path d="M6 22 L24 36 L24 44 L6 30 Z" fill="#000" fill-opacity="0.25" />
+      <!-- 底座下方右阴影面 -->
+      <path d="M42 22 L24 36 L24 44 L42 30 Z" fill="#000" fill-opacity="0.35" />
+      <!-- 底座左上阴影 -->
+      <path d="M6 22 L24 13 L24 6 Z" fill="#000" fill-opacity="0.22" />
+      <!-- 底座右上阴影 -->
+      <path d="M42 22 L24 13 L24 6 Z" fill="#000" fill-opacity="0.38" />
+      <!-- 底座右下阴影 -->
+      <path d="M42 22 L24 13 L24 36 Z" fill="#000" fill-opacity="0.32" />
+
+      <!-- 屋顶内描边 -->
+      <path d="M14 12 L24 4 L34 12 L34 18 L24 26 L14 18 Z" fill="#000" stroke="#000" stroke-width="2" />
+      <!-- 屋顶主体 -->
+      <path d="M14 12 L24 4 L34 12 L34 18 L24 26 L14 18 Z" fill="currentColor" />
+      <!-- 屋顶下方左阴影面 -->
+      <path d="M14 12 L24 20 L24 26 L14 18 Z" fill="#000" fill-opacity="0.25" />
+      <!-- 屋顶下方右阴影面 -->
+      <path d="M34 12 L24 20 L24 26 L34 18 Z" fill="#000" fill-opacity="0.35" />
+      <!-- 屋顶左上阴影 -->
+      <path d="M14 12 L24 4 L24 7Z" fill="#000" fill-opacity="0.22" />
+      <!-- 屋顶右上阴影 -->
+      <path d="M34 12 L24 4 L24 7Z" fill="#000" fill-opacity="0.38" />
+      <!-- 屋顶右下阴影 -->
+      <path d="M24 20 L24 7L34 12 Z" fill="#000" fill-opacity="0.32" />
+    </symbol>
+
+    <symbol id="fort" viewBox="0 0 64 64">
+      <path
+        fill="#000"
+        stroke="#000"
+        stroke-width="10"
+        stroke-linejoin="round"
+        d="M 50.5 23.7
+               L 48.4 20.2
+               L 45.4 15.1 L 41.0 18.0 L 39.1 15.8 L 38.2 9.9 L 37.7 6.9 L 35.3 6.9
+               L 32.5 8.3 L 27.2 14.5 L 24.1 19.5 L 22.9 20.2 L 21.7 20.4 L 19.3 19.7
+               L 15.4 23.5 L 15.4 24.9 L 19.7 29.6 L 19.5 32.8 L 17.9 34.5 L 15.4 34.9 L 15.3 37.2
+               L 23.7 49.2 L 37.1 57.5 L 52.4 37.8 L 52.5 27.7 L 47.1 30.0 L 50.5 23.7 Z"
+      />
+
+      <path
+        fill="currentColor"
+        d="M 50.5 23.7
+               L 48.4 20.2
+               L 45.4 15.1 L 41.0 18.0 L 39.1 15.8 L 38.2 9.9 L 37.7 6.9 L 35.3 6.9
+               L 32.5 8.3 L 27.2 14.5 L 24.1 19.5 L 22.9 20.2 L 21.7 20.4 L 19.3 19.7
+               L 15.4 23.5 L 15.4 24.9 L 19.7 29.6 L 19.5 32.8 L 17.9 34.5 L 15.4 34.9 L 15.3 37.2
+               L 23.7 49.2 L 37.1 57.5 L 52.4 37.8 L 52.5 27.7 L 47.1 30.0 L 50.5 23.7 Z"
+      />
+
+      <path
+        fill="#000"
+        fill-opacity="0.25"
+        d="M 39.1 15.8 L 29.3 28.5 L 31.1 34.2 L 26.5 40.5 L 28.2 49.5 L 37.1 57.5
+               L 23.7 49.2 L 15.3 37.2 L 22.1 39.9 L 22.3 34.9 L 21.1 33.3 L 19.5 32.8
+               L 19.7 29.6 L 15.4 24.9 C 15.4 25.0 15.4 23.5 15.4 23.5 L 16.8 22.3
+               L 23.2 30.1 L 26.1 27.2 L 25.9 23.2 L 27.4 20.6 L 29.1 17.0 L 38.2 9.9 L 39.1 15.8 Z
+               M 36.3 52.7 L 41.4 39.0 L 45.8 34.8 L 52.5 31.5 L 52.5 27.7 L 47.1 30.0
+               L 44.3 33.0 L 39.9 30.7 L 33.8 36.0 L 38.6 39.0 L 29.7 46.5 L 36.3 52.7 Z"
+      />
+
+      <path
+        fill="#000"
+        fill-opacity="0.4"
+        d="M 33.8 36.0 L 39.9 30.7 L 44.3 33.0 L 47.1 30.0
+               L 50.5 23.7 L 48.4 20.2 L 37.0 27.9 L 41.0 18.0 L 39.1 15.8
+               L 29.3 28.5 L 31.1 34.2 L 33.8 36.0 Z
+               M 26.5 40.5 L 29.7 46.5 L 36.3 52.7 L 41.4 39.0 L 45.8 34.8 L 52.5 31.5
+               L 52.5 37.8 L 37.1 57.5 L 28.2 49.5 L 26.5 40.5 Z"
+      />
+    </symbol>
+  </defs>
+</svg>

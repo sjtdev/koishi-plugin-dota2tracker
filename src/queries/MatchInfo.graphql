@@ -20,6 +20,19 @@ query MatchInfo($matchId: Long!) {
     radiantNetworthLeads
     radiantExperienceLeads
     winRates
+
+    towerStatusRadiant
+    towerStatusDire
+    barracksStatusRadiant
+    barracksStatusDire
+
+    playbackData {
+      buildingEvents {
+        time
+        npcId
+      }
+    }
+
     players {
       steamAccountId
       steamAccount {
