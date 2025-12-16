@@ -38,7 +38,7 @@ export class StratzAPI extends Service<Config> {
   }
 
   public async queryGetWeeklyMetaByPosition({ bracketIds }: graphql.GetWeeklyMetaByPositionQueryVariables) {
-    return this.query<graphql.GetWeeklyMetaByPositionQueryVariables, graphql.GetWeeklyMetaByPositionQuery>("GetWeeklyMetaByPosition", { bracketIds }, (data) => !!data.heroStats);
+    return this.query<graphql.GetWeeklyMetaByPositionQueryVariables, graphql.GetWeeklyMetaByPositionQuery>("GetWeeklyMetaByPosition", { bracketIds }, (data) => !!data?.heroStats);
   }
 
   public async queryPlayerPerformanceForHeroRecommendation({ steamAccountId, recentDateTime }: graphql.PlayerPerformanceForHeroRecommendationQueryVariables) {
@@ -48,7 +48,7 @@ export class StratzAPI extends Service<Config> {
         steamAccountId,
         recentDateTime,
       },
-      (data) => !!data.player,
+      (data) => !!data?.player,
     );
   }
 
@@ -59,12 +59,12 @@ export class StratzAPI extends Service<Config> {
         steamAccountIds,
         seconds,
       },
-      (data) => !!data.players,
+      (data) => !!data?.players,
     );
   }
 
   public async queryVerifyingPlayer(steamAccountId: number) {
-    return this.query<graphql.VerifyingPlayerQueryVariables, graphql.VerifyingPlayerQuery>("VerifyingPlayer", { steamAccountId }, (data) => !!data.player);
+    return this.query<graphql.VerifyingPlayerQueryVariables, graphql.VerifyingPlayerQuery>("VerifyingPlayer", { steamAccountId }, (data) => !!data?.player);
   }
 
   public async queryPlayerExtraInfo({ steamAccountId, matchCount, heroIds }: graphql.PlayerExtraInfoQueryVariables) {
@@ -75,11 +75,11 @@ export class StratzAPI extends Service<Config> {
         matchCount,
         heroIds,
       },
-      (data) => !!data.player,
+      (data) => !!data?.player,
     );
   }
   public async queryPlayersInfoWith10MatchesForGuild({ steamAccountIds }: graphql.PlayersInfoWith10MatchesForGuildQueryVariables): Promise<graphql.PlayersInfoWith10MatchesForGuildQuery> {
-    return this.query<graphql.PlayersInfoWith10MatchesForGuildQueryVariables, graphql.PlayersInfoWith10MatchesForGuildQuery>("PlayersInfoWith10MatchesForGuild", { steamAccountIds }, (data) => !!data.players);
+    return this.query<graphql.PlayersInfoWith10MatchesForGuildQueryVariables, graphql.PlayersInfoWith10MatchesForGuildQuery>("PlayersInfoWith10MatchesForGuild", { steamAccountIds }, (data) => !!data?.players);
   }
 
   public async queryPlayerInfoWith25Matches({ steamAccountId, heroIds }: graphql.PlayerInfoWith25MatchesQueryVariables) {
@@ -89,20 +89,20 @@ export class StratzAPI extends Service<Config> {
         steamAccountId,
         heroIds,
       },
-      (data) => !!data.player,
+      (data) => !!data?.player,
     );
   }
 
   public async queryPlayersLastMatchRankInfo({ steamAccountIds }: graphql.PlayersLastmatchRankinfoQueryVariables): Promise<graphql.PlayersLastmatchRankinfoQuery> {
-    return this.query<graphql.PlayersLastmatchRankinfoQueryVariables, graphql.PlayersLastmatchRankinfoQuery>("PlayersLastmatchRankinfo", { steamAccountIds }, (data) => !!data.players);
+    return this.query<graphql.PlayersLastmatchRankinfoQueryVariables, graphql.PlayersLastmatchRankinfoQuery>("PlayersLastmatchRankinfo", { steamAccountIds }, (data) => !!data?.players);
   }
 
   public async queryConstants(languageTag: string) {
-    return this.query<graphql.ConstantsQueryVariables, graphql.ConstantsQuery>("Constants", { language: this.ctx.dota2tracker.i18n.getGraphqlLanguageTag(languageTag) as graphql.LanguageEnum }, (data) => !!data.constants);
+    return this.query<graphql.ConstantsQueryVariables, graphql.ConstantsQuery>("Constants", { language: this.ctx.dota2tracker.i18n.getGraphqlLanguageTag(languageTag) as graphql.LanguageEnum }, (data) => !!data?.constants);
   }
 
   public async queryMatchInfo(matchId: number) {
-    return this.query<graphql.MatchInfoQueryVariables, graphql.MatchInfoQuery>("MatchInfo", { matchId }, (data) => !!data.match);
+    return this.query<graphql.MatchInfoQueryVariables, graphql.MatchInfoQuery>("MatchInfo", { matchId }, (data) => !!data?.match);
   }
 
   public async requestParseMatch(matchId: number) {
