@@ -1,11 +1,14 @@
 import { Context, Service } from "koishi";
 import { Benchmarks, OpenDotaMatch } from "../../@types/opendota-generated";
-import * as dotaconstants from "dotaconstants";
+import type ConstantsType from "dotaconstants";
 import { LeaverStatusEnum, MatchInfoQuery, MatchLaneType, MatchPlayerPositionType, LaneOutcomeEnums, LobbyTypeEnum, GameModeEnumType } from "../../@types/graphql-generated";
 import { clamp } from "../common/utils";
 
 export class OpenDotaAdapter extends Service {
-  constructor(ctx: Context) {
+  constructor(
+    ctx: Context,
+    private dotaconstants: typeof ConstantsType,
+  ) {
     super(ctx, "dota2tracker.opendota-adapter", true);
   }
 
@@ -56,9 +59,9 @@ export class OpenDotaAdapter extends Service {
         steamAccount: { name: _player.personaname, seasonRank: _player.rank_tier, seasonLeaderboardRank: null },
         hero: {
           id: _player.hero_id,
-          name: dotaconstants.heroes[_player.hero_id].name,
-          shortName: dotaconstants.heroes[_player.hero_id].name.match(/^npc_dota_hero_(.+)$/)[1],
-          facets: [...dotaconstants.hero_abilities[dotaconstants.heroes[_player.hero_id].name].facets.map((f) => ({ id: -1, name: f.name }))],
+          name: this.dotaconstants.heroes[_player.hero_id].name,
+          shortName: this.dotaconstants.heroes[_player.hero_id].name.match(/^npc_dota_hero_(.+)$/)[1],
+          facets: [...this.dotaconstants.hero_abilities[this.dotaconstants.heroes[_player.hero_id].name].facets.map((f) => ({ id: -1, name: f.name }))],
         },
         dotaPlus: null,
         stats: {
@@ -89,7 +92,7 @@ export class OpenDotaAdapter extends Service {
               disableCount: 0,
             },
           },
-          itemPurchases: _player.purchase_log.map((p) => ({ time: p.time, itemId: dotaconstants.items[p.key].id })),
+          itemPurchases: _player.purchase_log.map((p) => ({ time: p.time, itemId: this.dotaconstants.items[p.key].id })),
         },
         additionalUnit: null,
       };
@@ -118,8 +121,8 @@ export class OpenDotaAdapter extends Service {
     const match: StrictMatchInfo = {
       id: _match.match_id,
       didRadiantWin: _match.radiant_win,
-      lobbyType: convertLobbyType(_match.lobby_type),
-      gameMode: convertGameMode(_match.game_mode),
+      lobbyType: convertLobbyType(_match.lobby_type, this.dotaconstants),
+      gameMode: convertGameMode(_match.game_mode, this.dotaconstants),
       regionId: _match.region,
       parsedDateTime: _match.start_time + _match.duration,
       startDateTime: _match.start_time,
@@ -219,7 +222,7 @@ function convertPosition(openDotaPosition: number): MatchPlayerPositionType {
   }
 }
 
-function convertLobbyType(openDotaLobbyType: number): LobbyTypeEnum {
+function convertLobbyType(openDotaLobbyType: number, dotaconstants: typeof ConstantsType): LobbyTypeEnum {
   const map = {
     lobby_type_normal: LobbyTypeEnum.Unranked,
     lobby_type_practice: LobbyTypeEnum.Practice,
@@ -239,7 +242,7 @@ function convertLobbyType(openDotaLobbyType: number): LobbyTypeEnum {
   return map[dotaconstants.lobby_type[openDotaLobbyType].name] || LobbyTypeEnum.Event;
 }
 
-function convertGameMode(openDotaGameModeId: number): GameModeEnumType {
+function convertGameMode(openDotaGameModeId: number, dotaconstants: typeof ConstantsType): GameModeEnumType {
   const gameModeName = dotaconstants.game_mode[openDotaGameModeId]?.name;
 
   switch (gameModeName) {

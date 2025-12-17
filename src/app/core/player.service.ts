@@ -1,14 +1,17 @@
 import { Context, Random, Service, Session } from "koishi";
 import * as graphql from "../../@types/graphql-generated";
 import { HeroScoreBreakdown, PlayerInfoEx } from "../data/types";
-import * as dotaconstants from "dotaconstants";
+import type ConstantsType from "dotaconstants";
 import { Config } from "../../config";
 import { clamp, enhancedSimpleHashToSeed, sec2time } from "../common/utils";
 import { DateTime } from "luxon";
 import { RANK_BRACKETS } from "../common/constants";
 
 export class PlayerService extends Service {
-  constructor(ctx: Context) {
+  constructor(
+    ctx: Context,
+    private dotaconstants: typeof ConstantsType,
+  ) {
     super(ctx, "dota2tracker.player", true);
     this.config = ctx.config;
   }
@@ -169,12 +172,15 @@ export class PlayerService extends Service {
             dotaPlus: null,
           },
         };
-    const player = PlayerService.extendPlayerData({
-      playerQuery,
-      playerExtraQuery,
-      genHero: heroId ? { heroId, name: this.ctx.dota2tracker.i18n.getConstantLocale(languageTag).dota2tracker.template.hero_names[heroId] } : null,
-      estimateRank: this.config.playerRankEstimate,
-    });
+    const player = PlayerService.extendPlayerData(
+      {
+        playerQuery,
+        playerExtraQuery,
+        genHero: heroId ? { heroId, name: this.ctx.dota2tracker.i18n.getConstantLocale(languageTag).dota2tracker.template.hero_names[heroId] } : null,
+        estimateRank: this.config.playerRankEstimate,
+      },
+      this.dotaconstants,
+    );
     return player;
   }
 
@@ -206,7 +212,10 @@ export class PlayerService extends Service {
     }
   }
 
-  public static extendPlayerData(param: { playerQuery: graphql.PlayerInfoWith25MatchesQuery; playerExtraQuery?: graphql.PlayerExtraInfoQuery; genHero?: { heroId: number; name: string }; estimateRank?: boolean }) {
+  public static extendPlayerData(
+    param: { playerQuery: graphql.PlayerInfoWith25MatchesQuery; playerExtraQuery?: graphql.PlayerExtraInfoQuery; genHero?: { heroId: number; name: string }; estimateRank?: boolean },
+    dotaconstants: typeof ConstantsType,
+  ) {
     const { playerQuery, playerExtraQuery, genHero, estimateRank } = param;
     const player = playerQuery.player as PlayerInfoEx;
     const playerExtra = playerExtraQuery?.player;

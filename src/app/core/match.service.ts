@@ -1,7 +1,7 @@
 import { Context, Service } from "koishi";
 import * as graphql from "../../@types/graphql-generated";
 import { MatchInfoEx, PlayerInfoExInMatch } from "../data/types";
-import * as dotaconstants from "dotaconstants";
+import type ConstantsType from "dotaconstants";
 import { sec2time, formatNumber } from "../common/utils";
 import { HeroService } from "./hero.service";
 import { FetchMatchDataFailError, handleError } from "../common/error";
@@ -10,6 +10,7 @@ export class MatchService extends Service {
   constructor(
     ctx: Context,
     private pluginVersion: string,
+    private dotaconstants: typeof ConstantsType,
   ) {
     super(ctx, "dota2tracker.match", true);
   }
@@ -167,7 +168,7 @@ export class MatchService extends Service {
       const facetData = await MatchService.constantsInjectFacetData(constantsQuery, matchQuery, languageTag, this.ctx.dota2tracker.hero);
       this.ctx.dota2tracker.cache.setFacetConstantsCache(languageTag, constantsQuery);
       // Step 4: 扩展比赛数据
-      const match = MatchService.extendMatchData(matchQuery, facetData);
+      const match = MatchService.extendMatchData(matchQuery, facetData, this.dotaconstants);
       return match;
     } catch (error) {
       // 查询失败时删除缓存
@@ -198,7 +199,7 @@ export class MatchService extends Service {
   }
 
   // 对比赛数据进行补充以供生成模板函数使用
-  public static extendMatchData(matchQuery: graphql.MatchInfoQuery, facetData: Record<string, PlayerInfoExInMatch["facet"]>): MatchInfoEx {
+  public static extendMatchData(matchQuery: graphql.MatchInfoQuery, facetData: Record<string, PlayerInfoExInMatch["facet"]>, dotaconstants: typeof ConstantsType): MatchInfoEx {
     const match = matchQuery.match as MatchInfoEx;
     // if (!match.parsedDateTime)
     //     return match;
@@ -375,7 +376,7 @@ export class MatchService extends Service {
       player.items = [];
       for (let i = 0; i <= 5; i++) {
         const itemId = player[`item${i}Id`];
-        const itemObject = createItemObject(itemId, purchaseTimesMap, purchaseTimeIndices);
+        const itemObject = createItemObject(itemId, purchaseTimesMap, purchaseTimeIndices, dotaconstants);
         player.items.push(itemObject);
       }
 
@@ -383,7 +384,7 @@ export class MatchService extends Service {
       player.backpacks = [];
       for (let i = 0; i <= 2; i++) {
         const itemId = player[`backpack${i}Id`];
-        const itemObject = createItemObject(itemId, purchaseTimesMap, purchaseTimeIndices);
+        const itemObject = createItemObject(itemId, purchaseTimesMap, purchaseTimeIndices, dotaconstants);
         player.backpacks.push(itemObject);
       }
 
@@ -394,14 +395,14 @@ export class MatchService extends Service {
         // 提取 item0Id 到 item5Id
         for (let i = 0; i <= 5; i++) {
           const itemId = player.additionalUnit[`item${i}Id`];
-          const itemObject = createItemObject(itemId, purchaseTimesMap, purchaseTimeIndices);
+          const itemObject = createItemObject(itemId, purchaseTimesMap, purchaseTimeIndices, dotaconstants);
           player.unitItems.push(itemObject);
         }
 
         // 提取 backpack0Id 到 backpack2Id
         for (let i = 0; i <= 2; i++) {
           const itemId = player.additionalUnit[`backpack${i}Id`];
-          const itemObject = createItemObject(itemId, purchaseTimesMap, purchaseTimeIndices);
+          const itemObject = createItemObject(itemId, purchaseTimesMap, purchaseTimeIndices, dotaconstants);
           player.unitBackpacks.push(itemObject);
         }
       }
@@ -512,7 +513,7 @@ export class MatchService extends Service {
   }
 }
 
-function createItemObject(itemId: number, purchaseTimesMap: { [key: number]: number[] }, purchaseTimeIndices: Map<number, number>) {
+function createItemObject(itemId: number, purchaseTimesMap: { [key: number]: number[] }, purchaseTimeIndices: Map<number, number>, dotaconstants) {
   if (itemId === undefined || itemId === null) {
     return null; // 如果没有物品ID，直接返回null
   }

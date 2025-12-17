@@ -1,5 +1,5 @@
 import { Context, Service, Channel, I18n, Session, Random } from "koishi";
-import * as dotaconstants from "dotaconstants";
+import type ConstantsType from "dotaconstants";
 import { Config } from "../../config";
 import { enhancedSimpleHashToSeed } from "./utils";
 
@@ -14,7 +14,10 @@ export class I18NService extends Service<Config> {
   private readonly constantLocales = {};
   private readonly i18n: I18n;
   private readonly globalLanguageTag: string;
-  constructor(ctx: Context) {
+  constructor(
+    ctx: Context,
+    private dotaconstants: typeof ConstantsType,
+  ) {
     super(ctx, "dota2tracker.i18n", true);
     this.config = ctx.config;
     this.i18n = this.ctx.i18n;
@@ -167,7 +170,7 @@ export class I18NService extends Service<Config> {
    */
   private _buildNicknameMap(languageTag: string): Map<string, number> {
     this.logger.debug(`Building nickname map for ${languageTag}...`);
-    const heroIds = Object.keys(dotaconstants.heroes).map(Number);
+    const heroIds = Object.keys(this.dotaconstants.heroes).map(Number);
     const nicknameMap = new Map<string, number>();
 
     for (const heroId of heroIds) {
@@ -187,7 +190,7 @@ export class I18NService extends Service<Config> {
     // 1. 优先检查输入是否是纯数字ID
     if (/^\d+$/.test(inputStr)) {
       const heroId = Number(inputStr);
-      if (dotaconstants.heroes[heroId]) {
+      if (this.dotaconstants.heroes[heroId]) {
         return heroId;
       }
     }
