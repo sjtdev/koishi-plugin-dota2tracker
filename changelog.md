@@ -1,5 +1,11 @@
 # 更新日志
 
+### [2.3.1](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.3.0...v2.3.1) (2025-12-17)
+
+### 🐛 Bug 修复
+
+* 修复依赖`dotaconstants`的新版本在部分环境中无法引用导致插件启用失败的问题。 ([045cd0c](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/045cd0c8a66dda2bf084a3b5d6470250a372a366))
+
 ## [2.3.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.2.3...v2.3.0) (2025-12-17)
 
 ### ✨ 新增功能
