@@ -1,5 +1,27 @@
 # 更新日志
 
+## [2.3.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.2.3...v2.3.0) (2025-12-17)
+
+### ✨ 新增功能
+
+* 适配`7.40`新英雄 **朗戈**，更新`dotaconstants`依赖。 ([8308ed9](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/8308ed96c641519ec52a39329e2c3312b0fa2dc8))
+* **templates/match_2+:** 添加小地图，显示防御塔、兵营、基地的存活状态，数据可用时显示建筑被拆毁时间。（高地仅显示各路近战兵营被破时间、4塔被全部拆除时间、基地时间） ([923b40f](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/923b40fc8f24e05ce4b28dfa9a20ad3166c8e2f5))
+
+### 🚀 功能优化
+
+* **api:** 将超时时间从10秒统一上调到15秒，解决某些数据量大的耗时任务失败概率高的问题。 ([b3f51de](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/b3f51defd49ac7c9c176f894aa9d94d9b392b3aa))
+* **logger:** 优化部分查询情况下的报错提示日志。 ([79ba28b](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/79ba28b4822df8858e4f4c8d71303b339d407569))
+
+### 🐛 Bug 修复
+
+* **command/query-hero:** 修复了指令`查询英雄`无参数但携带`-r/--random`选项无响应的问题。（即无法通过`查询英雄 -r`直接随机查询英雄的问题） ([c56a22c](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/c56a22caacf65eef573e6434b1032b06f589c2b8))
+* **command/query-match:** 修复`2.2.2`更新导致指令`查询比赛`不可用的问题。 ([be5061c](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/be5061c9b67593cceb8067d480b965cb47c53d4d))
+
+### ⚡ 性能提升
+
+* **command/query-match:** 清理`2.0.0`大型重构时遗留耗时代码，提升执行速度。 ([4c0bf34](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/4c0bf34c358af3d508bf1be6be88fd1e86fefc17))
+* **templates:** 重构大部分模板，使其构建打包后体积更小，略微提升生成速度。 ([fdf1d33](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/fdf1d3367e12f8e46124df31d6f432e7fd0a7187))
+
 ### [2.2.3](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.2.2...v2.2.3) (2025-11-20)
 
 ### 🎨 样式
