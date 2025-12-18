@@ -24,6 +24,7 @@ backup.ts
 # VitePress cache
 **/.vitepress/cache
 
-# 当前文档使用图片由本地构建，不再需要将临时测试数据上传至远程仓库。
+# 当前文档使用图片由本地构建，不再需要将临时测试数据和图片构建脚本上传至远程仓库。
 src/docs/.vitepress/data/*
 !src/docs/.vitepress/data/.gitkeep
+scripts
