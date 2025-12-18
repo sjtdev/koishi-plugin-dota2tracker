@@ -51,11 +51,12 @@ export async function apply(ctx: Context, config: Config) {
   const pluginVersion = require(path.join(currentDir, "..", "package.json")).version as string;
   // 注册模块为自定义服务
   ctx.dota2tracker = {} as any;
-  ctx.dota2tracker.i18n = new I18NService(ctx, dotaconstants);
-  ctx.dota2tracker.image = new ImageRenderer(ctx, currentDir, dotaconstants);
+  ctx.dota2tracker.dotaconstants = dotaconstants;
+  ctx.dota2tracker.i18n = new I18NService(ctx);
+  ctx.dota2tracker.image = new ImageRenderer(ctx, currentDir);
   ctx.dota2tracker.messageBuilder = new MessageBuilder(ctx);
-  ctx.dota2tracker.match = new MatchService(ctx, pluginVersion, dotaconstants);
-  ctx.dota2tracker.player = new PlayerService(ctx, dotaconstants);
+  ctx.dota2tracker.match = new MatchService(ctx, pluginVersion);
+  ctx.dota2tracker.player = new PlayerService(ctx);
   if (ctx.cron) {
     ctx.dota2tracker.matchWatcher = new MatchWatcherTask(ctx);
     ctx.dota2tracker.parsePolling = new ParsePollingTask(ctx);
@@ -68,7 +69,7 @@ export async function apply(ctx: Context, config: Config) {
   } else {
     logger.info(ctx.dota2tracker.i18n.gt("dota2tracker.logger.cron_not_enabled"));
   }
-  ctx.dota2tracker.hero = new HeroService(ctx, dotaconstants);
+  ctx.dota2tracker.hero = new HeroService(ctx);
   ctx.dota2tracker.item = new ItemService(ctx);
   ctx.dota2tracker.cache = new CacheService(ctx);
   ctx.dota2tracker.database = new DatabaseService(ctx);
@@ -76,7 +77,7 @@ export async function apply(ctx: Context, config: Config) {
   ctx.dota2tracker.stratzAPI = new StratzAPI(ctx, currentDir);
   if (config.enableOpenDotaFallback) {
     ctx.dota2tracker.opendotaAPI = new OpenDotaAPI(ctx);
-    ctx.dota2tracker.opendotaAdapter = new OpenDotaAdapter(ctx, dotaconstants);
+    ctx.dota2tracker.opendotaAdapter = new OpenDotaAdapter(ctx);
   }
   ctx.dota2tracker = ctx.dota2tracker as DOTA2TrackerServices;
 

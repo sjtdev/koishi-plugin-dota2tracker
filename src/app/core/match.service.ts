@@ -10,7 +10,6 @@ export class MatchService extends Service {
   constructor(
     ctx: Context,
     private pluginVersion: string,
-    private dotaconstants: typeof ConstantsType,
   ) {
     super(ctx, "dota2tracker.match", true);
   }
@@ -168,7 +167,7 @@ export class MatchService extends Service {
       const facetData = await MatchService.constantsInjectFacetData(constantsQuery, matchQuery, languageTag, this.ctx.dota2tracker.hero);
       this.ctx.dota2tracker.cache.setFacetConstantsCache(languageTag, constantsQuery);
       // Step 4: 扩展比赛数据
-      const match = MatchService.extendMatchData(matchQuery, facetData, this.dotaconstants);
+      const match = MatchService.extendMatchData(matchQuery, facetData, this.ctx.dota2tracker.dotaconstants);
       return match;
     } catch (error) {
       // 查询失败时删除缓存

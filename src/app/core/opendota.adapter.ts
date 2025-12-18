@@ -5,10 +5,7 @@ import { LeaverStatusEnum, MatchInfoQuery, MatchLaneType, MatchPlayerPositionTyp
 import { clamp } from "../common/utils";
 
 export class OpenDotaAdapter extends Service {
-  constructor(
-    ctx: Context,
-    private dotaconstants: typeof ConstantsType,
-  ) {
+  constructor(ctx: Context) {
     super(ctx, "dota2tracker.opendota-adapter", true);
   }
 
@@ -59,9 +56,9 @@ export class OpenDotaAdapter extends Service {
         steamAccount: { name: _player.personaname, seasonRank: _player.rank_tier, seasonLeaderboardRank: null },
         hero: {
           id: _player.hero_id,
-          name: this.dotaconstants.heroes[_player.hero_id].name,
-          shortName: this.dotaconstants.heroes[_player.hero_id].name.match(/^npc_dota_hero_(.+)$/)[1],
-          facets: [...this.dotaconstants.hero_abilities[this.dotaconstants.heroes[_player.hero_id].name].facets.map((f) => ({ id: -1, name: f.name }))],
+          name: this.ctx.dota2tracker.dotaconstants.heroes[_player.hero_id].name,
+          shortName: this.ctx.dota2tracker.dotaconstants.heroes[_player.hero_id].name.match(/^npc_dota_hero_(.+)$/)[1],
+          facets: [...this.ctx.dota2tracker.dotaconstants.hero_abilities[this.ctx.dota2tracker.dotaconstants.heroes[_player.hero_id].name].facets.map((f) => ({ id: -1, name: f.name }))],
         },
         dotaPlus: null,
         stats: {
@@ -92,7 +89,7 @@ export class OpenDotaAdapter extends Service {
               disableCount: 0,
             },
           },
-          itemPurchases: _player.purchase_log.map((p) => ({ time: p.time, itemId: this.dotaconstants.items[p.key].id })),
+          itemPurchases: _player.purchase_log.map((p) => ({ time: p.time, itemId: this.ctx.dota2tracker.dotaconstants.items[p.key].id })),
         },
         additionalUnit: null,
       };
@@ -121,8 +118,8 @@ export class OpenDotaAdapter extends Service {
     const match: StrictMatchInfo = {
       id: _match.match_id,
       didRadiantWin: _match.radiant_win,
-      lobbyType: convertLobbyType(_match.lobby_type, this.dotaconstants),
-      gameMode: convertGameMode(_match.game_mode, this.dotaconstants),
+      lobbyType: convertLobbyType(_match.lobby_type, this.ctx.dota2tracker.dotaconstants),
+      gameMode: convertGameMode(_match.game_mode, this.ctx.dota2tracker.dotaconstants),
       regionId: _match.region,
       parsedDateTime: _match.start_time + _match.duration,
       startDateTime: _match.start_time,

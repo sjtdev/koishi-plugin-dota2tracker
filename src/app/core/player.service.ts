@@ -8,10 +8,7 @@ import { DateTime } from "luxon";
 import { RANK_BRACKETS } from "../common/constants";
 
 export class PlayerService extends Service {
-  constructor(
-    ctx: Context,
-    private dotaconstants: typeof ConstantsType,
-  ) {
+  constructor(ctx: Context) {
     super(ctx, "dota2tracker.player", true);
     this.config = ctx.config;
   }
@@ -179,7 +176,7 @@ export class PlayerService extends Service {
         genHero: heroId ? { heroId, name: this.ctx.dota2tracker.i18n.getConstantLocale(languageTag).dota2tracker.template.hero_names[heroId] } : null,
         estimateRank: this.config.playerRankEstimate,
       },
-      this.dotaconstants,
+      this.ctx.dota2tracker.dotaconstants,
     );
     return player;
   }

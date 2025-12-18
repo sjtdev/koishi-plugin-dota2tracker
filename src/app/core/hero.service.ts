@@ -1,5 +1,4 @@
 import { Context, Random, Service } from "koishi";
-import type ConstantsType from "dotaconstants";
 import { DateTime } from "luxon";
 import { RankBracket } from "../../@types/graphql-generated";
 import { RANK_BRACKETS } from "../common/constants";
@@ -7,10 +6,7 @@ import { clamp } from "../common/utils";
 import { WeeklyHeroMeta, HeroMeta } from "../data/types";
 
 export class HeroService extends Service {
-  constructor(
-    ctx: Context,
-    private dotaconstants: typeof ConstantsType,
-  ) {
+  constructor(ctx: Context) {
     super(ctx, "dota2tracker.hero", true);
   }
 
@@ -57,7 +53,7 @@ export class HeroService extends Service {
   }
 
   async getHeroDetails(input: any, languageTag: string, isRandom: boolean = false) {
-    const heroId = this.ctx.dota2tracker.i18n.findHeroIdInLocale(isRandom ? Random.pick(Object.keys(this.dotaconstants.heroes)) : input);
+    const heroId = this.ctx.dota2tracker.i18n.findHeroIdInLocale(isRandom ? Random.pick(Object.keys(this.ctx.dota2tracker.dotaconstants.heroes)) : input);
     if (!heroId) return;
     return HeroService.formatHeroDetails(await this.ctx.dota2tracker.valveAPI.queryHeroDetailsFromValve(heroId, languageTag));
   }

@@ -5,17 +5,12 @@ import path from "path";
 import { type Config } from "../../config";
 import {} from "koishi-plugin-puppeteer";
 import { TemplateType } from "../common/types";
-import type ConstantsType from "dotaconstants";
 import { ImageFormat, ImageType } from "../common/types";
 import { DateTime } from "luxon";
 
 export class ImageRenderer extends Service<Config> {
   private readonly templateDir: string;
-  constructor(
-    ctx: Context,
-    currentDir: string,
-    private dotaconstants: typeof ConstantsType,
-  ) {
+  constructor(ctx: Context, currentDir: string) {
     super(ctx, "dota2tracker.image", true);
     this.config = ctx.config;
     this.templateDir = path.join(currentDir, "templates");
@@ -36,7 +31,7 @@ export class ImageRenderer extends Service<Config> {
       data,
       ImageType,
       ImageFormat,
-      dotaconstants: this.dotaconstants,
+      dotaconstants: this.ctx.dota2tracker.dotaconstants,
       DateTime,
       $t: (key: string, params?: any) => this.ctx.dota2tracker.i18n.$t(languageTag, key, params),
       languageTag,

@@ -14,6 +14,7 @@ import { DatabaseService } from "../data/database";
 import { ReportTask } from "../tasks/report.task";
 import { OpenDotaAPI } from "../data/opendota.api";
 import { OpenDotaAdapter } from "./opendota.adapter";
+import type ConstantsType from "dotaconstants";
 
 export interface DOTA2TrackerServices {
   // 工具层
@@ -36,6 +37,7 @@ export interface DOTA2TrackerServices {
   database: DatabaseService;
   cache: CacheService;
   opendotaAPI: OpenDotaAPI;
+  dotaconstants: typeof ConstantsType;
 }
 
 declare module "koishi" {
