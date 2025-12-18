@@ -130,6 +130,7 @@ dota2tracker:
     "137": '"Primal Beast"'
     "138": '"Muerta"'
     "145": '"Kez"'
+    "155": '"Largo"'
   broadcast:
     WIN_NEGATIVE: >-
       "Won the match by sheer luck", "Won the match by a stroke of bad luck",
