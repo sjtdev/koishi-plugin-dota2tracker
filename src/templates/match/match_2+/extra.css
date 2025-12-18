@@ -135,6 +135,18 @@ body {
       pointer-events: none;
       text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.8);
 
+      image {
+        /* 1. 物理裁剪：上下左右各切掉 2% */
+        /* inset(上 右 下 左) */
+        clip-path: inset(2% round 12px);
+
+        /* 2. 视觉调色：模拟 #000e 的效果 */
+        opacity: 0.88;
+
+        /* 确保图片填充方式正确 */
+        object-fit: contain;
+      }
+
       use {
         &.radiant {
           color: #95cc4b;
