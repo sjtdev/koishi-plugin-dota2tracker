@@ -1,5 +1,19 @@
 # 更新日志
 
+### [2.3.2](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.3.1...v2.3.2) (2025-12-18)
+
+### 🚀 功能优化
+
+* **templates/match_2+:** 更换至`7.40`版地图，并调整了建筑坐标使位置更合理；修复了部分近战/远程兵营位置错乱的问题。 ([cb88644](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/cb88644d0f519d44bc983f975d62c8aea33879eb))
+
+### 🐛 Bug 修复
+
+* **locale:** 补充新英雄在`本地化`词典中的词条。 ([8a72813](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/8a728134e15ca1f570d06dd8c215c25fcab23286))
+
+### 📝 文档
+
+* 更新图片构建、补充对`match_2+`的说明。 ([9193c21](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/9193c21981c5ced74f6c759c82f137871efd163c))
+
 ### [2.3.1](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.3.0...v2.3.1) (2025-12-17)
 
 ### 🐛 Bug 修复
