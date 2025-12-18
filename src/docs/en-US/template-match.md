@@ -24,6 +24,8 @@ Compared to `match_1`, it lacks some details like: laning outcome, permanent buf
 ***
 ### match_2+
 
-<ImageViewer src="generated/match_2+.png" />
+<ImageViewer src="/en-US/generated/match_2+.png" />
 
-Supplement to `match_2`, adding some additional information, such as the situation and economic line charts, and the results of the lines.
+An extension of `match_2` that includes additional information such as advantage and net worth line charts, a mini-map, and laning phase details.
+Within the mini-map, the high-ground section displays timestamps for the destruction of melee barracks in each lane, the fall of the final Tier 4 tower, and the destruction of the Ancient (game end).
+The extended information above is only displayed when the corresponding data is available.
