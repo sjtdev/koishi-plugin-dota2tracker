@@ -1,0 +1,613 @@
+html,
+body {
+  background-color: black;
+  color: white;
+  width: 800px;
+}
+
+.wrapper > *:not(.skills) {
+  margin: 5px;
+  box-shadow: 0 0 5px #fff;
+  display: flex;
+}
+
+img {
+  width: 100%;
+  vertical-align: middle;
+}
+
+p {
+  margin: 0;
+}
+
+.hero {
+  position: relative;
+}
+
+.hero img {
+  /* flex-grow: 1; */
+  width: 25%;
+}
+
+.hero .pri_attr {
+  position: absolute;
+  width: 48px;
+  left: 25%;
+}
+
+.hero .info {
+  display: flex;
+  width: 75%;
+  /* height: 100%; */
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  padding: 4px;
+}
+
+.hero .info .name {
+  font-size: 24px;
+}
+
+.hero .info .roles .role {
+  font-size: 14px;
+}
+
+.hero .info .roles .role:not(:last-child) {
+  margin-right: 12px;
+}
+
+.hero .info .roles .role::after {
+  margin-left: 3px;
+  font-size: 22px;
+}
+
+.hero .info .roles .role.level1::after {
+  content: "■□□";
+}
+
+.hero .info .roles .role.level2::after {
+  content: "■■□";
+}
+
+.hero .info .roles .role.level3::after {
+  content: "■■■";
+}
+
+.hero .info .attrs {
+  height: 16px;
+  font-size: 16px;
+  line-height: 1;
+}
+.hero .info .attrs > span {
+  margin: 0 8px;
+  vertical-align: middle;
+}
+
+.hero .info .attrs > span::before {
+  display: inline-block;
+  content: "";
+  background-size: 100%;
+  width: 16px;
+  height: 16px;
+  vertical-align: top;
+}
+
+.hero .info .attrs > span.str::before {
+  background-image: url("<%= getImageUrl('hero_strength', ImageType.Icons) %>");
+}
+
+.hero .info .attrs > span.agi::before {
+  background-image: url("<%= getImageUrl('hero_agility', ImageType.Icons) %>");
+}
+
+.hero .info .attrs > span.int::before {
+  background-image: url("<%= getImageUrl('hero_intelligence', ImageType.Icons) %>");
+}
+
+.details {
+  flex-direction: row;
+}
+
+.details > * {
+  width: 50%;
+}
+
+.wrapper .hype {
+  display: block;
+  padding: 8px;
+  line-height: 1.25;
+}
+
+.wrapper .hype .npe {
+  color: #a5e0f3;
+  font-weight: bold;
+  line-height: 1.25;
+  margin-bottom: 8px;
+}
+
+.talents {
+  display: grid;
+  grid-template-rows: repeat(4, 35px);
+  gap: 10px;
+  border: #444 10px solid;
+  box-sizing: border-box;
+  position: relative; /* 添加相对定位 */
+}
+
+.talents::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #444;
+  pointer-events: none; /* 使伪元素不可点击 */
+  box-sizing: border-box;
+  width: 395px;
+  transform: translate(-10px, -10px); /* 调整伪元素的位置 */
+}
+
+.talents .talent {
+  width: 375px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  background: #000; /* 设置背景颜色以覆盖伪元素的背景 */
+  position: relative; /* 添加相对定位 */
+}
+
+.talents .talent .left,
+.talents .talent .right {
+  width: 170px;
+  font-size: 12px;
+}
+
+.talents .talent .level {
+  flex: 0 0 auto;
+  width: 35px;
+  height: 35px;
+  font-size: 18px;
+  line-height: 35px;
+  text-align: center;
+  box-sizing: border-box;
+  border-radius: 100%;
+  color: #e7d292;
+  text-shadow: 0px 0px 8px #ff531c;
+  background-color: #444;
+}
+
+.details .list table td {
+  width: 50%;
+  text-align: center;
+}
+
+.details .list table tr:nth-child(even) {
+  background-color: #333;
+}
+
+.details .list {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+}
+
+.details .list > * {
+  flex-grow: 1;
+}
+
+.details .bars {
+  height: 64px;
+  flex-grow: 0;
+}
+
+.details .bars > div {
+  height: 28px;
+  margin-bottom: 4px;
+  border-radius: 5px; /* 可选：圆角效果 */
+  box-shadow:
+    inset 0 0 2px rgba(0, 0, 0, 0.5),
+    0 0 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.details .bars .health {
+  background: linear-gradient(to top, #279027 0%, #27a329 56%, #96e891 83%, #366a35 100%);
+}
+.details .bars .mana {
+  background: linear-gradient(to top, #4676c4 0%, #2b76d5 56%, #95cdff 100%);
+}
+.details .bars .mana.zero {
+  background: none;
+}
+.details .bars span {
+  text-shadow: #000 1px 1px 4px;
+}
+.details .bars .number {
+  font-size: 18px; /* 数字文本大小 */
+  position: absolute; /* 绝对定位 */
+  left: 50%; /* 左侧50% */
+  transform: translateX(-50%); /* 水平居中 */
+}
+.details .bars .suffix {
+  margin-left: auto; /* 将右侧文本推到容器的最右边 */
+  font-size: 14px; /* 较小的字体 */
+  padding-right: 10px; /* 右侧留些间距 */
+}
+
+.details .stats {
+  display: flex;
+  justify-content: space-around;
+  line-height: 1.3;
+}
+.details .stats > .column > p {
+  padding: 4px;
+  color: #b2b2b2;
+}
+.details .stats .stat img {
+  width: 20px;
+}
+
+.facets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* 可选：设置项目之间的间距 */
+}
+
+.facets > .facet,
+.skill > .facet {
+  flex: 1 1 calc(50% - 10px); /* 每行两个项目 */
+  box-sizing: border-box; /* 包含padding和border在宽度和高度的计算中 */
+  background-color: #181f24;
+  position: relative;
+  border: 1px solid #2b2f33;
+}
+
+.facets > .facet:nth-child(odd):last-child {
+  flex-basis: 100%; /* 最后一个奇数项目占据整行 */
+}
+.facets > .facet > .name_back,
+.skill > .facet > .name_back {
+  position: absolute;
+  height: 50px;
+  width: 100%;
+}
+.facet > .name_back.type_0 {
+  background: linear-gradient(to right, #9f3c3c, #4a2026);
+}
+.facet > .name_line.type_0 {
+  filter: invert(22%) sepia(100%) saturate(100%) hue-rotate(316deg) brightness(98%) contrast(100%);
+}
+.facet > .name_back.type_1 {
+  background: linear-gradient(to right, #c8a45c, #6f3d21);
+}
+.facet > .name_line.type_1 {
+  filter: invert(54%) sepia(99%) saturate(100%) hue-rotate(0deg) brightness(97%) contrast(100%);
+}
+.facet > .name_back.type_2 {
+  background: linear-gradient(to right, #a2b23e, #2d5a18);
+}
+.facet > .name_line.type_2 {
+  filter: invert(57%) sepia(100%) saturate(100%) hue-rotate(32deg) brightness(93%) contrast(100%);
+}
+.facet > .name_back.type_3 {
+  background: linear-gradient(to right, #547ea6, #2a385e);
+}
+.facet > .name_line.type_3 {
+  filter: invert(39%) sepia(100%) saturate(99%) hue-rotate(167deg) brightness(99%) contrast(100%);
+}
+.facet > .name_back.type_4 {
+  background: linear-gradient(to right, #675cae, #261c44);
+}
+.facet > .name_line.type_4 {
+  filter: invert(33%) sepia(100%) saturate(100%) hue-rotate(207deg) brightness(99%) contrast(100%);
+}
+.facet > .name_back.type_5 {
+  background: linear-gradient(to right, #adb6be, #4e5557);
+}
+.facet > .name_line.type_5 {
+  filter: invert(73%) sepia(23%) saturate(99%) hue-rotate(166deg) brightness(93%) contrast(94%);
+}
+.facet > .name_line {
+  position: absolute;
+  background-size: cover;
+  height: 50px;
+  width: 100%;
+  background-image: url("https://cdn.akamai.steamstatic.com/apps/dota2/images/dota_react/icons/facets/ripple_texture.png");
+}
+.facet > .name {
+  height: 50px;
+  line-height: 50px;
+  z-index: 1;
+  position: relative;
+  display: flex;
+}
+.facet > .name > img {
+  width: 24px;
+  padding: 13px;
+  background-color: #0003;
+}
+.facet > .name > span {
+  margin-left: 16px;
+  letter-spacing: 2px;
+  text-shadow:
+    2px 2px 3px rgba(0, 0, 0, 0.3),
+    4px 4px 6px rgba(0, 0, 0, 0.2),
+    6px 6px 9px rgba(0, 0, 0, 0.1);
+}
+.facet > .content {
+  padding: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.facet > .content > .ability {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.facet > .content > .ability > .name {
+  background: linear-gradient(to right, #9bcdff17 0%, #9bcdff09 30%, #d0e8ff00 100%);
+  line-height: 1;
+}
+.facet > .content > .ability > .name > img {
+  width: 30px;
+}
+.facet > .content > .ability > .name > span {
+  margin-left: 10px;
+  font-size: 14px;
+  /* font-weight: bold; */
+}
+.facet > .content .description {
+  color: #9ab0cd;
+}
+.facet > .content > .ability > .attributes {
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.facet > .content > .ability > .attributes .item {
+  color: #737373;
+}
+.facet > .content .value {
+  color: #fff;
+}
+
+.skills {
+  width: 800px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.skill {
+  background-color: #141b1f;
+  margin: 5px;
+  box-shadow: 0 0 5px #fff;
+  width: 390px;
+  /* flex-direction: column; */
+}
+
+.skill > *:not(:nth-child(2)) {
+  padding-left: 8px;
+}
+
+.skill > .title {
+  position: relative;
+  background-color: #1f272b;
+  padding: 8px;
+  font-weight: 100;
+  height: auto;
+  width: auto;
+}
+.skill > .title > .name {
+  font-family: "KaiTi", "楷体", "楷体_GB2312", "STKaiti", serif;
+}
+.skill > .title > .is_innate {
+  font-size: 14px;
+  line-height: 18px;
+  width: auto;
+  display: inline;
+  padding: 2px 8px;
+  box-sizing: content-box;
+  background-color: #5b93d1;
+}
+
+.skill > .title.name_back > img {
+  width: 16px;
+}
+
+.skill img.scepter,
+.skill img.shard {
+  position: absolute;
+  width: 24px;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.skill .img_stats {
+  display: flex;
+  color: #546780;
+  margin-bottom: 16px;
+  border-top: #2a363c 1px solid;
+  border-bottom: #2a363c 1px solid;
+}
+
+.skill .img_stats img {
+  width: 128px;
+}
+
+.skill .img_stats .stats {
+  padding: 8px;
+}
+
+.skill .stats .dmg_type.Physical span {
+  color: #ae2f28;
+}
+
+.skill .stats .dmg_type.Magical span {
+  color: #5b93d1;
+}
+
+.skill .stats .dmg_type.Pure span {
+  color: #c29c4a;
+}
+
+.skill .stats .dispellable.Yes span {
+  /* color: #c29c4a; */
+}
+
+.skill .stats .dispellable.No span {
+  color: #f00;
+}
+
+.skill .stats .dispellable.Strong span {
+  color: #9828ae;
+}
+
+.skill .stats .bkbpierce.Yes span {
+  color: #6add71;
+}
+
+.skill > .description {
+  color: #9bb1ce;
+  margin-bottom: 32px;
+}
+
+.skill > .facet {
+  padding-left: 0;
+  margin-bottom: 16px;
+}
+
+.skill .value {
+  color: #fff;
+}
+
+.skill .aghanim_description {
+  padding-left: 0;
+  color: #9bb1ce;
+  margin-bottom: 16px;
+  border: #263945 solid 3px;
+  box-sizing: border-box;
+}
+
+.skill .aghanim_description .title {
+  /* content: "阿哈利姆魔晶"; */
+  display: block;
+  font-size: 20px;
+  background-color: #263945;
+  padding: 12px;
+}
+
+.skill .aghanim_description .desc {
+  margin: 12px;
+  display: block;
+}
+
+.skill .aghanim_description img {
+  position: unset;
+  transform: none;
+  margin-right: 8px;
+}
+
+.skill .notes {
+  padding: 12px;
+  margin-bottom: 12px;
+  color: #9fb7c6;
+  background-color: #263945;
+}
+
+.skill .attributes {
+  line-height: 1.2em;
+  margin-bottom: 12px;
+}
+
+.skill .attributes .heading {
+  color: #546780;
+}
+
+.skill .attributes .values {
+  color: #4b525d;
+}
+
+.skill .attributes .values img {
+  width: 16px;
+}
+
+.skill .attributes .facet {
+  display: inline-flex;
+  font-size: 1em;
+  align-items: center;
+  line-height: 1.2em;
+  position: unset;
+  color: #fff;
+}
+
+.skill .attributes .facet span {
+  height: auto;
+  width: auto;
+  position: unset;
+  padding: 0 2px;
+}
+
+.skill .attributes .facet img {
+  width: auto;
+  height: 1em;
+  padding-right: 0.2em;
+}
+
+.skill .attributes .alternative .plus {
+  display: none;
+}
+
+.skill .attributes .primary ~ .alternative .plus {
+  display: inline;
+}
+.skill .attributes .primary ~ .alternative::before {
+  content: "(";
+}
+.skill .attributes .primary ~ .alternative::after {
+  content: ")";
+}
+
+.skill .cooldown {
+  padding-right: 12px;
+}
+
+.skill .cooldown::before,
+.skill .mana_cost::before {
+  content: "";
+  background-size: 100%;
+  width: 21px;
+  height: 21px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.skill .cooldown::before {
+  background-image: url("data:image/webp;base64,UklGRnABAABXRUJQVlA4TGMBAAAvE8AEEE2QTdqmkI5pRP/DS2wBEIT/bw8R/U8Ddq1NipSvGnd3eXJ3d3kmEM+GTDwBciCBTQCd7qpCeokBQdu2cc6f8tcQEBT5P9oEIGiwYuMBECqAbCUVIIAa19Py1I/AQMrJVGEABACe+DRqcl2GUxeOwIAzQkAAMCBxyi3BRcbSkzAKyIDTciQOAAgwyx43JA4CWRkeQXAAQKkGEs5+/siARwFHAHCUiAGwPwAEAGQSDgCAoCQUQc7OkwMbhgAAJBIKEAtkE9enBgcABEUxAIwyZ6cOx/lTkPiHsX+mqCQTMQRwcmAszPLUoTiCkVAAbDKEAWWUjWlGMYyEAR4n4wMeiBk8W9M1lphIQmAsmWxBJ1vfAJZIBMAoJwNQ0JTN04/yRaCCftofwWBkAMAjQ6BILaWMsEkFFVTTk/qEETyQlYFXnh9jmABKbkgzNQgemYwnTOKFEgAAOGJAeUbyhQIAAA==");
+}
+
+.skill .mana_cost::before {
+  background-image: url("data:image/webp;base64,UklGRsYAAABXRUJQVlA4TLkAAAAvE8AEEIfBOIDbtEmdpEDhS8G2kSTF0eteuLOebJz/0KDREgwBAGEu/89yqe5LCyEaDT03NBcLpEXnJgkZKS2dmlqAlNSCgJXURBoNCHAY2bbSvEP0fxzi7sGh//rslRDR/xQxS0bXRkRMmr5Ho8iISY5523Ztr2vabBuaZZLVE99wRqWAUgGFAv4K+Cngo4CXAp4KeCjgroCbAi4KVv7pOnFwF8aP9+fRXeAaMZ63GbXWiIhxGJ0bEQA=");
+}
+
+.skill .lore {
+  font-size: 13px;
+  color: #3e4f5b;
+  padding: 8px;
+  line-height: 1.25;
+}
+
+body .wrapper > .lore {
+  /* flex-direction: column; */
+  display: block;
+  line-height: 1.25;
+  padding: 8px;
+  font-family: "KaiTi", "楷体", "楷体_GB2312", "STKaiti", serif;
+  color: #aaa;
+}
