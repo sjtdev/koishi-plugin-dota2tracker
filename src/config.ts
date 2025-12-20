@@ -12,7 +12,6 @@ export interface Config {
   enableOpenDotaFallback: boolean;
   OPENDOTA_API_KEY: string;
   OpenDotaIPStack: string;
-  enableConsole: boolean;
 
   useHeroNicknames: boolean;
   urlInMessageType: Array<string>;
@@ -48,7 +47,6 @@ export const Config: Schema = Schema.intersect([
       proxyAddress: Schema.string(),
       suppressApiNetworkErrors: Schema.boolean().default(false),
       enableOpenDotaFallback: Schema.boolean().default(false),
-      enableConsole: Schema.boolean().default(false).experimental(),
     }).i18n(getI18n("base")),
     Schema.union([
       Schema.object({

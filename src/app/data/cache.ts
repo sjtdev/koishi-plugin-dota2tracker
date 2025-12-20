@@ -32,7 +32,7 @@ export class CacheService extends Service<Config> {
 
   addOpendotaAPIRequestLog(request: string, count: number = 1) {
     this.ctx.cache.set("dt_opendota_api_request_log", String(Date.now()), { count, request }, this.msUntilUTCEndOfDay);
-    if (this.config.enableConsole) this.ctx.console.services["apiCount"].refresh();
+    // if (this.config.enableConsole) this.ctx.console.services["apiCount"].refresh();
   }
 
   async getTodayOpendotaAPIRequestCount() {

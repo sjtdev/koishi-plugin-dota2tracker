@@ -30,8 +30,6 @@ import { registerUserCommand } from "./app/commands/user.command.ts";
 import { OpenDotaAPI } from "./app/data/opendota.api.ts";
 import { OpenDotaAdapter } from "./app/core/opendota.adapter.ts";
 
-import { registerConsolePage } from "./console.ts";
-
 export const name = "dota2tracker";
 export let usage = "";
 // export const inject = ["http", "database", "cron", "puppeteer", "cache"]; // 声明依赖
@@ -94,6 +92,4 @@ export async function apply(ctx: Context, config: Config) {
   registerQueryHeroCommand(ctx);
   registerQueryItemCommand(ctx);
   registerHeroOfTheDayCommand(ctx);
-
-  if (ctx.console && config.enableConsole) registerConsolePage(ctx);
 }
