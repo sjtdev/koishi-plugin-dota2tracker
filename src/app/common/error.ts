@@ -146,7 +146,7 @@ export function handleError(error: unknown, logger: Logger, i18n: I18NService, c
     output += error.stack; // 只打印 NetworkError 的 stack
 
     // 遵循降噪配置
-    const logLevel = config.suppressApiNetworkErrors || config.suppressStratzNetworkErrors ? "debug" : "error";
+    const logLevel = config.suppressApiNetworkErrors ? "debug" : "error";
     logger[logLevel](output);
   }
 
