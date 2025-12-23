@@ -6,10 +6,7 @@
   "typings": "lib/index.d.ts",
   "files": [
     "lib",
-    "dist",
-    "images",
-    "template",
-    "queries"
+    "dist"
   ],
   "contributors": [
     "sjtdev <sh1j1n9ta0@foxmail.com>"
