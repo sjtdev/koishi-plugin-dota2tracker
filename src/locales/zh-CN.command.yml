@@ -202,6 +202,8 @@ commands:
         meta_intro: "一周内，基于您段位±1 ({tiers}) 范围内各位置<b>选择率≥2%</b>按胜率从高到低前三名优势英雄："
         meta_table_header: "英雄名称(选择率% 胜率%)"
         meta_position: "{pos}号位："
+        querying: "正在查询玩家数据、英雄胜率等数据，请稍候……"
+        query_failed: "指令调用失败。"
     common:
       messages:
         user_not_binded_in_channel: |-

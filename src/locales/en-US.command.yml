@@ -208,6 +208,8 @@ commands:
         meta_intro: "Top 3 advantage heroes for each position with a <b>pick rate ≥2%</b> within ±1 of your rank bracket ({tiers}) over the last week, sorted by win rate:"
         meta_table_header: "Hero (Pick% Win%)"
         meta_position: "Pos {pos}:"
+        querying: "Retrieving player stats and hero win rates, please wait..."
+        query_failed: "Command failed."
     common:
       messages:
         user_not_binded_in_channel: |-
