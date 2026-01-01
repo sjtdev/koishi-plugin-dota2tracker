@@ -38,24 +38,32 @@ export function registerQueryMatchCommand(ctx: Context) {
     .option("template", "-t <value:string>")
     .action(async ({ session, options }, input_data) => {
       const name = "query-recent-match";
+      const logger = ctx.logger("command/" + name);
+
+      const task = new TaskMessenger(session);
       try {
         const steamId = await resolvePlayerAndHandleErrors(ctx, session, input_data);
         if (steamId === null) return;
-        session.send(session.text(".querying_match"));
+        await task.send(session.text(".querying_match"));
 
-        let lastMatch;
-        try {
-          lastMatch = await ctx.dota2tracker.player.getLastMatchId(Number(steamId));
-        } catch (error) {
-          handleError(error, ctx.logger(name), ctx.dota2tracker.i18n, ctx.config);
+        const lastMatch = await ctx.dota2tracker.player.getLastMatchId(Number(steamId));
+
+        if (!lastMatch?.id) {
+          await task.finish();
+          return session.text(".query_failed");
+        }
+        if (lastMatch.isAnonymous) {
+          await task.finish();
+          return session.text(".is_anonymous");
         }
 
-        if (!lastMatch?.id) return session.text(".query_failed");
-        if (lastMatch.isAnonymous) return session.text(".is_anonymous");
-
-        return await handleQueryMatchCommand(ctx, ctx.config, session, options, lastMatch.id);
+        const message = await handleQueryMatchCommand(ctx, ctx.config, session, options, lastMatch.id);
+        await task.finish();
+        return message;
       } catch (error) {
-        handleError(error, ctx.logger(name), ctx.dota2tracker.i18n, ctx.config);
+        await task.finish();
+        handleError(error, logger, ctx.dota2tracker.i18n, ctx.config);
+        return session.text(".query_failed");
       }
     });
 }
