@@ -1,7 +1,7 @@
 import { Context, Session } from "koishi";
 import { Config } from "../../config";
 import { TemplateType } from "../common/types";
-import { resolvePlayerAndHandleErrors } from "./_helper";
+import { resolvePlayerAndHandleErrors, TaskMessenger } from "./_helper";
 import { handleError } from "../common/error";
 
 export function registerQueryMatchCommand(ctx: Context) {
@@ -12,15 +12,22 @@ export function registerQueryMatchCommand(ctx: Context) {
     .option("template", "-t <value:string>")
     .action(async ({ session, options }, match_id) => {
       const name = "query-match";
+      const logger = ctx.logger("command/" + name);
+
+      const task = new TaskMessenger(session);
       try {
         if (!match_id) return session.text(".empty_input");
         if (!/^\d{1,11}$/.test(match_id)) return session.text(".match_id_invalid");
 
-        await session.send(session.text(".querying_match"));
+        await task.send(session.text(".querying_match"));
 
-        return await handleQueryMatchCommand(ctx, ctx.config, session, options, match_id);
+        const message = await handleQueryMatchCommand(ctx, ctx.config, session, options, match_id);
+        await task.finish();
+        return message;
       } catch (error) {
-        handleError(error, ctx.logger(name), ctx.dota2tracker.i18n, ctx.config);
+        await task.finish();
+        handleError(error, logger, ctx.dota2tracker.i18n, ctx.config);
+        return session.text(".query_failed");
       }
     });
 
