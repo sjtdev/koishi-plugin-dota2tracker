@@ -7,14 +7,6 @@
      const isPos = impVal > 0;
      const isOver = abs > 25;
 
-     // 宽度计算：如果溢出(>25)，则填满单侧(25px)；否则按比例
-     // 原逻辑中 .score_bar 宽 51px (中心各 25px?)。
-     // 原逻辑：
-     // if (abs > 25) { right = abs (if pos), left = abs (if neg) }
-     // 这里的逻辑有点奇怪，如果 abs=30，width=30px，父容器只有25px空间？
-     // 让我们严格遵循原逻辑：
-     // width 赋值直接是 absValue。CSS里父容器 overflow 没写 hidden，可能靠 flex 布局撑开？
-     // 无论如何，保持原值逻辑：
      let left = 0, right = 0;
      if (isOver) {
        if (isPos) right = abs;
