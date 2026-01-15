@@ -11,7 +11,7 @@ export function registerQueryItemCommand(ctx: Context) {
     .command(`dota2tracker.${name} <input_data>`)
     .alias("查询物品")
     .action(async ({ session }, input_data) => {
-      const task = new TaskMessenger(session);
+      const task = new TaskMessenger(session, { autoRecall: ctx.config.autoRecallTips });
 
       // 1. 【卫语句】优先处理 "无输入且不允许显示列表" 的情况
       // 这种情况不需要 TaskMessenger，直接报错并退出

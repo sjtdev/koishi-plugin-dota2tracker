@@ -14,7 +14,7 @@ export function registerQueryMatchCommand(ctx: Context) {
       const name = "query-match";
       const logger = ctx.logger("command/" + name);
 
-      const task = new TaskMessenger(session);
+      const task = new TaskMessenger(session, { autoRecall: ctx.config.autoRecallTips });
       try {
         if (!match_id) return session.text(".empty_input");
         if (!/^\d{1,11}$/.test(match_id)) return session.text(".match_id_invalid");
@@ -40,7 +40,7 @@ export function registerQueryMatchCommand(ctx: Context) {
       const name = "query-recent-match";
       const logger = ctx.logger("command/" + name);
 
-      const task = new TaskMessenger(session);
+      const task = new TaskMessenger(session, { autoRecall: ctx.config.autoRecallTips });
       try {
         const steamId = await resolvePlayerAndHandleErrors(ctx, session, input_data);
         if (steamId === null) return;

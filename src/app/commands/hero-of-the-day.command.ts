@@ -14,7 +14,7 @@ export function registerHeroOfTheDayCommand(ctx: Context) {
     .alias("今日英雄")
     .option("days", "-d <value:number>")
     .action(async ({ session, options }, input_data) => {
-      const task = new TaskMessenger(session);
+      const task = new TaskMessenger(session, { autoRecall: ctx.config.autoRecallTips });
       try {
         await task.send(session.text(".querying"));
         const steamId = await resolvePlayerAndHandleErrors(ctx, session, input_data);

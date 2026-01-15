@@ -45,6 +45,7 @@ _config:
         (Example **Keyword**: Blink Dagger，**Alias**: Blink)
       keyword: Keyword
       alias: Alias
+    autoRecallTips: Automatically recall tip messages after the command finishes, e.g., "Searching for match details, please wait..."
   report:
     $desc: Summary Settings
     dailyReportSwitch: "Daily Report Function"

@@ -41,6 +41,7 @@ _config:
       $desc: "额外物品别名设置<br/>当插件内置的[物品别名列表](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/src/locales/zh-CN.constants.json#L304-L407)中没有想要的物品别名可在此处追加，如果是插件疏漏的广为人知的物品别名推荐到源码仓库提交issue或pull request完善列表。<br/>（例如 **关键词**: 闪烁匕首，**别名**: 跳刀）"
       keyword: 关键词
       alias: 别名
+    autoRecallTips: 在指令调用结束后自动撤回提示消息，如：“正在搜索对局详情，请稍后……”
   report:
     $desc: 总结设置
     dailyReportSwitch: "日报功能"

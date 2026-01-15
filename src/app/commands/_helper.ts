@@ -32,10 +32,17 @@ export async function resolvePlayerAndHandleErrors(ctx: Context, session: Sessio
   return Number(result.steamId);
 }
 
+interface TaskMessengerOptions {
+  autoRecall?: boolean;
+}
+
 export class TaskMessenger {
   private tipIds: string[] = [];
 
-  constructor(private session: Session) {}
+  constructor(
+    private session: Session,
+    private options: TaskMessengerOptions = { autoRecall: true },
+  ) {}
   /**
    * 发送一条提示消息，并记录其 ID 以便后续撤回
    * @param content 提示内容
@@ -57,6 +64,11 @@ export class TaskMessenger {
    * 任务结束，撤回所有提示消息
    */
   async finish() {
+    if (!this.options.autoRecall) {
+      this.tipIds = [];
+      return;
+    }
+
     if (this.tipIds.length === 0) return;
 
     // 倒序撤回通常体验更好（先撤回最新的），不过顺序也无所谓

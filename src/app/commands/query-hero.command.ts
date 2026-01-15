@@ -11,7 +11,7 @@ export function registerQueryHeroCommand(ctx: Context): void {
     .option("random", "-r")
     .alias("查询英雄")
     .action(async ({ session, options }, input_data) => {
-      const task = new TaskMessenger(session);
+      const task = new TaskMessenger(session, { autoRecall: ctx.config.autoRecallTips });
       try {
         if (input_data || options.random) {
           await task.send(session.text(".querying_hero"));

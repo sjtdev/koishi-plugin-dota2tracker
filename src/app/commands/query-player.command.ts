@@ -11,7 +11,7 @@ export function registerQueryPlayerCommand(ctx: Context) {
     .option("hero", "-o <value:string>")
     .alias("查询玩家")
     .action(async ({ session, options }, input_data) => {
-      const task = new TaskMessenger(session);
+      const task = new TaskMessenger(session, { autoRecall: ctx.config.autoRecallTips });
       try {
         if (session.guild || (!session.guild && input_data)) {
           const steamId = await resolvePlayerAndHandleErrors(ctx, session, input_data);

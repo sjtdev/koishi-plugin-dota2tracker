@@ -22,6 +22,7 @@ export interface Config {
   rankBroadStar: boolean;
   rankBroadLeader: boolean;
   rankBroadFun: boolean;
+  autoRecallTips: boolean;
 
   dailyReportSwitch: boolean;
   dailyReportHours: number;
@@ -69,8 +70,9 @@ export const Config: Schema = Schema.intersect([
           alias: Schema.string().required(),
         }),
       )
-        .default([])
-        .role("table"),
+      .default([])
+      .role("table"),
+      autoRecallTips: Schema.boolean().default(true),
       rankBroadSwitch: Schema.boolean().default(false),
     }).i18n(getI18n("message")),
     Schema.union([
