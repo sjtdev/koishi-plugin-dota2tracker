@@ -61,7 +61,7 @@ const BUILDINGS = [
   // 门牙 & 基地
   { id: 35, name: 'Dire T4 Left',  type: 'tower', lane: "mid", bit: 9, team: 'dire', x: 189.7, y: 56.4 },
   { id: 35, name: 'Dire T4 Right', type: 'tower', lane: "mid", bit: 10, team: 'dire', x: 194.4, y: 60.2 },
-  { id: 35, name: 'Dire T4 Time', type: 't4_time', lane: "mid", bit: 10, team: 'dire', x: 198, y: 63 },
+  { id: 35, name: 'Dire T4 Time', type: 't4_time', lane: "mid", bit: [9, 10], team: 'dire', x: 198, y: 63 },
   { id: 51, name: 'Dire Ancient',  type: 'fort', lane: "", bit: -1, team: 'dire', x: 195.7, y: 49 },
   { id: 51, name: 'Dire Ancient Time',  type: 'fort_time', lane: "", bit: -1, team: 'dire', x: 210, y: 52 },
 ];
@@ -80,10 +80,12 @@ const BUILDINGS = [
   // 2. 存活判定 (逻辑保持不变，确保正确引用 mask)
   const checkAlive = (b) => {
     let mask = 0;
+    const isTowerType = b.type.includes('tower') || b.type === 't4_time';
+
     if (b.team === 'radiant') {
-      mask = b.type.includes('tower') ? match.towerStatusRadiant : match.barracksStatusRadiant;
+      mask = isTowerType ? match.towerStatusRadiant : match.barracksStatusRadiant;
     } else {
-      mask = b.type.includes('tower') ? match.towerStatusDire : match.barracksStatusDire;
+      mask = isTowerType ? match.towerStatusDire : match.barracksStatusDire;
     }
 
     // T4 时间锚点 (只要有一个活着，整体就算活)
