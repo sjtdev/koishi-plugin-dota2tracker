@@ -1,5 +1,5 @@
 import { Context, Service } from "koishi";
-import { Benchmarks, OpenDotaMatch } from "../../@types/opendota-generated";
+import { Objective, OpenDotaMatch } from "../../@types/opendota-generated";
 import type ConstantsType from "dotaconstants";
 import { LeaverStatusEnum, MatchInfoQuery, MatchLaneType, MatchPlayerPositionType, LaneOutcomeEnums, LobbyTypeEnum, GameModeEnumType } from "../../@types/graphql-generated";
 import { clamp } from "../common/utils";
@@ -140,6 +140,13 @@ export class OpenDotaAdapter extends Service {
       radiantNetworthLeads: [0, ..._match.radiant_gold_adv], // 同样，此处的radiant_gold_adv也是基于累计获取金币的差值而非经济差。
       radiantExperienceLeads: [0, ..._match.radiant_xp_adv], // opendota两组数据都需要补充-1分钟时的数据对齐stratz格式。
       winRates: null,
+      towerStatusRadiant: _match.tower_status_radiant,
+      towerStatusDire: _match.tower_status_dire,
+      barracksStatusRadiant: _match.barracks_status_radiant,
+      barracksStatusDire: _match.barracks_status_dire,
+      playbackData: {
+        buildingEvents: convertBuildingEvents(_match.objectives),
+      },
       players,
       pickBans: _match.picks_bans?.map((pb) => ({ isPick: pb.is_pick, ...(pb.is_pick ? { heroId: pb.hero_id, bannedHeroId: null } : { bannedHeroId: pb.hero_id, heroId: null }), order: pb.order })),
       odParsed: true,
@@ -459,4 +466,63 @@ function determineIMP(player: OpenDotaMatch["players"][number]) {
   if (values.length === 0) return 0;
   const totalScore = values.reduce((acc, cur) => acc + cur.pct, 0);
   return Math.round((totalScore / values.length) * 100 - 50);
+}
+function convertBuildingEvents(objectives: Objective[]): { time: number; npcId: number }[] {
+  if (!objectives) return [];
+
+  // 内部定义映射表，保持逻辑闭环
+  const KEY_TO_ID: Record<string, number> = {
+    // ================= 天辉 Radiant =================
+    npc_dota_goodguys_tower1_top: 16,
+    npc_dota_goodguys_tower2_top: 19,
+    npc_dota_goodguys_tower3_top: 22,
+    npc_dota_goodguys_tower1_mid: 17,
+    npc_dota_goodguys_tower2_mid: 20,
+    npc_dota_goodguys_tower3_mid: 23,
+    npc_dota_goodguys_tower1_bot: 18,
+    npc_dota_goodguys_tower2_bot: 21,
+    npc_dota_goodguys_tower3_bot: 24,
+    npc_dota_goodguys_tower4: 25, // 统一映射 T4
+    npc_dota_goodguys_melee_rax_top: 38,
+    npc_dota_goodguys_range_rax_top: 41,
+    npc_dota_goodguys_melee_rax_mid: 39,
+    npc_dota_goodguys_range_rax_mid: 42,
+    npc_dota_goodguys_melee_rax_bot: 40,
+    npc_dota_goodguys_range_rax_bot: 43,
+    npc_dota_goodguys_fort: 50,
+
+    // ================= 夜魇 Dire =================
+    npc_dota_badguys_tower1_top: 26,
+    npc_dota_badguys_tower2_top: 29,
+    npc_dota_badguys_tower3_top: 32,
+    npc_dota_badguys_tower1_mid: 27,
+    npc_dota_badguys_tower2_mid: 30,
+    npc_dota_badguys_tower3_mid: 33,
+    npc_dota_badguys_tower1_bot: 28,
+    npc_dota_badguys_tower2_bot: 31,
+    npc_dota_badguys_tower3_bot: 34,
+    npc_dota_badguys_tower4: 35, // 统一映射 T4
+    npc_dota_badguys_melee_rax_top: 44,
+    npc_dota_badguys_range_rax_top: 47,
+    npc_dota_badguys_melee_rax_mid: 45,
+    npc_dota_badguys_range_rax_mid: 48,
+    npc_dota_badguys_melee_rax_bot: 46,
+    npc_dota_badguys_range_rax_bot: 49,
+    npc_dota_badguys_fort: 51,
+  };
+
+  const events: { time: number; npcId: number }[] = [];
+
+  for (const obj of objectives) {
+    // 1. 过滤掉非建筑击杀事件
+    // 2. 确保 key 存在于我们的映射表中 (过滤掉 creep 或英雄击杀等无关信息)
+    if (obj.type === "building_kill" && obj.key && KEY_TO_ID[obj.key]) {
+      events.push({
+        time: obj.time,
+        npcId: KEY_TO_ID[obj.key],
+      });
+    }
+  }
+
+  return events;
 }
