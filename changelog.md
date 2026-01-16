@@ -1,5 +1,29 @@
 # 更新日志
 
+### [2.3.3](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.3.2...v2.3.3) (2026-01-16)
+
+### ✨ 新增功能
+
+* **command:** 新增`TaskMessenger`实现调用指令时在回复正文或错误信息后将**撤回/删除**如“正在查询****，请稍候……”之类的提示语句。 ([bc987d2](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/bc987d2b3ee2774d9f9cc1894892333a398629cf))
+* **config/autoRecallTips:** 为新增的**提示消息撤回**功能添加配置项`autoRecallTips`，默认启用。 ([31e173a](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/31e173a2e47a5b5b92535e8a93f54514f2ef9890))
+
+### 🚀 功能优化
+
+* **command/hero-of-the-day:** 适配提示消息撤回；增加了提示等待信息与错误提示信息。 ([43b9aa5](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/43b9aa5fd4364637148b34ff407f75faad0320ac))
+* **command/query-hero:** 适配提示消息撤回；增加了查询失败的错误提示信息。 ([d7e577c](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/d7e577c749a19768f8852cbe9eacee24ffa9f150))
+* **command/query-item:** 适配提示消息撤回；优化判断逻辑。 ([f3ae006](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/f3ae006eb93b49661cc10c58c201ffa279fb3462))
+* **command/query-match:** 适配提示消息撤回；增加了查询失败时的错误提示信息。 ([b7a9d77](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/b7a9d774bd95ea0836bfe8d133a2c1a4a11c2050))
+* **command/query-player:** 适配提示消息撤回；增加了查询失败时的错误提示信息。 ([476a7bc](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/476a7bc98fe275e3049e1f0f7a2efbee154e0699))
+* **command/query-recent-match:** 适配提示消息撤回；优化了错误处理逻辑。 ([4ad88a3](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/4ad88a32f2bb9a053f757cda986c8fa6e4ceb27e))
+* **configs:** 移除此前声明**已弃用**的配置项`suppressStratzNetworkErrors`。 ([f602ec3](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/f602ec34d8b5c37d9d936d82c9420e80ab1965a7))
+* **console:** 移除**控制台**相关减小📦体积。想不到这玩意能做什么。 ([3002a03](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/3002a035adcdd87eb882c21ef32473bd167a521b))
+
+### 🐛 Bug 修复
+
+* **templates/match_2+:** 尝试修复部分场景下t4时间标签错误显示的问题。 ([92f2521](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/92f2521f47a8483889ca632f4abed3f10ee64092))
+* **templates/match_2+:** 使`opendota-adapter`支持使用**opendota数据源**时正确渲染小地图图标与时间 ([2bedf8d](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/2bedf8d10071b4043eece1e4431ce2bdf86460c8))
+* **templates/match_2+:** 修复`v2.3.0`添加小地图后，未解析提示、opendota数据提示样式不正确的问题。 ([4559509](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/455950977cce0f51648f2378f4cb46a21f4361d1))
+
 ### [2.3.2](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.3.1...v2.3.2) (2025-12-18)
 
 ### 🚀 功能优化
