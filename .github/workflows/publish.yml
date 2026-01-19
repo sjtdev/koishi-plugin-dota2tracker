@@ -1,0 +1,52 @@
+name: NPM Auto Publish
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "package.json"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 拉取 Koishi 环境
+      - name: Checkout Koishi Boilerplate
+        uses: actions/checkout@v4
+        with:
+          repository: koishijs/boilerplate
+          path: .
+
+      # 2. 拉取插件
+      - name: Checkout Plugin Source
+        uses: actions/checkout@v4
+        with:
+          path: external/dota2tracker
+
+      # 3. 设置 Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # 4. 安装依赖
+      - name: Install Dependencies
+        run: yarn install --no-immutable
+
+      - name: Install Build Script Deps
+        run: yarn add -D html-minifier-terser glob
+
+      # 5. 构建
+      - name: Build
+        run: |
+          yarn build
+          node external/dota2tracker/scripts/build-assets.js
+
+      # 6. 发布
+      - name: Publish
+        run: yarn pub --debug
