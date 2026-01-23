@@ -1,6 +1,6 @@
 commands:
   dota2tracker:
-    description: "dota2tracker的一系列指令，可以使用dota2tracker -h查看所有可用指令。"
+    description: "dota2tracker的一系列指令，可以使用dota2tracker -h查看所有可用指令，或者使用`dota2tracker.help`（默认别名`DOTA2帮助`）查看所有指令详细说明表。"
     subscribe:
       description: "[订阅本群]"
       usage: 订阅后还需玩家在本群绑定SteamID，BOT将订阅本群中已绑定玩家的新比赛数据，在STRATZ比赛解析完成后将比赛数据生成为图片战报发布至本群中。

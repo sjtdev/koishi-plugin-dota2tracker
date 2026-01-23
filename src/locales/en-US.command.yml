@@ -1,6 +1,6 @@
 commands:
   dota2tracker:
-    description: A series of commands for Dota 2 Tracker. Use "dota2tracker -h" to see all available commands.
+    description: "A series of commands for Dota 2 Tracker. Use dota2tracker -h to see all available commands, or use dota2tracker.help to see a detailed description of all commands."
     subscribe:
       description: Subscribes the current channel to Dota 2 match tracking.
       usage: >-
