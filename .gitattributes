@@ -5,3 +5,7 @@
 *.ico -text
 *.gif -text
 *.webp -text
+
+src/docs/** linguist-documentation
+scripts/** linguist-vendored
+*.config.js linguist-vendored
