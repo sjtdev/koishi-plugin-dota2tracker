@@ -1,6 +1,6 @@
 {
   "name": "@sjtdev/koishi-plugin-dota2tracker",
-  "description": "koishi插件-追踪群友的DOTA2对局",
+  "description": "koishi插件-追踪群友的DOTA2对局 | A Koishi plugin to track Dota 2 matches",
   "version": "2.3.3",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/sjtdev/koishi-plugin-dota2tracker.git"
   },
-  "license": "MIT",
+  "license": "GPL-3.0",
   "keywords": [
     "chatbot",
     "koishi",

@@ -36,4 +36,6 @@ For all detailed feature showcases, configuration items, command lists, and all 
 * Also inspired by [koishi-plugin-dota2track(npm)](https://www.npmjs.com/package/koishi-plugin-dota2track).
 
 ## 📄 License
-MIT License © 2023-2025 [sjtdev](https://github.com/sjtdev)
+
+This project is licensed under the [GPL-3.0](LICENSE) License.
+Copyright © 2023-2026 [sjtdev](https://github.com/sjtdev)

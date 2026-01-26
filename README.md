@@ -36,4 +36,6 @@
 * 也受到了 [koishi-plugin-dota2track(npm)](https://www.npmjs.com/package/koishi-plugin-dota2track) 的启发。
 
 ## 📄 许可证
-MIT License © 2023-2025 [sjtdev](https://github.com/sjtdev)
+
+本项目使用 [GPL-3.0](LICENSE) 许可证开源。
+Copyright © 2023-2026 [sjtdev](https://github.com/sjtdev)
