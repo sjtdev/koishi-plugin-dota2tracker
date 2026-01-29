@@ -83,7 +83,7 @@ export class MessageBuilder extends Service<Config> {
 
     html += this._createTableHTML(table, undefined, this.ctx.i18n._data[languageTag]["commands.dota2tracker.help.messages.header"]); // 这里由于直接使用$t会被错误转义，导致koishi会对<arg>错误地添加一个</arg>闭合标签，所以使用_data直接获取rawData
     // message += await this.ctx.dota2tracker.image.renderToImageByHTML( html);
-    message += await this.ctx.dota2tracker.image.renderToImageByEJSCode(undefined, html, languageTag);
+    message += await this.ctx.dota2tracker.view.renderToImageByEJSCode(undefined, html, languageTag);
     message += this.ctx.dota2tracker.i18n.$t(languageTag, "commands.dota2tracker.help.messages.footer");
     return message;
   }
@@ -156,7 +156,7 @@ export class MessageBuilder extends Service<Config> {
     }
 
     ejs += "</body></html>";
-    return await this.ctx.dota2tracker.image.renderToImageByEJSCode(undefined, ejs, languageTag);
+    return await this.ctx.dota2tracker.view.renderToImageByEJSCode(undefined, ejs, languageTag);
     // return message;
   }
 
@@ -285,7 +285,7 @@ export class MessageBuilder extends Service<Config> {
     `;
 
     // 调用图片渲染服务将 HTML 转换为图片，并返回图片消息元素
-    return await this.ctx.dota2tracker.image.renderToImageByEJSCode({}, ejs, languageTag);
+    return await this.ctx.dota2tracker.view.renderToImageByEJSCode({}, ejs, languageTag);
   }
 
   buildRankChangedMessage(languageTag: string, name: string, prevRank, currRank): string {

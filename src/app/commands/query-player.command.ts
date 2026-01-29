@@ -20,7 +20,7 @@ export function registerQueryPlayerCommand(ctx: Context) {
           const heroId = ctx.dota2tracker.i18n.findHeroIdInLocale(options.hero);
           const languageTag = await ctx.dota2tracker.i18n.getLanguageTag({ session });
           const formattedPlayerData = await ctx.dota2tracker.player.getFormattedPlayerData(steamId, heroId, languageTag);
-          const image = await ctx.dota2tracker.image.renderToImageByFile(formattedPlayerData, ctx.config.template_player, TemplateType.Player, languageTag);
+          const image = await ctx.dota2tracker.view.renderToImageByFile(formattedPlayerData, ctx.config.template_player, TemplateType.Player, languageTag);
           const message = ctx.dota2tracker.messageBuilder.buildPlayerMessage(steamId);
           await task.finish();
           return message + image;

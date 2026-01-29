@@ -123,7 +123,7 @@ export class MatchWatcherTask extends Service<Config> {
             const languageTag = await this.ctx.dota2tracker.i18n.getLanguageTag({ channelId: subPlayer.guildId });
             if (this.config.rankBroadFun === true) {
               // 整活播报
-              const img = await this.ctx.dota2tracker.image.renderToImageByFile(
+              const img = await this.ctx.dota2tracker.view.renderToImageByFile(
                 {
                   name,
                   avatar: guildMember?.avatar ?? playersData.find((player) => subPlayer.steamId == player.steamAccount.id).steamAccount.avatar,

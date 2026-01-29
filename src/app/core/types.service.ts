@@ -5,7 +5,7 @@ import { ParsePollingTask } from "../tasks/parse-polling.task";
 import { CacheService } from "../data/cache";
 import { StratzAPI } from "../data/stratz.api";
 import { ValveAPI } from "../data/valve.api";
-import { ImageRenderer } from "../presentation/image.renderer";
+import { ViewRenderer } from "../presentation/view.renderer";
 import { MessageBuilder } from "../presentation/message.builder";
 import { ItemService } from "./item.service";
 import { MatchWatcherTask } from "../tasks/match-watcher.task";
@@ -20,7 +20,7 @@ export interface DOTA2TrackerServices {
   // 工具层
   i18n: I18NService;
   // 展现层
-  image: ImageRenderer;
+  view: ViewRenderer;
   messageBuilder: MessageBuilder;
   // 业务层
   match: MatchService;

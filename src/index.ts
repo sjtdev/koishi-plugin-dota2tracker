@@ -11,7 +11,7 @@ import { CacheService } from "./app/data/cache.ts";
 import { DatabaseService } from "./app/data/database.ts";
 import { StratzAPI } from "./app/data/stratz.api.ts";
 import { ValveAPI } from "./app/data/valve.api.ts";
-import { ImageRenderer } from "./app/presentation/image.renderer.ts";
+import { ViewRenderer } from "./app/presentation/view.renderer.ts";
 import { MessageBuilder } from "./app/presentation/message.builder.ts";
 import { MatchWatcherTask } from "./app/tasks/match-watcher.task.ts";
 import { ParsePollingTask } from "./app/tasks/parse-polling.task.ts";
@@ -51,7 +51,7 @@ export async function apply(ctx: Context, config: Config) {
   ctx.dota2tracker = {} as any;
   ctx.dota2tracker.dotaconstants = dotaconstants;
   ctx.dota2tracker.i18n = new I18NService(ctx);
-  ctx.dota2tracker.image = new ImageRenderer(ctx, currentDir);
+  ctx.dota2tracker.view = new ViewRenderer(ctx, currentDir);
   ctx.dota2tracker.messageBuilder = new MessageBuilder(ctx);
   ctx.dota2tracker.match = new MatchService(ctx, pluginVersion);
   ctx.dota2tracker.player = new PlayerService(ctx);

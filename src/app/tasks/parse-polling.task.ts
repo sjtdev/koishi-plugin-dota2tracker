@@ -142,7 +142,7 @@ export class ParsePollingTask extends Service<Config> {
 
           // C. 高效处理默认模板
           if (defaultTemplateSubscribers.length > 0) {
-            const defaultImage = await this.ctx.dota2tracker.image.renderToImageByFile(formattedMatchData, this.config.template_match, TemplateType.Match, languageTag);
+            const defaultImage = await this.ctx.dota2tracker.view.renderToImageByFile(formattedMatchData, this.config.template_match, TemplateType.Match, languageTag);
             for (const sub of defaultTemplateSubscribers) {
               const message = this.ctx.dota2tracker.messageBuilder.buildMatchMessage(languageTag, formattedMatchData, sub.relevantPlayers);
               await this.broadcastMessage(sub, message + defaultImage);
@@ -153,7 +153,7 @@ export class ParsePollingTask extends Service<Config> {
 
           // D. 逐一处理自定义模板
           for (const sub of customTemplateSubscribers) {
-            const image = await this.ctx.dota2tracker.image.renderToImageByFile(formattedMatchData, sub.source === "COMMAND" ? sub.templateName : this.config.template_match, TemplateType.Match, languageTag);
+            const image = await this.ctx.dota2tracker.view.renderToImageByFile(formattedMatchData, sub.source === "COMMAND" ? sub.templateName : this.config.template_match, TemplateType.Match, languageTag);
             const message = this.ctx.dota2tracker.messageBuilder.buildMatchMessage(languageTag, formattedMatchData, sub.relevantPlayers);
             await this.broadcastMessage(sub, message + image);
             // 记录日志所需信息

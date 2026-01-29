@@ -124,7 +124,7 @@ export class ReportTask extends Service<Config> {
           const languageTag = await this.ctx.dota2tracker.i18n.getLanguageTag({ channelId: guild.guildId });
           await this.ctx.broadcast(
             [`${guild.platform}:${guild.guildId}`],
-            await this.ctx.dota2tracker.image.renderToImageByFile(
+            await this.ctx.dota2tracker.view.renderToImageByFile(
               {
                 title: this.ctx.dota2tracker.i18n.$t(languageTag, titleKey),
                 players: currentsubscribedPlayers.sort((a, b) => {

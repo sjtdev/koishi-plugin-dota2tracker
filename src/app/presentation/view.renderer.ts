@@ -8,7 +8,7 @@ import { TemplateType } from "../common/types";
 import { ImageFormat, ImageType } from "../common/types";
 import { DateTime } from "luxon";
 
-export class ImageRenderer extends Service<Config> {
+export class ViewRenderer extends Service<Config> {
   private readonly templateDir: string;
   constructor(ctx: Context, currentDir: string) {
     super(ctx, "dota2tracker.image", true);

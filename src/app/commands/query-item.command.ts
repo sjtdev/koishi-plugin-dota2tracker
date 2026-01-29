@@ -33,7 +33,7 @@ export function registerQueryItemCommand(ctx: Context) {
         // 4. 分支处理：渲染全量列表 OR 搜索物品
         if (!input_data) {
           // --- 分支 A: 无输入 -> 显示全量列表 ---
-          const image = await ctx.dota2tracker.image.renderToImageByFile(itemList, "itemlist", TemplateType.Item, languageTag);
+          const image = await ctx.dota2tracker.view.renderToImageByFile(itemList, "itemlist", TemplateType.Item, languageTag);
 
           await task.finish(); // ✅ 渲染完成，撤回
           await session.send(image);
@@ -56,7 +56,7 @@ export function registerQueryItemCommand(ctx: Context) {
 
           if (ctx.config.showItemListAtTooMuchItems) {
             // 这里重新生成一次搜索结果列表的图
-            const image = await ctx.dota2tracker.image.renderToImageByFile(matchedItemList, "itemlist", TemplateType.Item, languageTag);
+            const image = await ctx.dota2tracker.view.renderToImageByFile(matchedItemList, "itemlist", TemplateType.Item, languageTag);
             await session.send(image);
           }
           return;
@@ -70,7 +70,7 @@ export function registerQueryItemCommand(ctx: Context) {
           try {
             const itemDetails = await ctx.dota2tracker.item.getItemDetails(basicItemInfo.id, languageTag);
             const finalItemData = { ...itemDetails, ...basicItemInfo };
-            const image = await ctx.dota2tracker.image.renderToImageByFile(finalItemData, "item", TemplateType.Item, languageTag);
+            const image = await ctx.dota2tracker.view.renderToImageByFile(finalItemData, "item", TemplateType.Item, languageTag);
             await session.send(image);
           } catch (error) {
             ctx.logger.error(`查询物品[${basicItemInfo.name_loc}]详情失败:`, error);

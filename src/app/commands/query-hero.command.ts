@@ -21,7 +21,7 @@ export function registerQueryHeroCommand(ctx: Context): void {
             await task.finish();
             return session.text(".not_found");
           }
-          const image = await ctx.dota2tracker.image.renderToImageByFile(heroData, ctx.config.template_hero, TemplateType.Hero, languageTag);
+          const image = await ctx.dota2tracker.view.renderToImageByFile(heroData, ctx.config.template_hero, TemplateType.Hero, languageTag);
           const message = ctx.dota2tracker.messageBuilder.buildHeroMessage(heroData);
           await task.finish();
           await session.send(message + image);
