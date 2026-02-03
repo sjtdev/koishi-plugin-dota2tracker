@@ -1,5 +1,11 @@
 # 更新日志
 
+### [2.3.4](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.3.3...v2.3.4) (2026-02-03)
+
+### ✨ 新增功能
+
+* **report:** 将每场比赛部分数据存至数据库中留待未来重构的日报周报功能使用 ([9f68253](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/9f68253aac43f4d99fc4477fd338e3626a0a3b06))
+
 ### [2.3.3](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.3.2...v2.3.3) (2026-01-16)
 
 ### ✨ 新增功能
