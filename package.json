@@ -37,6 +37,10 @@
     "@koishijs/plugin-console": "^5.30.11",
     "koishi": "^4.18.9"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "koishi": {
     "description": {
       "zh": "追踪群友的DOTA2对局",

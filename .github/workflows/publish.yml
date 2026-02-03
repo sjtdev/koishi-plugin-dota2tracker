@@ -32,7 +32,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
 
       # 4. 安装依赖
       - name: Install Dependencies
@@ -47,6 +48,20 @@ jobs:
           yarn build
           node external/dota2tracker/scripts/build-assets.js
 
+      - name: Fix Config
+        run: |
+          yarn set version stable
+
+          yarn config set npmPublishRegistry "https://registry.npmjs.org"
+
+          yarn config set npmRegistryServer "https://registry.npmjs.org"
+
+          yarn config set npmPublishAccess public
+
+          yarn config set npmPublishProvenance true
+
       # 6. 发布
       - name: Publish
-        run: yarn pub --debug
+        run: yarn pub --debug   
+        env:
+          NPM_CONFIG_PROVENANCE: true
