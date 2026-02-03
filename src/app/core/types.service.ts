@@ -14,6 +14,7 @@ import { DatabaseService } from "../data/database";
 import { ReportTask } from "../tasks/report.task";
 import { OpenDotaAPI } from "../data/opendota.api";
 import { OpenDotaAdapter } from "./opendota.adapter";
+import { ReportService } from "./report.service";
 import type ConstantsType from "dotaconstants";
 
 export interface DOTA2TrackerServices {
@@ -22,15 +23,17 @@ export interface DOTA2TrackerServices {
   // 展现层
   view: ViewRenderer;
   messageBuilder: MessageBuilder;
-  // 业务层
+  // 核心服务层
   match: MatchService;
   player: PlayerService;
   hero: HeroService;
   item: ItemService;
+  opendotaAdapter: OpenDotaAdapter;
+  report: ReportService;
+  // 任务层
   matchWatcher: MatchWatcherTask;
   parsePolling: ParsePollingTask;
-  report: ReportTask;
-  opendotaAdapter: OpenDotaAdapter;
+  reportTask: ReportTask;
   // 数据层
   valveAPI: ValveAPI;
   stratzAPI: StratzAPI;

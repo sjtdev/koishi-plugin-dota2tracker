@@ -168,6 +168,8 @@ export class MatchService extends Service {
       this.ctx.dota2tracker.cache.setFacetConstantsCache(languageTag, constantsQuery);
       // Step 4: 扩展比赛数据
       const match = MatchService.extendMatchData(matchQuery, facetData, this.ctx.dota2tracker.dotaconstants);
+      // 保存日报周报所需数据
+      this.ctx.dota2tracker.report.recordMatchExtension(match);
       return match;
     } catch (error) {
       // 查询失败时删除缓存

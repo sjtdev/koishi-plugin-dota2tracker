@@ -1,10 +1,11 @@
 import { Context, Service, Session } from "koishi";
 import * as graphql from "../../@types/graphql-generated";
-import { ItemList } from "./types";
+import { ItemList, RankInfo } from "./types";
 declare module "koishi" {
   interface Tables {
     dt_subscribed_guilds: dt_subscribed_guilds;
     dt_subscribed_players: dt_subscribed_players;
+    dt_match_extension: dt_match_extension;
   }
 }
 export interface dt_subscribed_players {
@@ -23,6 +24,32 @@ export interface dt_subscribed_guilds {
   platform: string;
 }
 
+export interface dt_match_extension {
+  matchId: number;
+  startTime: Date;
+  data: MatchExtensionData;
+}
+
+export interface MatchExtensionData {
+  // 索引键
+  matchId: number;
+
+  players: {
+    steamAccountId: number;
+    // 1. 时间敏感快照
+    rankSnapshot: RankInfo;
+
+    // 2. 高价值计算结果
+    mvpScore: number;
+    titles: string[];
+    utilityScore: number;
+
+    // 3. 极简状态位 (方便快速筛选，不用解析整个 match 对象)
+    laneResult: "stomp" | "stomped" | "tie" | "advantage" | "disadvantage" | "jungle";
+    partyId: number;
+  }[];
+}
+
 // export interface dt_sended_match_id {
 //     matchId: number;
 //     sendTime: Date;
@@ -34,7 +61,7 @@ export interface dt_subscribed_guilds {
 //     queryTime: Date;
 // }
 
-export  class DatabaseService extends Service {
+export class DatabaseService extends Service {
   constructor(ctx: Context) {
     super(ctx, "dota2tracker.database", true);
     // 注册数据库-表
@@ -52,7 +79,12 @@ export  class DatabaseService extends Service {
       },
       { autoInc: true },
     );
+    ctx.model.extend("dt_match_extension", { matchId: "unsigned", startTime: "timestamp", data: "json" }, { autoInc: false, primary: ["matchId"] });
   }
+  async insertReportData(matchId: number, startTime: Date, data: MatchExtensionData) {
+    return this.ctx.database.upsert("dt_match_extension", [{ matchId, startTime, data }]);
+  }
+
   async setPlayerRank(playerId: number, rank: { rank: number; leader: number }) {
     return this.ctx.database.set("dt_subscribed_players", playerId, { rank });
   }
