@@ -86,18 +86,18 @@ dota2tracker:
     titles:
       MVP: MVP-#FFA500
       Soul: Soul-#66CCFF
-      Rich: R-#FFD700
-      Wise: W-#8888FF
-      Controller: C-#FF00FF
-      Nuker: N-#CC0088
-      Breaker: B-#DD0000
-      Ghost: G-#CCCCCC
-      Utility: U-#20B2AA
-      Assister: A-#006400
-      Demolisher: D-#FEDCBA
-      Healer: H-#00FF00
-      Tank: T-#84A1C7
-      Idle: I-#DDDDDD
+      Rich: Rich-#FFD700
+      Wise: Wise-#8888FF
+      Controller: Controller-#FF00FF
+      Nuker: Nuker-#CC0088
+      Breaker: Breaker-#DD0000
+      Ghost: Ghost-#CCCCCC
+      Utility: Utility-#20B2AA
+      Assister: Assister-#006400
+      Demolisher: Demolisher-#FEDCBA
+      Healer: Healer-#00FF00
+      Tank: Tank-#84A1C7
+      Idle: Idle-#DDDDDD
     situation: Situation
     networth: Net Worth
     experience: Experience
