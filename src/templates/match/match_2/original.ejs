@@ -22,7 +22,8 @@
 <% const modeName = ($t("dota2tracker.template.lobby_types." + match.lobbyType) || match.lobbyType) + "/" + ($t("dota2tracker.template.game_modes." + match.gameMode) || match.gameMode); %>
 <% const statusClass = match.odParsed ? "opendota" : (match.parsedDateTime ? "success" : "fail"); %>
 <% const rankStyle = (match.odParsed && match.lobbyType !== "RANKED") ? "filter:grayscale(1)" : ""; %>
-
+<%# --- 引入工具函数 --- %>
+<%- include("../../common/utils/match") %>
 <nav>
   <div class="match_id">
     <p><%= $t("dota2tracker.template.match_id_").slice(0, -1) %> <%- match.id %></p>
@@ -133,8 +134,8 @@
 
       <div class="titles">
         <% p.titles.forEach(item => { %>
-        <% const [title, color] = $t(item).split('-'); %>
-        <span <%- `style="color: ${darken(color, 25)};"` %>><%= title %></span>
+        <% const title = parseBadge(item, $t); %>
+        <span <%- `style="color: ${darken(title.color, 25)};"` %>><%= title.shortText %></span>
         <% }); %>
       </div>
 

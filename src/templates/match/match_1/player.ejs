@@ -117,8 +117,8 @@
     <%# 5. 称号 (Titles) %>
     <div class="titles row-2 col-start-2 col-end-3 w-full flex items-center pl-[12px] gap-[6px]">
       <% p.titles.forEach(item => { %>
-        <% const [title, color] = $t(item).split("-"); %>
-        <span <%- `style="color: ${color};"` %>><%= title %></span>
+        <% const title = parseBadge(item, $t); %>
+        <span <%- `style="color: ${title.color};"` %>><%= title.shortText %></span>
       <% }); %>
     </div>
   </section>

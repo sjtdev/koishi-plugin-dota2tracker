@@ -1,0 +1,37 @@
+<%
+/**
+ * 智能解析称号徽章
+ */
+parseBadge = function(key, $t) {
+  // 1. 获取翻译内容 "富-#FFD700"
+  const rawTranslation = $t(key);
+
+  // 2. 分割颜色
+  const parts = rawTranslation.split('-#');
+  const text = parts[0];
+  const color = parts.length > 1 ? '#' + parts[1] : '#9CA3AF';
+
+  // 3. 提取 Key 后缀
+  const keySuffix = key.split('.').pop() || '';
+
+  // 4. 白名单 (核心称号不缩写)
+  const FORCE_FULL = ['MVP', 'Soul'];
+
+  // 5. 生成短文本 (战报逻辑)
+  let shortText = text;
+
+  // 逻辑：不是核心称号 && 纯英文 && 长度 > 3 -> 缩写
+  if (!FORCE_FULL.includes(keySuffix) &&
+      /^[A-Za-z0-9]+$/.test(text) &&
+      text.length > 3) {
+      shortText = text.charAt(0).toUpperCase();
+  }
+
+  return {
+    fullText: text,
+    shortText: shortText,
+    color: color,
+    style: `color: ${color}; border-color: ${color};`
+  };
+}
+%>
