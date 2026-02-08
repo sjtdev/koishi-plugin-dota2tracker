@@ -36,7 +36,7 @@ export let usage = "";
 // export const inject = ["http", "database", "cron", "puppeteer", "cache"]; // 声明依赖
 export const inject = {
   required: ["database", "puppeteer", "cache"],
-  optional: ["cron", "console"],
+  optional: ["cron"],
 };
 
 export { Config } from "./config.ts";
