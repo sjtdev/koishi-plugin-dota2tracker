@@ -196,7 +196,7 @@
                   <% if (item.facet) { %>
                     <img src="<%= getImageUrl(item.facet?.icon, ImageType.IconsFacets) %>">
                   <% } %>
-                  <span class="name"><%= item.name_loc %></span>
+                  <span class="name font-serif"><%= item.name_loc %></span>
 
                   <% if (item.ability_is_innate && !item.ability_is_facet) { %>
                     <span class="is_innate"><%= $t("dota2tracker.template.innate") %></span>

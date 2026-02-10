@@ -13,7 +13,7 @@ _config:
     suppressApiNetworkErrors: |-
        When enabled, Stratz/OpenDota network error logs will be output at the debug level.  
        (e.g., timeouts, network connection issues, but excludes 403 Forbidden)  
-       Koishi does not display debug-level logs by default. To enable debug log display, please see [📖 Configs#suppressapinetworkerrors](http://sjtdev.github.io/koishi-plugin-dota2tracker/configs.html#suppressapinetworkerrors-boolean)
+       Koishi does not display debug-level logs by default. To enable debug log display, please see [📖 Configs#suppressapinetworkerrors](https://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/configs.html#suppressapinetworkerrors-boolean)
     enableOpenDotaFallback: Enable OpenDota as a fallback data source for match tracking and query-match features.
     OPENDOTA_API_KEY: |-
       Your paid subscription API key for OpenDota.  
@@ -56,21 +56,35 @@ _config:
     weeklyReportShowCombi: Show combinations in weekly report
   template:
     $desc: Template Settings
-    template_match: Template used to generate match information images, see [📖 Template Display](https://sjtdev.github.io/koishi-plugin-dota2tracker/template-match.html) for template display.
-    template_player: Template used to generate player information images. (Currently only one template available)
-    template_hero: Template used to generate hero information images. (Currently only one template available)
-    playerRankEstimate: Estimate the rank of players without a rank in the player template <br>Estimated rank will be displayed as a gray image
+    template_match: Template used for generating match information images. See [📖 Template Info#Match Info Template](https://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/template-match.html) for display effects.
+    template_player: Template used for generating player information images. (Currently only one template available)
+    template_hero: Template used for generating hero information images. (Currently only one template available)
+    playerRankEstimate: Estimate rank for unranked players in the player template <br>Estimated ranks will be displayed as gray images
     templateFonts: |-
-      Font names used in the template. Requires font files installed on the koishi host machine.  
-      Multiple fonts can be added; the system will use the first available font from top to bottom.  
-      If all fonts are unavailable, falls back to system defaults.  
-      Important formatting rules:  
-      - Enclose font names in quotes (" ") if they contain spaces or special characters (recommended for all font names)
-      - Do NOT enclose generic font family names (e.g. sans-serif, monospace) in quotes
-      Examples:
+      **>Deprecated!<**  
+      **If you need to configure fonts, please use the `fonts.*` configuration option below instead!**  
+      Font names used in the template. Requires font files to be installed on the device running Koishi.  
+      Multiple font names can be added, and it will fallback from top to bottom to the first available font; if no fonts are available, the system default font will be used.  
+      If a font name contains spaces or special characters, quotes must be added around the name (it is recommended to always use quotes here);  
+      If using a generic font family name, you must **NOT use quotes**, e.g.:
       ```
       "Microsoft YaHei"
       sans-serif
       ```
-      For details on font-family syntax, see:
-      [📖 MDN: font-family](https://developer.mozilla.org/en-US/docs/Web/CSS/font-family)
+      For more information on font-family, please refer to [📖 MDN: font-family](https://developer.mozilla.org/en-US/docs/Web/CSS/font-family)
+    fontPath: Font directory path
+    fonts: 
+      description: |-
+        **Interim solution. A more comprehensive and flexible font configuration scheme will be implemented in the console in the future.**  
+        Font configuration used in the template.  
+        It will automatically scan font files in the `fontPath` directory to generate the selectable font list below.  
+        You can separately configure fallback lists for sans-serif (sans), serif (serif), and monospace (mono) font families.  
+        The main font type used in the templates is **sans-serif**, while some text in certain templates uses **serif** and **monospace** fonts.  
+        For more information on font configuration, please refer to [📖 Template Info#Template Fonts](https://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/template-fonts.html)
+        
+      sans: 
+        $desc: Sans-serif fonts (sans-serif)
+      serif: 
+        $desc: Serif fonts (serif)
+      mono: 
+        $desc: Monospace fonts (monospace)

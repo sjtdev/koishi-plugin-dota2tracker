@@ -160,6 +160,7 @@ dota2tracker:
     stratz_api_query_error: "Stratz API 返回了有效数据，但同时也返回了查询报错。错误信息: {cause}"
     opendota_parse_request_sent: "比赛 {matchId} 解析请求已成功发送至 OpenDota 服务器。"
     opendota_parse_request_failed: "比赛 {matchId} 解析请求向 OpenDota 服务器发送失败。"
+    font_loaded: "字体目录发生变化: {filename} ({eventType})，重新加载字体列表..."
   time:
     years_months_ago: "{years}年{months}个月前"
     years_ago: "{years}年前"

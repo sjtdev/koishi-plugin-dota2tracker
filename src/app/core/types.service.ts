@@ -15,6 +15,7 @@ import { ReportTask } from "../tasks/report.task";
 import { OpenDotaAPI } from "../data/opendota.api";
 import { OpenDotaAdapter } from "./opendota.adapter";
 import { ReportService } from "./report.service";
+import { FontService } from "../presentation/font.service";
 import type ConstantsType from "dotaconstants";
 
 export interface DOTA2TrackerServices {
@@ -23,6 +24,7 @@ export interface DOTA2TrackerServices {
   // 展现层
   view: ViewRenderer;
   messageBuilder: MessageBuilder;
+  font: FontService;
   // 核心服务层
   match: MatchService;
   player: PlayerService;

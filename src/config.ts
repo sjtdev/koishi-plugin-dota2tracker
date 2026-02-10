@@ -36,6 +36,8 @@ export interface Config {
   template_hero: string;
   playerRankEstimate: boolean;
   templateFonts: string[];
+  fontPath: string;
+  fonts: { sans: string[]; serif: string[]; mono: string[] };
 }
 const templateDir = path.join(__dirname, "templates");
 // 读取 schema.yml 文件
@@ -70,8 +72,8 @@ export const Config: Schema = Schema.intersect([
           alias: Schema.string().required(),
         }),
       )
-      .default([])
-      .role("table"),
+        .default([])
+        .role("table"),
       autoRecallTips: Schema.boolean().default(true),
       rankBroadSwitch: Schema.boolean().default(false),
     }).i18n(getI18n("message")),
@@ -116,7 +118,14 @@ export const Config: Schema = Schema.intersect([
     template_player: Schema.union([...readDirectoryFilesSync(path.join(templateDir, "player"))]).default("player_1"),
     template_hero: Schema.union([...readDirectoryFilesSync(path.join(templateDir, "hero"))]).default("hero_1"),
     playerRankEstimate: Schema.boolean().default(true),
-    templateFonts: Schema.array(String).default([]).role("table"),
+    templateFonts: Schema.array(String).default([]).role("table").deprecated(),
+    fontPath: Schema.path({ filters: ["directory"] }).default("data/fonts/dota2tracker"),
+    fonts: Schema.object({
+      description: Schema.never(),
+      sans: Schema.array(Schema.dynamic("dota2tracker.fonts")).collapse(),
+      serif: Schema.array(Schema.dynamic("dota2tracker.fonts")).collapse(),
+      mono: Schema.array(Schema.dynamic("dota2tracker.fonts")).collapse(),
+    }),
   }).i18n(getI18n("template")),
 ]);
 

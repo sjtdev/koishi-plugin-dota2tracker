@@ -1,6 +1,7 @@
 import { Context } from "koishi";
-import {} from "koishi-plugin-cron";
 import path from "path";
+import {} from "koishi-plugin-cron";
+import {} from "koishi-plugin-fonts";
 import { I18NService } from "./app/common/i18n.ts";
 import { HeroService } from "./app/core/hero.service.ts";
 import { ItemService } from "./app/core/item.service.ts";
@@ -12,6 +13,7 @@ import { DatabaseService } from "./app/data/database.ts";
 import { StratzAPI } from "./app/data/stratz.api.ts";
 import { ValveAPI } from "./app/data/valve.api.ts";
 import { ViewRenderer } from "./app/presentation/view.renderer.ts";
+import { FontService } from "./app/presentation/font.service.ts";
 import { MessageBuilder } from "./app/presentation/message.builder.ts";
 import { MatchWatcherTask } from "./app/tasks/match-watcher.task.ts";
 import { ParsePollingTask } from "./app/tasks/parse-polling.task.ts";
@@ -79,6 +81,8 @@ export async function apply(ctx: Context, config: Config) {
     ctx.dota2tracker.opendotaAPI = new OpenDotaAPI(ctx);
     ctx.dota2tracker.opendotaAdapter = new OpenDotaAdapter(ctx);
   }
+  ctx.dota2tracker.font = new FontService(ctx);
+
   ctx.dota2tracker = ctx.dota2tracker as DOTA2TrackerServices;
 
   // 注册配置页说明

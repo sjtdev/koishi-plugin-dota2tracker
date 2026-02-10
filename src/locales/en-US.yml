@@ -172,6 +172,7 @@ dota2tracker:
     stratz_api_query_error: "Stratz API returned partial data with errors: {cause}"
     opendota_parse_request_sent: "Parse request for match {matchId} has been sent to OpenDota servers successfully."
     opendota_parse_request_failed: "Failed to send parse request for match {matchId} to OpenDota servers."
+    font_loaded: "Font directory changed: {filename} ({eventType}), reloading font list..."
   time:
     years_months_ago: "{years} years and {months} months ago"
     years_ago: "{years} years ago"
