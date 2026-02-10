@@ -1,6 +1,6 @@
-import fs from "fs";
+import fs from "node:fs";
 import { Context, Service } from "koishi";
-import path from "path";
+import path from "node:path";
 import * as graphql from "../../@types/graphql-generated";
 import { Config } from "../../config";
 import { GraphQLQueryError, processFetchError } from "../common/error";

@@ -3,8 +3,8 @@ import { Config } from "../../config";
 import { OpenDotaMatch } from "../../@types/opendota-generated";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
-import { Agent as HttpAgent } from "http";
-import { Agent as HttpsAgent } from "https";
+import { Agent as HttpAgent } from "node:http";
+import { Agent as HttpsAgent } from "node:https";
 import { processFetchError } from "../common/error";
 
 export class OpenDotaAPI extends Service<Config> {

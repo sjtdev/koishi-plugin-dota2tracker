@@ -1,6 +1,6 @@
 import { Schema } from "koishi";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { LanguageTags } from "./app/common/i18n";
 
 // 配置项

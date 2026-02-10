@@ -1,5 +1,5 @@
 import { Context } from "koishi";
-import path from "path";
+import path from "node:path";
 import {} from "koishi-plugin-cron";
 import {} from "koishi-plugin-fonts";
 import { I18NService } from "./app/common/i18n.ts";

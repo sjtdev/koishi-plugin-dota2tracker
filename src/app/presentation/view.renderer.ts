@@ -1,14 +1,14 @@
 import { Context, Random, Service } from "koishi";
 import ejs from "ejs";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { type Config } from "../../config";
 import {} from "koishi-plugin-puppeteer";
 import { type FontInfo } from "./font.service";
 import { TemplateType } from "../common/types";
 import { ImageFormat, ImageType } from "../common/types";
 import { DateTime } from "luxon";
-import { pathToFileURL } from "url";
+import { pathToFileURL } from "node:url";
 
 export class ViewRenderer extends Service<Config> {
   private readonly templateDir: string;

@@ -1,7 +1,7 @@
 import { Logger } from "@cordisjs/logger";
 import { I18NService } from "./i18n";
 import { Config } from "../../config";
-import { inspect } from "util";
+import { inspect } from "node:util";
 import axios from "axios";
 
 export class NetworkError extends Error {
