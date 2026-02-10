@@ -7,6 +7,7 @@ import {} from "koishi-plugin-puppeteer";
 import { TemplateType } from "../common/types";
 import { ImageFormat, ImageType } from "../common/types";
 import { DateTime } from "luxon";
+import { pathToFileURL } from "url";
 
 export class ViewRenderer extends Service<Config> {
   private readonly templateDir: string;
@@ -62,10 +63,8 @@ export class ViewRenderer extends Service<Config> {
   private getImageUrl(image: string, type: ImageType = ImageType.Local, format: ImageFormat = ImageFormat.png) {
     if (type === ImageType.Local) {
       try {
-        if (format === ImageFormat.svg) return fs.readFileSync(path.join(this.templateDir, "images", `${image}.svg`));
-        const imageData = fs.readFileSync(path.join(this.templateDir, "images", `${image}.${format}`));
-        const base64Data = imageData.toString("base64");
-        return `data:image/png;base64,${base64Data}`;
+        const absolutePath = path.join(this.templateDir, "images", `${image}.${format}`);
+        return pathToFileURL(absolutePath).href;
       } catch (error) {
         console.error(error);
         return "";
