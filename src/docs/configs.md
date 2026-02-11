@@ -73,6 +73,9 @@
 #### customItemAlias `array`
 - 插件会从[内置别名列表](https://github.com/sjtdev/koishi-plugin-dota2tracker/blob/master/src/locales/zh-CN.constants.json#L304-L407)通过一些常见物品别名检索物品，如有疏漏可在此配置处自行添加。如果是内置列表遗漏的广为流传的别名也可提出*issue*或*pull request*协助完善词典。
 
+#### autoRecallTips `boolean`
+- 开启后，在指令调用结束后自动撤回**提示**消息，如：“正在搜索对局详情，请稍后……”
+
 #### 段位追踪
 ##### rankBroadSwitch `boolean`
 - 启用后追踪已绑定玩家的段位信息，出现变动后对所在且已订阅的群组发送段位变动报告。

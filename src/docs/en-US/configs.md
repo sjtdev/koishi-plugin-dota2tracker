@@ -72,6 +72,9 @@
 #### customItemAlias `array`
 - Define custom alias list for in-game items.
 
+#### autoRecallTips `boolean`
+- When enabled, automatically recalls **tip** messages after the command call ends, such as: "Searching for match details, please wait..."
+
 #### Rank Tracking
 ##### rankBroadSwitch `boolean`
 - Enables tracking of bound players’ rank information; changes will result in sending rank change reports to the subscribed groups.
