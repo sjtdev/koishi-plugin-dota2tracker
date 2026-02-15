@@ -1,5 +1,21 @@
 # 更新日志
 
+## [2.4.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.3.4...v2.4.0) (2026-02-15)
+
+### ✨ 新增功能
+
+* **fonts:** **破坏性更新** 弃用`templateFonts`，重构实现更完善的模板字体配置服务 ([2883322](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/2883322dcaabeaadad26bbf88e6b419a97ced594))
+
+### 🚀 功能优化
+
+* **dep:** 依赖 `ejs` 从`3.1.10`升级至`4.0.1`，略微提升性能(?) ([35d79ea](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/35d79ea8bc1c63dcab3794405096231d293f34dc))
+* **locale-en/template/titles:** update English titles to full words for adaptive rendering ([6ce279d](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/6ce279daeafed77478618b95b77a83991c5b428a))
+* **view:** 切换 ejs 获取本地图片资源的方式，优化模板生成速度 ([6687537](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/66875377e685d8de71e4c5edd7e3b2a1c79b9895))
+
+### 📝 文档
+
+* **config/autoRecallTips:** 补充说明 ([1dfb38d](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/1dfb38d3755d32ce10e8dd1d5e4170b8852760a6))
+
 ### [2.3.4](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.3.3...v2.3.4) (2026-02-03)
 
 ### ✨ 新增功能
