@@ -54,9 +54,11 @@ export class FontService extends Service {
     try {
       this.watcher = fs.watch(fontsPath, (eventType, filename) => {
         if (filename && /\.(ttf|otf|woff2?|ttc|sfnt)$/.test(filename)) {
-          this.logger.debug(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.font_loader", { filename, eventType }));
           if (this.debounceTimer) clearTimeout(this.debounceTimer);
-          this.debounceTimer = setTimeout(() => this.loadFonts(fontsPath), 200);
+          this.debounceTimer = setTimeout(() => {
+            this.logger.debug(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.font_loader", { filename: "batch", eventType: "change" }));
+            this.loadFonts(fontsPath);
+          }, 200);
         }
       });
     } catch (e) {
