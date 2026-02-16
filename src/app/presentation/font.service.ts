@@ -54,7 +54,7 @@ export class FontService extends Service {
     try {
       this.watcher = fs.watch(fontsPath, (eventType, filename) => {
         if (filename && /\.(ttf|otf|woff2?|ttc|sfnt)$/.test(filename)) {
-          this.logger.debug(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.font_loader.reload", { filename, eventType }));
+          this.logger.debug(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.font_loader", { filename, eventType }));
           if (this.debounceTimer) clearTimeout(this.debounceTimer);
           this.debounceTimer = setTimeout(() => this.loadFonts(fontsPath), 200);
         }
