@@ -109,13 +109,17 @@
 英雄模板选择`目前仅有一张模板`
 #### playerRankEstimate `boolean`
 启用后使用`查询玩家`指令查询无段位玩家时，将根据玩家近期场次段位推算玩家段位，推算的段位标志显示为灰色图片。
-#### templateFonts `string[]`
-模板所使用的字体名。需要 koishi 所在设备安装字体文件。  
-可添加多个字体名，将从上到下回退到第一个可用字体；若所有字体都不可用，则使用系统默认字体。  
-其中字体名若包含空格或特殊字符需要在名称首尾添加引号（此处建议尽量强制使用引号）；  
-若使用字体族名则必须**不使用引号**，如：
-```
-"Microsoft YaHei"
-sans-serif
-```
-有关font-family的更多信息，请查阅 [📖 MDN: font-family](https://developer.mozilla.org/zh-CN/docs/Web/CSS/font-family)  
+
+#### fontPath `string`
+- 字体文件所在目录，默认为 `data/fonts/dota2tracker`。
+- 插件会自动读取该目录下的字体文件，并在下方 `fonts` 配置项中生成可选列表。
+- 支持的字体格式：`.ttf`, `.otf`, `.woff`, `.woff2`, `ttc`, `sfnt`。
+
+#### fonts
+模板字体设置。具体请见 [模板字体](./template-fonts.md)。
+##### fonts.sans `dynamic`
+- 非衬线字体，是大多数模板的默认主要正文字体。
+##### fonts.serif `dynamic`
+- 衬线字体，在一些模板中用作标题字体。
+##### fonts.mono `dynamic`
+- 等宽字体，在一些模板中用作代码、数字字体。

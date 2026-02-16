@@ -5,6 +5,9 @@
 
 > 每次构建文档时随机选取三个英雄生成展示图片  
 
+> [!TIP] 字体
+> 技能名使用`font-serif`字体设置。
+
 <ImageViewer src="generated/hero_1-0.png" />
 ***
 <ImageViewer src="generated/hero_1-1.png" />

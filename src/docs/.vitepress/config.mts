@@ -67,9 +67,10 @@ export default defineConfig({
               { text: "配置项", link: "/configs" },
               { text: "指令说明", link: "/commands" },
               {
-                text: "模板展示",
+                text: "模板相关",
                 link: "/template",
                 items: [
+                  { text: "模板字体", link: "/template-fonts" },
                   { text: "对局信息模板", link: "/template-match" },
                   { text: "玩家信息模板", link: "/template-player" },
                   { text: "英雄信息模板", link: "/template-hero" },
@@ -134,9 +135,10 @@ export default defineConfig({
               { text: "Configuration Items", link: "/en-US/configs" },
               { text: "Command Instructions", link: "/en-US/commands" },
               {
-                text: "Template Display",
+                text: "Templates",
                 link: "/en-US/template",
                 items: [
+                  { text: "Template Fonts", link: "/en-US/template-fonts" },
                   { text: "Match Info Template", link: "/en-US/template-match" },
                   { text: "Player Info Template", link: "/en-US/template-player" },
                   { text: "Hero Info Template", link: "/en-US/template-hero" },
