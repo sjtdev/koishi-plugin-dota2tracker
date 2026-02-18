@@ -2012,7 +2012,15 @@ export type PlayersMatchesForDailyQueryVariables = Exact<{
 }>;
 
 
-export type PlayersMatchesForDailyQuery = { __typename?: 'DotaQuery', players?: Array<{ __typename?: 'PlayerType', steamAccount?: { __typename?: 'SteamAccountType', id?: any | null, name?: string | null, avatar?: string | null } | null, matches?: Array<{ __typename?: 'MatchType', id?: any | null, didRadiantWin?: boolean | null, parsedDateTime?: any | null, startDateTime?: any | null, players?: Array<{ __typename?: 'MatchPlayerType', kills?: any | null, deaths?: any | null, assists?: any | null, imp?: any | null, isRadiant?: boolean | null, steamAccount?: { __typename?: 'SteamAccountType', id?: any | null } | null } | null> | null } | null> | null } | null> | null };
+export type PlayersMatchesForDailyQuery = { __typename?: 'DotaQuery', players?: Array<{ __typename?: 'PlayerType', steamAccount?: { __typename?: 'SteamAccountType', id?: any | null, name?: string | null, avatar?: string | null } | null, matches?: Array<{ __typename?: 'MatchType', id?: any | null, didRadiantWin?: boolean | null, parsedDateTime?: any | null, startDateTime?: any | null, durationSeconds?: number | null, players?: Array<{ __typename?: 'MatchPlayerType', heroId?: any | null, kills?: any | null, deaths?: any | null, assists?: any | null, imp?: any | null, isRadiant?: boolean | null, heroDamage?: number | null, towerDamage?: number | null, networth?: number | null, steamAccount?: { __typename?: 'SteamAccountType', id?: any | null } | null } | null> | null } | null> | null } | null> | null };
+
+export type PlayersMatchesForDaily_LegacyQueryVariables = Exact<{
+  steamAccountIds: Array<InputMaybe<Scalars['Long']['input']>> | InputMaybe<Scalars['Long']['input']>;
+  seconds: Scalars['Long']['input'];
+}>;
+
+
+export type PlayersMatchesForDaily_LegacyQuery = { __typename?: 'DotaQuery', players?: Array<{ __typename?: 'PlayerType', steamAccount?: { __typename?: 'SteamAccountType', id?: any | null, name?: string | null, avatar?: string | null } | null, matches?: Array<{ __typename?: 'MatchType', id?: any | null, didRadiantWin?: boolean | null, parsedDateTime?: any | null, startDateTime?: any | null, players?: Array<{ __typename?: 'MatchPlayerType', kills?: any | null, deaths?: any | null, assists?: any | null, imp?: any | null, isRadiant?: boolean | null, steamAccount?: { __typename?: 'SteamAccountType', id?: any | null } | null } | null> | null } | null> | null } | null> | null };
 
 export type RequestMatchDataAnalysisQueryVariables = Exact<{
   matchId: Scalars['Long']['input'];

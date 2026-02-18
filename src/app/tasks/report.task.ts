@@ -1,4 +1,4 @@
-import { Context, Service } from "koishi";
+import { Context, Service, Session } from "koishi";
 import { Config } from "../../config";
 import { roundToDecimalPlaces } from "../common/utils";
 import * as graphql from "../../@types/graphql-generated";
@@ -7,36 +7,42 @@ import { handleError } from "../common/error";
 import { DateTime } from "luxon";
 
 export class ReportTask extends Service<Config> {
-  /*
-  还没计划好怎么动这一坨，先原样移植吧。
-  */
   constructor(ctx: Context) {
-    super(ctx, "dota2tracker.report", true);
+    super(ctx, "dota2tracker.report-task", true);
     this.config = ctx.config;
 
     if (this.config.dailyReportSwitch) {
       ctx.cron(`0 ${this.config.dailyReportHours} * * *`, async () => {
-        try {
-          const oneDayAgo = Math.floor(DateTime.now().minus({ days: 1 }).toSeconds());
-          await this.report(oneDayAgo, "dota2tracker.template.yesterdays_summary", this.config.dailyReportShowCombi);
-        } catch (error) {
-          handleError(error, this.logger, this.ctx.dota2tracker.i18n, this.config);
-        }
+        await this.runDailyJob();
       });
     }
     if (this.config.weeklyReportSwitch) {
       ctx.cron(`0 ${this.config.weeklyReportDayHours[1]} * * ${this.config.weeklyReportDayHours[0]}`, async () => {
-        try {
-          const oneWeekAgo = Math.floor(DateTime.now().minus({ weeks: 1 }).toSeconds());
-          await this.report(oneWeekAgo, "dota2tracker.template.last_weeks_summary", this.config.weeklyReportShowCombi);
-        } catch (error) {
-          handleError(error, this.logger, this.ctx.dota2tracker.i18n, this.config);
-        }
+        await this.runWeeklyJob();
       });
     }
   }
 
-  private async report(timeAgo, titleKey, showCombi) {
+  private async runDailyJob() {
+    // Step 1: 调用 reportService 获取{频道: 数据}[]
+    const bundles = await this.ctx.dota2tracker.report.generateDailyReportBundles();
+    // Step 2: 遍历每个对象，调用 view 渲染图片并发送到对应频道
+    for (const bundle of bundles) {
+      const image = await this.ctx.dota2tracker.view.renderToImageByFile(bundle.report, "daily", TemplateType.Report, await this.ctx.dota2tracker.i18n.getLanguageTag({ channelId: bundle.channelId }));
+      await this.ctx.broadcast([`${bundle.platform}:${bundle.channelId}`], image);
+    }
+  }
+
+  private async runWeeklyJob() {
+    try {
+      const oneWeekAgo = Math.floor(DateTime.now().minus({ weeks: 1 }).toSeconds());
+      await this.report_legacy(oneWeekAgo, "dota2tracker.template.last_weeks_summary", this.config.weeklyReportShowCombi);
+    } catch (error) {
+      handleError(error, this.logger, this.ctx.dota2tracker.i18n, this.config);
+    }
+  }
+
+  private async report_legacy(timeAgo, titleKey, showCombi) {
     // 获取所有订阅的公会信息
     const subscribedGuilds = await this.ctx.database.get("dt_subscribed_guilds", undefined);
     // 获取订阅的玩家，并筛选出那些属于已订阅公会的玩家
@@ -44,7 +50,7 @@ export class ReportTask extends Service<Config> {
     const steamIds = subscribedPlayersInGuild.map((player) => player.steamId).filter((value, index, self) => self.indexOf(value) === index);
 
     // 使用工具函数查询比赛数据，将结果中的玩家信息过滤出参与过至少一场比赛的玩家
-    const players = (await this.ctx.dota2tracker.stratzAPI.queryPlayersMatchesForDaily(steamIds, timeAgo)).players.filter((player) => player.matches?.length > 0);
+    const players = (await this.ctx.dota2tracker.stratzAPI.queryPlayersMatchesForDaily_legacy(steamIds, timeAgo)).players.filter((player) => player.matches?.length > 0);
     // 对比赛信息去重处理，确保每场比赛唯一
     const matches = players
       .map((player) => player.matches.map((match) => match))
@@ -135,7 +141,7 @@ export class ReportTask extends Service<Config> {
                 combinations,
                 showCombi,
               },
-              "daily",
+              "daily_legacy",
               TemplateType.Report,
               languageTag,
             ),

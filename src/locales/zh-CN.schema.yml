@@ -46,7 +46,7 @@ _config:
     $desc: 总结设置
     dailyReportSwitch: "日报功能"
     dailyReportHours: 日报时间小时
-    dailyReportShowCombi: 日报是否显示组合
+    dailyReportShowCombi: "*日报是否显示组合*"
     weeklyReportSwitch: 周报功能
     weeklyReportDayHours: 周报发布于周（几）的（几）点
     weeklyReportShowCombi: 周报是否显示组合

@@ -95,7 +95,7 @@ export const Config: Schema = Schema.intersect([
       Schema.object({
         dailyReportSwitch: Schema.const(true).required(),
         dailyReportHours: Schema.number().min(0).max(23).default(6),
-        dailyReportShowCombi: Schema.boolean().default(true),
+        dailyReportShowCombi: Schema.boolean().default(true).deprecated(),
       }),
       Schema.object({}),
     ]).i18n(getI18n("report")),

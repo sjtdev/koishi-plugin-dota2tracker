@@ -1,0 +1,87 @@
+<%# --- 基础数据 --- %>
+<% const { title, players, combinations, showCombi } = data; %>
+
+<%# --- 工具: 计算 IMP 条样式 --- %>
+<% const getImpInfo = (impVal) => {
+     const abs = Math.abs(impVal);
+     const isPos = impVal > 0;
+     const isOver = abs > 25;
+
+     let left = 0, right = 0;
+     if (isOver) {
+       if (isPos) right = abs;
+       else left = abs;
+     } else {
+       left = right = abs;
+     }
+
+     return {
+       valStr: (isPos ? "+" : "") + impVal,
+       barClass: `score_bar ${isPos ? "pos" : "neg"}${isOver ? " over" : ""}`,
+       leftStyle: `width: ${left}px`,
+       rightStyle: `width: ${right}px`
+     };
+   };
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Report</title>
+
+    <%- `<style>` %>
+      <%- include("../common/styles/normalize.min.css") %>
+      <%- include("./daily_legacy/base.css") %>
+      <% if (fontFamily) { %><%- `body { font-family: ${fontFamily}; }` %><% } %>
+    <%- `</style>` %>
+</head>
+<body>
+    <h3 class="title"><%= title %></h3>
+
+    <%# --- 玩家列表 --- %>
+    <div class="players">
+        <% players.forEach(p => { %>
+        <% const winRate = Math.round((p.winCount / p.matches.length) * 100); %>
+        <% const imp = getImpInfo(p.avgImp); %>
+
+        <div class="player">
+            <img src="<%= p.steamAccount.avatar %>" class="avatar" />
+            <span class="name"><%= p.name %></span>
+            <span class="count">
+                <span class="win"><%= $t("dota2tracker.template.report_won") %><%= p.winCount %></span>
+                <span class="lose"><%= $t("dota2tracker.template.report_lost") %><%= p.loseCount %></span>
+                <span><%= $t("dota2tracker.template.report_winrate") %> <%= winRate %>%</span>
+            </span>
+            <div class="performance">
+                <div class="<%= imp.barClass %>">
+                    <div class="left" <%- `style="${imp.leftStyle}"` %>></div>
+                    <div class="pipe"></div>
+                    <div class="right" <%- `style="${imp.rightStyle}"` %>></div>
+                </div>
+                <span class="score_value"><%= imp.valStr %></span>
+            </div>
+            <span class="kda"><%= p.avgKills %>/<%= p.avgDeaths %>/<%= p.avgAssists %> (<%= p.avgKDA %>)</span>
+        </div>
+        <% }); %>
+    </div>
+
+    <%# --- 组合列表 (开黑统计) --- %>
+    <div class="combinations" <%- !showCombi ? `style="display:none;"` : "" %>>
+        <span style="grid-column: 1/-1"><%= $t("dota2tracker.template.combined_win_loss_summary") %></span>
+        <% combinations.forEach(combi => { %>
+        <% const combiRate = Math.round((combi.winCount / combi.matches.length) * 100); %>
+
+        <div class="players">
+            <% combi.players.forEach(p => { %>
+            <img src="<%= p.steamAccount.avatar %>" class="avatar" />
+            <% }); %>
+        </div>
+        <span class="win"><%= $t("dota2tracker.template.report_won") %><%= combi.winCount %></span>
+        <span class="lose"><%= $t("dota2tracker.template.report_lost") %><%= combi.matches.length - combi.winCount %></span>
+        <span><%= $t("dota2tracker.template.report_winrate") %> <%= combiRate %>%</span>
+        <% }); %>
+    </div>
+</body>
+</html>

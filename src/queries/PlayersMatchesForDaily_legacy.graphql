@@ -1,4 +1,4 @@
-query PlayersMatchesForDaily($steamAccountIds: [Long]!, $seconds: Long!) {
+query PlayersMatchesForDaily_Legacy($steamAccountIds: [Long]!, $seconds: Long!) {
   players(steamAccountIds: $steamAccountIds) {
     steamAccount {
       id
@@ -10,17 +10,12 @@ query PlayersMatchesForDaily($steamAccountIds: [Long]!, $seconds: Long!) {
       didRadiantWin
       parsedDateTime
       startDateTime
-      durationSeconds
       players {
-        heroId
         kills
         deaths
         assists
         imp
         isRadiant
-        heroDamage
-        towerDamage
-        networth
         steamAccount {
           id
         }

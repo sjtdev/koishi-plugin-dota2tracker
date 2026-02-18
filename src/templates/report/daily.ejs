@@ -1,87 +1,228 @@
-<%# --- 基础数据 --- %>
-<% const { title, players, combinations, showCombi } = data; %>
-
-<%# --- 工具: 计算 IMP 条样式 --- %>
-<% const getImpInfo = (impVal) => {
-     const abs = Math.abs(impVal);
-     const isPos = impVal > 0;
-     const isOver = abs > 25;
-
-     let left = 0, right = 0;
-     if (isOver) {
-       if (isPos) right = abs;
-       else left = abs;
-     } else {
-       left = right = abs;
-     }
-
-     return {
-       valStr: (isPos ? "+" : "") + impVal,
-       barClass: `score_bar ${isPos ? "pos" : "neg"}${isOver ? " over" : ""}`,
-       leftStyle: `width: ${left}px`,
-       rightStyle: `width: ${right}px`
-     };
-   };
-%>
-
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Daily Report</title>
-
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Dota 2 Daily Recap</title>
     <%- `<style>` %>
-      <%- include("../common/styles/normalize.min.css") %>
-      <%- include("./daily/base.css") %>
-      <% if (fontFamily) { %><%- `body { font-family: ${fontFamily}; }` %><% } %>
+    <%- include(`./daily/style.css`) %>
+    <% if (fontFamily) { %><%- `body { font-family: ${fontFamily}; }` %><% } %>
     <%- `</style>` %>
-</head>
-<body>
-    <h3 class="title"><%= title %></h3>
+    <style>
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #101922; }
+      ::-webkit-scrollbar-thumb { background: #233648; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #137fec; }
+      .bg-texture {
+        background-color: #101922;
+        background-image:
+          radial-gradient(at 0% 0%, rgba(19, 127, 236, 0.08) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(255, 60, 60, 0.05) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(232, 188, 86, 0.05) 0px, transparent 50%);
+      }
+    </style>
+  </head>
+  <body class="bg-texture font-display text-white overflow-x-hidden antialiased min-h-screen">
+    <div class="w-full flex justify-center py-8 px-4 sm:px-6">
+      <div class="w-full max-w-[900px] flex flex-col gap-8">
 
-    <%# --- 玩家列表 --- %>
-    <div class="players">
-        <% players.forEach(p => { %>
-        <% const winRate = Math.round((p.winCount / p.matches.length) * 100); %>
-        <% const imp = getImpInfo(p.avgImp); %>
-
-        <div class="player">
-            <img src="<%= p.steamAccount.avatar %>" class="avatar" />
-            <span class="name"><%= p.name %></span>
-            <span class="count">
-                <span class="win"><%= $t("dota2tracker.template.report_won") %><%= p.winCount %></span>
-                <span class="lose"><%= $t("dota2tracker.template.report_lost") %><%= p.loseCount %></span>
-                <span><%= $t("dota2tracker.template.report_winrate") %> <%= winRate %>%</span>
+        <div class="flex flex-col items-center justify-center pt-2 pb-4 text-center">
+          <div class="mb-3 border-b-2 border-dota-red pb-1">
+            <span class="text-xs font-bold tracking-[0.2em] uppercase text-dota-gold drop-shadow-md">
+              <%= $t("dota2tracker.template.report.daily.plugin_name") %>
             </span>
-            <div class="performance">
-                <div class="<%= imp.barClass %>">
-                    <div class="left" <%- `style="${imp.leftStyle}"` %>></div>
-                    <div class="pipe"></div>
-                    <div class="right" <%- `style="${imp.rightStyle}"` %>></div>
+          </div>
+          <h1 class="text-4xl md:text-6xl font-serif font-black tracking-tight text-white uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] mb-2">
+            <%= $t("dota2tracker.template.report.daily.title") %>
+          </h1>
+          <div class="flex flex-col items-center gap-1 text-slate-400 font-medium">
+            <p class="text-lg tracking-widest uppercase text-slate-300"><%= data.meta.date %></p>
+            <p class="text-xs opacity-60 max-w-md mx-auto">
+              <%= data.meta.summary %>
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div class="flex flex-col items-center justify-center p-4 rounded bg-card-dark border border-white/5 shadow-lg relative overflow-hidden group">
+            <span class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">
+              <%= $t("dota2tracker.template.report.daily.stats.matches") %>
+            </span>
+            <span class="text-3xl font-black text-white"><%= data.headerStats.matches.value %></span>
+            <span class="text-xs text-slate-400 mt-1"><%= data.headerStats.matches.subtext %></span>
+          </div>
+
+          <div class="flex flex-col items-center justify-center p-4 rounded bg-card-dark border border-white/5 shadow-lg relative overflow-hidden group">
+            <div class="absolute inset-x-0 bottom-0 h-1 <%= data.headerStats.winRate.isWinRateAbove50 ? 'bg-dota-green/50' : 'bg-dota-red/50' %>"></div>
+            <span class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">
+              <%= $t("dota2tracker.template.report.daily.stats.win_rate") %>
+            </span>
+            <span class="text-3xl font-black <%= data.headerStats.winRate.isWinRateAbove50 ? 'text-dota-green' : 'text-dota-red' %>"><%= data.headerStats.winRate.value %></span>
+            <span class="text-xs mt-1 <%= data.headerStats.winRate.isPositive ? 'text-dota-green' : 'text-dota-red' %>"><%= data.headerStats.winRate.subtext %></span>
+          </div>
+
+          <div class="flex flex-col items-center justify-center p-4 rounded bg-card-dark border border-white/5 shadow-lg relative overflow-hidden group">
+            <div class="absolute inset-x-0 bottom-0 h-1 bg-dota-red/50"></div>
+            <span class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">
+              <%= $t("dota2tracker.template.report.daily.stats.kills") %>
+            </span>
+            <span class="text-3xl font-black text-dota-red"><%= data.headerStats.kills.value %></span>
+            <span class="text-xs text-slate-400 mt-1"><%= data.headerStats.kills.subtext %></span>
+          </div>
+
+          <div class="flex flex-col items-center justify-center p-4 rounded bg-card-dark border border-white/5 shadow-lg relative overflow-hidden group">
+            <div class="absolute inset-x-0 bottom-0 h-1 bg-dota-gold/50"></div>
+            <span class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">
+              <%= $t("dota2tracker.template.report.daily.stats.duration") %>
+            </span>
+            <span class="text-3xl font-black text-dota-gold"><%= data.headerStats.duration.value %></span>
+            <span class="text-xs text-slate-400 mt-1">
+              <%= data.headerStats.duration.subtext %>
+            </span>
+          </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-6 mt-2">
+          <% const lights = [data.spotlights.mvp, data.spotlights.lvp]; %>
+          <% lights.forEach(function(light) { %>
+            <div class="flex-1 relative rounded-lg border <%= light.type === 'MVP' ? 'border-dota-gold shadow-[0_0_30px_rgba(232,188,86,0.15)]' : 'border-dota-red shadow-[0_0_30px_rgba(255,60,60,0.15)]' %> bg-card-dark overflow-hidden group">
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style="background-image: url('<%= light.player.heroBannerUrl %>'); opacity: 0.4"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-card-dark via-card-dark/80 to-transparent"></div>
+              <div class="relative z-10 p-6 flex flex-col h-full min-h-[280px]">
+                <div class="flex justify-between items-center">
+                  <div class="<%= light.type === 'MVP' ? 'bg-dota-gold text-black shadow-dota-gold/20' : 'bg-dota-red text-white shadow-dota-red/20' %> text-xs font-black uppercase px-3 py-1 rounded shadow-lg">
+                    <%= light.type === 'MVP' ? $t("dota2tracker.template.report.daily.spotlight.mvp_title") : $t("dota2tracker.template.report.daily.spotlight.lvp_title") %>
+                  </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 fill-current" viewBox="0 0 24 24">
+                    <% if (light.type === 'MVP') { %>
+                      <path class="text-dota-gold" d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+                    <% } else { %>
+                      <path class="text-dota-red" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    <% } %>
+                  </svg>
                 </div>
-                <span class="score_value"><%= imp.valStr %></span>
+                <div class="mt-auto">
+                  <h3 class="text-3xl font-serif font-bold text-white leading-none mb-1 drop-shadow-md"><%= light.player.name %></h3>
+                  <p class="text-slate-300 text-sm font-medium leading-none mb-1"><%= light.player.heroName %></p>
+                  <p class="text-slate-400 text-sm font-mono mb-3"><%= light.player.kda %></p>
+                  <div class="bg-black/40 backdrop-blur-sm rounded-lg p-3 border border-white/10">
+                    <div class="flex flex-col gap-2">
+                      <div class="flex justify-between items-center border-b border-white/10 pb-2">
+                        <span class="text-xs text-slate-400 uppercase tracking-widest font-bold">
+                          <%= light.score.label %>
+                        </span>
+                        <span class="font-mono text-2xl font-bold <%= light.type === 'MVP' ? 'text-dota-gold' : 'text-dota-red' %>"><%= light.score.value %></span>
+                      </div>
+                      <div class="flex flex-wrap gap-2 pt-1 min-h-[22px]">
+                        <% if (light.badges && light.badges.length > 0) { %>
+                          <% light.badges.forEach(function(badge) { %>
+                            <% 
+                              // Convert HEX to RGB for background opacity
+                              const r = parseInt(badge.hexColor.slice(1, 3), 16);
+                              const g = parseInt(badge.hexColor.slice(3, 5), 16);
+                              const b = parseInt(badge.hexColor.slice(5, 7), 16);
+                              const bgStyle = `background-color: rgba(${r}, ${g}, ${b}, 0.2); border-color: rgba(${r}, ${g}, ${b}, 0.3); color: ${badge.hexColor};`;
+                            %>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border" style="<%= bgStyle %>"><%= badge.text %></span>
+                          <% }); %>
+                        <% } else { %>
+                           <!-- Placeholder to maintain layout if needed, though min-h handles it -->
+                        <% } %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <span class="kda"><%= p.avgKills %>/<%= p.avgDeaths %>/<%= p.avgAssists %> (<%= p.avgKDA %>)</span>
+          <% }); %>
         </div>
-        <% }); %>
-    </div>
 
-    <%# --- 组合列表 (开黑统计) --- %>
-    <div class="combinations" <%- !showCombi ? `style="display:none;"` : "" %>>
-        <span style="grid-column: 1/-1"><%= $t("dota2tracker.template.combined_win_loss_summary") %></span>
-        <% combinations.forEach(combi => { %>
-        <% const combiRate = Math.round((combi.winCount / combi.matches.length) * 100); %>
+        <div class="bg-[#0d141c] rounded-xl border border-white/5 overflow-hidden">
+          <div class="flex items-center justify-between p-4 border-b border-white/5 bg-[#16202c]">
+            <h2 class="text-lg font-serif font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <span class="w-1 h-4 bg-dota-red rounded-full"></span>
+              <%= $t("dota2tracker.template.report.daily.squad.title") %>
+            </h2>
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-black/20 px-2 py-1 rounded border border-white/5">
+              <%= $t("dota2tracker.template.report.daily.squad.subtitle") %>
+            </div>
+          </div>
 
-        <div class="players">
-            <% combi.players.forEach(p => { %>
-            <img src="<%= p.steamAccount.avatar %>" class="avatar" />
+          <div class="hidden md:grid grid-cols-12 gap-4 px-4 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-black/20">
+            <div class="col-span-1 text-center"><%= $t("dota2tracker.template.report.daily.squad.header.rank") %></div>
+            <div class="col-span-4 pl-2"><%= $t("dota2tracker.template.report.daily.squad.header.player_info") %></div>
+            <div class="col-span-3"><%= $t("dota2tracker.template.report.daily.squad.header.hero_pool") %></div>
+            <div class="col-span-2 text-center"><%= $t("dota2tracker.template.report.daily.squad.header.kda") %></div>
+            <div class="col-span-2 text-left pl-2"><%= $t("dota2tracker.template.report.daily.squad.header.impact") %></div>
+          </div>
+
+          <div class="flex flex-col">
+            <% data.squad.forEach(function(row) { %>
+            <div class="flex flex-col md:grid md:grid-cols-12 gap-4 p-4 border-b border-white/5 hover:bg-white/[0.02] transition-colors items-center">
+              <div class="col-span-1 flex items-center justify-center">
+                <span class="font-serif italic text-2xl <%= row.rank === 1 ? 'text-dota-gold' : (row.rank === data.squad.length ? 'text-dota-red' : 'text-slate-400') %> font-bold"><%= row.rank %></span>
+              </div>
+              <div class="col-span-4 w-full flex items-center gap-3 pl-2">
+                <div class="w-12 h-12 rounded bg-cover bg-center border border-slate-600 shadow-md" style="background-image: url('<%= row.player.avatarUrl || '' %>')"></div>
+                <div class="flex flex-col">
+                  <span class="font-bold text-white text-base leading-tight"><%= row.player.name %></span>
+                  <div class="flex items-center gap-1 text-xs font-medium mt-0.5">
+                    <span class="text-dota-green"><%= row.player.winCount %> <%= $t("dota2tracker.template.won") %></span>
+                    <span class="text-slate-500">-</span>
+                    <span class="text-dota-red"><%= row.player.loseCount %> <%= $t("dota2tracker.template.lost") %></span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-span-3 w-full flex items-center gap-2">
+                <% row.heroes.forEach(function(hero) { %>
+                  <div class="relative w-[48px] h-[27px] rounded border border-slate-700 shadow-sm overflow-hidden group">
+                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<%= hero.url %>')"></div>
+                    <!-- Win/Loss Overlay -->
+                    <div class="absolute inset-x-0 bottom-0 flex justify-between px-1 pb-0.5 pointer-events-none">
+                      <span class="text-[10px] font-bold leading-none text-dota-green drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;"><%= hero.wins %></span>
+                      <span class="text-[10px] font-bold leading-none text-dota-red drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;"><%= hero.losses %></span>
+                    </div>
+                  </div>
+                <% }); %>
+                <% if (row.plusHeroesCount > 0) { %>
+                  <span class="text-[10px] font-bold bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">+<%= row.plusHeroesCount %></span>
+                <% } %>
+              </div>
+              <div class="col-span-2 w-full flex flex-col items-center justify-center">
+                <span class="text-xl font-bold text-white leading-none"><%= row.kda.ratio %></span>
+                <div class="text-xs text-slate-500 font-mono mt-1"><%= row.kda.detail %></div>
+              </div>
+              <div class="col-span-2 w-full flex flex-col justify-center gap-1.5 pl-2">
+                <div class="flex items-center gap-2 w-full">
+                  <span class="text-[9px] w-6 text-slate-500 font-bold uppercase">
+                    <%= $t("dota2tracker.template.report.daily.squad.impact.dmg") %>
+                  </span>
+                  <div class="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden flex">
+                    <div class="h-full bg-dota-red" style="width: <%= row.impact.damage.heroPercent %>%"></div>
+                    <div class="h-full bg-orange-500" style="width: <%= row.impact.damage.buildingsPercent %>%"></div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 w-full">
+                  <span class="text-[9px] w-6 text-slate-500 font-bold uppercase">
+                    <%= $t("dota2tracker.template.report.daily.squad.impact.gold") %>
+                  </span>
+                  <div class="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-dota-gold" style="width: <%= row.impact.networth.percent %>%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <% }); %>
+
+            </div>
         </div>
-        <span class="win"><%= $t("dota2tracker.template.report_won") %><%= combi.winCount %></span>
-        <span class="lose"><%= $t("dota2tracker.template.report_lost") %><%= combi.matches.length - combi.winCount %></span>
-        <span><%= $t("dota2tracker.template.report_winrate") %> <%= combiRate %>%</span>
-        <% }); %>
+
+        <div class="flex flex-col items-center justify-center text-center gap-1 pb-6 opacity-60">
+          <div class="flex items-center gap-2 text-dota-gold text-xs font-bold uppercase tracking-widest" style="display: none;">
+            <span class="material-symbols-outlined text-sm">auto_awesome</span>
+            <span><%= $t("dota2tracker.template.report.daily.footer.generated_by") %></span>
+          </div>
+          <p class="text-[10px] text-slate-500 font-mono"><%= data.meta.footerId %></p>
+        </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>

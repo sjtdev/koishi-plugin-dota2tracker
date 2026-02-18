@@ -81,8 +81,12 @@ export class DatabaseService extends Service {
     );
     ctx.model.extend("dt_match_extension", { matchId: "unsigned", startTime: "timestamp", data: "json" }, { autoInc: false, primary: ["matchId"] });
   }
-  async insertReportData(matchId: number, startTime: Date, data: MatchExtensionData) {
+  async insertMatchExtension(matchId: number, startTime: Date, data: MatchExtensionData) {
     return this.ctx.database.upsert("dt_match_extension", [{ matchId, startTime, data }]);
+  }
+
+  async getMatchExtension(matchIds: number[]) {
+    return this.ctx.database.get("dt_match_extension", { matchId: matchIds });
   }
 
   async setPlayerRank(playerId: number, rank: { rank: number; leader: number }) {
