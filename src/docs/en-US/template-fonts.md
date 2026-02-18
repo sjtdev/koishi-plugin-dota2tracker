@@ -1,7 +1,10 @@
 # Template Font Settings
 
-Previous font configuration methods had limitations, requiring system-level font installation which could be difficult in environments like Docker.
-Starting from version `2.4.0`, the plugin implements a new font management system. You can now upload font files directly and configure separate font lists for three styles (`sans`, `serif`, `mono`). The fallback order (priority) is determined by the order in the list.
+Previous font configuration methods had limitations, strictly writing the user-configured `templateFonts` font-family string into the template's css font-family, which required system-level font installation. In some environments (such as Docker images, minimal Linux distributions, etc.), font management tools also need to be installed manually, making deployment difficult.
+
+Therefore, starting from version `2.4.0`, the plugin implements a new font management system. You can now upload font files directly and configure separate font lists for three styles (`sans`, `serif`, `mono`). The fallback order (priority) is determined by the order in the list.
+
+Now, when calling `puppeteer` to generate images, the plugin injects the static path of font files and the css font-face registration code, so there is no need to rely on system environment fonts.
 
 ## Installing Fonts
 
@@ -45,8 +48,8 @@ Example:
 ```
 
 ## Font Recommendations
-> [!IMPORTANT] Note
-> The following are suggestions only.
+> [!IMPORTANT] Disclaimer
+> Represents personal preference only.
 
 ### **[fonts.sans](../configs.md#fonts-sans-dynamic)**
 > Body Text
