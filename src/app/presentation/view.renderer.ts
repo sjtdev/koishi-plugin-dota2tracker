@@ -31,13 +31,9 @@ export class ViewRenderer extends Service<Config> {
   private async render(html: string): Promise<string> {
     const { fonts } = this.config;
     const finalHtml = html.replace("</head>", `${this.getFontStyleBlock()}</head>`);
-    
+
     // Construct font family list (flatten arrays and deduplicate)
-    const fontFamilies = Array.from(new Set([
-      ...(fonts.sans || []),
-      ...(fonts.serif || []),
-      ...(fonts.mono || [])
-    ])).filter(Boolean);
+    const fontFamilies = Array.from(new Set([...(fonts.sans || []), ...(fonts.serif || []), ...(fonts.mono || [])])).filter(Boolean);
 
     return this.ctx.puppeteer.render(
       finalHtml,
@@ -59,31 +55,23 @@ export class ViewRenderer extends Service<Config> {
                 return this.ctx.dota2tracker.font.getFontFormat(format);
               });
 
-              await page.evaluate(async (fonts: FontInfo[]) => {
-                // @ts-ignore
-                const win = window as any;
+              await page.evaluate(
+                async (fonts: FontInfo[]) => {
+                  // @ts-ignore
+                  const win = window as any;
 
-                const loaders = fonts.map(async (font: FontInfo) => {
-                  const format = await win.dota2tracker_font_service_get_format(font.format);
-                  
-                  // pathToFileURL logic was removed in favor of standard URL if path is absolute?
-                  // Puppeteer page.evaluate context cannot access Node's 'path' or 'url' modules.
-                  // We should convert path to URL in Node context before passing to browser if needed.
-                  // But 'font.path' comes from FontService. FontService stores absolute paths.
-                  // Browser needs 'file://' URL or base64. 
-                  // Previous implementation used 'font.path' directly which worked because Puppeteer allows local file access if configured?
-                  // Wait, previous code used `url("${font.path}")`. `font.path` from `koishi-plugin-fonts` is absolute path.
-                  // Puppeteer standard behavior usually requires file:// for local files.
-                  // I will convert it to file URL in Node context to be safe/correct.
-                  
-                  const fontFace = new win.FontFace(font.family, `url("${font.path}") format("${format}")`, font.descriptors);
-                  win.document.fonts.add(fontFace);
-                  await fontFace.load();
-                });
+                  const loaders = fonts.map(async (font: FontInfo) => {
+                    const format = await win.dota2tracker_font_service_get_format(font.format);
+                    const fontFace = new win.FontFace(font.family, `url("${font.path}") format("${format}")`, font.descriptors);
+                    win.document.fonts.add(fontFace);
+                    await fontFace.load();
+                  });
 
-                await Promise.all(loaders);
-                await win.document.fonts.ready;
-              }, fontInfos.map(f => ({ ...f, path: pathToFileURL(f.path).href }))); // Convert to file URL here
+                  await Promise.all(loaders);
+                  await win.document.fonts.ready;
+                },
+                fontInfos.map((f) => ({ ...f, path: pathToFileURL(f.path).href })),
+              ); // Convert to file URL here
             }
 
             // --- Step C: (Node environment) Screenshot ---
@@ -143,13 +131,13 @@ export class ViewRenderer extends Service<Config> {
 
     // Helper to join font array with quotes
     const formatFontStack = (fontList: string[], fallback: string) => {
-      const quoted = fontList.map(f => `"${f}"`).join(", ");
+      const quoted = fontList.map((f) => `"${f}"`).join(", ");
       return quoted ? `${quoted}, ${fallback}` : fallback;
-    }
+    };
 
-    const sans = formatFontStack(fonts.sans, 'sans-serif');
-    const serif = formatFontStack(fonts.serif, 'serif');
-    const mono = formatFontStack(fonts.mono, 'monospace');
+    const sans = formatFontStack(fonts.sans, "sans-serif");
+    const serif = formatFontStack(fonts.serif, "serif");
+    const mono = formatFontStack(fonts.mono, "monospace");
 
     return `
     <style>
@@ -174,4 +162,3 @@ export class ViewRenderer extends Service<Config> {
     `;
   }
 }
-
