@@ -52,6 +52,17 @@ export class StratzAPI extends Service<Config> {
     );
   }
 
+  public async queryPlayersMatchesForDaily_legacy(steamAccountIds: number[], seconds: number) {
+    return this.query<graphql.PlayersMatchesForDaily_LegacyQueryVariables, graphql.PlayersMatchesForDaily_LegacyQuery>(
+      "PlayersMatchesForDaily_Legacy",
+      {
+        steamAccountIds,
+        seconds,
+      },
+      (data) => !!data?.players,
+    );
+  }
+
   public async queryPlayersMatchesForDaily(steamAccountIds: number[], seconds: number) {
     return this.query<graphql.PlayersMatchesForDailyQueryVariables, graphql.PlayersMatchesForDailyQuery>(
       "PlayersMatchesForDaily",

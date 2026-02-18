@@ -50,7 +50,7 @@ _config:
     $desc: Summary Settings
     dailyReportSwitch: "Daily Report Function"
     dailyReportHours: Daily report time in hours
-    dailyReportShowCombi: Show combinations in daily report
+    dailyReportShowCombi: "*Show combinations in daily report*"
     weeklyReportSwitch: Weekly Report Function
     weeklyReportDayHours: Weekly report published on (day) at (hour)
     weeklyReportShowCombi: Show combinations in weekly report

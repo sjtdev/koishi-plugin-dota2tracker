@@ -113,7 +113,7 @@ export class ViewRenderer extends Service<Config> {
       throw error;
     }
   }
-  private getImageUrl(image: string, type: ImageType = ImageType.Local, format: ImageFormat = ImageFormat.png) {
+  public getImageUrl(image: string, type: ImageType = ImageType.Local, format: ImageFormat = ImageFormat.png) {
     if (type === ImageType.Local) {
       try {
         const absolutePath = path.join(this.templateDir, "images", `${image}.${format}`);
