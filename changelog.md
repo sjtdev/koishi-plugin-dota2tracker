@@ -1,5 +1,21 @@
 # 更新日志
 
+## [2.5.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.4.0...v2.5.0) (2026-02-18)
+
+### ✨ 新增功能
+
+* **report/daily:** 重写了全新的日报模板 ([8e8687a](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/8e8687adc4ad92df423c8b2be4a23f54ec07c105))
+
+### 🐛 Bug 修复
+
+* **font-service:** 调整监控重载字体目录打印日志逻辑防止刷屏 ([49a16fd](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/49a16fd288184e6619d416fb304d541d7e6d0181))
+* **logger/font:** 修复重载字体目录时打印日志失败 ([9226d76](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/9226d7683b020d87b72edb85318c7422565a20b1))
+
+### 📝 文档
+
+* 补上关于重构`font`内容的文档 ([ac25965](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/ac25965dab839f8040e19d6f9f6237c2d1404a7d))
+* **template-fonts:** 更新一些文档说明 ([a4530fc](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/a4530fcd86d2cdfc048e718fa37242af5e41f14d))
+
 ## [2.4.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.3.4...v2.4.0) (2026-02-15)
 
 ### ✨ 新增功能
