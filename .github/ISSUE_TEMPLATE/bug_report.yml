@@ -1,5 +1,5 @@
 name: Bug Report
-description: 反馈一个bug
+description: 提交 bug 报告以帮助我们修复问题 / Create a report to help us improve
 title: "[Bug]: "
 labels: ["bug"]
 assignees: []
@@ -9,29 +9,80 @@ body:
     attributes:
       value: |
         感谢您花时间填写这份 bug 报告！
-        
+        Thank you for taking the time to fill out this bug report!
+
   - type: input
-    id: version
+    id: plugin-version
     attributes:
-      label: 版本号
-      description: 您正在使用的版本是什么？
-      placeholder: 例如：v1.0.0
+      label: 插件版本号 / Plugin Version
+      description: 您正在使用的插件版本是什么？ / Which version of the plugin are you using?
+      placeholder: 例如：v1.0.0 / e.g. v1.0.0
     validations:
       required: true
-      
+
+  - type: input
+    id: koishi-version
+    attributes:
+      label: Koishi 版本号 / Koishi Version
+      description: 您正在使用的 Koishi 框架版本是什么？ / Which version of Koishi are you using?
+      placeholder: 例如：v4.18.0 / e.g. v4.18.0
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js 版本号 / Node.js Version
+      description: 您正在使用的 Node.js 版本是什么？ / Which version of Node.js are you using?
+      placeholder: 例如：v18.17.0 / e.g. v18.17.0
+    validations:
+      required: true
+
   - type: textarea
     id: what-happened
     attributes:
-      label: 发生了什么？
-      description: 请详细描述遇到的问题
-      placeholder: 请详细描述问题...
+      label: 发生了什么？ / What happened?
+      description: 请详细描述遇到的问题 / Please describe the problem in detail
+      placeholder: 请详细描述问题... / Please describe the problem...
     validations:
       required: true
-      
+
   - type: textarea
     id: expected
     attributes:
-      label: 期望的结果
-      description: 请描述您期望看到的结果
+      label: 期望的结果 / Expected Behavior
+      description: 请描述您期望看到的结果 / Please describe the expected result
     validations:
       required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: 复现步骤 / Steps to Reproduce
+      description: 请提供复现该 bug 的具体步骤 / Please provide the specific steps to reproduce the bug
+      placeholder: |
+        1. 运行命令 / Run command '...'
+        2. 触发事件 / Trigger event '...'
+        3. 看到错误 / See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 报错日志 / Error Logs
+      description: 如果有控制台报错日志，请粘贴在这里 / If there are console error logs, please paste them here
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 确认 / Confirmation
+      description: 提交前请确认以下事项 / Please confirm the following before submitting
+      options:
+        - label: 我已经搜索过现有的 issues，确认这不是重复的问题 / I have searched existing issues and confirmed this is not a duplicate
+          required: true
+        - label: 我已经仔细检查了问题描述，确保信息准确完整 / I have double-checked the description to ensure accuracy and completeness
+          required: true

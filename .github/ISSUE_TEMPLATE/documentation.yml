@@ -1,5 +1,5 @@
 name: Documentation Issue
-description: 报告文档相关的问题或建议（如文档错误、缺失、改进建议等）
+description: 改进或更正现有文档 / Improve or correct existing documentation
 title: "[Docs]: "
 labels: ["docs"]
 assignees: []
@@ -9,64 +9,75 @@ body:
     attributes:
       value: |
         感谢您帮助我们改进[文档](https://sjtdev.github.io/koishi-plugin-dota2tracker/)！请填写以下信息来帮助我们更好地理解和解决文档相关的问题。
+        Thank you for helping us improve our [documentation](https://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/)! Please fill out the following information to help us better understand and resolve documentation-related issues.
 
   - type: dropdown
     id: issue-type
     attributes:
-      label: 问题类型
-      description: 这是什么类型的文档问题？
+      label: 问题类型 / Issue Type
+      description: 这是什么类型的文档问题？ / What type of documentation issue is this?
       options:
-        - 文档错误（错别字、格式问题等）
-        - 内容不准确或过时
-        - 文档缺失
-        - 文档不清晰或难以理解
-        - 文档改进建议
-        - 其他
+        - 文档错误（错别字、格式问题等） / Typo or formatting issue
+        - 内容不准确或过时 / Inaccurate or outdated content
+        - 文档缺失 / Missing documentation
+        - 文档不清晰或难以理解 / Unclear or confusing documentation
+        - 文档改进建议 / Suggestion for improvement
+        - 其他 / Other
     validations:
       required: true
 
   - type: textarea
     id: current-problem
     attributes:
-      label: 当前问题
-      description: 请描述您发现的文档问题
+      label: 当前问题 / Current Problem
+      description: 请描述您发现的文档问题 / Please describe the issue you found
       placeholder: |
         例如：
         - 在XX页面中的YY部分存在错别字
         - ZZ功能的使用说明不够清晰
         - 缺少XX功能的安装说明
+        
+        For example:
+        - Typo in section YY on page XX
+        - Instructions for feature ZZ are unclear
+        - Missing installation instructions for feature XX
     validations:
       required: true
 
   - type: textarea
     id: suggested-changes
     attributes:
-      label: 建议的修改
-      description: 如果您有具体的修改建议，请在这里详细说明
+      label: 建议的修改 / Suggested Changes
+      description: 如果您有具体的修改建议，请在这里详细说明 / If you have specific suggestions, please describe them here
       placeholder: |
         例如：
         - 将"XXX"改为"YYY"
         - 建议添加以下内容：...
         - 建议重组该部分结构为：...
+        
+        For example:
+        - Change "XXX" to "YYY"
+        - Suggest adding the following content: ...
+        - Suggest restructuring this section to: ...
     validations:
       required: false
 
   - type: textarea
     id: additional-context
     attributes:
-      label: 补充信息
-      description: 还有什么其他信息可以帮助我们理解和解决这个文档问题？
-      placeholder: 添加任何有助于理解问题的额外上下文信息...
+      label: 补充信息 / Additional Context
+      description: 还有什么其他信息可以帮助我们理解和解决这个文档问题？ / Is there any other information that can help us understand and resolve this issue?
+      placeholder: 添加任何有助于理解问题的额外上下文信息... / Add any other context about the problem here...
     validations:
       required: false
 
   - type: checkboxes
     id: terms
     attributes:
-      label: 确认
-      description: 提交前请确认以下事项
+      label: 确认 / Confirmation
+      description: 提交前请确认以下事项 / Please confirm the following before submitting
       options:
-        - label: 我已经搜索过现有的 issues，确认这不是重复的问题
+        - label: 我已经搜索过现有的 issues，确认这不是重复的问题 / I have searched existing issues and confirmed this is not a duplicate
           required: true
-        - label: 我已经仔细检查了问题描述，确保信息准确完整
+        - label: 我已经仔细检查了问题描述，确保信息准确完整 / I have double-checked the description to ensure accuracy and completeness
           required: true

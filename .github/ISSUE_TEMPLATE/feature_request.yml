@@ -1,5 +1,5 @@
 name: Feature Request
-description: 提出新功能建议
+description: 提出新功能或改进建议 / Suggest a new feature or improvement
 title: "[Feature]: "
 labels: ["feature"]
 assignees: []
@@ -9,20 +9,41 @@ body:
     attributes:
       value: |
         感谢您提出新功能建议！
-        
+        Thank you for suggesting a new feature!
+
   - type: textarea
     id: feature-description
     attributes:
-      label: 功能描述
-      description: 请详细描述您想要的新功能
-      placeholder: 请描述新功能...
+      label: 功能描述 / Feature Description
+      description: 请详细描述您想要的新功能 / Please describe the new feature you want
+      placeholder: 请描述新功能... / Please describe the new feature...
     validations:
       required: true
       
   - type: textarea
     id: motivation
     attributes:
-      label: 动机
-      description: 请说明为什么需要这个功能
+      label: 动机 / Motivation
+      description: 请说明为什么需要这个功能 / Please explain why this feature is needed
     validations:
       required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 替代方案 / Alternatives Considered
+      description: 您目前是如何绕过或解决这个需求的？是否有其他替代方案？ / How are you currently bypassing or solving this need? Are there alternative solutions?
+      placeholder: 我目前通过...来解决 / I am currently solving this by...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 确认 / Confirmation
+      description: 提交前请确认以下事项 / Please confirm the following before submitting
+      options:
+        - label: 我已经搜索过现有的 issues，确认这不是重复的问题 / I have searched existing issues and confirmed this is not a duplicate
+          required: true
+        - label: 我已经仔细检查了问题描述，确保信息准确完整 / I have double-checked the description to ensure accuracy and completeness
+          required: true
