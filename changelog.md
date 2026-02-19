@@ -1,5 +1,20 @@
 # 更新日志
 
+### [2.5.1](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.0...v2.5.1) (2026-02-19)
+
+### 🎨 样式
+
+* **report/daily:** 优化日报的宽度显示与一处文字内容 ([85d17f8](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/85d17f89b617bc7a0befba88f02d1fffbcb38202))
+
+### 🐛 Bug 修复
+
+* **report/daily:** 修复一处英文语言下数据展示错误 ([6e02113](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/6e021130f41b6a17ab2baadc303f1efd05f4ed0c))
+
+### 📝 文档
+
+* **images:** 重建英雄展示图 ([108d941](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/108d9416f85b08ef4135003f2a337fe48ba3351c))
+* **report/daily:** 添加日报周报展示页并构建日报展示图 ([cc599d6](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/cc599d60f8adeefe29860e042cd51cb0da7a4f7c))
+
 ## [2.5.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.4.0...v2.5.0) (2026-02-18)
 
 ### ✨ 新增功能
