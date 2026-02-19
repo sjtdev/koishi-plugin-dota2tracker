@@ -122,7 +122,7 @@ dota2tracker:
         title: "Daily Group Recap"
         meta:
           date_format: "cccc, LLLL d, yyyy"
-          summary: "Performance summary for {0}. High-density battle report generated automatically."
+          summary: "Performance summary for {0}."
           footer_format: "ID: #{0} • Server: {1}"
         stats:
           matches: "Matches"

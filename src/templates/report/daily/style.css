@@ -330,6 +330,9 @@
   .max-w-md {
     max-width: var(--container-md);
   }
+  .min-w-\[1000px\] {
+    min-width: 1000px;
+  }
   .flex-1 {
     flex: 1;
   }

@@ -122,7 +122,7 @@ dota2tracker:
         title: "每日战报"
         meta:
           date_format: "yyyy年L月d日 cccc"
-          summary: "战报生成于 {0}。高密度战斗数据自动汇总。"
+          summary: "战报生成于 {0}。"
           footer_format: "ID: #{0} • 服务器: {1}"
         stats:
           matches: "总场次"
