@@ -1,5 +1,5 @@
-# 总结模板展示
+# Report Template
 
-## 日报
+## Daily Report
 
 <ImageViewer src="generated/daily.png" />
