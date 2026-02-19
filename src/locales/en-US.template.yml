@@ -130,7 +130,7 @@ dota2tracker:
           kills: "Total Kills"
           duration: "Duration"
           avg_time: "Avg"
-          matches_subtext: "%s W - %s L"
+          matches_subtext: "{0} W - {1} L"
           vs_yesterday: "vs Yesterday"
           kills_avg: "Avg {0}"
         spotlight:
