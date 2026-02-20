@@ -1,5 +1,15 @@
 # 更新日志
 
+### [2.5.2](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.1...v2.5.2) (2026-02-20)
+
+### 🐛 Bug 修复
+
+* **report/daily:** 修复如果已订阅的玩家中有不公开数据的玩家，获取日报数据失败的问题 ([e293fb6](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/e293fb62b4120d9db2709c8c073b45225d6e466d))
+
+### 📝 文档
+
+* **image/daily:** 修正日报展示图 ([25ad31d](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/25ad31d193a41920aa940c4c4b188fdb627c1d95))
+
 ### [2.5.1](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.0...v2.5.1) (2026-02-19)
 
 ### 🎨 样式
