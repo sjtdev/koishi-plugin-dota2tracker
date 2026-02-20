@@ -321,6 +321,9 @@
   .w-\[48px\] {
     width: 48px;
   }
+  .w-\[1024px\] {
+    width: 1024px;
+  }
   .w-full {
     width: 100%;
   }
