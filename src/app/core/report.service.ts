@@ -44,7 +44,7 @@ export class ReportService extends Service {
     const data = await this.ctx.dota2tracker.stratzAPI.queryPlayersMatchesForDaily(steamIds, Math.floor(dataStartDate.toSeconds()));
 
     // 汇总所有比赛ID以便查询扩展数据
-    const allMatchIds = [...new Set(data.players.flatMap((p) => p.matches.map((m) => m.id)))].map((id) => Number(id));
+    const allMatchIds = [...new Set(data.players.flatMap((p) => (p.matches || []).map((m) => m.id)))].map((id) => Number(id));
     const extensions = await this.ctx.dota2tracker.database.getMatchExtension(allMatchIds);
 
     const getImageUrl = this.ctx.dota2tracker.view.getImageUrl.bind(this.ctx.dota2tracker.view);
@@ -100,7 +100,7 @@ export class ReportService extends Service {
 
       for (const user of squadUsers) {
         const playerData = squadPlayerData.find((p) => p.steamAccount.id === user.steamId);
-        if (!playerData || playerData.matches.length === 0) continue;
+        if (!playerData || !playerData.matches || playerData.matches.length === 0) continue;
 
         const processed = this.processPlayer(user, playerData, dotaconstants, targetDate, extensions, getImageUrl);
         // Only include players who actually played/parsed in the current period
@@ -176,7 +176,7 @@ export class ReportService extends Service {
     const previousMatches = new Map<number, graphql.PlayersMatchesForDailyQuery["players"][number]["matches"][number]>();
 
     for (const player of squadPlayerData) {
-      for (const match of player.matches) {
+      for (const match of player.matches || []) {
         if (match.startDateTime >= targetSeconds) {
           currentMatches.set(match.id, match);
         } else {
@@ -239,18 +239,12 @@ export class ReportService extends Service {
       pTowerDamage = 0,
       pNetworth = 0;
     let kdaSum = 0,
-      mvpScoreSum = 0, // Track MVP score sum
-      bestScore = -1, // Use MVP score for best/worst determination logic? Or keep KDA? 
-                      // User asked for *sorting* logic change. 
-                      // For consistency let's stick to user request: "sort by MVP score, if same then compare avgKDA".
-                      // BUT, bestMatchId/worstMatchId logic usually correlates with the metric used for MVP/LVP.
-                      // If we are picking MVP based on score, the "best match" should probably be the high score match.
-                      // Let's update best/worst tracking to use MVP score primarily.
+      mvpScoreSum = 0,
+      bestScore = -1,
       worstScore = Infinity;
-      
-    let bestKda = -1, worstKda = Infinity; // Keep tracking KDA for display or fallback?
-                                           // The prompt says "logic can be modified to default sort by MVP score".
-                                           // It implies the MVP/LVP selection refactor.
+
+    let bestKda = -1,
+      worstKda = Infinity;
 
     let bestMatchId = 0,
       worstMatchId = 0;
@@ -258,7 +252,7 @@ export class ReportService extends Service {
     const playedHeroes = new Map<number, { count: number; wins: number }>();
     let processedMatchCount = 0;
 
-    for (const m of playerData.matches) {
+    for (const m of playerData.matches || []) {
       if (m.startDateTime < targetSeconds) continue; // Filter out previous period matches
 
       processedMatchCount++;
@@ -288,7 +282,7 @@ export class ReportService extends Service {
         bestKda = matchKda;
         bestMatchId = m.id;
       }
-      
+
       // For Worst match
       if (mvpScore < worstScore || (mvpScore === worstScore && matchKda < worstKda)) {
         worstScore = mvpScore;
@@ -335,12 +329,12 @@ export class ReportService extends Service {
 
     return {
       row,
-      stats: { 
-        steamId: user.steamId, 
-        avgKda: matchCount > 0 ? kdaSum / matchCount : 0, 
+      stats: {
+        steamId: user.steamId,
+        avgKda: matchCount > 0 ? kdaSum / matchCount : 0,
         maxMvpScore: bestScore, // Use bestScore as maxMvpScore
-        bestMatchId, 
-        worstMatchId 
+        bestMatchId,
+        worstMatchId,
       },
       impact: { heroDamage: pHeroDamage, towerDamage: pTowerDamage, networth: pNetworth, matchCount, row },
     };
@@ -364,10 +358,10 @@ export class ReportService extends Service {
 
       const heroPercent = maxAvgTotalDamage > 0 ? Math.round((avgHeroDamage / maxAvgTotalDamage) * 100) : 0;
       const buildingsPercent = maxAvgTotalDamage > 0 ? Math.round((avgTowerDamage / maxAvgTotalDamage) * 100) : 0;
-      
+
       data.row.impact.damage.heroPercent = Math.min(100, heroPercent);
       data.row.impact.damage.buildingsPercent = Math.min(100 - data.row.impact.damage.heroPercent, buildingsPercent);
-      
+
       data.row.impact.networth.percent = maxAvgNetworth > 0 ? Math.round((avgNetworth / maxAvgNetworth) * 100) : 0;
     }
   }
@@ -388,7 +382,7 @@ export class ReportService extends Service {
     getHeroName: (heroId: number) => string,
     getImageUrl: (image: string, type?: ImageType, format?: ImageFormat) => string,
   ): any {
-    const match = playerData.matches.find((m) => m.id === matchId)!;
+    const match = (playerData.matches || []).find((m) => m.id === matchId)!;
     const self = match.players.find((p) => p.steamAccount?.id === playerData.steamAccount.id)!;
 
     // 从扩展数据中获取 titles 和 mvpScore
