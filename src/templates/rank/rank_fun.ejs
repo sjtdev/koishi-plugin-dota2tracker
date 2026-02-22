@@ -35,8 +35,6 @@
       div.rank.prev { filter: grayscale(1); }
       div.rank.curr { transform: scale(1.25); }
       div.rank p { font-size: 36px; bottom: 20px; width: 100%; text-align: center; color: #fff; position: absolute; }
-
-      <% if (fontFamily) { %><%- `body { font-family: ${fontFamily}; }` %><% } %>
     <%- `</style>` %>
   </head>
   <body class="<%= kind %>" <%- `style="background-image: url(${getImageUrl(kind, undefined, "jpg")})"` %>>
