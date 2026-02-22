@@ -11,10 +11,10 @@ import { ItemService } from "./item.service";
 import { MatchWatcherTask } from "../tasks/match-watcher.task";
 import { PlayerService } from "./player.service";
 import { DatabaseService } from "../data/database";
-import { ReportTask } from "../tasks/report.task";
+import { DailyReportTask } from "../tasks/daily-report.task";
 import { OpenDotaAPI } from "../data/opendota.api";
 import { OpenDotaAdapter } from "./opendota.adapter";
-import { ReportService } from "./report.service";
+import { DailyReportService } from "./daily-report.service";
 import { FontService } from "../presentation/font.service";
 import type ConstantsType from "dotaconstants";
 
@@ -31,11 +31,11 @@ export interface DOTA2TrackerServices {
   hero: HeroService;
   item: ItemService;
   opendotaAdapter: OpenDotaAdapter;
-  report: ReportService;
+  dailyReport: DailyReportService;
   // 任务层
   matchWatcher: MatchWatcherTask;
   parsePolling: ParsePollingTask;
-  reportTask: ReportTask;
+  dailyReportTask: DailyReportTask;
   // 数据层
   valveAPI: ValveAPI;
   stratzAPI: StratzAPI;

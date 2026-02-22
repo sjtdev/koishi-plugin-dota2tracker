@@ -3,13 +3,12 @@ import { MatchInfoEx } from "../data/types";
 import { DateTime } from "luxon";
 import { MatchExtensionData, dt_match_extension, dt_subscribed_players } from "../data/database";
 import { DailyReportViewModel, PlayerRowModel } from "../presentation/view-models";
-import { ViewRenderer } from "../presentation/view.renderer";
 import { ImageType, ImageFormat } from "../common/types";
 import * as graphql from "../../@types/graphql-generated";
 
-export class ReportService extends Service {
+export class DailyReportService extends Service {
   constructor(ctx: Context) {
-    super(ctx, "dota2tracker.report", true);
+    super(ctx, "dota2tracker.daily-report", true);
     this.config = ctx.config;
   }
 
@@ -49,7 +48,7 @@ export class ReportService extends Service {
 
     const getImageUrl = this.ctx.dota2tracker.view.getImageUrl.bind(this.ctx.dota2tracker.view);
 
-    return await ReportService.formatDailyReportBundles(
+    return await DailyReportService.formatDailyReportBundles(
       data,
       users,
       extensions,

@@ -1,7 +1,6 @@
 import { Context } from "koishi";
 import path from "node:path";
 import {} from "koishi-plugin-cron";
-import {} from "koishi-plugin-fonts";
 import { I18NService } from "./app/common/i18n.ts";
 import { HeroService } from "./app/core/hero.service.ts";
 import { ItemService } from "./app/core/item.service.ts";
@@ -17,7 +16,7 @@ import { FontService } from "./app/presentation/font.service.ts";
 import { MessageBuilder } from "./app/presentation/message.builder.ts";
 import { MatchWatcherTask } from "./app/tasks/match-watcher.task.ts";
 import { ParsePollingTask } from "./app/tasks/parse-polling.task.ts";
-import { ReportTask } from "./app/tasks/report.task.ts";
+import { DailyReportTask } from "./app/tasks/daily-report.task.ts";
 import { type Config } from "./config.ts";
 
 import { registerSubscibeCommand } from "./app/commands/channel.command.ts";
@@ -31,7 +30,7 @@ import { registerQueryPlayerCommand } from "./app/commands/query-player.command.
 import { registerUserCommand } from "./app/commands/user.command.ts";
 import { OpenDotaAPI } from "./app/data/opendota.api.ts";
 import { OpenDotaAdapter } from "./app/core/opendota.adapter.ts";
-import { ReportService } from "./app/core/report.service.ts";
+import { DailyReportService } from "./app/core/daily-report.service.ts";
 
 export const name = "dota2tracker";
 export let usage = "";
@@ -61,7 +60,7 @@ export async function apply(ctx: Context, config: Config) {
   if (ctx.cron) {
     ctx.dota2tracker.matchWatcher = new MatchWatcherTask(ctx);
     ctx.dota2tracker.parsePolling = new ParsePollingTask(ctx);
-    ctx.dota2tracker.reportTask = new ReportTask(ctx);
+    ctx.dota2tracker.dailyReportTask = new DailyReportTask(ctx);
     // 追踪与轮询需要固定顺序所以从match-watcher与parse-polling的构造器中取出在这里定义。
     ctx.cron("* * * * *", async () => {
       await ctx.dota2tracker.matchWatcher.discovery();
@@ -72,7 +71,7 @@ export async function apply(ctx: Context, config: Config) {
   }
   ctx.dota2tracker.hero = new HeroService(ctx);
   ctx.dota2tracker.item = new ItemService(ctx);
-  ctx.dota2tracker.report = new ReportService(ctx);
+  ctx.dota2tracker.dailyReport = new DailyReportService(ctx);
   ctx.dota2tracker.cache = new CacheService(ctx);
   ctx.dota2tracker.database = new DatabaseService(ctx);
   ctx.dota2tracker.valveAPI = new ValveAPI(ctx);

@@ -1,4 +1,4 @@
-import { Context, Service, Session } from "koishi";
+import { Context, Service } from "koishi";
 import { Config } from "../../config";
 import { roundToDecimalPlaces } from "../common/utils";
 import * as graphql from "../../@types/graphql-generated";
@@ -6,9 +6,9 @@ import { TemplateType } from "../common/types";
 import { handleError } from "../common/error";
 import { DateTime } from "luxon";
 
-export class ReportTask extends Service<Config> {
+export class DailyReportTask extends Service<Config> {
   constructor(ctx: Context) {
-    super(ctx, "dota2tracker.report-task", true);
+    super(ctx, "dota2tracker.daily-report-task", true);
     this.config = ctx.config;
 
     if (this.config.dailyReportSwitch) {
@@ -24,8 +24,8 @@ export class ReportTask extends Service<Config> {
   }
 
   private async runDailyJob() {
-    // Step 1: 调用 reportService 获取{频道: 数据}[]
-    const bundles = await this.ctx.dota2tracker.report.generateDailyReportBundles();
+    // Step 1: 调用 dailyReportService 获取{频道: 数据}[]
+    const bundles = await this.ctx.dota2tracker.dailyReport.generateDailyReportBundles();
     // Step 2: 遍历每个对象，调用 view 渲染图片并发送到对应频道
     for (const bundle of bundles) {
       const image = await this.ctx.dota2tracker.view.renderToImageByFile(bundle.report, "daily", TemplateType.Report, await this.ctx.dota2tracker.i18n.getLanguageTag({ channelId: bundle.channelId }));
