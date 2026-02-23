@@ -12,22 +12,6 @@ export class DailyReportService extends Service {
     this.config = ctx.config;
   }
 
-  public async recordMatchExtension(match: MatchInfoEx) {
-    const extensionData: MatchExtensionData = { matchId: match.id, players: [] };
-    for (const player of match.players) {
-      extensionData.players.push({
-        steamAccountId: player.steamAccountId,
-        rankSnapshot: player.rank,
-        mvpScore: player.mvpScore,
-        titles: player.titles,
-        utilityScore: player.utilityScore,
-        laneResult: player.laneResult,
-        partyId: player.partyId,
-      });
-    }
-    this.ctx.dota2tracker.database.insertMatchExtension(extensionData.matchId, new Date(match.startDateTime * 1000), extensionData);
-  }
-
   /**
    * 入口函数，返回报告数据
    */

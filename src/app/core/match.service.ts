@@ -5,6 +5,7 @@ import type ConstantsType from "dotaconstants";
 import { sec2time, formatNumber } from "../common/utils";
 import { HeroService } from "./hero.service";
 import { FetchMatchDataFailError, handleError } from "../common/error";
+import { MatchExtensionData } from "../data/database";
 
 export class MatchService extends Service {
   constructor(
@@ -169,7 +170,7 @@ export class MatchService extends Service {
       // Step 4: 扩展比赛数据
       const match = MatchService.extendMatchData(matchQuery, facetData, this.ctx.dota2tracker.dotaconstants);
       // 保存日报周报所需数据
-      this.ctx.dota2tracker.report.recordMatchExtension(match);
+      this.recordMatchExtension(match);
       return match;
     } catch (error) {
       // 查询失败时删除缓存
@@ -511,6 +512,22 @@ export class MatchService extends Service {
 
   private static isMatchParsed(matchQuery: graphql.MatchInfoQuery) {
     return matchQuery?.match?.parsedDateTime && matchQuery?.match?.players.filter((player) => player?.stats?.heroDamageReport?.dealtTotal).length > 0;
+  }
+
+  private async recordMatchExtension(match: MatchInfoEx) {
+    const extensionData: MatchExtensionData = { matchId: match.id, players: [] };
+    for (const player of match.players) {
+      extensionData.players.push({
+        steamAccountId: player.steamAccountId,
+        rankSnapshot: player.rank,
+        mvpScore: player.mvpScore,
+        titles: player.titles,
+        utilityScore: player.utilityScore,
+        laneResult: player.laneResult,
+        partyId: player.partyId,
+      });
+    }
+    this.ctx.dota2tracker.database.insertMatchExtension(extensionData.matchId, new Date(match.startDateTime * 1000), extensionData);
   }
 }
 
