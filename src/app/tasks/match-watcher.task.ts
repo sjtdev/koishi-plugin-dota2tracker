@@ -118,7 +118,13 @@ export class MatchWatcherTask extends Service<Config> {
           const prevRank = ranks["prevRank"];
           const currRank = ranks["currRank"];
           if (prevRank.medal !== currRank.medal || (prevRank.star !== currRank.star && this.config.rankBroadStar) || (prevRank.leader !== currRank.leader && this.config.rankBroadLeader)) {
-            const guildMember = await this.ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember?.(subPlayer.guildId, subPlayer.userId);
+            let guildMember;
+            try {
+              // 被封禁/退出的群会抛出异常，此处捕获以避免中断整个段位变动检测循环
+              guildMember = await this.ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember?.(subPlayer.guildId, subPlayer.userId);
+            } catch (error) {
+              this.logger.warn(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.fetch_guilds_failed") + error);
+            }
             const name = subPlayer.nickName ?? guildMember?.nick ?? playersData.find((player) => player.steamAccount.id == subPlayer.steamId)?.steamAccount.name ?? String(subPlayer.steamId);
             const languageTag = await this.ctx.dota2tracker.i18n.getLanguageTag({ channelId: subPlayer.guildId });
             if (this.config.rankBroadFun === true) {
