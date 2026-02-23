@@ -1,5 +1,16 @@
 # 更新日志
 
+### [2.5.3](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.2...v2.5.3) (2026-02-23)
+
+### 🎨 样式
+
+* **report/daily:** 缩窄整体宽度 ([ef756e0](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/ef756e0f418715a63b50586653221f92c25afd91))
+
+### 🐛 Bug 修复
+
+* 尝试修复在**异常状态群组**中获取群友信息时失败导致流程阻塞的问题 ([f00841d](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/f00841dd82794afd69987926804147a4b49fbfee)), closes [#17](https://github.com/sjtdev/koishi-plugin-dota2tracker/issues/17)
+* **database:** 修改`dt_match_extension`键类型定义排除某些可能的隐患 ([72c0bbe](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/72c0bbebc0faf540aea29c8e2e4ae8210ab13b3e))
+
 ### [2.5.2](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.1...v2.5.2) (2026-02-20)
 
 ### 🐛 Bug 修复
