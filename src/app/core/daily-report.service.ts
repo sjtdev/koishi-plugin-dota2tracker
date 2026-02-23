@@ -1,7 +1,7 @@
 import { Context, Service } from "koishi";
 import { MatchInfoEx } from "../data/types";
 import { DateTime } from "luxon";
-import { MatchExtensionData, dt_match_extension, dt_subscribed_players } from "../data/database";
+import { MatchExtensionData, dt_match_extension_biz, dt_subscribed_players } from "../data/database";
 import { DailyReportViewModel, PlayerRowModel } from "../presentation/view-models";
 import { ImageType, ImageFormat } from "../common/types";
 import * as graphql from "../../@types/graphql-generated";
@@ -72,7 +72,7 @@ export class DailyReportService extends Service {
   public static async formatDailyReportBundles(
     data: graphql.PlayersMatchesForDailyQuery,
     users: dt_subscribed_players[],
-    extensions: dt_match_extension[],
+    extensions: dt_match_extension_biz[],
     dotaconstants: any,
     targetDate: DateTime,
     getTranslator: (platform: string, guildId: string) => Promise<{ t: (key: string, params?: any) => string; locale: string; getHeroName: (heroId: number) => string }>,
@@ -225,7 +225,7 @@ export class DailyReportService extends Service {
     playerData: graphql.PlayersMatchesForDailyQuery["players"][number],
     dotaconstants: any,
     targetDate: DateTime,
-    extensions: dt_match_extension[],
+    extensions: dt_match_extension_biz[],
     getImageUrl: (image: string, type?: ImageType, format?: ImageFormat) => string,
   ) {
     const targetSeconds = targetDate.toSeconds();
@@ -375,7 +375,7 @@ export class DailyReportService extends Service {
     playerData: graphql.PlayersMatchesForDailyQuery["players"][number],
     type: "MVP" | "LVP",
     matchId: number,
-    extensions: dt_match_extension[],
+    extensions: dt_match_extension_biz[],
     dotaconstants: any,
     t: (key: string) => string,
     getHeroName: (heroId: number) => string,

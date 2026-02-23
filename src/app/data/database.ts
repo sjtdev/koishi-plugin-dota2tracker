@@ -24,11 +24,15 @@ export interface dt_subscribed_guilds {
   platform: string;
 }
 
-export interface dt_match_extension {
-  matchId: number;
+interface dt_match_extension {
+  matchId: string;
   startTime: Date;
   data: MatchExtensionData;
 }
+
+export type dt_match_extension_biz = Omit<dt_match_extension, "matchId"> & {
+  matchId: number;
+};
 
 export interface MatchExtensionData {
   // 索引键
@@ -79,14 +83,21 @@ export class DatabaseService extends Service {
       },
       { autoInc: true },
     );
-    ctx.model.extend("dt_match_extension", { matchId: "unsigned", startTime: "timestamp", data: "json" }, { autoInc: false, primary: ["matchId"] });
+    ctx.model.extend("dt_match_extension", { matchId: "string", startTime: "timestamp", data: "json" }, { autoInc: false, primary: ["matchId"] });
   }
   async insertMatchExtension(matchId: number, startTime: Date, data: MatchExtensionData) {
-    return this.ctx.database.upsert("dt_match_extension", [{ matchId, startTime, data }]);
+    return this.ctx.database.upsert("dt_match_extension", [{ matchId: String(matchId), startTime, data }]);
   }
 
   async getMatchExtension(matchIds: number[]) {
-    return this.ctx.database.get("dt_match_extension", { matchId: matchIds });
+    const rows = await this.ctx.database.get("dt_match_extension", {
+      matchId: matchIds.map((id) => String(id)),
+    });
+
+    return rows.map((row) => ({
+      ...row,
+      matchId: Number(row.matchId),
+    }));
   }
 
   async setPlayerRank(playerId: number, rank: { rank: number; leader: number }) {
