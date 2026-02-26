@@ -133,6 +133,10 @@ export class DatabaseService extends Service {
     return this.ctx.database.remove("dt_subscribed_players", this.getUserQuery(session));
   }
 
+  async renamePlayer(playerId: number, nickName: string) {
+    return this.ctx.database.set("dt_subscribed_players", playerId, { nickName });
+  }
+
   async isChannelSubscribed(session: Session): Promise<boolean> {
     const subscribedChannels: dt_subscribed_channels[] = await this.ctx.database.get("dt_subscribed_guilds", this.getChannelQuery(session));
     return subscribedChannels.length > 0;

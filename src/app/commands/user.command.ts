@@ -43,7 +43,7 @@ export function registerUserCommand(ctx: Context) {
       if (!session.isDirect) {
         const sessionPlayer = await ctx.dota2tracker.database.getBindedUser(session);
         if (sessionPlayer) {
-          await ctx.database.remove("dt_subscribed_players", sessionPlayer.id); // 从数据库中删除
+          ctx.dota2tracker.database.unbindUser(session);
           return session.text(".unbind_success");
         } else {
           return session.text(".not_binded");
@@ -66,7 +66,7 @@ export function registerUserCommand(ctx: Context) {
           if (nick_name === sessionPlayer.nickName){
             return session.text(".nick_name_same");
           }
-          await ctx.database.set("dt_subscribed_players", sessionPlayer.id, { nickName: nick_name });
+          await ctx.dota2tracker.database.renamePlayer(sessionPlayer.id, nick_name);
           return session.text(".rename_success", { nick_name });
         } else {
           return session.text(".not_binded");
