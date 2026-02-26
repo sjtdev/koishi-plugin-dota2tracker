@@ -1,5 +1,15 @@
 # 更新日志
 
+### [2.5.4](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.3...v2.5.4) (2026-02-26)
+
+### 🚀 功能优化
+
+* **database:** 增加缓存群友列表机制，加入对拉取有效群友时的检测，每小时更新缓存 ([1ac1df9](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/1ac1df9513a883b17031fdc3e912fccc0af8a3e2)), closes [#17](https://github.com/sjtdev/koishi-plugin-dota2tracker/issues/17)
+
+### 🐛 Bug 修复
+
+* **match-watcher:** 修复无有效群友时还会发送查询请求 ([a8d1e8c](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/a8d1e8c173d71b850516912729e398943d3ea391))
+
 ### [2.5.3](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.2...v2.5.3) (2026-02-23)
 
 ### 🎨 样式
