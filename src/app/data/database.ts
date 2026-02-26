@@ -3,7 +3,8 @@ import * as graphql from "../../@types/graphql-generated";
 import { ItemList, RankInfo } from "./types";
 declare module "koishi" {
   interface Tables {
-    dt_subscribed_guilds: dt_subscribed_guilds;
+    // 历史遗留：数据库表名为 dt_subscribed_guilds，实际存储 channel 订阅数据
+    dt_subscribed_guilds: dt_subscribed_channels;
     dt_subscribed_players: dt_subscribed_players;
     dt_match_extension: dt_match_extension;
   }
@@ -11,16 +12,16 @@ declare module "koishi" {
 export interface dt_subscribed_players {
   id: number;
   userId: string;
-  guildId: string;
+  channelId: string;
   platform: string;
   steamId: number;
   nickName: string;
   rank: { rank: number; leader: number };
 }
 
-export interface dt_subscribed_guilds {
+export interface dt_subscribed_channels {
   id: number;
-  guildId: string;
+  channelId: string;
   platform: string;
 }
 
@@ -68,14 +69,14 @@ export interface MatchExtensionData {
 export class DatabaseService extends Service {
   constructor(ctx: Context) {
     super(ctx, "dota2tracker.database", true);
-    // 注册数据库-表
-    ctx.model.extend("dt_subscribed_guilds", { id: "unsigned", guildId: "string", platform: "string" }, { autoInc: true });
+    // 注册数据库-表（channelId 字段兼容旧数据库中的 guildId 字段）
+    ctx.model.extend("dt_subscribed_guilds", { id: "unsigned", channelId: { type: "string", legacy: ["guildId"] }, platform: "string" }, { autoInc: true });
     ctx.model.extend(
       "dt_subscribed_players",
       {
         id: "unsigned",
         userId: "string",
-        guildId: "string",
+        channelId: { type: "string", legacy: ["guildId"] },
         platform: "string",
         steamId: "integer",
         nickName: "string",
@@ -105,9 +106,9 @@ export class DatabaseService extends Service {
   }
 
   async getActiveSubscribedPlayers(): Promise<dt_subscribed_players[]> {
-    const subscribedGuilds = await this.ctx.database.get("dt_subscribed_guilds", undefined);
-    const subscribedPlayersInGuild = (await this.ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
-    return subscribedPlayersInGuild;
+    const subscribedChannels = await this.ctx.database.get("dt_subscribed_guilds", undefined);
+    const subscribedPlayersInChannel = (await this.ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedChannels.some((ch) => ch.channelId == player.channelId));
+    return subscribedPlayersInChannel;
   }
 
   async isUserBinded(session: Session) {
@@ -133,11 +134,11 @@ export class DatabaseService extends Service {
   }
 
   async isChannelSubscribed(session: Session): Promise<boolean> {
-    const subscribedChannels: dt_subscribed_guilds[] = await this.ctx.database.get("dt_subscribed_guilds", this.getChannelQuery(session));
+    const subscribedChannels: dt_subscribed_channels[] = await this.ctx.database.get("dt_subscribed_guilds", this.getChannelQuery(session));
     return subscribedChannels.length > 0;
   }
 
-  async subscribeChannel(session: Session): Promise<dt_subscribed_guilds> {
+  async subscribeChannel(session: Session): Promise<dt_subscribed_channels> {
     return this.ctx.database.create("dt_subscribed_guilds", this.getChannelQuery(session));
   }
 
@@ -153,14 +154,14 @@ export class DatabaseService extends Service {
    */
   private getChannelQuery(session: Session) {
     return {
-      guildId: session.event.channel.id,
+      channelId: session.event.channel.id,
       platform: session.event.platform,
     };
   }
 
   private getUserQuery(session: Session) {
     return {
-      guildId: session.event.channel.id,
+      channelId: session.event.channel.id,
       platform: session.event.platform,
       userId: session.event.user.id,
     };
@@ -170,7 +171,7 @@ export class DatabaseService extends Service {
   async getSubscribedPlayerByNickNameOrSession(session: Session, nickName?: string): Promise<dt_subscribed_players | undefined> {
     const player: dt_subscribed_players = (
       await this.ctx.database.get("dt_subscribed_players", {
-        guildId: session.event.channel.id,
+        channelId: session.event.channel.id,
         platform: session.event.platform,
         ...(nickName ? { nickName } : { userId: session.event.user.id }),
       })
@@ -178,7 +179,7 @@ export class DatabaseService extends Service {
     return player;
   }
 
-  getChannelInfo({ platform, guildId }: dt_subscribed_guilds | dt_subscribed_players) {
-    return `${platform}:${guildId}`;
+  getChannelInfo({ platform, channelId }: dt_subscribed_channels | dt_subscribed_players) {
+    return `${platform}:${channelId}`;
   }
 }

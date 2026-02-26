@@ -47,7 +47,6 @@ export type PendingMatchSubscriber = BaseSubscriber &
         type: "CHANNEL";
         platform: string;
         channelId: string;
-        guildId: string;
       }
   );
 
@@ -74,7 +73,7 @@ export class ParsePollingTask extends Service<Config> {
     };
   }
 
-  createSubscriberByAutomatic(target: { type: "GUILD"; platform: string; channelId: string; guildId: string; languageTag: string; relevantPlayers: PlayerContext[] }): PendingMatchSubscriber {
+  createSubscriberByAutomatic(target: { type: "GUILD"; platform: string; channelId: string; languageTag: string; relevantPlayers: PlayerContext[] }): PendingMatchSubscriber {
     return {
       languageTag: target.languageTag,
       relevantPlayers: target.relevantPlayers,
@@ -82,7 +81,6 @@ export class ParsePollingTask extends Service<Config> {
       type: "CHANNEL",
       platform: target.platform,
       channelId: target.channelId,
-      guildId: target.guildId,
     };
   }
 

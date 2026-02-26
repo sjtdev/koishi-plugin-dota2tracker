@@ -144,7 +144,7 @@ export class DailyReportService extends Service {
   private static groupUsersByChannel(users: dt_subscribed_players[]) {
     const groups = new Map<string, dt_subscribed_players[]>();
     for (const user of users) {
-      const key = `${user.platform}:${user.guildId}`;
+      const key = `${user.platform}:${user.channelId}`;
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(user);
     }

@@ -43,11 +43,11 @@ export class DailyReportTask extends Service<Config> {
   }
 
   private async report_legacy(timeAgo, titleKey, showCombi) {
-    // 获取所有订阅的公会信息
-    const subscribedGuilds = await this.ctx.database.get("dt_subscribed_guilds", undefined);
-    // 获取订阅的玩家，并筛选出那些属于已订阅公会的玩家
-    const subscribedPlayersInGuild: any[] = (await this.ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedGuilds.some((guild) => guild.guildId == player.guildId));
-    const steamIds = subscribedPlayersInGuild.map((player) => player.steamId).filter((value, index, self) => self.indexOf(value) === index);
+    // 获取所有订阅的频道信息
+    const subscribedChannels = await this.ctx.database.get("dt_subscribed_guilds", undefined);
+    // 获取订阅的玩家，并筛选出那些属于已订阅频道的玩家
+    const subscribedPlayersInChannel: any[] = (await this.ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedChannels.some((ch) => ch.channelId == player.channelId));
+    const steamIds = subscribedPlayersInChannel.map((player) => player.steamId).filter((value, index, self) => self.indexOf(value) === index);
 
     // 使用工具函数查询比赛数据，将结果中的玩家信息过滤出参与过至少一场比赛的玩家
     const players = (await this.ctx.dota2tracker.stratzAPI.queryPlayersMatchesForDaily_legacy(steamIds, timeAgo)).players.filter((player) => player.matches?.length > 0);
@@ -57,7 +57,7 @@ export class DailyReportTask extends Service<Config> {
       .flat()
       .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
     // 遍历每位订阅玩家，计算相关统计信息并更新
-    for (let subPlayer of subscribedPlayersInGuild) {
+    for (let subPlayer of subscribedPlayersInChannel) {
       let player: NonNullable<graphql.PlayersMatchesForDailyQuery["players"]>[number] & {
         name?: string;
         winCount?: number;
@@ -93,9 +93,9 @@ export class DailyReportTask extends Service<Config> {
       subPlayer = Object.assign(subPlayer, player);
     }
 
-    // 处理每个公会的订阅玩家组合和比赛结果
-    for (let guild of subscribedGuilds) {
-      const currentsubscribedPlayers = subscribedPlayersInGuild.filter((player) => player.platform == guild.platform && player.guildId == guild.guildId && player.matches?.length);
+    // 处理每个已订阅频道的玩家组合和比赛结果
+    for (let channel of subscribedChannels) {
+      const currentsubscribedPlayers = subscribedPlayersInChannel.filter((player) => player.platform == channel.platform && player.channelId == channel.channelId && player.matches?.length);
       if (currentsubscribedPlayers.length) {
         const currentsubscribedPlayersIds = currentsubscribedPlayers.map((player) => player.steamId);
         const combinationsMap = new Map();
@@ -127,9 +127,9 @@ export class DailyReportTask extends Service<Config> {
         });
         const combinations = Array.from(combinationsMap.values());
         try {
-          const languageTag = await this.ctx.dota2tracker.i18n.getLanguageTag({ channelId: guild.guildId });
+          const languageTag = await this.ctx.dota2tracker.i18n.getLanguageTag({ channelId: channel.channelId });
           await this.ctx.broadcast(
-            [`${guild.platform}:${guild.guildId}`],
+            [`${channel.platform}:${channel.channelId}`],
             await this.ctx.dota2tracker.view.renderToImageByFile(
               {
                 title: this.ctx.dota2tracker.i18n.$t(languageTag, titleKey),
@@ -147,7 +147,7 @@ export class DailyReportTask extends Service<Config> {
             ),
           );
           // 记录日志
-          this.logger.info(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.report_sent", { title: this.ctx.dota2tracker.i18n.$t(languageTag, titleKey), guildId: guild.guildId, platform: guild.platform }));
+          this.logger.info(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.report_sent", { title: this.ctx.dota2tracker.i18n.$t(languageTag, titleKey), guildId: channel.channelId, platform: channel.platform }));
         } catch (error) {
           // 错误处理
           this.logger.error(error);

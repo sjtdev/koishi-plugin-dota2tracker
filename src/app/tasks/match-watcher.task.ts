@@ -44,13 +44,13 @@ export class MatchWatcherTask extends Service<Config> {
         continue;
       }
 
-      // 2. 将这些玩家【按他们所在的群组】进行分组
-      const playersByGuild = new Map<string, { guildInfo: { platform: string; channelId: string; guildId: string }; players: PlayerContext[] }>();
+      // 2. 将这些玩家【按他们所在的频道】进行分组
+      const playersByGuild = new Map<string, { guildInfo: { platform: string; channelId: string }; players: PlayerContext[] }>();
       for (const player of relevantActivePlayers) {
-        const guildKey = `${player.platform}:${player.guildId}`;
+        const guildKey = `${player.platform}:${player.channelId}`;
         if (!playersByGuild.has(guildKey)) {
           playersByGuild.set(guildKey, {
-            guildInfo: { platform: player.platform, channelId: player.guildId, guildId: player.guildId },
+            guildInfo: { platform: player.platform, channelId: player.channelId },
             players: [],
           });
         }
@@ -76,7 +76,7 @@ export class MatchWatcherTask extends Service<Config> {
 
         messageToLogger.push({
           platform: guildInfo.platform,
-          guildId: guildInfo.guildId,
+          guildId: guildInfo.channelId,
           players,
         });
 
@@ -122,12 +122,12 @@ export class MatchWatcherTask extends Service<Config> {
             let guildMember;
             try {
               // 被封禁/退出的群会抛出异常，此处捕获以避免中断整个段位变动检测循环
-              guildMember = await this.ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember?.(subPlayer.guildId, subPlayer.userId);
+              guildMember = await this.ctx.bots.find((bot) => bot.platform == subPlayer.platform)?.getGuildMember?.(subPlayer.channelId, subPlayer.userId);
             } catch (error) {
               this.logger.warn(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.fetch_guilds_failed") + error);
             }
             const name = subPlayer.nickName ?? guildMember?.nick ?? playersData.find((player) => player.steamAccount.id == subPlayer.steamId)?.steamAccount.name ?? String(subPlayer.steamId);
-            const languageTag = await this.ctx.dota2tracker.i18n.getLanguageTag({ channelId: subPlayer.guildId });
+            const languageTag = await this.ctx.dota2tracker.i18n.getLanguageTag({ channelId: subPlayer.channelId });
             if (this.config.rankBroadFun === true) {
               // 整活播报
               const img = await this.ctx.dota2tracker.view.renderToImageByFile(
@@ -146,16 +146,16 @@ export class MatchWatcherTask extends Service<Config> {
                 TemplateType.Rank,
                 languageTag,
               );
-              await this.ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], img);
+              await this.ctx.broadcast([`${subPlayer.platform}:${subPlayer.channelId}`], img);
             } else {
               // 常规播报
               // const message = `群友 ${name} 段位变动：${$t(languageTag, "dota2tracker.template.ranks." + prevRank.medal)}${prevRank.star} → ${$t(languageTag, "dota2tracker.template.ranks." + currRank.medal)}${currRank.star} `;
               const message = this.ctx.dota2tracker.messageBuilder.buildRankChangedMessage(languageTag, name, prevRank, currRank);
-              await this.ctx.broadcast([`${subPlayer.platform}:${subPlayer.guildId}`], message);
+              await this.ctx.broadcast([`${subPlayer.platform}:${subPlayer.channelId}`], message);
             }
             // 更新玩家的数据记录
             this.ctx.dota2tracker.database.setPlayerRank(subPlayer.id, rankMap.get(subPlayer.steamId));
-            this.logger.info(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.rank_sent", { platform: subPlayer.platform, guildId: subPlayer.guildId, player: { nickName: subPlayer.nickName, steamId: subPlayer.steamId } }));
+            this.logger.info(this.ctx.dota2tracker.i18n.gt("dota2tracker.logger.rank_sent", { platform: subPlayer.platform, guildId: subPlayer.channelId, player: { nickName: subPlayer.nickName, steamId: subPlayer.steamId } }));
           }
         } else {
           this.ctx.dota2tracker.database.setPlayerRank(subPlayer.id, rankMap.get(subPlayer.steamId));
