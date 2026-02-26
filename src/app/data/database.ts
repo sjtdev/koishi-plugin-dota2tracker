@@ -85,6 +85,70 @@ export class DatabaseService extends Service {
       { autoInc: true },
     );
     ctx.model.extend("dt_match_extension", { matchId: "string", startTime: "timestamp", data: "json" }, { autoInc: false, primary: ["matchId"] });
+    // 每小时全量刷新所有已订阅频道的成员缓存
+    ctx.cron("0 * * * *", async () => {
+      await this.refreshAllGuildMemberCaches();
+    });
+  }
+
+  /** 群成员列表内存缓存： Map<"platform:channelId", Set<userId>> */
+  private guildMemberCache = new Map<string, Set<string>>();
+
+  /**
+   * 刷新指定频道的群成员缓存。
+   * 通过 channel 表获取 assignee（bot selfId），再调用 bot.getGuildMemberList。
+   * 失败时记录 warn 并清除该 key（保守策略）。
+   */
+  private async refreshGuildMemberCache(platform: string, channelId: string): Promise<void> {
+    const cacheKey = `${platform}:${channelId}`;
+    try {
+      const channelRow = (await this.ctx.database.get("channel", { id: channelId })).at(0);
+      const selfId = channelRow?.assignee;
+      // channel 表中有货真价实的 guildId（区别于 channelId，某些平台两者不同）
+      const guildId = channelRow?.guildId ?? channelId;
+      if (!selfId) {
+        this.guildMemberCache.delete(cacheKey);
+        return;
+      }
+      const bot = this.ctx.bots[`${platform}:${selfId}`];
+      if (!bot) {
+        this.guildMemberCache.delete(cacheKey);
+        return;
+      }
+      const members = await bot.getGuildMemberList(guildId);
+      const userIds = new Set(members.data.map((m) => m.user.id));
+      this.guildMemberCache.set(cacheKey, userIds);
+    } catch (error) {
+      this.logger.warn(`获取频道 ${cacheKey} 成员列表失败，已清除对应缓存：` + error);
+      this.guildMemberCache.delete(cacheKey);
+    }
+  }
+
+  /** 全量刷新所有已订阅频道的群成员缓存（每小时 cron 调用） */
+  private async refreshAllGuildMemberCaches(): Promise<void> {
+    const subscribedChannels = await this.ctx.database.get("dt_subscribed_guilds", undefined);
+    await Promise.allSettled(subscribedChannels.map((ch) => this.refreshGuildMemberCache(ch.platform, ch.channelId)));
+  }
+
+  /**
+   * 判断玩家是否仍在群组中。
+   * 缓存未命中（冷启动阶段）时保守放行，返回 true。
+   */
+  isPlayerInGuild(platform: string, channelId: string, userId: string): boolean {
+    const cached = this.guildMemberCache.get(`${platform}:${channelId}`);
+    if (!cached) return true; // 缓存尚未建立，冷启动保守放行
+    return cached.has(userId);
+  }
+
+  /** 删除指定频道的群成员缓存（取消订阅时内部调用） */
+  private deleteGuildMemberCache(platform: string, channelId: string): void {
+    this.guildMemberCache.delete(`${platform}:${channelId}`);
+  }
+
+  /** 从缓存中移除单个用户（取消绑定时内部调用，保留频道内其他成员的缓存）*/
+  private removeUserFromGuildMemberCache(platform: string, channelId: string, userId: string): void {
+    const cached = this.guildMemberCache.get(`${platform}:${channelId}`);
+    if (cached) cached.delete(userId);
   }
   async insertMatchExtension(matchId: number, startTime: Date, data: MatchExtensionData) {
     return this.ctx.database.upsert("dt_match_extension", [{ matchId: String(matchId), startTime, data }]);
@@ -107,8 +171,9 @@ export class DatabaseService extends Service {
 
   async getActiveSubscribedPlayers(): Promise<dt_subscribed_players[]> {
     const subscribedChannels = await this.ctx.database.get("dt_subscribed_guilds", undefined);
-    const subscribedPlayersInChannel = (await this.ctx.database.get("dt_subscribed_players", undefined)).filter((player) => subscribedChannels.some((ch) => ch.channelId == player.channelId));
-    return subscribedPlayersInChannel;
+    return (await this.ctx.database.get("dt_subscribed_players", undefined))
+      .filter((player) => subscribedChannels.some((ch) => ch.channelId == player.channelId))
+      .filter((player) => this.isPlayerInGuild(player.platform, player.channelId, player.userId));
   }
 
   async isUserBinded(session: Session) {
@@ -122,14 +187,19 @@ export class DatabaseService extends Service {
   }
 
   async bindUser(session: Session, steamId: number | string, nickName?: string) {
-    return this.ctx.database.create("dt_subscribed_players", {
+    const result = await this.ctx.database.create("dt_subscribed_players", {
       ...this.getUserQuery(session),
       steamId: Number(steamId),
       nickName: nickName || "",
     });
+    // 立即刷新该频道的成员缓存，确保新绑定玩家不会因缓存过期而漏过比赛
+    this.refreshGuildMemberCache(session.event.platform, session.event.channel.id);
+    return result;
   }
 
   async unbindUser(session: Session) {
+    // 从缓存移除该用户（保留频道内其他成员的缓存）
+    this.removeUserFromGuildMemberCache(session.event.platform, session.event.channel.id, session.event.user.id);
     return this.ctx.database.remove("dt_subscribed_players", this.getUserQuery(session));
   }
 
@@ -143,10 +213,15 @@ export class DatabaseService extends Service {
   }
 
   async subscribeChannel(session: Session): Promise<dt_subscribed_channels> {
-    return this.ctx.database.create("dt_subscribed_guilds", this.getChannelQuery(session));
+    const result = await this.ctx.database.create("dt_subscribed_guilds", this.getChannelQuery(session));
+    // 新订阅立即建立该频道的成员缓存
+    this.refreshGuildMemberCache(session.event.platform, session.event.channel.id);
+    return result;
   }
 
   async unSubscribeChannel(session: Session) {
+    // 取消订阅时清除对应频道的缓存
+    this.deleteGuildMemberCache(session.event.platform, session.event.channel.id);
     return this.ctx.database.remove("dt_subscribed_guilds", this.getChannelQuery(session));
   }
 
