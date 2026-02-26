@@ -15,6 +15,7 @@ export class MatchWatcherTask extends Service<Config> {
   async discovery() {
     try {
       const activePlayers = await this.ctx.dota2tracker.database.getActiveSubscribedPlayers();
+      if (activePlayers.length === 0) return;
       const uniqueSteamIds = activePlayers.map((player) => player.steamId).filter((steamId, index, self) => self.indexOf(steamId) === index);
       const playersData = (await this.ctx.dota2tracker.stratzAPI.queryPlayersLastMatchRankInfo({ steamAccountIds: uniqueSteamIds })).players;
       await this.discoverNewMatches(playersData, activePlayers);
