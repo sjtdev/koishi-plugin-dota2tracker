@@ -99,7 +99,7 @@ export class MessageBuilder extends Service<Config> {
   ) {
     const $t = (key: string, params?: any) => this.ctx.dota2tracker.i18n.$t(languageTag, `commands.dota2tracker.hero-of-the-day.messages.${key}`, params);
 
-    let ejs = "<html><head><style>body{width:fit-content;height:fit-content;margin:0;padding:12px;font-family:<%-fontFamily%>;}</style></head><body>";
+    let ejs = "<html><head><style>body{width:fit-content;height:fit-content;margin:0;padding:12px;}</style></head><body>";
 
     if (heroRcmd.recommendationType !== "LIFETIME_NO_RECORD" && heroRcmd.recommendationType !== "PLAYER_ANONYMOUS") {
       ejs += `<h3>${$t("title_recommendation")}</h3>`;
@@ -222,7 +222,6 @@ export class MessageBuilder extends Service<Config> {
             width: fit-content;
             height: fit-content;
             background-color: #f7f7f7;
-            font-family:<%-fontFamily%>;
           }
           table {
             border-collapse: collapse;
