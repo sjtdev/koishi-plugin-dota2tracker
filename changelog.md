@@ -1,5 +1,11 @@
 # 更新日志
 
+### [2.5.5](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.4...v2.5.5) (2026-03-08)
+
+### 🐛 Bug 修复
+
+* **ejs:** 修复使用`查询群友``DOTA2帮助`因简单模板未适配新字体方案导致报错的问题 ([7ecf9e7](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/7ecf9e7518488dde9c0a174f14ee1c9efc57698c)), closes [#18](https://github.com/sjtdev/koishi-plugin-dota2tracker/issues/18)
+
 ### [2.5.4](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.3...v2.5.4) (2026-02-26)
 
 ### 🚀 功能优化
