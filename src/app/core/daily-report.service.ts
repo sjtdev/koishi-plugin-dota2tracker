@@ -99,10 +99,24 @@ export class DailyReportService extends Service {
       this.calculateImpactPercentages(impactData);
 
       // MVP / LVP Logic
-      // Sort by Max MVP Score (desc), then by AVG KDA (desc)
+      // MVP: 最高单场 MVP 分（bestMatchId 对应场次），KDA 做 tie-breaker
       playerStats.sort((a, b) => b.maxMvpScore - a.maxMvpScore || b.avgKda - a.avgKda);
       const mvpStat = playerStats[0];
-      const lvpStat = playerStats[playerStats.length - 1];
+
+      // LVP: 反查每位玩家 worstMatchId 对应的实际 mvpScore，取最差者
+      // 使用单场最低分而非 maxMvpScore 倒序，避免"场次少且全部获胜"的玩家因峰值低被误判为 LVP
+      const getWorstMatchScore = (stat: (typeof playerStats)[0]) => {
+        const ext = extensions.find((e) => Number(e.matchId) === stat.worstMatchId);
+        const playerExt = ext?.data?.players?.find((p) => p.steamAccountId === stat.steamId);
+        return playerExt?.mvpScore ?? 0;
+      };
+      const lvpStat = playerStats.reduce((worst, curr) => {
+        const worstScore = getWorstMatchScore(worst);
+        const currScore = getWorstMatchScore(curr);
+        // 最差单场分更低者为 LVP；分数相同时 avgKda 更低者更差
+        return currScore < worstScore || (currScore === worstScore && curr.avgKda < worst.avgKda) ? curr : worst;
+      });
+
       const mvpPlayerData = squadPlayerData.find((p) => p.steamAccount.id === mvpStat.steamId)!;
       const lvpPlayerData = squadPlayerData.find((p) => p.steamAccount.id === lvpStat.steamId)!;
 
