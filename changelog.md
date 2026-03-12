@@ -1,5 +1,11 @@
 # 更新日志
 
+### [2.5.6](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.5...v2.5.6) (2026-03-12)
+
+### 🐛 Bug 修复
+
+* **daily:** 修复了对于"LVP(头号战犯)"卡片判定的逻辑错误 ([1797209](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/17972098102dc0479dd9d3a9a3d33b041919cf1b))
+
 ### [2.5.5](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.4...v2.5.5) (2026-03-08)
 
 ### 🐛 Bug 修复
