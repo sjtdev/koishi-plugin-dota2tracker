@@ -81,7 +81,7 @@
     <div class="lane_rank row-1 col-3 flex w-full h-full justify-between">
       <div class="lane w-[44px] h-full">
         <p class="text-[10px] text-center"><%= $t("dota2tracker.template.lane_" + p.laneResult) %></p>
-        <div class="h-[44px] w-[44px]"><%- utils.laneSVG[p.laneResult] %></div>
+        <div class="h-[44px] w-[44px]"><img src="<%- utils.laneSVG[p.laneResult] %>" /></div>
       </div>
       <div class="rank_plus w-[36px] h-full relative text-[10px] leading-[1.15] text-shadow-[-1px_1px_0_#000,1px_-1px_0_#000,-1px_1px_0_#000,1px_1px_0_#000]">
         <div class="rank absolute top-0 size-[36px] z-2">

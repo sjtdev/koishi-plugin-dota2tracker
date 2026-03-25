@@ -253,7 +253,7 @@
                             <p><%= m.kda %> (<%= (m.parsedDateTime ? "" : "≈") + m.kp %>%)</p>
                             <p><%= m.inner.kills %>/<%= m.inner.deaths %>/<%= m.inner.assists %></p>
                         </td>
-                        <td><div class="player_lane <%= m.laneRes %>"><%- getImageUrl("lane_" + m.laneRes, undefined, ImageFormat.svg) %></div></td>
+                        <td><div class="player_lane <%= m.laneRes %>"><img src="<%- getImageUrl("lane_" + m.laneRes, undefined, ImageFormat.svg) %>" /></div></td>
                         <td style="line-height: 20px"><%= m.timeStr %></td>
                         <td><%= m.durationTime %></td>
                         <td><%= m.inner.imp != null ? ((m.inner.imp >= 0 ? "+" : "") + m.inner.imp) : "?" %></td>
