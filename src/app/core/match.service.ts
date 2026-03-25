@@ -3,7 +3,6 @@ import * as graphql from "../../@types/graphql-generated";
 import { MatchInfoEx, PlayerInfoExInMatch } from "../data/types";
 import type ConstantsType from "dotaconstants";
 import { sec2time, formatNumber } from "../common/utils";
-import { HeroService } from "./hero.service";
 import { FetchMatchDataFailError, handleError } from "../common/error";
 import { MatchExtensionData } from "../data/database";
 
@@ -143,65 +142,15 @@ export class MatchService extends Service {
   }
 
   private async formatMatchData(matchQuery: graphql.MatchInfoQuery, languageTag: string): Promise<MatchInfoEx> {
-    try {
-      // Step 3: 检查Constants缓存
-      let constantsQuery: graphql.ConstantsQuery = await this.ctx.dota2tracker.cache.getFacetConstantsCache(languageTag);
-      const isFromOpenDota = (matchQuery.match as any)?.odParsed === true;
-
-      // 定义一个变量来决定是否需要重新获取 constants
-      let needsRefetch = false;
-
-      if (!constantsQuery) {
-        // 1. 如果缓存本身就为空，则必须获取
-        needsRefetch = true;
-      } else if (!isFromOpenDota) {
-        // 2. 如果数据源是 Stratz，则进行版本校验
-        if (!matchQuery.constants?.gameVersions?.[0]?.id || !constantsQuery.constants?.gameVersions?.[0]?.id || matchQuery.constants.gameVersions[0].id !== constantsQuery.constants.gameVersions[0].id) {
-          needsRefetch = true;
-        }
-      }
-      // (如果数据源是 OpenDota，且缓存存在，则 needsRefetch 保持 false，直接使用缓存)
-
-      if (needsRefetch) {
-        constantsQuery = await this.ctx.dota2tracker.stratzAPI.queryConstants(languageTag);
-      }
-      const facetData = await MatchService.constantsInjectFacetData(constantsQuery, matchQuery, languageTag, this.ctx.dota2tracker.hero);
-      this.ctx.dota2tracker.cache.setFacetConstantsCache(languageTag, constantsQuery);
-      // Step 4: 扩展比赛数据
-      const match = MatchService.extendMatchData(matchQuery, facetData, this.ctx.dota2tracker.dotaconstants);
-      // 保存日报周报所需数据
-      this.recordMatchExtension(match);
-      return match;
-    } catch (error) {
-      // 查询失败时删除缓存
-      this.ctx.dota2tracker.cache.deleteFacetConstantsCache(languageTag);
-      throw error;
-    }
-  }
-
-  public static async constantsInjectFacetData(constantsQuery: graphql.ConstantsQuery, matchQuery: graphql.MatchInfoQuery, languageTag: string, heroService?: HeroService) {
-    const facetData = {};
-    for (let player of (matchQuery.match as MatchInfoEx)?.players) {
-      // 命石处理
-      if (player.variant != null) {
-        const constantsFacet = constantsQuery.constants.facets.find((facet) => facet.id === player.hero.facets[player.variant - 1]?.facetId || facet.name === player.hero.facets[player.variant - 1]?.name);
-
-        let displayName = constantsFacet?.language?.displayName;
-        if (!displayName && heroService) {
-          const valveFacet = (await heroService.getHeroDetails(player.hero.id, languageTag)).facets.find((facet) => facet.index === player.variant - 1);
-
-          constantsFacet.language.displayName = valveFacet.title_loc;
-          constantsFacet.name = valveFacet.name;
-          constantsFacet.icon = valveFacet.icon;
-        }
-        facetData[player.steamAccountId] = { id: constantsFacet.id, name: constantsFacet.name, icon: constantsFacet.icon, color: constantsFacet.color, displayName: constantsFacet.language?.displayName };
-      }
-    }
-    return facetData;
+    // 扩展比赛数据
+    const match = MatchService.extendMatchData(matchQuery, this.ctx.dota2tracker.dotaconstants);
+    // 保存日报周报所需数据
+    this.recordMatchExtension(match);
+    return match;
   }
 
   // 对比赛数据进行补充以供生成模板函数使用
-  public static extendMatchData(matchQuery: graphql.MatchInfoQuery, facetData: Record<string, PlayerInfoExInMatch["facet"]>, dotaconstants: typeof ConstantsType): MatchInfoEx {
+  public static extendMatchData(matchQuery: graphql.MatchInfoQuery, dotaconstants: typeof ConstantsType): MatchInfoEx {
     const match = matchQuery.match as MatchInfoEx;
     // if (!match.parsedDateTime)
     //     return match;
@@ -410,8 +359,6 @@ export class MatchService extends Service {
       }
 
       player.formattedNetworth = formatNumber(player.networth);
-
-      player.facet = facetData[player.steamAccountId];
 
       player.titles = []; // 添加空的称号数组
       player.mvpScore = // 计算MVP分数

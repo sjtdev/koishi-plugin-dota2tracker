@@ -10,7 +10,6 @@ export enum TemplateType {
 
 export enum ImageType {
   Icons = "icons",
-  IconsFacets = "icons/facets",
   Heroes = "heroes",
   HeroIcons = "heroes/icons",
   HeroStats = "heroes/stats",

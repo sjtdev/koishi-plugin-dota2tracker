@@ -43,9 +43,6 @@ query MatchInfo($matchId: Long!) {
         id
         name
         shortName
-        facets {
-          facetId
-        }
       }
       variant
       dotaPlus {

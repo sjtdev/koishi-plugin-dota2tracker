@@ -36,12 +36,8 @@ export interface PlayerInfoExInMatch extends PlayerType {
   backpacks?: ItemInfo[];
   unitItems?: ItemInfo[];
   unitBackpacks?: ItemInfo[];
-  facet: { id: number; name: string; displayName: string; color: string; icon: string };
   formattedNetworth: string;
   utilityScore: number;
-  hero: PlayerType["hero"] & {
-    facets?: (PlayerType["hero"]["facets"][number] & { name?: string })[];
-  };
 }
 export interface RankInfo {
   medal: number;

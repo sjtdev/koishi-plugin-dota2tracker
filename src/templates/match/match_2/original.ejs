@@ -13,8 +13,6 @@
    };
 %>
 
-<%# --- 工具函数: 命石字体大小 --- %>
-<% const getFacetSize = n => { const l=n?.length||0; return l<=4?"11px":l===5?"8px":l>=6?"7px":"10px"; }; %>
 
 <%# --- 顶部数据预处理 --- %>
 <% const startTime = DateTime.fromSeconds(match.startDateTime).toFormat("yyyy-MM-dd HH:mm:ss").slice(2); %>
@@ -89,11 +87,6 @@
     <% const orderStyle = `order: ${p.team === 'radiant' ? 1 : 100}`; %>
     <% const partyClass = p.partyId != null ? ' party_' + match.party[p.partyId] : ''; %>
 
-    <%# --- Facet --- %>
-    <% const facetColor = p.facet?.color ?? 'Black'; %>
-    <% const facetStyle = `font-size: ${getFacetSize(p.facet?.displayName)}`; %>
-    <% const facetName = p.facet?.displayName ?? '?'; %>
-
     <%# --- 统计数据 --- %>
     <% const teamTotalDmg = match[p.team].heroDamage || 1; %>
     <% const teamTotalTaken = match[p.team].damageReceived || 1; %>
@@ -115,15 +108,6 @@
         <p class="level"><%= p.level %></p>
         <p class="party_line"></p>
         <p class="party_mark"></p>
-      </div>
-
-      <div class="facet <%= facetColor %>">
-        <% if (p.facet) { %>
-          <img src="<%- getImageUrl(p.facet.icon, ImageType.IconsFacets) %>">
-        <% } %>
-        <span <%- `style="${facetStyle}"` %>>
-          <p><%= facetName %></p>
-        </span>
       </div>
 
       <div class="rank">

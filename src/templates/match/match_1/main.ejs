@@ -55,7 +55,7 @@
 <%# --- 玩家列表 --- %>
 <div class="w-[790px] grid grid-cols-2 gap-[5px] mx-[5px]">
   <% match.players.forEach(player => { %>
-  <%- include(`./player.ejs`, { match, player, utils: {kc, dc, laneSVG}, facetColor, partyColor }) %>
+  <%- include(`./player.ejs`, { match, player, utils: {kc, dc, laneSVG}, partyColor }) %>
   <% }); %>
 </div>
 

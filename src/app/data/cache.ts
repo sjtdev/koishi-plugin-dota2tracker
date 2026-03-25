@@ -8,7 +8,6 @@ import { Config } from "../../config";
 
 declare module "@koishijs/cache" {
   interface Tables {
-    dt_facets_constants: graphql.ConstantsQuery; // 游戏数据
     dt_itemlist_constants: { itemList: ItemList; gameVersion: string };
     dt_previous_query_results: { data: graphql.MatchInfoQuery; pluginVersion: string };
     dt_sended_match_id: undefined;
@@ -90,15 +89,4 @@ export class CacheService extends Service<Config> {
     return sendedIds;
   }
 
-  async getFacetConstantsCache(languageTag: string) {
-    return this.ctx.cache.get("dt_facets_constants", languageTag);
-  }
-
-  setFacetConstantsCache(languageTag: string, constants: graphql.ConstantsQuery) {
-    this.ctx.cache.set("dt_facets_constants", languageTag, constants, DAYS_30);
-  }
-
-  deleteFacetConstantsCache(languageTag: string) {
-    this.ctx.cache.delete("dt_facets_constants", languageTag);
-  }
 }

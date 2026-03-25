@@ -60,60 +60,10 @@ export class HeroService extends Service {
 
   public static formatHeroDetails(rawHero: any) {
     let hero = Object.assign({}, rawHero);
-    hero.facet_abilities.forEach((fa, i) => {
-      if (fa.abilities.length) {
-        fa.abilities.forEach((ab) => {
-          if (!(hero.facets[i] as any).abilities) (hero.facets[i] as any).abilities = [];
-          if ((hero.facets[i] as any).description_loc !== ab.desc_loc)
-            (hero.facets[i] as any).abilities.push({
-              id: ab.id,
-              name: ab.name,
-              name_loc: ab.name_loc,
-              description_ability_loc: this.formatHeroDesc(ab.desc_loc, ab.special_values, HeroDescType.Facet),
-            });
-          else (hero.facets[i] as any).description_loc = this.formatHeroDesc((hero.facets[i] as any).description_loc, ab.special_values, HeroDescType.Facet);
-          ab.ability_is_facet = true;
-          ab.facet = hero.facets[i];
-          hero.abilities.push(ab);
-        });
-      }
-    });
-    // 遍历技能处理命石（facet）
-    const all_special_values = [...hero.abilities.flatMap((ab) => ab.special_values), ...hero.facet_abilities.flatMap((fas) => fas.abilities.flatMap((fa) => fa.special_values))];
+
     hero.abilities.forEach((ab) => {
-      // 遍历修改技能的命石，将描述与技能回填
-      ab.facets_loc.forEach((facet, i) => {
-        i = i + (hero.facets.length - ab.facets_loc.length);
-        if (i < 0) return;
-        if (facet) {
-          if (!(hero.facets[i] as any).abilities) (hero.facets[i] as any).abilities = [];
-          (hero.facets[i] as any).abilities.push({
-            id: ab.id,
-            name: ab.name,
-            name_loc: ab.name_loc,
-            description_ability_loc: this.formatHeroDesc(facet, ab.special_values, HeroDescType.Facet),
-            attributes: [],
-          });
-        }
-      });
-      hero.facets.forEach((facet) => {
-        const svs = ab.special_values.filter((sv) => sv.facet_bonus.name === facet.name);
-        svs.forEach((sv) => {
-          if (sv.heading_loc) {
-            if (!facet.abilities) facet.abilities = [];
-            (facet as any).abilities
-              .find((ability: any) => ab.id == ability.id)
-              ?.attributes.push({
-                heading_loc: sv.heading_loc,
-                values: [...sv.facet_bonus.values],
-                is_percentage: sv.is_percentage,
-              });
-          }
-        });
-        facet.description_loc = this.formatHeroDesc(facet.description_loc, svs, HeroDescType.Facet);
-      });
       // 处理技能本身说明
-      ab.desc_loc = this.formatHeroDesc(ab.desc_loc, ab.special_values, (ab as any).ability_is_facet ? HeroDescType.Facet : undefined);
+      ab.desc_loc = this.formatHeroDesc(ab.desc_loc, ab.special_values);
       ab.notes_loc = ab.notes_loc.map((note) => this.formatHeroDesc(note, ab.special_values));
       // 处理神杖与魔晶说明
       if (ab.ability_has_scepter) ab.scepter_loc = this.formatHeroDesc(ab.scepter_loc, ab.special_values, HeroDescType.Scepter);
@@ -191,9 +141,6 @@ export class HeroService extends Service {
         if (specialValue) {
           let valuesToUse = "";
           switch (type) {
-            case HeroDescType.Facet:
-              valuesToUse = specialValue.facet_bonus.name ? specialValue.facet_bonus.values.join(" / ") : specialValue.values_float.join(" / ");
-              break;
             case HeroDescType.Scepter:
               valuesToUse = specialValue.values_scepter.length ? specialValue.values_scepter.join(" / ") : specialValue.values_float.join(" / ");
               break;
@@ -213,7 +160,6 @@ export class HeroService extends Service {
 }
 enum HeroDescType {
   Normal = "normal",
-  Facet = "facet",
   Scepter = "scepter",
   Shard = "shard",
 }

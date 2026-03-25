@@ -133,48 +133,6 @@
                 </div>
               </div>
             </div>
-            <div class="facets">
-            <% hero.facets.forEach(facet => { %>
-              <div class="facet">
-                <div class="name_back type_<%= facet.color %>"></div>
-                <div class="name_line type_<%= facet.color %>"></div>
-                <p class="name">
-                  <img src="<%= getImageUrl(facet.icon, ImageType.IconsFacets) %>"/>
-                  <span><%- facet.title_loc %></span>
-                </p>
-                <div class="content">
-                  <% if (facet.description_loc && !facet.abilities?.some(ability => ability.description_ability_loc === facet.description_loc)) { %>
-                  <p class="description"><%- facet.description_loc %></p>
-                  <% } %>
-
-                  <% if (facet.abilities) { %>
-                  <% facet.abilities.forEach(ability => { %>
-                  <div class="ability">
-                    <div class="name">
-                      <img src="<%= getImageUrl(ability.name, ImageType.Abilities) %>" onerror="this.onerror=null; this.src='<%= getImageUrl(`innate_icon`, ImageType.Icons) %>';"/>
-                      <span><%- ability.name_loc %></span>
-                    </div>
-                    <% if (ability.description_ability_loc) { %>
-                    <div class="description"><%- ability.description_ability_loc %></div>
-                    <% } %>
-
-                    <% if (ability.attributes && ability.attributes.length) { %>
-                    <% ability.attributes.forEach(attr => { %>
-                    <div class="attributes">
-                      <p>
-                        <span class="item"><%- attr.heading_loc %></span>
-                        <span class="values"><%- attr.values.map(value => value + (attr.is_percentage ? "%" : "")).join(" / ") %></span>
-                      </p>
-                    </div>
-                    <% }); %>
-                    <% } %>
-                  </div>
-                  <% }); %>
-                  <% } %>
-                </div>
-              </div>
-              <% }); %>
-            </div>
             <div class="skills">
               <%# --- 遍历技能列表 --- %>
               <% hero.abilities.forEach((item) => {
@@ -188,16 +146,13 @@
                   const hasCd = cdStats?.values_float.length && !(cdStats.values_float.length === 1 && cdStats.values_float[0] === 0);
                   const hasMana = manaStats?.values_float.length && !(manaStats.values_float.length === 1 && manaStats.values_float[0] === 0);
               %>
-              <div class="skill<%= item.facet ? ' facet' : '' %>" data-innate="<%= item.ability_is_innate && !item.ability_is_facet %>">
+              <div class="skill" data-innate="<%= item.ability_is_innate %>">
 
                 <%# --- 技能标题行 --- %>
-                <p class="title<%= item.facet ? (' name_back type_' + item.facet?.color) : '' %>">
-                  <% if (item.facet) { %>
-                    <img src="<%= getImageUrl(item.facet?.icon, ImageType.IconsFacets) %>">
-                  <% } %>
+                <p class="title">
                   <span class="name font-serif"><%= item.name_loc %></span>
 
-                  <% if (item.ability_is_innate && !item.ability_is_facet) { %>
+                  <% if (item.ability_is_innate) { %>
                     <span class="is_innate"><%= $t("dota2tracker.template.innate") %></span>
                   <% } %>
                   <% if (item.ability_is_granted_by_scepter) { %>
@@ -253,32 +208,6 @@
 
                 <p class="description"><%- item.desc_loc %></p>
 
-                <%# --- Facet 描述渲染逻辑 --- %>
-                <%# 将原来的 reduce 逻辑解构为清晰的计算 %>
-                <%
-                  const facetStartIndex = hero.facets.length - item.facets_loc.length;
-                  item.facets_loc.forEach((facet_loc, i) => {
-                    const realIndex = i + facetStartIndex;
-                    if (realIndex >= 0 && facet_loc !== "") {
-                      const currentFacet = hero.facets[realIndex];
-                %>
-                <div class="facet">
-                  <div class="name_back type_<%= currentFacet.color %>"></div>
-                  <div class="name_line type_<%= currentFacet.color %>"></div>
-                  <p class="name">
-                    <img src="<%= getImageUrl(currentFacet.icon, ImageType.IconsFacets) %>" />
-                    <span><%- currentFacet.title_loc %></span>
-                  </p>
-                  <div class="content">
-                    <div class="ability">
-                      <div class="description"><%- currentFacet.abilities.find(ab => ab.id == item.id)?.description_ability_loc %></div>
-                    </div>
-                  </div>
-                </div>
-                <%
-                    }
-                  });
-                %>
 
                 <%# --- A杖/魔晶描述 --- %>
                 <% if (item.ability_has_scepter && !item.ability_is_granted_by_scepter && item.scepter_loc) { %>
@@ -312,7 +241,6 @@
                       const isAllZero = sv.values_float?.every(value => value === 0) || sv.values_float.length == 0;
                       const hasScepterVal = sv.values_scepter && sv.values_scepter.length;
                       const hasShardVal = sv.values_shard && sv.values_shard.length;
-                      const hasFacetVal = sv.facet_bonus.name && hero.facets.some(facet => facet.name == sv.facet_bonus.name);
                       const hasTalentVal = sv.bonuses.length > 0;
 
                       // 如果基础值全为0，且没有任何额外加成(A杖/魔晶/命石)，则该条目其实没意义，但在原逻辑里似乎是作为空 primary 渲染？
@@ -327,7 +255,7 @@
                     <span class="heading"><%= sv.heading_loc %></span>
                     <span class="values">
                       <%# --- 主数值 --- %>
-                      <% if (!isAllZero || (isAllZero && (hasScepterVal || hasShardVal || hasFacetVal))) { %>
+                      <% if (!isAllZero || (isAllZero && (hasScepterVal || hasShardVal))) { %>
                       <span class="primary<%= isAllZero ? ' empty' : '' %>">
                         <% if (!isAllZero) { %>
                           <%= sv.values_float.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ") %>
@@ -351,19 +279,6 @@
                       </span>
                       <% } %>
 
-                      <%# --- 命石数值 --- %>
-                      <% if (hasFacetVal) {
-                          const facet = hero.facets.find(f => f.name == sv.facet_bonus.name);
-                      %>
-                      <span class="alternative facet">
-                        <span class="facet">
-                          <span class="name_back type_<%= facet.color %>">
-                            <img src="<%= getImageUrl(facet.icon, ImageType.IconsFacets) %>" />
-                            <%= sv.facet_bonus.values.map(value => value + (sv.is_percentage ? "%" : "")).join(" / ") %>
-                          </span>
-                        </span>
-                      </span>
-                      <% } %>
 
                       <%# --- 天赋数值 --- %>
                       <% if (hasTalentVal) { %>

@@ -108,9 +108,6 @@ export class StratzAPI extends Service<Config> {
     return this.query<graphql.PlayersLastmatchRankinfoQueryVariables, graphql.PlayersLastmatchRankinfoQuery>("PlayersLastmatchRankinfo", { steamAccountIds }, (data) => !!data?.players);
   }
 
-  public async queryConstants(languageTag: string) {
-    return this.query<graphql.ConstantsQueryVariables, graphql.ConstantsQuery>("Constants", { language: this.ctx.dota2tracker.i18n.getGraphqlLanguageTag(languageTag) as graphql.LanguageEnum }, (data) => !!data?.constants);
-  }
 
   public async queryMatchInfo(matchId: number) {
     return this.query<graphql.MatchInfoQueryVariables, graphql.MatchInfoQuery>("MatchInfo", { matchId }, (data) => !!data?.match);

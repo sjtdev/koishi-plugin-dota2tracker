@@ -22,10 +22,6 @@
 <% const kcStyle = `color: ${utils.kc(kcVal)}`; %>
 <% const dcStyle = `color: ${utils.dc(dcVal)}`; %>
 
-<%# --- Facet 信息 --- %>
-<% const facetGradient = facetColor[p.facet?.color ?? 'Black']; %>
-<% const facetIcon = p.facet?.icon; %>
-<% const facetName = p.facet?.displayName ?? "?"; %>
 
 <%# --- 伤害与控制统计 --- %>
 <% const damageReport = p.stats?.heroDamageReport?.receivedTotal || {}; %>
@@ -102,20 +98,8 @@
       </div>
     </div>
 
-    <%# 4. Facet (命石) %>
-    <div class="facet row-2 col-1 w-full h-full grid grid-cols-[24px_1fr] grid-rows-1 bg-linear-to-r <%- facetGradient %>">
-      <% if (p.facet) { %>
-      <div class="w-[24px] h-[24px] flex items-center justify-center bg-[#4444]">
-        <img class="h-[18px]" src="<%= getImageUrl(facetIcon, ImageType.IconsFacets) %>" />
-      </div>
-      <% } %>
-      <div class="facet_name w-full truncate grow px-[4px] text-sm flex justify-center items-center">
-        <span class="w-full truncate text-center"><%= facetName %></span>
-      </div>
-    </div>
-
     <%# 5. 称号 (Titles) %>
-    <div class="titles row-2 col-start-2 col-end-3 w-full flex items-center pl-[12px] gap-[6px]">
+    <div class="titles row-2 col-start-1 col-end-3 w-full flex items-center pl-[10px] gap-[10px]">
       <% p.titles.forEach(item => { %>
         <% const title = parseBadge(item, $t); %>
         <span <%- `style="color: ${title.color};"` %>><%= title.shortText %></span>

@@ -58,7 +58,6 @@ export class OpenDotaAdapter extends Service {
           id: _player.hero_id,
           name: this.ctx.dota2tracker.dotaconstants.heroes[_player.hero_id].name,
           shortName: this.ctx.dota2tracker.dotaconstants.heroes[_player.hero_id].name.match(/^npc_dota_hero_(.+)$/)[1],
-          facets: [...this.ctx.dota2tracker.dotaconstants.hero_abilities[this.ctx.dota2tracker.dotaconstants.heroes[_player.hero_id].name].facets.map((f) => ({ id: -1, name: f.name }))],
         },
         dotaPlus: null,
         stats: {
