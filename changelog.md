@@ -1,5 +1,15 @@
 # 更新日志
 
+### [2.5.7](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.6...v2.5.7) (2026-03-25)
+
+### 🚀 功能优化
+
+* 跟进`DOTA2 7.41`移除命石系统更新，全面清理`facet`相关代码以优化性能与减小存储占用 ([5842fd0](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/5842fd0d9925c361b0bccf8c0db9ab861cc4c47d))
+
+### 🐛 Bug 修复
+
+* **template:** 修复因`2.4.0`重写ejs读取图片逻辑导致`match_1` `player_1`模板中对线结果图片显示错误的问题 ([d619b10](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/d619b10abd15a22eae052c725070b0db976ca097))
+
 ### [2.5.6](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.5...v2.5.6) (2026-03-12)
 
 ### 🐛 Bug 修复
