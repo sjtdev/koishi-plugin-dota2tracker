@@ -24,8 +24,8 @@
     "dota2"
   ],
   "dependencies": {
-    "axios": "^1.13.5",
-    "dotaconstants": "^10.7.0",
+    "axios": "^1.14.0",
+    "dotaconstants": "^10.8.0",
     "ejs": "^4.0.1",
     "fontkit": "^2.0.4",
     "https-proxy-agent": "^7.0.6",
