@@ -1,5 +1,15 @@
 # 更新日志
 
+### [2.5.8](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.7...v2.5.8) (2026-03-31)
+
+### 🚀 功能优化
+
+* **templates/hero:** 优化部分显示逻辑，避免在数据失效时显示错误字符 ([480b418](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/480b4181310afaff45dfa7c98ff52390fe1e59f4))
+
+### 🐛 Bug 修复
+
+* **opendota-adapter:** 提升`dotaconstants`依赖版本以修复使用`opendota`查询比赛数据失败的问题 ([81b56fd](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/81b56fdcc636b792e1371855fdbbcd9416d3eefc))
+
 ### [2.5.7](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.6...v2.5.7) (2026-03-25)
 
 ### 🚀 功能优化
