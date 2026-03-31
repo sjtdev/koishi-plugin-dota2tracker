@@ -243,6 +243,7 @@
                       const hasShardVal = sv.values_shard && sv.values_shard.length;
                       const hasTalentVal = sv.bonuses.length > 0;
                   %>
+                  <% if (!isAllZero || hasScepterVal || hasShardVal || hasTalentVal) { %>
                   <p>
                     <span class="heading"><%= sv.heading_loc %></span>
                     <span class="values">
@@ -283,6 +284,7 @@
                       <% } %>
                     </span>
                   </p>
+                  <% } %>
                   <% }); %>
                 </div>
 

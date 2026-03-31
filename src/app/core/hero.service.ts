@@ -117,6 +117,9 @@ export class HeroService extends Service {
           }
         }
       }
+      
+      // 未能替换成功的变量，用 ? 占位以免显示原始代码
+      talent.name_loc = talent.name_loc.replace(/\{s:.*?\}/g, "?");
     });
     return hero;
   }
