@@ -59,105 +59,100 @@ export class HeroService extends Service {
   }
 
   public static formatHeroDetails(rawHero: any) {
-    let hero = Object.assign({}, rawHero);
+    const hero = Object.assign({}, rawHero);
 
-    hero.abilities.forEach((ab) => {
-      // 处理技能本身说明
+    // 1. 遍历并格式化每个技能（以及 A杖 / 魔晶加成）的说明和备注
+    hero.abilities.forEach((ab: any) => {
       ab.desc_loc = this.formatHeroDesc(ab.desc_loc, ab.special_values);
-      ab.notes_loc = ab.notes_loc.map((note) => this.formatHeroDesc(note, ab.special_values));
-      // 处理神杖与魔晶说明
+      ab.notes_loc = ab.notes_loc.map((note: string) => this.formatHeroDesc(note, ab.special_values));
+      
       if (ab.ability_has_scepter) ab.scepter_loc = this.formatHeroDesc(ab.scepter_loc, ab.special_values, HeroDescType.Scepter);
       if (ab.ability_has_shard) ab.shard_loc = this.formatHeroDesc(ab.shard_loc, ab.special_values, HeroDescType.Shard);
     });
 
-    // 处理天赋
+    // 2. 遍历并处理天赋文案中的占位符（例如 "{s:bonus_X}" 或 "{s:value}"）
     hero.talents.forEach((talent: any) => {
-      // Regular expression to match {s:some_value}
-      const regex = /\{s:(.*?)\}/g;
-      let match;
-
-      // Loop through all matches
-      while ((match = regex.exec(talent.name_loc)) !== null) {
-        const specialValueName = match[1];
-
-        // Find the target special value in the talent's special values
+      talent.name_loc = talent.name_loc.replace(/\{s:(.*?)\}/g, (match: string, specialValueName: string) => {
+        // 第一优先级：尝试直接从天赋自身的 special_values 取值（常用于 {s:value}）
         const target = talent.special_values?.find((sv: any) => sv.name === specialValueName);
-        if (target) {
-          talent.name_loc = talent.name_loc.replace(match[0], target.values_float.join("/"));
-        } else {
-          // Find the ability that contains the bonus associated with the talent
-          const abilities = hero.abilities.filter((ability: any) => ability.special_values.some((specialValue: any) => specialValue.bonuses.some((bonus: any) => bonus.name === talent.name)));
+        if (target) return target.values_float.join("/");
 
-          for (const ability of abilities) {
-            // Find the special value in the ability that contains the bonus
-            const specialValues = ability.special_values.filter((specialValue: any) => specialValue.bonuses.some((bonus: any) => bonus.name === talent.name));
-
-            const regex = /{s:bonus_(.*?)}/g;
-            let match: RegExpExecArray | null;
-            const replacements: {
-              original: string;
-              replacement: any;
-            }[] = [];
-
-            while ((match = regex.exec(talent.name_loc)) !== null) {
-              const specialValue = specialValues.find((sv) => sv.name === String((match as any)[1]));
-              const replacement = specialValue?.bonuses.find((bonus) => bonus.name === talent.name)?.value;
-              if (replacement !== undefined) {
-                replacements.push({
-                  original: match[0],
-                  replacement,
-                });
-              }
+        // 第二优先级：前往英雄技能中，查找该天赋对某个技能的属性加成
+        // 比如占位符是 specialValueName = "bonus_AbilityChannelTime"
+        const cleanVarName = specialValueName.replace(/^bonus_/, ""); 
+        
+        for (const ability of hero.abilities) {
+          // 查找该技能中是否有某个特殊项，其 bonuses 数组里包含了这个天赋
+          const svWithBonus = ability.special_values.find((sv: any) => 
+            (sv.name === cleanVarName || sv.name === specialValueName) && 
+            sv.bonuses.some((bonus: any) => bonus.name === talent.name)
+          );
+          
+          if (svWithBonus) {
+            const bonusObj = svWithBonus.bonuses.find((bonus: any) => bonus.name === talent.name);
+            if (bonusObj && bonusObj.value !== undefined) {
+              return bonusObj.value; 
             }
-
-            // 进行所有替换
-            replacements.forEach(({ original, replacement }) => {
-              talent.name_loc = talent.name_loc.replace(original, replacement);
-            });
           }
         }
-      }
-      
-      // 未能替换成功的变量，用 ? 占位以免显示原始代码
-      talent.name_loc = talent.name_loc.replace(/\{s:.*?\}/g, "?");
+
+        // 没找到任何相关加成数值时，返回 ? 防止将原生的占位符代码渲染到前端界面
+        return "?";
+      });
     });
+
     return hero;
   }
 
   private static formatHeroDesc(template: string, special_values: any[], type: HeroDescType = HeroDescType.Normal): string {
+    if (!template) return template;
+    
+    // 匹配类似 %value%、%% 或 {s:value} 的占位符
     return template.replace(/%%|%([^%]+)%|\{([^}]+)\}/g, (match, p1, p2) => {
-      const field = p1 || p2;
+      if (match === "%%") return "%";
 
-      if (match === "%%") {
-        return "%";
-      } else {
-        // 处理 "s:" 前缀和 "shard_" 前缀，然后转换为小写
-        const fieldName = field
-          .replace(/^s:/, "")
-          .replace(/^shard_/, "")
-          .toLowerCase();
-        const specialValue = special_values.find((sv) => {
-          const nameLower = sv.name.toLowerCase();
-          // 匹配字段名，忽略 "bonus_" 和 "shard_" 的有无
-          return nameLower === fieldName || nameLower === `bonus_${fieldName}` || nameLower === `shard_${fieldName}` || `bonus_${nameLower}` === fieldName || `shard_${nameLower}` === fieldName;
-        });
-        if (specialValue) {
-          let valuesToUse = "";
-          switch (type) {
-            case HeroDescType.Scepter:
-              valuesToUse = specialValue.values_scepter.length ? specialValue.values_scepter.join(" / ") : specialValue.values_float.join(" / ");
-              break;
-            case HeroDescType.Shard:
-              valuesToUse = specialValue.values_shard.length ? specialValue.values_shard.join(" / ") : specialValue.values_float.join(" / ");
-              break;
-            default:
-              valuesToUse = specialValue.values_float.join(" / ");
-          }
-          return `<span class="value">${valuesToUse}</span>`;
-        } else {
-          return match; // 如果未找到对应的特殊值，则保持原样
+      const field = p1 || p2;
+      
+      // 预处理变量名：去除可能有干扰的前缀、后缀，然后转小写
+      const fieldName = field.replace(/^s:/, "").replace(/^shard_/, "").toLowerCase();
+      const strippedFieldName = fieldName.replace(/_tooltip$/, "");
+
+      // 在当前技能的 special_values 中查找对应的数值定义
+      const specialValue = special_values.find((sv) => {
+        const nameLower = sv.name.toLowerCase();
+        const strippedNameLower = nameLower.replace(/_tooltip$/, "");
+        
+        // 匹配字段名，忽略 "bonus_"、"shard_"、"_tooltip" 的有无，以及潜在的 Ability 前缀映射
+        // 目的是为了处理 Valve API 中杂乱无章、首尾多变的命名规范
+        return nameLower === fieldName || 
+               nameLower === `bonus_${fieldName}` || 
+               nameLower === `shard_${fieldName}` || 
+               `bonus_${nameLower}` === fieldName || 
+               `shard_${nameLower}` === fieldName ||
+               strippedNameLower === strippedFieldName ||
+               nameLower === `ability${strippedFieldName}`;
+      });
+
+      // 找到了相应的特殊数值配置
+      if (specialValue) {
+        let valuesToUse = "";
+        
+        // 根据渲染场景（A杖、魔晶还是基础）选择对应的 Float 数组
+        switch (type) {
+          case HeroDescType.Scepter:
+            valuesToUse = specialValue.values_scepter.length ? specialValue.values_scepter.join(" / ") : specialValue.values_float.join(" / ");
+            break;
+          case HeroDescType.Shard:
+            valuesToUse = specialValue.values_shard.length ? specialValue.values_shard.join(" / ") : specialValue.values_float.join(" / ");
+            break;
+          default:
+            valuesToUse = specialValue.values_float.join(" / ");
         }
-      }
+        return `<span class="value">${valuesToUse}</span>`;
+      } 
+      
+      // 未匹配到，保持原样回退（在模板渲染阶段不作处理）
+      return match;
     });
   }
 }
