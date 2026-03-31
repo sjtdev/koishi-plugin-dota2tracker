@@ -105,7 +105,10 @@ export class ViewRenderer extends Service<Config> {
           async: true,
         });
       }
-      if (process.env.NODE_ENV === "development") fs.writeFileSync(path.resolve(process.cwd(), "temp.html"), html);
+      if (process.env.NODE_ENV === "development") {
+        const debugFileName = template.source === "CODE" ? "code" : template.templateName;
+        fs.writeFileSync(path.resolve(process.cwd(), "temp", `${debugFileName}.html`), html);
+      }
       return html;
     } catch (error) {
       this.logger.error(error);
