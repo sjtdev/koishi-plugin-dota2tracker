@@ -392,7 +392,7 @@ p {
 }
 
 .skill > *:not(:nth-child(2)) {
-  padding-left: 8px;
+  padding: 0 8px;
 }
 
 .skill > .title {
@@ -488,7 +488,7 @@ p {
 }
 
 .skill .aghanim_description {
-  padding-left: 0;
+  padding: 0;
   color: #9bb1ce;
   margin-bottom: 16px;
   border: #263945 solid 3px;

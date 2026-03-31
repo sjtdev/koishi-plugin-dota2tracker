@@ -245,7 +245,7 @@
                   %>
                   <% if (!isAllZero || hasScepterVal || hasShardVal || hasTalentVal) { %>
                   <p>
-                    <span class="heading"><%= sv.heading_loc %></span>
+                    <span class="heading"><%- sv.heading_loc %></span>
                     <span class="values">
                       <%# --- 主数值 --- %>
                       <% if (!isAllZero || (isAllZero && (hasScepterVal || hasShardVal))) { %>
