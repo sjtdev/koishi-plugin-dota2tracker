@@ -1,5 +1,19 @@
 # 更新日志
 
+### [2.5.9](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.8...v2.5.9) (2026-04-06)
+
+### 🚀 功能优化
+
+* **hero:** 重构精简数据处理逻辑，并进一步解决部分情况下的异常显示问题 ([a2dd5d4](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/a2dd5d4143b49ace1254031b43bd5c2f6b9a5a7c))
+
+### 🎨 样式
+
+* **templates/hero:** 微调样式 ([89523c2](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/89523c2353f7f4166674dd21d322cda82cad9584))
+
+### 🐛 Bug 修复
+
+* **weekly-report:** 修复文件名不匹配导致的周报发送失败的问题 ([1ed3270](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/1ed3270122987e0924176b04fb8d5f537f9a5048)), closes [#19](https://github.com/sjtdev/koishi-plugin-dota2tracker/issues/19)
+
 ### [2.5.8](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.7...v2.5.8) (2026-03-31)
 
 ### 🚀 功能优化
