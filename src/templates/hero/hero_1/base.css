@@ -636,3 +636,11 @@ body .wrapper > .lore {
   color: #888;
 }
   
+.wrapper > .game_version {
+  display: block;
+  box-shadow: none;
+  text-align: right;
+  color: #888;
+  font-size: 12px;
+  padding: 15px 0;
+}
