@@ -198,7 +198,7 @@
 
                 <%# 位置列表循环 %>
                 <% p.positionPerformance.forEach(pos => { %>
-                <span><img src="<%= getImageUrl(pos.icon, ImageType.IconsFacets) %>"></span>
+                <span><img src="<%= getImageUrl(pos.icon, "icons/facets") %>"></span>
                 <span class="count"><%= pos.matchCount %></span>
                 <span class="win_rate"><%= pos.matchCount > 0 ? ((pos.winCount / pos.matchCount) * 100).toFixed(0) : "-" %>%</span>
                 <span class="imp"><%= (pos.imp > 0 ? "+" : "") + pos.imp %></span>
