@@ -6,6 +6,7 @@ import { Config } from "../../config";
 import { GraphQLQueryError, processFetchError } from "../common/error";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
+import { MiniQueue } from "../common/miniqueue";
 
 interface QueryFormat {
   query: string;
@@ -201,61 +202,5 @@ export class StratzAPI extends Service<Config> {
 
   private loadGraphqlFile(queryName: string): string {
     return fs.readFileSync(path.join(this.graphqlQueriesDir, `${queryName}.graphql`), { encoding: "utf-8" }).replace(/[\r\n]+/g, " ");
-  }
-}
-
-class MiniQueue {
-  private queue: (() => Promise<any>)[] = [];
-  private isProcessing = false;
-  private interval: number;
-  private stopped = false; // 新增一个停止标志
-
-  // 1. 构造函数接收 ctx
-  constructor(
-    private ctx: Context,
-    options: { interval: number },
-  ) {
-    this.interval = options.interval;
-  }
-
-  public add<T>(task: () => Promise<T>): Promise<T> {
-    if (this.stopped) {
-      return Promise.reject(new Error("Queue has been disposed."));
-    }
-    return new Promise((resolve, reject) => {
-      this.queue.push(async () => {
-        try {
-          const result = await task();
-          resolve(result);
-        } catch (error) {
-          reject(error);
-        }
-      });
-      this._process();
-    });
-  }
-
-  // 4. 新增 dispose 方法
-  public dispose() {
-    this.stopped = true;
-    this.queue = []; // 清空等待队列
-  }
-
-  private async _process(): Promise<void> {
-    if (this.isProcessing || this.queue.length === 0 || this.stopped) {
-      return;
-    }
-    this.isProcessing = true;
-
-    const task = this.queue.shift();
-    if (task) {
-      await task();
-      // 2. 使用 ctx.setTimeout
-      await new Promise<void>((resolve) => this.ctx.setTimeout(resolve, this.interval));
-    }
-
-    this.isProcessing = false;
-    // 递归处理队列中的下一个任务
-    this._process();
   }
 }

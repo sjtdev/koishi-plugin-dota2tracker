@@ -6,20 +6,24 @@ import { HttpsProxyAgent } from "https-proxy-agent";
 import { Agent as HttpAgent } from "node:http";
 import { Agent as HttpsAgent } from "node:https";
 import { processFetchError } from "../common/error";
+import { MiniQueue } from "../common/miniqueue";
 
 export class OpenDotaAPI extends Service<Config> {
   private readonly BASE_URL = "https://api.opendota.com/api";
+  private readonly queue: MiniQueue;
   private readonly http: AxiosInstance;
   private readonly abortController = new AbortController();
   constructor(ctx: Context) {
     super(ctx, "dota2tracker.opendota-api", true);
     this.config = ctx.config;
+    this.queue = new MiniQueue(ctx, { interval: 200 });
 
     this.http = axios.create({ timeout: 15000, signal: this.abortController.signal, baseURL: this.BASE_URL });
     ctx.on("dispose", () => this.dispose());
   }
 
   dispose() {
+    this.queue.dispose();
     this.abortController.abort();
   }
 
@@ -44,38 +48,40 @@ export class OpenDotaAPI extends Service<Config> {
   }
 
   private async fetchData(type: "GET" | "POST", path: string, data?: any) {
-    const config: AxiosRequestConfig = {
-      headers: {},
-      httpAgent: undefined,
-      httpsAgent: undefined,
-    };
+    return this.queue.add(async () => {
+      const config: AxiosRequestConfig = {
+        headers: {},
+        httpAgent: undefined,
+        httpsAgent: undefined,
+      };
 
-    // 优先处理代理
-    if (this.config.proxyAddress) {
-      config.httpsAgent = new HttpsProxyAgent(this.config.proxyAddress);
-      config.httpAgent = new HttpsProxyAgent(this.config.proxyAddress);
-    }
-    // 仅在 *没有* 代理时，才应用 IPv4 强制策略
-    else if (this.config.OpenDotaIPStack === "ipv4") {
-      // 强制 axios 使用 family: 4
-      config.httpAgent = new HttpAgent({ family: 4 });
-      config.httpsAgent = new HttpsAgent({ family: 4 });
-    }
-
-    if (this.config.OPENDOTA_API_KEY) {
-      config.headers["Authorization"] = `Bearer ${this.config.OPENDOTA_API_KEY}`;
-    }
-
-    try {
-      let response;
-      if (type === "GET") {
-        response = await this.http.get(path, config);
-      } else {
-        response = await this.http.post(path, data, config);
+      // 优先处理代理
+      if (this.config.proxyAddress) {
+        config.httpsAgent = new HttpsProxyAgent(this.config.proxyAddress);
+        config.httpAgent = new HttpsProxyAgent(this.config.proxyAddress);
       }
-      return response.data;
-    } catch (error) {
-      processFetchError(error, "OpenDota", path);
-    }
+      // 仅在 *没有* 代理时，才应用 IPv4 强制策略
+      else if (this.config.OpenDotaIPStack === "ipv4") {
+        // 强制 axios 使用 family: 4
+        config.httpAgent = new HttpAgent({ family: 4 });
+        config.httpsAgent = new HttpsAgent({ family: 4 });
+      }
+
+      if (this.config.OPENDOTA_API_KEY) {
+        config.headers["Authorization"] = `Bearer ${this.config.OPENDOTA_API_KEY}`;
+      }
+
+      try {
+        let response;
+        if (type === "GET") {
+          response = await this.http.get(path, config);
+        } else {
+          response = await this.http.post(path, data, config);
+        }
+        return response.data;
+      } catch (error) {
+        processFetchError(error, "OpenDota", path);
+      }
+    });
   }
 }
