@@ -165,8 +165,7 @@
 
                 <%# --- 技能图片与行为标签 --- %>
                 <div class="img_stats">
-                  <%# 原逻辑中的 onerror 处理保留，注意 EJS 里的引号转义 %>
-                  <img src="<%= getImageUrl(item.name, ImageType.Abilities) %>" onerror="this.onerror=null; this.src='<%= getImageUrl(`innate_icon`, ImageType.Icons) %>';"/>
+                  <img src="<%= getImageUrl(item.name, ImageType.Abilities) %>" onerror="this.onerror=null; this.src='<%= getImageUrl(`innate_icon`, ImageType.Icons) %>'; if(this.closest('.skill').dataset.innate === 'true') { this.closest('.skill').style.order = -1; this.closest('.skill').style.flexBasis = '100%'; }"/>
 
                   <div class="stats">
                     <p class="behavior">
@@ -315,32 +314,4 @@
             </div>
         </div>
     </body>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const items = document.querySelectorAll('.skills > .skill');
-            items.forEach(item => {
-                // const name = item.getAttribute('data-name');
-                const abilityIsInnate = item.getAttribute('data-innate') === 'true';
-                const img = item.querySelector('.img_stats > img');
-                const imageUrl = img.src;
-
-                // Check if image exists
-                const image = new Image();
-                image.src = imageUrl;
-                image.onload = function() {
-                    // Image exists, do nothing
-                };
-                image.onerror = function() {
-                    // Image doesn't exist
-                    if (abilityIsInnate) {
-                        item.style.order = -1;
-                        item.style.flexBasis = "100%";
-                        img.src = '<%- getImageUrl("innate_icon",ImageType.Icons) %>';  // Set backup image URL
-                        // item.querySelector(".cooldown").style.display = "none";
-                        // item.querySelector(".mana_cost").style.display = "none";
-                    }
-                };
-            });
-        });
-    </script>
 </html>
