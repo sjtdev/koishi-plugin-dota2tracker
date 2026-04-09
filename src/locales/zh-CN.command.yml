@@ -148,6 +148,7 @@ commands:
       messages:
         not_found: 未找到输入的英雄，请确认后重新输入。
         querying_hero: 正在获取英雄数据，请稍后……
+        fetching_patch_notes: 正在获取英雄历史改动建立缓存，请稍候……
         query_failed: 获取英雄数据失败。
         empty_input: 请输入参数。
     query-item:

@@ -16,7 +16,9 @@ export function registerQueryHeroCommand(ctx: Context): void {
         if (input_data || options.random) {
           await task.send(session.text(".querying_hero"));
           const languageTag = await ctx.dota2tracker.i18n.getLanguageTag({ session });
-          const heroData = await ctx.dota2tracker.hero.getHeroDetails(input_data, languageTag, options.random);
+          const heroData = await ctx.dota2tracker.hero.getHeroDetails(input_data, languageTag, options.random, () => {
+            task.send(session.text(".fetching_patch_notes"));
+          });
           if (!heroData) {
             await task.finish();
             return session.text(".not_found");

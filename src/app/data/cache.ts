@@ -13,6 +13,7 @@ declare module "@koishijs/cache" {
     dt_sended_match_id: undefined;
     dt_weekly_metadata: WeeklyHeroMeta;
     dt_opendota_api_request_log: { count: number; request: string };
+    dt_patch_notes: any;
   }
 }
 
@@ -48,6 +49,14 @@ export class CacheService extends Service<Config> {
 
   async getWeeklyMetaCache(key: string): Promise<WeeklyHeroMeta> {
     return this.ctx.cache.get("dt_weekly_metadata", key);
+  }
+
+  setPatchNoteCache(key: string, value: any) {
+    this.ctx.cache.set("dt_patch_notes", key, value, 3600 * 1000 * 6); // 6小时缓存
+  }
+
+  async getPatchNoteCache(key: string): Promise<any> {
+    return this.ctx.cache.get("dt_patch_notes", key);
   }
 
   cacheItemListConstants(languageTag: string, itemList: ItemList, gameVersion: string) {

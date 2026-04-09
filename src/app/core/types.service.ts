@@ -16,6 +16,8 @@ import { OpenDotaAPI } from "../data/opendota.api";
 import { OpenDotaAdapter } from "./opendota.adapter";
 import { DailyReportService } from "./daily-report.service";
 import { FontService } from "../presentation/font.service";
+import { FileService } from "../data/file";
+import { StaticDataService } from "../data/static-data";
 import type ConstantsType from "dotaconstants";
 
 export interface DOTA2TrackerServices {
@@ -41,6 +43,8 @@ export interface DOTA2TrackerServices {
   stratzAPI: StratzAPI;
   database: DatabaseService;
   cache: CacheService;
+  file: FileService;
+  staticData: StaticDataService;
   opendotaAPI: OpenDotaAPI;
   dotaconstants: typeof ConstantsType;
 }

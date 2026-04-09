@@ -56,22 +56,13 @@ _config:
     template_player: 生成玩家信息图片使用的模板。（目前仅有一张模板）
     template_hero: 生成英雄信息图片使用的模板。（目前仅有一张模板）
     playerRankEstimate: 在player模板中对没有段位的玩家进行段位估算 <br>估算的段位将以灰色图片显示
-    templateFonts: |-
-      **>已弃用！<**  
-      **如果需要配置字体请使用下方`fonts.*`配置项代替！**  
-      模板所使用的字体名。需要 koishi 所在设备安装字体文件。  
-      可添加多个字体名，将从上到下回退到第一个可用字体；若所有字体都不可用，则使用系统默认字体。  
-      其中字体名若包含空格或特殊字符需要在名称首尾添加引号（此处建议尽量强制使用引号）；  
-      若使用字体族名则必须**不使用引号**，如：
-      ```
-      "Microsoft YaHei"
-      sans-serif
-      ```
-      有关font-family的更多信息，请查阅 [📖 MDN: font-family](https://developer.mozilla.org/zh-CN/docs/Web/CSS/font-family)
+    heroPatchNotesRetrievalDepth: |-
+      在hero模板中用于展示英雄的面板属性与技能数值或机制的改动的更新日志获取范围（大版本）。  
+      例如当前版本为7.41b，此项设置为**2**时，将获取7.40~7.41b的更新日志内容。  
+      展示效果见 [📖 模板相关#英雄信息模板](https://sjtdev.github.io/koishi-plugin-dota2tracker/template-hero.html)。
     fontPath: 字体文件文件夹路径
     fonts: 
       description: |-
-        **过渡方案，之后会重启控制台页面并在其中实现更完善更灵活的字体配置方案。**  
         模板所使用的字体配置。
         会自动读取配置项 `fontPath` 目录下的字体文件为下方配置项生成可选字体列表。  
         可分别配置无衬线(sans)、衬线(serif)、等宽(mono)字体族的备选表。  

@@ -144,6 +144,7 @@ commands:
       messages:
         not_found: Hero not found, please confirm and re-enter.
         querying_hero: Retrieving hero data, please wait...
+        fetching_patch_notes: Fetching hero patch notes and building cache, please wait...
         query_failed: Failed to get hero data.
         empty_input: Please enter a parameter.
     query-item:

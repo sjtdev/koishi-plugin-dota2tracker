@@ -52,22 +52,59 @@ export class HeroService extends Service {
     return weeklyHeroMeta;
   }
 
-  async getHeroDetails(input: any, languageTag: string, isRandom: boolean = false) {
+  async getHeroDetails(input: any, languageTag: string, isRandom: boolean = false, onDownloadingStalePatch?: () => void) {
     const heroId = this.ctx.dota2tracker.i18n.findHeroIdInLocale(isRandom ? Random.pick(Object.keys(this.ctx.dota2tracker.dotaconstants.heroes)) : input);
     if (!heroId) return;
-    return HeroService.formatHeroDetails(await this.ctx.dota2tracker.valveAPI.queryHeroDetailsFromValve(heroId, languageTag));
+    
+    const patchNotes = await this.ctx.dota2tracker.staticData.getPatchNotes(languageTag, onDownloadingStalePatch);
+    const rawHero = await this.ctx.dota2tracker.valveAPI.queryHeroDetailsFromValve(heroId, languageTag);
+    return HeroService.formatHeroDetails(rawHero, patchNotes);
   }
 
-  public static formatHeroDetails(rawHero: any) {
+  public static formatHeroDetails(rawHero: any, patchNotes: any[] = []) {
+    const patchesOfHero: { patch_number: string, patch_timestamp: number, notes: any }[] = [];
+    for (const patch of patchNotes.reverse()) {
+      const heroPatchData = patch.heroes?.find((hero: any) => hero.hero_id === rawHero.id);
+      if (heroPatchData) {
+        patchesOfHero.push({ patch_number: patch.patch_number, patch_timestamp: patch.patch_timestamp, notes: heroPatchData });
+      }
+    }
+
     const hero = Object.assign({}, rawHero);
+    hero.game_version = (patchNotes.length > 0 ? patchNotes[0].patch_number : "Unknown") + " (" + DateTime.now().toFormat("yyyy-MM-dd HH:mm") + ")";
+    hero.patch_notes = [];
+
+    // 将英雄变动与天赋变动合并
+    for (const patch of patchesOfHero) {
+      const combinedNotes = [];
+      if (patch.notes.hero_notes) {
+        combinedNotes.push(...patch.notes.hero_notes);
+      }
+      if (patch.notes.talent_notes) {
+        combinedNotes.push(...patch.notes.talent_notes);
+      }
+      if (combinedNotes.length > 0) {
+        hero.patch_notes.push({ patch_number: patch.patch_number, patch_timestamp: patch.patch_timestamp, notes: combinedNotes });
+      }
+    }
 
     // 1. 遍历并格式化每个技能（以及 A杖 / 魔晶加成）的说明和备注
     hero.abilities.forEach((ab: any) => {
       ab.desc_loc = this.formatHeroDesc(ab.desc_loc, ab.special_values);
       ab.notes_loc = ab.notes_loc.map((note: string) => this.formatHeroDesc(note, ab.special_values));
-      
+
       if (ab.ability_has_scepter) ab.scepter_loc = this.formatHeroDesc(ab.scepter_loc, ab.special_values, HeroDescType.Scepter);
       if (ab.ability_has_shard) ab.shard_loc = this.formatHeroDesc(ab.shard_loc, ab.special_values, HeroDescType.Shard);
+      
+      // 提取技能变动
+      ab.patch_notes = [];
+      for (const patch of patchesOfHero) {
+        if (!patch.notes.abilities) continue;
+        const patchAbility = patch.notes.abilities.find((patchAb: any) => patchAb.ability_id === ab.id);
+        if (patchAbility && patchAbility.ability_notes) {
+          ab.patch_notes.push({ patch_number: patch.patch_number, patch_timestamp: patch.patch_timestamp, notes: patchAbility.ability_notes });
+        }
+      }
     });
 
     // 2. 遍历并处理天赋文案中的占位符（例如 "{s:bonus_X}" 或 "{s:value}"）
@@ -79,19 +116,16 @@ export class HeroService extends Service {
 
         // 第二优先级：前往英雄技能中，查找该天赋对某个技能的属性加成
         // 比如占位符是 specialValueName = "bonus_AbilityChannelTime"
-        const cleanVarName = specialValueName.replace(/^bonus_/, ""); 
-        
+        const cleanVarName = specialValueName.replace(/^bonus_/, "");
+
         for (const ability of hero.abilities) {
           // 查找该技能中是否有某个特殊项，其 bonuses 数组里包含了这个天赋
-          const svWithBonus = ability.special_values.find((sv: any) => 
-            (sv.name === cleanVarName || sv.name === specialValueName) && 
-            sv.bonuses.some((bonus: any) => bonus.name === talent.name)
-          );
-          
+          const svWithBonus = ability.special_values.find((sv: any) => (sv.name === cleanVarName || sv.name === specialValueName) && sv.bonuses.some((bonus: any) => bonus.name === talent.name));
+
           if (svWithBonus) {
             const bonusObj = svWithBonus.bonuses.find((bonus: any) => bonus.name === talent.name);
             if (bonusObj && bonusObj.value !== undefined) {
-              return bonusObj.value; 
+              return bonusObj.value;
             }
           }
         }
@@ -106,37 +140,42 @@ export class HeroService extends Service {
 
   private static formatHeroDesc(template: string, special_values: any[], type: HeroDescType = HeroDescType.Normal): string {
     if (!template) return template;
-    
+
     // 匹配类似 %value%、%% 或 {s:value} 的占位符
     return template.replace(/%%|%([^%]+)%|\{([^}]+)\}/g, (match, p1, p2) => {
       if (match === "%%") return "%";
 
       const field = p1 || p2;
-      
+
       // 预处理变量名：去除可能有干扰的前缀、后缀，然后转小写
-      const fieldName = field.replace(/^s:/, "").replace(/^shard_/, "").toLowerCase();
+      const fieldName = field
+        .replace(/^s:/, "")
+        .replace(/^shard_/, "")
+        .toLowerCase();
       const strippedFieldName = fieldName.replace(/_tooltip$/, "");
 
       // 在当前技能的 special_values 中查找对应的数值定义
       const specialValue = special_values.find((sv) => {
         const nameLower = sv.name.toLowerCase();
         const strippedNameLower = nameLower.replace(/_tooltip$/, "");
-        
+
         // 匹配字段名，忽略 "bonus_"、"shard_"、"_tooltip" 的有无，以及潜在的 Ability 前缀映射
         // 目的是为了处理 Valve API 中杂乱无章、首尾多变的命名规范
-        return nameLower === fieldName || 
-               nameLower === `bonus_${fieldName}` || 
-               nameLower === `shard_${fieldName}` || 
-               `bonus_${nameLower}` === fieldName || 
-               `shard_${nameLower}` === fieldName ||
-               strippedNameLower === strippedFieldName ||
-               nameLower === `ability${strippedFieldName}`;
+        return (
+          nameLower === fieldName ||
+          nameLower === `bonus_${fieldName}` ||
+          nameLower === `shard_${fieldName}` ||
+          `bonus_${nameLower}` === fieldName ||
+          `shard_${nameLower}` === fieldName ||
+          strippedNameLower === strippedFieldName ||
+          nameLower === `ability${strippedFieldName}`
+        );
       });
 
       // 找到了相应的特殊数值配置
       if (specialValue) {
         let valuesToUse = "";
-        
+
         // 根据渲染场景（A杖、魔晶还是基础）选择对应的 Float 数组
         switch (type) {
           case HeroDescType.Scepter:
@@ -149,8 +188,8 @@ export class HeroService extends Service {
             valuesToUse = specialValue.values_float.join(" / ");
         }
         return `<span class="value">${valuesToUse}</span>`;
-      } 
-      
+      }
+
       // 未匹配到，保持原样回退（在模板渲染阶段不作处理）
       return match;
     });

@@ -611,3 +611,28 @@ body .wrapper > .lore {
   font-family: "KaiTi", "楷体", "楷体_GB2312", "STKaiti", serif;
   color: #aaa;
 }
+
+.patches {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  .patch_number {
+    color: #887d4f;
+    margin-bottom: 4px;
+    .patch_time {
+      color: #555;
+    }
+  }
+}
+
+.wrapper > .patches {
+  padding: 12px;
+}
+
+.skill .patches {
+  padding: 9px;
+  background-color: #19222b;
+  font-size: 14px;
+  color: #888;
+}
+  

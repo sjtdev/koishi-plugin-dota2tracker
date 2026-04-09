@@ -9,6 +9,8 @@ import { PlayerService } from "./app/core/player.service.ts";
 import { DOTA2TrackerServices } from "./app/core/types.service.ts";
 import { CacheService } from "./app/data/cache.ts";
 import { DatabaseService } from "./app/data/database.ts";
+import { FileService } from "./app/data/file.ts";
+import { StaticDataService } from "./app/data/static-data.ts";
 import { StratzAPI } from "./app/data/stratz.api.ts";
 import { ValveAPI } from "./app/data/valve.api.ts";
 import { ViewRenderer } from "./app/presentation/view.renderer.ts";
@@ -74,8 +76,10 @@ export async function apply(ctx: Context, config: Config) {
   ctx.dota2tracker.dailyReport = new DailyReportService(ctx);
   ctx.dota2tracker.cache = new CacheService(ctx);
   ctx.dota2tracker.database = new DatabaseService(ctx);
+  ctx.dota2tracker.file = new FileService(ctx);
   ctx.dota2tracker.valveAPI = new ValveAPI(ctx);
   ctx.dota2tracker.stratzAPI = new StratzAPI(ctx, currentDir);
+  ctx.dota2tracker.staticData = new StaticDataService(ctx);
   if (config.enableOpenDotaFallback) {
     ctx.dota2tracker.opendotaAPI = new OpenDotaAPI(ctx);
     ctx.dota2tracker.opendotaAdapter = new OpenDotaAdapter(ctx);

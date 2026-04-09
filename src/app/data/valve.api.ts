@@ -72,9 +72,18 @@ export class ValveAPI extends Service<Config> {
     return data.result.data.items[0];
   }
 
-  async queryLastPatchNumber(): Promise<string> {
-    // 传入 undefined, fetchData 会跳过 language 参数
+  async queryPatchList(): Promise<any[]> {
     const data = await this.fetchData("/patchnoteslist", undefined);
-    return data.patches.at(-1).patch_number;
+    return data.patches;
+  }
+
+  async queryPatchNotes(version: string, languageTag = "zh-CN"): Promise<any> {
+    const data = await this.fetchData(`/patchnotes?version=${version}`, languageTag);
+    return data;
+  }
+
+  async queryLastPatchNumber(): Promise<string> {
+    const patches = await this.queryPatchList();
+    return patches.at(-1).patch_number;
   }
 }

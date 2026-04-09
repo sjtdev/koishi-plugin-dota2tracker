@@ -133,6 +133,21 @@
                 </div>
               </div>
             </div>
+
+            <%# --- 版本变动 --- %>
+            <% if (hero.patch_notes && hero.patch_notes.length > 0) { %>
+            <div class="patches">
+              <% hero.patch_notes.forEach(patch => { %>
+                <div class="patch_group">
+                  <p class="patch_number"><%= patch.patch_number %> <span class="patch_time">(<%= new Date(patch.patch_timestamp * 1000).toISOString().split('T')[0] %>)</span>: </p>
+                  <% patch.notes.forEach(note => { %>
+                    <p data-indent="<%= note.indent_level %>"><%- note.note %></p>
+                  <% }); %>
+                </div>
+              <% }); %>
+            </div>
+            <% } %>
+
             <div class="skills">
               <%# --- 遍历技能列表 --- %>
               <% hero.abilities.forEach((item) => {
@@ -304,6 +319,20 @@
 
                 <% if (item.lore_loc) { %>
                 <p class="lore"><%= item.lore_loc %></p>
+                <% } %>
+
+                <%# --- 版本变动 --- %>
+                <% if (item.patch_notes && item.patch_notes.length > 0) { %>
+                <div class="patches">
+                  <% item.patch_notes.forEach(patch => { %>
+                    <div class="patch_group">
+                      <p class="patch_number"><%= patch.patch_number %> <span class="patch_time">(<%= new Date(patch.patch_timestamp * 1000).toISOString().split('T')[0] %>)</span>: </p>
+                      <% patch.notes.forEach(note => { %>
+                        <p data-indent="<%= note.indent_level %>"><%- note.note %></p>
+                      <% }); %>
+                    </div>
+                  <% }); %>
+                </div>
                 <% } %>
 
               </div>

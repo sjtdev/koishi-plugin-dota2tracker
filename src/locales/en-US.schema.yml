@@ -60,22 +60,13 @@ _config:
     template_player: Template used for generating player information images. (Currently only one template available)
     template_hero: Template used for generating hero information images. (Currently only one template available)
     playerRankEstimate: Estimate rank for unranked players in the player template <br>Estimated ranks will be displayed as gray images
-    templateFonts: |-
-      **>Deprecated!<**  
-      **If you need to configure fonts, please use the `fonts.*` configuration option below instead!**  
-      Font names used in the template. Requires font files to be installed on the device running Koishi.  
-      Multiple font names can be added, and it will fallback from top to bottom to the first available font; if no fonts are available, the system default font will be used.  
-      If a font name contains spaces or special characters, quotes must be added around the name (it is recommended to always use quotes here);  
-      If using a generic font family name, you must **NOT use quotes**, e.g.:
-      ```
-      "Microsoft YaHei"
-      sans-serif
-      ```
-      For more information on font-family, please refer to [📖 MDN: font-family](https://developer.mozilla.org/en-US/docs/Web/CSS/font-family)
+    heroPatchNotesRetrievalDepth: |-
+      The scope of the update log (major version) used in the hero template to display changes to the hero's panel attributes, skill values, or mechanics.  
+      For example, if the current version is 7.41b, setting this to **2** will retrieve the update logs from 7.40 to 7.41b.  
+      For display effects, see [📖 Template Info#Hero Info Template](https://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/template-hero.html).
     fontPath: Font directory path
     fonts: 
       description: |-
-        **Interim solution. A more comprehensive and flexible font configuration scheme will be implemented in the console in the future.**  
         Font configuration used in the template.  
         It will automatically scan font files in the `fontPath` directory to generate the selectable font list below.  
         You can separately configure fallback lists for sans-serif (sans), serif (serif), and monospace (mono) font families.  
