@@ -1,5 +1,23 @@
 # 更新日志
 
+## [2.6.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.9...v2.6.0) (2026-04-09)
+
+### ✨ 新增功能
+
+* **commands/query-hero:** 现在会在英雄模板中展示英雄面板、天赋、技能改动历史，提供配置项修改获取的版本范围 ([3357f28](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/3357f28b4ede94b55e57248c747f7e29a1c935db))
+
+### 🚀 功能优化
+
+* **templates/hero_1:** 现在在模板底部显示生成版本与时间 ([b89ab6c](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/b89ab6c192199f8cafe0339b3270b182e87e0d40))
+
+### 🐛 Bug 修复
+
+* **templates/player_1:** 修复玩家模板因命石相关代码删除导致位置图标显示失败 ([1198d42](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/1198d42646fd4cba2a043f0cec7ce75202f99699))
+
+### 📝 文档
+
+* 重建新版展示图 ([a487cec](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/a487cecd0f7f57fa73c5eb0eb2868bacfa435db7))
+
 ### [2.5.9](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.8...v2.5.9) (2026-04-06)
 
 ### 🚀 功能优化
