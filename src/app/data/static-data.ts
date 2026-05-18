@@ -2,6 +2,7 @@ import { Context, Service } from "koishi";
 import { Config } from "../../config";
 
 export class StaticDataService extends Service<Config> {
+  private inFlightRequests: Map<string, Promise<any[]>> = new Map();
 
   constructor(ctx: Context) {
     super(ctx, "dota2tracker.staticData", true);
@@ -9,7 +10,21 @@ export class StaticDataService extends Service<Config> {
     this.logger = ctx.logger("dota2tracker.staticData");
   }
 
-  async getPatchNotes(languageTag: string, onDownloadingStalePatch?: () => void): Promise<any[]> {
+  getPatchNotes(languageTag: string, onDownloadingStalePatch?: () => void): Promise<any[]> {
+    const cacheKey = languageTag;
+    if (this.inFlightRequests.has(cacheKey)) {
+      return this.inFlightRequests.get(cacheKey)!;
+    }
+
+    const promise = this._getPatchNotes(languageTag, onDownloadingStalePatch).finally(() => {
+      this.inFlightRequests.delete(cacheKey);
+    });
+
+    this.inFlightRequests.set(cacheKey, promise);
+    return promise;
+  }
+
+  private async _getPatchNotes(languageTag: string, onDownloadingStalePatch?: () => void): Promise<any[]> {
     const patchesList = await this.ctx.dota2tracker.valveAPI.queryPatchList();
     if (!patchesList || patchesList.length === 0) return [];
 
