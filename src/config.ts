@@ -35,7 +35,7 @@ export interface Config {
   template_player: string;
   template_hero: string;
   playerRankEstimate: boolean;
-  heroPatchNotesRetrievalDepth: number;
+  patchNotesRetrievalDepth: number;
   fontPath: string;
   fonts: { sans: string[]; serif: string[]; mono: string[] };
 }
@@ -118,7 +118,7 @@ export const Config: Schema = Schema.intersect([
     template_player: Schema.union([...readDirectoryFilesSync(path.join(templateDir, "player"))]).default("player_1"),
     template_hero: Schema.union([...readDirectoryFilesSync(path.join(templateDir, "hero"))]).default("hero_1"),
     playerRankEstimate: Schema.boolean().default(true),
-    heroPatchNotesRetrievalDepth: Schema.number().min(1).max(5).default(2).description(""),
+    patchNotesRetrievalDepth: Schema.number().min(1).max(5).default(2).description(""),
     fontPath: Schema.path({ filters: ["directory"] }).default("data/dota2tracker/fonts"),
     fonts: Schema.object({
       description: Schema.never(),

@@ -56,8 +56,8 @@ _config:
     template_player: 生成玩家信息图片使用的模板。（目前仅有一张模板）
     template_hero: 生成英雄信息图片使用的模板。（目前仅有一张模板）
     playerRankEstimate: 在player模板中对没有段位的玩家进行段位估算 <br>估算的段位将以灰色图片显示
-    heroPatchNotesRetrievalDepth: |-
-      在hero模板中用于展示英雄的面板属性与技能数值或机制的改动的更新日志获取范围（大版本）。  
+    patchNotesRetrievalDepth: |-
+      在`hero`与`item`模板中用于展示改动历史的更新日志获取范围（大版本）。  
       例如当前版本为7.41b，此项设置为**2**时，将获取7.40~7.41b的更新日志内容。  
       展示效果见 [📖 模板相关#英雄信息模板](https://sjtdev.github.io/koishi-plugin-dota2tracker/template-hero.html)。
     fontPath: 字体文件文件夹路径

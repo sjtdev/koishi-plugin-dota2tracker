@@ -60,8 +60,8 @@ _config:
     template_player: Template used for generating player information images. (Currently only one template available)
     template_hero: Template used for generating hero information images. (Currently only one template available)
     playerRankEstimate: Estimate rank for unranked players in the player template <br>Estimated ranks will be displayed as gray images
-    heroPatchNotesRetrievalDepth: |-
-      The scope of the update log (major version) used in the hero template to display changes to the hero's panel attributes, skill values, or mechanics.  
+    patchNotesRetrievalDepth: |-
+      The scope of the update log (major version) used in the `hero` and `item` templates to display change history.  
       For example, if the current version is 7.41b, setting this to **2** will retrieve the update logs from 7.40 to 7.41b.  
       For display effects, see [📖 Template Info#Hero Info Template](https://sjtdev.github.io/koishi-plugin-dota2tracker/en-US/template-hero.html).
     fontPath: Font directory path

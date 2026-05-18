@@ -27,7 +27,7 @@ export class StaticDataService extends Service<Config> {
       if (!majorMatch) continue;
       
       collectedMajors.add(majorMatch[1]);
-      if (collectedMajors.size > this.config.heroPatchNotesRetrievalDepth) {
+      if (collectedMajors.size > this.config.patchNotesRetrievalDepth) {
         break;
       }
       
