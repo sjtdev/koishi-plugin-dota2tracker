@@ -1,5 +1,20 @@
 # 更新日志
 
+### [2.6.1](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.6.0...v2.6.1) (2026-05-18)
+
+### ✨ 新增功能
+
+* **破坏性更新** `heroPatchNotesRetrievalDepth` 重命名为 `patchNotesRetrievalDepth`，需要重新设置 ([b460cb5](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/b460cb5689739086c49dc6a1768f8b59a712bd79))
+* **commands/query-item:** 跟随`查询英雄`现在会显示物品的版本变动记录 ([4d4bb7b](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/4d4bb7b46d86e3a75fafe4976608bb3bb8488123))
+
+### 🚀 功能优化
+
+* **static-data:** 加入内部队列防止重复请求API ([5dd43ba](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/5dd43ba920380daa290ce90eb90fe24e772931c0))
+
+### 📝 文档
+
+* 重建部分展示图，修复player展示图错误 ([2b3cbe9](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/2b3cbe935cf0afae23259933f69f943663941a4a))
+
 ## [2.6.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.5.9...v2.6.0) (2026-04-09)
 
 ### ✨ 新增功能
