@@ -133,20 +133,20 @@ body {
   color: #9ba2d4;
 }
 .ability.active h1 {
-  color: #AAAAFF;
+  color: #aaaaff;
   background-image: linear-gradient(to right, #5155b9, #2a3550);
   display: flex;
   justify-content: space-between;
 }
 
 .ability h1 {
-    font-size: 14px;
-    padding: 6px 8px;
-    text-shadow: 1px 1px 2px #111;
-    font-weight: normal;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  font-size: 14px;
+  padding: 6px 8px;
+  text-shadow: 1px 1px 2px #111;
+  font-weight: normal;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .ability > p {
@@ -228,7 +228,8 @@ body {
   background: linear-gradient(0deg, #fff, #fff) no-repeat center/1px 100%;
 }
 
-.recipes *.multiple .line,.recipes *.direct .line {
+.recipes *.multiple .line,
+.recipes *.direct .line {
   height: 10px;
 }
 
@@ -242,3 +243,19 @@ body {
   top: 0;
   right: 0;
 } */
+
+.patches {
+  margin: 10px;
+  font-size: 14px;
+  color: #ddd;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  .patch_number {
+    color: #887d4f;
+    margin-bottom: 4px;
+    .patch_time {
+      color: #555;
+    }
+  }
+}

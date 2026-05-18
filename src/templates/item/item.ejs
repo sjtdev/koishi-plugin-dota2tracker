@@ -182,5 +182,19 @@
   <% if (item.recipes.length || item.builds_into.length) { %>
     <%- include("./item/recipe") %>
   <% } %>
+
+  <%# --- 版本变动 --- %>
+  <% if (item.patch_notes && item.patch_notes.length) { %>
+    <div class="patches">
+      <% item.patch_notes.forEach(patch => { %>
+      <div class="patch_group">
+        <p class="patch_number"><%= patch.patch_number %> <span class="patch_time">(<%= new Date(patch.patch_timestamp * 1000).toISOString().split('T')[0] %>)</span>: </p>
+        <% patch.notes.forEach(note => { %>
+        <p data-indent="<%= note.indent_level %>"><%- note.note %></p>
+        <% }); %>
+      </div>
+      <% }); %>
+    </div>
+  <% } %>
 </body>
 </html>

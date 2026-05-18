@@ -1,6 +1,7 @@
 import { Config } from "../../config";
 import { ItemList } from "../data/types";
 import { Context, Service } from "koishi";
+import { DateTime } from "luxon";
 
 export  class ItemService extends Service<Config> {
   constructor(ctx: Context) {
@@ -8,8 +9,26 @@ export  class ItemService extends Service<Config> {
     this.config = ctx.config;
   }
 
-  async getItemDetails(itemId: number, languageTag: string) {
-    return await this.ctx.dota2tracker.valveAPI.queryItemDetailsFromValve(itemId, languageTag);
+  async getItemDetails(itemId: number, languageTag: string, onDownloadingStalePatch?: () => void) {
+    const patchNotes = await this.ctx.dota2tracker.staticData.getPatchNotes(languageTag, onDownloadingStalePatch);
+    const rawItem = await this.ctx.dota2tracker.valveAPI.queryItemDetailsFromValve(itemId, languageTag);
+    return ItemService.formatItemDetails(rawItem, patchNotes);
+  }
+
+  public static formatItemDetails(rawItem: any, patchNotes: any[] = []) {
+    const patchesOfItem: { patch_number: string, patch_timestamp: number, notes: any }[] = [];
+    for (const patch of patchNotes.reverse()) {
+      const itemPatchData = patch.items?.find((item: any) => item.ability_id === rawItem.id);
+      if (itemPatchData) {
+        patchesOfItem.push({ patch_number: patch.patch_number, patch_timestamp: patch.patch_timestamp, notes: itemPatchData.ability_notes });
+      }
+    }
+
+    const item = Object.assign({}, rawItem);
+    item.game_version = (patchNotes.length > 0 ? patchNotes[0].patch_number : "Unknown") + " (" + DateTime.now().toFormat("yyyy-MM-dd HH:mm") + ")";
+    item.patch_notes = patchesOfItem;
+
+    return item;
   }
 
   async getItemList({ languageTag, onCacheMissTip }: { languageTag: string; onCacheMissTip: () => Promise<any> }): Promise<ItemList> {

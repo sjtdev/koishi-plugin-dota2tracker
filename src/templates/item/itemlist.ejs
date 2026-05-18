@@ -49,7 +49,7 @@ function calculateFontSize(text) {
   <body>
     <div class="container">
       <% data.forEach(function(item) { %>
-        <div class="item">
+        <div class="item" id="<%= item.id %>">
           <img src="<%= getImageUrl(item.name, ImageType.Items) %>" />
           <div class="name" <%- `style="font-size: ${calculateFontSize(item.name_loc)}px"` %>>
             <%= item.name_loc %>
