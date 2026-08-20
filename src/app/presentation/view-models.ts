@@ -12,6 +12,7 @@ export interface DailyReportViewModel {
       subtext: string; // "▲ 5.2%"
       isPositive: boolean; // trend is positive
       isWinRateAbove50: boolean; // win rate >= 50%
+      hasComparison?: boolean; // whether yesterday has comparison matches
     };
     kills: { value: string; subtext: string }; // "1,894", "Avg 45.1"
     duration: { value: string; subtext: string }; // "38:12", "Avg Time"

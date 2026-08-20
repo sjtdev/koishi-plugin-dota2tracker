@@ -135,9 +135,12 @@ export class DailyReportService extends Service {
           matches: { value: squadStats.totalMatches, subtext: t("dota2tracker.template.report.daily.stats.matches_subtext", [squadStats.totalWins, squadStats.totalMatches - squadStats.totalWins]) },
           winRate: {
             value: `${squadStats.winRate.toFixed(1)}%`,
-            subtext: `${t("dota2tracker.template.report.daily.stats.vs_yesterday")} ${squadStats.winRateDiff >= 0 ? "▲" : "▼"} ${Math.abs(squadStats.winRateDiff).toFixed(1)}%`,
+            subtext: squadStats.hasPreviousMatches
+              ? `${t("dota2tracker.template.report.daily.stats.vs_yesterday")} ${squadStats.winRateDiff >= 0 ? "▲" : "▼"} ${Math.abs(squadStats.winRateDiff).toFixed(1)}%`
+              : "---",
             isPositive: squadStats.winRateDiff >= 0,
             isWinRateAbove50: squadStats.winRate >= 50,
+            hasComparison: squadStats.hasPreviousMatches,
           },
           kills: { value: squadStats.totalKills.toLocaleString(), subtext: t("dota2tracker.template.report.daily.stats.kills_avg", [squadStats.avgKills.toFixed(1)]) },
           duration: { value: this.formatDuration(squadStats.totalDuration), subtext: `${t("dota2tracker.template.report.daily.stats.avg_time")} ${this.formatDuration(squadStats.avgDuration)}` },
@@ -211,10 +214,12 @@ export class DailyReportService extends Service {
 
     const currentStats = calcStats(currentMatches);
     const previousStats = calcStats(previousMatches);
+    const hasPreviousMatches = previousStats.totalMatches > 0;
 
     return {
       ...currentStats,
-      winRateDiff: currentStats.winRate - previousStats.winRate,
+      hasPreviousMatches,
+      winRateDiff: hasPreviousMatches ? currentStats.winRate - previousStats.winRate : 0,
     };
   }
 

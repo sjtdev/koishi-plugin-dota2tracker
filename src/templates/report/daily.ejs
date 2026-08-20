@@ -69,7 +69,7 @@
               <%= $t("dota2tracker.template.report.daily.stats.win_rate") %>
             </span>
             <span class="text-3xl font-black <%= data.headerStats.winRate.isWinRateAbove50 ? 'text-dota-green' : 'text-dota-red' %>"><%= data.headerStats.winRate.value %></span>
-            <span class="text-xs mt-1 <%= data.headerStats.winRate.isPositive ? 'text-dota-green' : 'text-dota-red' %>"><%= data.headerStats.winRate.subtext %></span>
+            <span class="text-xs mt-1 <%= data.headerStats.winRate.hasComparison ? (data.headerStats.winRate.isPositive ? 'text-dota-green' : 'text-dota-red') : 'text-slate-500' %>"><%= data.headerStats.winRate.subtext %></span>
           </div>
 
           <div class="flex flex-col items-center justify-center p-4 rounded bg-card-dark border border-white/5 shadow-lg relative overflow-hidden group">
