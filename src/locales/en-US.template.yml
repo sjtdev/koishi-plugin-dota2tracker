@@ -139,12 +139,13 @@ dota2tracker:
           score_label: "MVP Score"
         squad:
           title: "Performance"
-          subtitle: "Ranked by KDA (desc)"
+          subtitle: "Ranked by Score"
           header:
             rank: "Rank"
             player_info: "Player Info"
             hero_pool: "Hero Pool (Sorted by Wins)"
             kda: "KDA Ratio"
+            score: "Score"
             impact: "Impact"
           impact:
             dmg: "Dmg"

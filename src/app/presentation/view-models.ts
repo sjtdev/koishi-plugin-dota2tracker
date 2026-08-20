@@ -70,6 +70,8 @@ export interface PlayerRowModel {
     detail: string; // "22 / 2 / 18"
   };
 
+  mvpScore: string; // "75.5"
+
   impact: {
     damage: { heroPercent: number; buildingsPercent: number }; // 0-100
     networth: { percent: number }; // 0-100

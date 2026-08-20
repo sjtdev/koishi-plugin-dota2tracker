@@ -120,8 +120,8 @@ export class DailyReportService extends Service {
       const mvpPlayerData = squadPlayerData.find((p) => p.steamAccount.id === mvpStat.steamId)!;
       const lvpPlayerData = squadPlayerData.find((p) => p.steamAccount.id === lvpStat.steamId)!;
 
-      // Sort Rows by KDA Ratio
-      playerRows.sort((a, b) => parseFloat(b.kda.ratio) - parseFloat(a.kda.ratio));
+      // Sort Rows by MVP Score (descending), then by KDA Ratio
+      playerRows.sort((a, b) => parseFloat(b.mvpScore) - parseFloat(a.mvpScore) || parseFloat(b.kda.ratio) - parseFloat(a.kda.ratio));
       playerRows.forEach((row, i) => (row.rank = i + 1));
 
       const report: DailyReportViewModel = {
@@ -316,8 +316,9 @@ export class DailyReportService extends Service {
       plusHeroesCount: Math.max(0, sortedHeroes.length - 3),
       kda: {
         ratio: pKills + pAssists === 0 ? "0.0" : ((pKills + pAssists) / Math.max(1, pDeaths)).toFixed(1),
-        detail: matchCount > 0 ? `${(pKills / matchCount).toFixed(1)} / ${(pDeaths / matchCount).toFixed(1)} / ${(pAssists / matchCount).toFixed(1)}` : "0.0/0.0/0.0",
+        detail: matchCount > 0 ? `${(pKills / matchCount).toFixed(1)} / ${(pDeaths / matchCount).toFixed(1)} / ${(pAssists / matchCount).toFixed(1)}` : "0.0 / 0.0 / 0.0",
       },
+      mvpScore: matchCount > 0 ? (mvpScoreSum / matchCount).toFixed(1) : "0.0",
       impact: {
         damage: { heroPercent: 0, buildingsPercent: 0 },
         networth: { percent: 0 },

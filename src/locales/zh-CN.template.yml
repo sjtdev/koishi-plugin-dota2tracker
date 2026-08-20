@@ -139,12 +139,13 @@ dota2tracker:
           score_label: "综合评分"
         squad:
           title: "表现排行"
-          subtitle: "基于 KDA 倒序排列"
+          subtitle: "基于 评分 排序"
           header:
             rank: "排名"
             player_info: "玩家"
             hero_pool: "英雄池（基于胜场）"
             kda: "KDA"
+            score: "评分"
             impact: "贡献 / 经济"
           impact:
             dmg: "伤害"

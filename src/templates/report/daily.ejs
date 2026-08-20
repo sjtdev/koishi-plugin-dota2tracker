@@ -17,6 +17,20 @@
         background-image:
           radial-gradient(at 0% 0%, rgba(19, 127, 236, 0.08) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(255, 60, 60, 0.05) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(232, 188, 86, 0.05) 0px, transparent 50%);
       }
+      .truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .shrink-0 {
+        flex-shrink: 0;
+      }
+      .min-w-0 {
+        min-width: 0;
+      }
+      .whitespace-nowrap {
+        white-space: nowrap;
+      }
     </style>
   </head>
   <body class="bg-texture font-display text-white overflow-x-hidden antialiased min-h-screen w-[1024px] min-w-[1000px]">
@@ -147,9 +161,10 @@
 
           <div class="hidden md:grid grid-cols-12 gap-4 px-4 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-black/20">
             <div class="col-span-1 text-center"><%= $t("dota2tracker.template.report.daily.squad.header.rank") %></div>
-            <div class="col-span-4 pl-2"><%= $t("dota2tracker.template.report.daily.squad.header.player_info") %></div>
+            <div class="col-span-3 pl-2"><%= $t("dota2tracker.template.report.daily.squad.header.player_info") %></div>
             <div class="col-span-3"><%= $t("dota2tracker.template.report.daily.squad.header.hero_pool") %></div>
             <div class="col-span-2 text-center"><%= $t("dota2tracker.template.report.daily.squad.header.kda") %></div>
+            <div class="col-span-1 text-center"><%= $t("dota2tracker.template.report.daily.squad.header.score") %></div>
             <div class="col-span-2 text-left pl-2"><%= $t("dota2tracker.template.report.daily.squad.header.impact") %></div>
           </div>
 
@@ -159,11 +174,11 @@
               <div class="col-span-1 flex items-center justify-center">
                 <span class="font-serif italic text-2xl <%= row.rank === 1 ? 'text-dota-gold' : (row.rank === data.squad.length ? 'text-dota-red' : 'text-slate-400') %> font-bold"><%= row.rank %></span>
               </div>
-              <div class="col-span-4 w-full flex items-center gap-3 pl-2">
-                <div class="w-12 h-12 rounded bg-cover bg-center border border-slate-600 shadow-md" style="background-image: url('<%= row.player.avatarUrl || '' %>')"></div>
-                <div class="flex flex-col">
-                  <span class="font-bold text-white text-base leading-tight"><%= row.player.name %></span>
-                  <div class="flex items-center gap-1 text-xs font-medium mt-0.5">
+              <div class="col-span-3 w-full flex items-center gap-3 pl-2 min-w-0">
+                <div class="w-11 h-11 shrink-0 rounded bg-cover bg-center border border-slate-600 shadow-md" style="background-image: url('<%= row.player.avatarUrl || '' %>')"></div>
+                <div class="flex flex-col min-w-0">
+                  <span class="font-bold text-white text-base leading-tight truncate"><%= row.player.name %></span>
+                  <div class="flex items-center gap-1 text-xs font-medium mt-0.5 whitespace-nowrap">
                     <span class="text-dota-green"><%= row.player.winCount %> <%= $t("dota2tracker.template.won") %></span>
                     <span class="text-slate-500">-</span>
                     <span class="text-dota-red"><%= row.player.loseCount %> <%= $t("dota2tracker.template.lost") %></span>
@@ -172,7 +187,7 @@
               </div>
               <div class="col-span-3 w-full flex items-center gap-2">
                 <% row.heroes.forEach(function(hero) { %>
-                  <div class="relative w-[48px] h-[27px] rounded border border-slate-700 shadow-sm overflow-hidden group">
+                  <div class="relative w-[48px] h-[27px] rounded border border-slate-700 shadow-sm overflow-hidden group shrink-0">
                     <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<%= hero.url %>')"></div>
                     <!-- Win/Loss Overlay -->
                     <div class="absolute inset-x-0 bottom-0 flex justify-between px-1 pb-0.5 pointer-events-none">
@@ -182,12 +197,15 @@
                   </div>
                 <% }); %>
                 <% if (row.plusHeroesCount > 0) { %>
-                  <span class="text-[10px] font-bold bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">+<%= row.plusHeroesCount %></span>
+                  <span class="text-[10px] font-bold bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">+<%= row.plusHeroesCount %></span>
                 <% } %>
               </div>
               <div class="col-span-2 w-full flex flex-col items-center justify-center">
                 <span class="text-xl font-bold text-white leading-none"><%= row.kda.ratio %></span>
-                <div class="text-xs text-slate-500 font-mono mt-1"><%= row.kda.detail %></div>
+                <div class="text-[10px] text-slate-400 font-mono tracking-tight mt-1 whitespace-nowrap"><%= row.kda.detail %></div>
+              </div>
+              <div class="col-span-1 w-full flex flex-col items-center justify-center">
+                <span class="text-xl font-bold font-mono text-dota-gold leading-none"><%= row.mvpScore %></span>
               </div>
               <div class="col-span-2 w-full flex flex-col justify-center gap-1.5 pl-2">
                 <div class="flex items-center gap-2 w-full">
