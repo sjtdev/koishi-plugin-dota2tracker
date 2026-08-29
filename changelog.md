@@ -5,6 +5,12 @@
 ### ✨ 新增功能
 
 * **daily:** 卡片展示右侧的“战犯”卡片修改为副卡片 ([17d642a](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/17d642a21faef45ee5f72bd1c9ee44590ff853e4))
+* 现在修改或添加了数种新趣味卡片类型并按如下顺序判定：
+**修改** 头号战犯（LVP）：战犯卡片判定条件修改为**只在败局**过滤出表现分`低于当场10名玩家平均分25%`的玩家，取占比最低的场次  
+**新增** 无私奉献（UTILITY）：辅助分大于1200者取最高（辅助分算法详见 [文档](https://sjtdev.github.io/koishi-plugin-dota2tracker/template.html#%E7%A7%B0%E5%8F%B7%E7%B3%BB%E7%BB%9F-match-1-match-2) 此处不再赘述  
+**新增** 救死扶伤（HEALER）：治疗量大于10000者取最高  
+**新增** 拆迁队长（DEMOLISHER）：建筑伤害大于10000者取最高  
+**新增** 平平无奇（BORING）：以上条件均未有人满足的兜底方案，无任何数据展示。  
 * **daily:** 玩家列表添加`评分`（场均mvp分）列，并且排序由基于kda改为基于mvp分 ([b0de36c](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/b0de36cca816b3ff0422ab13c1da7733676424ab))
 
 ### 🚀 功能优化
