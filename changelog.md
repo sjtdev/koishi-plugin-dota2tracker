@@ -1,5 +1,16 @@
 # 更新日志
 
+## [2.7.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.6.1...v2.7.0) (2026-08-29)
+
+### ✨ 新增功能
+
+* **daily:** 卡片展示右侧的“战犯”卡片修改为副卡片 ([17d642a](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/17d642a21faef45ee5f72bd1c9ee44590ff853e4))
+* **daily:** 玩家列表添加`评分`（场均mvp分）列，并且排序由基于kda改为基于mvp分 ([b0de36c](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/b0de36cca816b3ff0422ab13c1da7733676424ab))
+
+### 🚀 功能优化
+
+* **daily:** 如果前天无比赛记录，日报中的“较昨日”差值不再当作0统计而是显示为`---` ([549cc48](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/549cc488ec6c5708c5e0881961cd694d265063ba))
+
 ### [2.6.1](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.6.0...v2.6.1) (2026-05-18)
 
 ### ✨ 新增功能
