@@ -136,7 +136,15 @@ dota2tracker:
         spotlight:
           mvp_title: "全 场 最 佳"
           lvp_title: "头 号 战 犯"
+          utility_title: "无 私 奉 献"
+          healer_title: "救 死 扶 伤"
+          demolisher_title: "拆 迁 队 长"
+          default_title: "平 平 无 奇"
           score_label: "综合评分"
+          utility_score_label: "辅助贡献"
+          healer_score_label: "治疗量"
+          demolisher_score_label: "建筑伤害"
+          default_label: "当日无趣味数据"
         squad:
           title: "表现排行"
           subtitle: "基于 评分 排序"

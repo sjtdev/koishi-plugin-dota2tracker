@@ -1,0 +1,98 @@
+<%
+  // 主题色映射与样式计算
+  const theme = card.themeColor || (
+    card.type === 'MVP' ? 'gold' :
+    card.type === 'LVP' ? 'red' :
+    card.type === 'UTILITY' ? 'cyan' :
+    card.type === 'HEALER' ? 'green' :
+    card.type === 'DEMOLISHER' ? 'orange' :
+    card.type === 'DEFAULT' ? 'gray' : 'gold'
+  );
+
+  let borderStyle = 'border-dota-gold shadow-[0_0_30px_rgba(232,188,86,0.15)]';
+  let badgeStyle = 'bg-dota-gold text-black shadow-dota-gold/20';
+  let accentTextColor = 'text-dota-gold';
+
+  if (theme === 'red' || card.type === 'LVP') {
+    borderStyle = 'border-dota-red shadow-[0_0_30px_rgba(255,60,60,0.15)]';
+    badgeStyle = 'bg-dota-red text-white shadow-dota-red/20';
+    accentTextColor = 'text-dota-red';
+  } else if (theme === 'cyan' || card.type === 'UTILITY') {
+    borderStyle = 'border-[#00e5ff] shadow-[0_0_30px_rgba(0,229,255,0.18)]';
+    badgeStyle = 'bg-[#00e5ff] text-black shadow-[0_0_15px_rgba(0,229,255,0.3)]';
+    accentTextColor = 'text-[#00e5ff]';
+  } else if (theme === 'green' || card.type === 'HEALER') {
+    borderStyle = 'border-[#0bda5b] shadow-[0_0_30px_rgba(11,218,91,0.18)]';
+    badgeStyle = 'bg-[#0bda5b] text-black shadow-[0_0_15px_rgba(11,218,91,0.3)]';
+    accentTextColor = 'text-[#0bda5b]';
+  } else if (theme === 'orange' || card.type === 'DEMOLISHER') {
+    borderStyle = 'border-[#f97316] shadow-[0_0_30px_rgba(249,115,22,0.18)]';
+    badgeStyle = 'bg-[#f97316] text-black shadow-[0_0_15px_rgba(249,115,22,0.3)]';
+    accentTextColor = 'text-[#f97316]';
+  } else if (theme === 'gray' || card.type === 'DEFAULT') {
+    borderStyle = 'border-white/10 shadow-none';
+    badgeStyle = 'bg-white/10 text-slate-300';
+    accentTextColor = 'text-slate-400';
+  }
+%>
+
+<div class="flex-1 relative rounded-lg border <%= borderStyle %> bg-card-dark overflow-hidden group">
+  <% if (card.player && card.player.heroBannerUrl) { %>
+    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style="background-image: url('<%= card.player.heroBannerUrl %>'); opacity: 0.4"></div>
+  <% } %>
+  <div class="absolute inset-0 bg-gradient-to-t from-card-dark via-card-dark/80 to-transparent"></div>
+  <div class="relative z-10 p-6 flex flex-col h-full min-h-[280px]">
+    <div class="flex justify-between items-center">
+      <div class="<%= badgeStyle %> text-xs font-black uppercase px-3 py-1 rounded shadow-lg">
+        <%= card.title %>
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 fill-current <%= accentTextColor %>" viewBox="0 0 24 24">
+        <% if (card.type === 'MVP' || theme === 'gold') { %>
+          <!-- 金色奖杯 -->
+          <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+        <% } else if (card.type === 'LVP' || theme === 'red') { %>
+          <!-- 红色战犯/警示 -->
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        <% } else if (card.type === 'UTILITY' || theme === 'cyan') { %>
+          <!-- 青色辅助守护盾 -->
+          <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm1 12h-2v-2H9v-2h2V8h2v2h2v2h-2v2z"/>
+        <% } else if (card.type === 'HEALER' || theme === 'green') { %>
+          <!-- 绿色救死扶伤/医疗爱心 -->
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z M13 7h-2v3H8v2h3v3h2v-3h3v-2h-3V7z"/>
+        <% } else if (card.type === 'DEMOLISHER' || theme === 'orange') { %>
+          <!-- 橙色拆迁队长/攻城锤 -->
+          <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
+        <% } else { %>
+          <!-- 灰色平静/波澜不惊 -->
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z"/>
+        <% } %>
+      </svg>
+    </div>
+    <div class="mt-auto">
+      <h3 class="text-3xl font-serif font-bold text-white leading-none mb-1 drop-shadow-md"><%= card.player.name %></h3>
+      <p class="text-slate-300 text-sm font-medium leading-none mb-1"><%= card.player.heroName %></p>
+      <p class="text-slate-400 text-sm font-mono mb-3"><%= card.player.kda %></p>
+      <div class="bg-black/40 backdrop-blur-sm rounded-lg p-3 border border-white/10">
+        <div class="flex flex-col gap-2">
+          <div class="flex justify-between items-center border-b border-white/10 pb-2">
+            <span class="text-xs text-slate-400 uppercase tracking-widest font-bold">
+              <%= card.score.label %>
+            </span>
+            <span class="font-mono text-2xl font-bold <%= accentTextColor %>"><%= card.score.value %></span>
+          </div>
+            <div class="flex flex-wrap gap-2 pt-1 min-h-[22px]">
+              <% card.badges.forEach(function(badge) { %>
+                <% 
+                  const r = parseInt(badge.hexColor.slice(1, 3), 16);
+                  const g = parseInt(badge.hexColor.slice(3, 5), 16);
+                  const b = parseInt(badge.hexColor.slice(5, 7), 16);
+                  const bgStyle = `background-color: rgba(${r}, ${g}, ${b}, 0.2); border-color: rgba(${r}, ${g}, ${b}, 0.3); color: ${badge.hexColor};`;
+                %>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border" style="<%= bgStyle %>"><%= badge.text %></span>
+              <% }); %>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -20,6 +20,7 @@ query PlayersMatchesForDaily($steamAccountIds: [Long]!, $seconds: Long!) {
         isRadiant
         heroDamage
         towerDamage
+        heroHealing
         networth
         steamAccount {
           id

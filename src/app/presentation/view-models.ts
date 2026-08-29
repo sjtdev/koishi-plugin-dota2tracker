@@ -20,25 +20,27 @@ export interface DailyReportViewModel {
 
   spotlights: {
     mvp: SpotlightCardModel;
-    lvp: SpotlightCardModel;
+    secondary: SpotlightCardModel; // LVP 或 UTILITY 等动态次级卡片
+    lvp?: SpotlightCardModel | null; // 向下兼容
   };
 
   squad: PlayerRowModel[];
 }
 
 export interface SpotlightCardModel {
-  // 用于决定边框颜色 (Gold vs Red)
-  type: "MVP" | "LVP";
+  type: "MVP" | "LVP" | "UTILITY" | "HEALER" | "DEMOLISHER" | "DEFAULT" | string;
+  title: string; // "全 场 最 佳" / "头 号 战 犯" / "无 私 奉 献" / "救 死 扶 伤" / "拆 迁 队 长" / "平 平 无 奇"
+  themeColor: "gold" | "red" | "cyan" | "green" | "orange" | "gray" | string;
   player: {
     name: string;
-    heroName: string; // "Playing Juggernaut"
-    kda: string; // "12 / 3 / 15 (9.0)"
-    heroBannerUrl: string; // 大背景图
-    avatarUrl: string; // 左下角如果需要显示头像的话(目前设计没显示，但备用)
+    heroName: string;
+    kda: string;
+    heroBannerUrl: string;
+    avatarUrl: string;
   };
   score: {
-    value: string; // "85.4"
-    label: string; // "MVP Score"
+    value: string;
+    label: string; // "综合评分" / "辅助贡献" / "治疗量" / "建筑伤害" / "当日无趣味数据"
   };
   // 称号列表
   badges: TitleBadge[];

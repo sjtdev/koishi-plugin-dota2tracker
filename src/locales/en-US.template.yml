@@ -136,7 +136,15 @@ dota2tracker:
         spotlight:
           mvp_title: "The King"
           lvp_title: "The Suspect"
+          utility_title: "Selfless Devotion"
+          healer_title: "The Lifesaver"
+          demolisher_title: "Demolition Master"
+          default_title: "Ordinary Day"
           score_label: "MVP Score"
+          utility_score_label: "Support Contribution"
+          healer_score_label: "Healing"
+          demolisher_score_label: "Tower Damage"
+          default_label: "No special highlights today"
         squad:
           title: "Performance"
           subtitle: "Ranked by Score"
