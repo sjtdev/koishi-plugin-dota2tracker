@@ -111,18 +111,19 @@ export class DailyReportService extends Service {
 
       this.calculateImpactPercentages(impactData);
 
-      // MVP / LVP / Secondary Logic
-      // MVP: 最高单场 MVP 分（bestMatchId 对应场次），KDA 做 tie-breaker
+
+      // Spotlight Cards: 遍历各项判定规则，只要通过判定则添加到 cards 数组中
+      const cards: SpotlightCardModel[] = [];
+
+      // 1. MVP: 最高单场 MVP 分（bestMatchId 对应场次），KDA 做 tie-breaker
       playerStats.sort((a, b) => b.maxMvpScore - a.maxMvpScore || b.avgKda - a.avgKda);
       const mvpStat = playerStats[0];
       const mvpPlayerData = squadPlayerData.find((p) => p.steamAccount.id === mvpStat.steamId)!;
       const mvpCard = this.buildSpotlightCard(mvpPlayerData, "MVP", mvpStat.bestMatchId, extensions, dotaconstants, t, getHeroName, getImageUrl);
+      cards.push(mvpCard);
 
-      // Secondary Spotlight: 多顺位优先级判定链
-      let secondaryCard: SpotlightCardModel;
+      // 2. LVP (头号战犯：败局且单场 mvpScore < 10人均分 * 25%，取对当场均分占比最低者)
       let lvpSpotlight: SpotlightCardModel | null = null;
-
-      // 顺位 1：LVP (头号战犯：败局且单场 mvpScore < 10人均分 * 25%，取对当场均分占比最低者)
       const lvpCandidates = playerStats.filter((s) => s.worstMatchId > 0);
       if (lvpCandidates.length > 0) {
         const lvpStat = lvpCandidates.reduce((worst, curr) => {
@@ -132,37 +133,34 @@ export class DailyReportService extends Service {
 
         const lvpPlayerData = squadPlayerData.find((p) => p.steamAccount.id === lvpStat.steamId)!;
         lvpSpotlight = this.buildSpotlightCard(lvpPlayerData, "LVP", lvpStat.worstMatchId, extensions, dotaconstants, t, getHeroName, getImageUrl);
-        secondaryCard = lvpSpotlight;
-      } else {
-        // 顺位 2：UTILITY (无私奉献：单场 utilityScore > 1200)
-        const utilityCandidates = playerStats.filter((s) => s.bestUtilityMatchId > 0);
-        if (utilityCandidates.length > 0) {
-          utilityCandidates.sort((a, b) => b.maxUtilityScore - a.maxUtilityScore || b.avgKda - a.avgKda);
-          const utilityStat = utilityCandidates[0];
-          const utilityPlayerData = squadPlayerData.find((p) => p.steamAccount.id === utilityStat.steamId)!;
-          secondaryCard = this.buildSpotlightCard(utilityPlayerData, "UTILITY", utilityStat.bestUtilityMatchId, extensions, dotaconstants, t, getHeroName, getImageUrl);
-        } else {
-          // 顺位 3：HEALER (救死扶伤：单场 heroHealing > 10000)
-          const healerCandidates = playerStats.filter((s) => s.bestHealingMatchId > 0);
-          if (healerCandidates.length > 0) {
-            healerCandidates.sort((a, b) => b.maxHealing - a.maxHealing || b.avgKda - a.avgKda);
-            const healerStat = healerCandidates[0];
-            const healerPlayerData = squadPlayerData.find((p) => p.steamAccount.id === healerStat.steamId)!;
-            secondaryCard = this.buildSpotlightCard(healerPlayerData, "HEALER", healerStat.bestHealingMatchId, extensions, dotaconstants, t, getHeroName, getImageUrl);
-          } else {
-            // 顺位 4：DEMOLISHER (拆迁队长：单场 towerDamage > 10000)
-            const demolisherCandidates = playerStats.filter((s) => s.bestTowerDamageMatchId > 0);
-            if (demolisherCandidates.length > 0) {
-              demolisherCandidates.sort((a, b) => b.maxTowerDamage - a.maxTowerDamage || b.avgKda - a.avgKda);
-              const demolisherStat = demolisherCandidates[0];
-              const demolisherPlayerData = squadPlayerData.find((p) => p.steamAccount.id === demolisherStat.steamId)!;
-              secondaryCard = this.buildSpotlightCard(demolisherPlayerData, "DEMOLISHER", demolisherStat.bestTowerDamageMatchId, extensions, dotaconstants, t, getHeroName, getImageUrl);
-            } else {
-              // 顺位 5：DEFAULT (平平无奇，兜底无趣味数据)
-              secondaryCard = this.buildDefaultSpotlightCard(t);
-            }
-          }
-        }
+        cards.push(lvpSpotlight);
+      }
+
+      // 3. UTILITY (无私奉献：单场 utilityScore > 1200)
+      const utilityCandidates = playerStats.filter((s) => s.bestUtilityMatchId > 0);
+      if (utilityCandidates.length > 0) {
+        utilityCandidates.sort((a, b) => b.maxUtilityScore - a.maxUtilityScore || b.avgKda - a.avgKda);
+        const utilityStat = utilityCandidates[0];
+        const utilityPlayerData = squadPlayerData.find((p) => p.steamAccount.id === utilityStat.steamId)!;
+        cards.push(this.buildSpotlightCard(utilityPlayerData, "UTILITY", utilityStat.bestUtilityMatchId, extensions, dotaconstants, t, getHeroName, getImageUrl));
+      }
+
+      // 4. HEALER (救死扶伤：单场 heroHealing > 10000)
+      const healerCandidates = playerStats.filter((s) => s.bestHealingMatchId > 0);
+      if (healerCandidates.length > 0) {
+        healerCandidates.sort((a, b) => b.maxHealing - a.maxHealing || b.avgKda - a.avgKda);
+        const healerStat = healerCandidates[0];
+        const healerPlayerData = squadPlayerData.find((p) => p.steamAccount.id === healerStat.steamId)!;
+        cards.push(this.buildSpotlightCard(healerPlayerData, "HEALER", healerStat.bestHealingMatchId, extensions, dotaconstants, t, getHeroName, getImageUrl));
+      }
+
+      // 5. DEMOLISHER (拆迁队长：单场 towerDamage > 10000)
+      const demolisherCandidates = playerStats.filter((s) => s.bestTowerDamageMatchId > 0);
+      if (demolisherCandidates.length > 0) {
+        demolisherCandidates.sort((a, b) => b.maxTowerDamage - a.maxTowerDamage || b.avgKda - a.avgKda);
+        const demolisherStat = demolisherCandidates[0];
+        const demolisherPlayerData = squadPlayerData.find((p) => p.steamAccount.id === demolisherStat.steamId)!;
+        cards.push(this.buildSpotlightCard(demolisherPlayerData, "DEMOLISHER", demolisherStat.bestTowerDamageMatchId, extensions, dotaconstants, t, getHeroName, getImageUrl));
       }
 
       // Sort Rows by MVP Score (descending), then by KDA Ratio
@@ -191,8 +189,9 @@ export class DailyReportService extends Service {
           duration: { value: this.formatDuration(squadStats.totalDuration), subtext: `${t("dota2tracker.template.report.daily.stats.avg_time")} ${this.formatDuration(squadStats.avgDuration)}` },
         },
         spotlights: {
+          cards,
           mvp: mvpCard,
-          secondary: secondaryCard,
+          secondary: cards.length > 1 ? cards[1] : null,
           lvp: lvpSpotlight,
         },
         squad: playerRows,
@@ -520,7 +519,7 @@ export class DailyReportService extends Service {
       player: {
         name: playerData.steamAccount.name || "Unknown",
         heroName: getHeroName(self.heroId),
-        kda: `${self.kills || 0} / ${self.deaths || 0} / ${self.assists || 0} (${matchKda.toFixed(1)})`,
+        kda: `${self.kills || 0}/${self.deaths || 0}/${self.assists || 0} (${matchKda.toFixed(1)})`,
         heroBannerUrl: dotaconstants.heroes[self.heroId] ? getImageUrl(dotaconstants.heroes[self.heroId].name.replace("npc_dota_hero_", ""), ImageType.Heroes, ImageFormat.png) : "",
         avatarUrl: playerData.steamAccount.avatar || "",
       },

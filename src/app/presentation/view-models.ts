@@ -19,8 +19,9 @@ export interface DailyReportViewModel {
   };
 
   spotlights: {
-    mvp: SpotlightCardModel;
-    secondary: SpotlightCardModel; // LVP 或 UTILITY 等动态次级卡片
+    cards: SpotlightCardModel[];
+    mvp?: SpotlightCardModel;
+    secondary?: SpotlightCardModel | null; // 向下兼容
     lvp?: SpotlightCardModel | null; // 向下兼容
   };
 

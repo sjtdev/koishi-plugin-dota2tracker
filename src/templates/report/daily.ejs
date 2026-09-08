@@ -93,14 +93,11 @@
           </div>
         </div>
 
-        <div class="flex flex-col md:flex-row gap-6 mt-2">
-          <% if (data.spotlights.mvp) { %>
-            <%- include(`./daily/spotlight_card.ejs`, { card: data.spotlights.mvp }) %>
-          <% } %>
-          <% const secondaryCard = data.spotlights.secondary || data.spotlights.lvp; %>
-          <% if (secondaryCard) { %>
-            <%- include(`./daily/spotlight_card.ejs`, { card: secondaryCard }) %>
-          <% } %>
+        <div class="flex flex-col gap-3 mt-2">
+          <% const cards = data.spotlights.cards || [data.spotlights.mvp, data.spotlights.secondary || data.spotlights.lvp].filter(Boolean); %>
+          <% cards.forEach(function(card) { %>
+            <%- include(`./daily/spotlight_card.ejs`, { card: card }) %>
+          <% }); %>
         </div>
 
         <div class="bg-[#0d141c] rounded-xl border border-white/5 overflow-hidden">
