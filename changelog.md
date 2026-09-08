@@ -1,5 +1,15 @@
 # 更新日志
 
+### [2.7.1-beta.1](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.7.0...v2.7.1-beta.1) (2026-09-08)
+
+### ✨ 新增功能
+
+* **daily:** 重做高光卡片样式，现在将展示所有满足条件的卡片（计划添加更多） ([ce9c8a6](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/ce9c8a6d327309b35a7db8aa7ae7c80fb25b8124))
+
+### 📝 文档
+
+* **images:** 重建与修复展示图 ([c6fad5b](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/c6fad5b6a37bf562ad811421b73376cd1ae9f2ee))
+
 ## [2.7.0](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.6.1...v2.7.0) (2026-08-29)
 
 ### ✨ 新增功能
