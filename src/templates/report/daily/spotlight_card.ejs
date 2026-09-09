@@ -68,7 +68,7 @@
     <div class="<%= badgeStyle %> w-25 px-4 self-stretch flex justify-center items-center text-sm font-black uppercase shadow-lg"> <%= card.title %> </div>
     <img class="w-auto h-9 object-cover rounded-2 ml-3" src="<%= card.player.heroBannerUrl %>">
     <h3 class="pl-4 font-serif font-bold text-white drop-shadow-md text-base leading-tight truncate"><%= card.player.name %></h3>
-    <p class="px-4 text-slate-400 text-sm font-mono whitespace-nowrap"><%= card.player.kda %></p>
+    <p class="flex w-38 justify-center text-slate-400 text-sm font-mono whitespace-nowrap"><%= card.player.kda %></p>
 
     <!-- Badges 容器：改用 py-2.5 增加上下内边距，多行垂直间距 gap-y-1.5 -->
     <div class="flex flex-wrap items-center gap-x-2 gap-y-1.5 py-2.5 pr-4">
