@@ -1,5 +1,11 @@
 # 更新日志
 
+### [2.7.1-beta.2](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.7.1-beta.1...v2.7.1-beta.2) (2026-09-09)
+
+### 🎨 样式
+
+* **daily:** 调整固定新卡片kda列宽度，防止影响其他列宽 ([c1eda49](https://github.com/sjtdev/koishi-plugin-dota2tracker/commit/c1eda49d2419ed411847521873978335aa444515))
+
 ### [2.7.1-beta.1](https://github.com/sjtdev/koishi-plugin-dota2tracker/compare/v2.7.0...v2.7.1-beta.1) (2026-09-08)
 
 ### ✨ 新增功能
